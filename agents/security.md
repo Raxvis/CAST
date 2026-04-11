@@ -89,6 +89,25 @@ The Security Agent may NOT:
 
 ---
 
+## Templates
+
+Security findings do not use a `docs/*.md` template — the finding format is defined below in the Severity Levels section and the Current Work table format. When producing a security review, write the findings directly to the instance destination and follow this file's existing finding format.
+
+| Artifact type | Format reference | Instance destination |
+|---|---|---|
+| Security review (produced during `/agent-plan` Stage 3a) | This file: Severity Levels + finding format below | `artifacts/reviews/security-review-milestone-{N}.md` |
+
+Every security review file written under `artifacts/reviews/` must:
+
+- Include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
+- Cite the specific vulnerability category (OWASP item or equivalent) for each finding.
+- Assign a severity (Critical / High / Medium / Low / Info) and a remediation recommendation.
+- Name the affected module or file path explicitly.
+
+Critical and High findings block the milestone until remediated or rolled into a CEO Approval Condition. Medium and Low findings can be accepted by Product and deferred with a documented rationale.
+
+---
+
 ## Interaction Rules
 
 - Security runs after every Architecture change or plan — this is automatic.

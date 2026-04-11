@@ -87,6 +87,22 @@ The UI Agent may NOT:
 
 ---
 
+## Templates
+
+When producing UI specifications, read the template from `docs/` **first** and follow its structure exactly. The template ensures every spec covers interaction states (default, focused, disabled, loading, error, empty), accessibility requirements, and platform-specific concerns consistently.
+
+| Artifact type | Template to read | Instance destination |
+|---|---|---|
+| Milestone UI specification (produced during `/agent-plan`) | `docs/UI_SPEC.md` | `artifacts/ui-specs/ui-milestone-{N}.md` |
+| Per-screen spec | `docs/UI_SPEC.md` | `artifacts/ui-specs/[SCREEN]_SCREEN.md` |
+| Per-component spec | `docs/UI_SPEC.md` | `artifacts/ui-specs/[COMPONENT]_COMPONENT.md` |
+
+For CLI projects, `docs/UI_SPEC.md` is still the right template — adapt the "visual layout" sections to describe terminal output formats (column alignment, exit codes, color usage, error messages). See `docs/CLI.md` for CLI-specific UX patterns and the `example/artifacts/ui-specs/ui-milestone-1.md` fixture for a worked CLI UX spec.
+
+Every UI artifact written under `artifacts/ui-specs/` must include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
+
+---
+
 ## Interaction Rules
 
 - UI publishes a screen specification before Coder begins any non-trivial screen.

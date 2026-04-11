@@ -87,6 +87,23 @@ The Product Agent may NOT:
 
 ---
 
+## Templates
+
+When producing milestone artifacts, read the corresponding template from `docs/` **first** and follow its structure exactly. The milestone definition file and the task breakdown file are deliberately separate — one captures what and why (the CEO's primary read during planning review), the other captures how (the Coder's primary read during engineering).
+
+| Artifact type | Template to read | Instance destination |
+|---|---|---|
+| Milestone definition (goal, scope, success metrics, top-level acceptance criteria) | `docs/MILESTONE_DEFINITION.md` | `artifacts/milestones/milestone-{N}-{slug}.md` |
+| Task breakdown (per-task IDs, dependencies, files touched, acceptance criteria) | `docs/MILESTONE_TASKS.md` | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
+| Milestone completion report (after `/agent-code` finishes) | `docs/MILESTONE_COMPLETION.md` | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
+| Milestone validation record (acceptance evidence) | `docs/MILESTONE_VALIDATION.md` | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
+
+The Task Validation Checklist template below this section is Product's internal review form — it stays inline because it is short and specific to Product's validation loop, not a typed artifact consumed by other agents.
+
+Every milestone file written under `artifacts/milestones/` must include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
+
+---
+
 ## Interaction Rules
 
 - Product reviews Coder's completed work using the Task Validation Checklist below.

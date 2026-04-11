@@ -83,6 +83,21 @@ The Architecture Agent may NOT:
 
 ---
 
+## Templates
+
+When producing architecture artifacts, read the corresponding template from `docs/` **first** and follow its structure exactly. Do not improvise document shape — the templates exist so downstream agents (Coder, Reviewer, CEO) can rely on predictable sections when consuming the output.
+
+| Artifact type | Template to read | Instance destination |
+|---|---|---|
+| Module architecture | `docs/ARCH_MODULE.md` | `artifacts/architecture/[MODULE]_MODULE.md` |
+| System architecture | `docs/ARCH_SYSTEM.md` | `artifacts/architecture/[SYSTEM]_SYSTEM.md` |
+| Data schema | `docs/ARCH_DATA_SCHEMA.md` | `artifacts/architecture/[SCHEMA]_SCHEMA.md` |
+| Milestone architecture (produced during `/agent-plan`) | `docs/ARCH_SYSTEM.md` (primary) plus `docs/ARCH_MODULE.md` per module | `artifacts/architecture/arch-milestone-{N}.md` |
+
+Every artifact written under `artifacts/architecture/` must include the `## Revision History` block from the top of `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
+
+---
+
 ## Interaction Rules
 
 - For non-trivial work (new modules, new data schemas, cross-module changes, or changes to shared interfaces), Architecture publishes a document via `/agent-plan` before Coder begins. This is enforced by the `/agent-code` pre-flight check: Coder does not implement an undocumented non-trivial module.

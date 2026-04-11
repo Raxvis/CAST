@@ -84,6 +84,26 @@ The Performance Agent may NOT:
 
 ---
 
+## Templates
+
+Performance findings do not use a `docs/*.md` template — the finding format is defined below in the Performance Budget Tracking section. When producing a performance review, write the findings directly to the instance destination and follow this file's existing finding format.
+
+| Artifact type | Format reference | Instance destination |
+|---|---|---|
+| Performance review (produced during `/agent-plan` Stage 3b) | This file: Performance Budget Tracking section below | `artifacts/reviews/performance-review-milestone-{N}.md` |
+
+Every performance review file written under `artifacts/reviews/` must:
+
+- Include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
+- Cite the specific performance budget or metric affected (startup time, tick duration, render time, memory, storage).
+- Name the hot path or module responsible.
+- Include a measurement plan describing how the finding can be verified after remediation.
+- Propose a concrete remediation (not "optimize this") — specific code-level changes the Coder can implement.
+
+Budget-violating findings block the milestone until remediated or rolled into a CEO Approval Condition. Sub-budget findings can be accepted by Product and deferred.
+
+---
+
 ## Interaction Rules
 
 - Performance runs after every Architecture change or plan — this is automatic.

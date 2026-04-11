@@ -85,6 +85,27 @@ The CEO Agent may NOT:
 
 ---
 
+## Templates
+
+The CEO review uses an inline template rather than a file under `docs/`. The CEO Review Checklist Template lives further down in this file — find it by searching for `## CEO Review Checklist Template`. Copy that template block verbatim when producing a new CEO review, fill in every field, and write the output to the instance destination below.
+
+| Artifact type | Format reference | Instance destination |
+|---|---|---|
+| CEO planning review (produced during `/agent-plan` Stage 4) | This file: `CEO Review Checklist Template` section below | `artifacts/reviews/ceo-review-milestone-{N}.md` |
+
+Every CEO review file written under `artifacts/reviews/` must:
+
+- Include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
+- List every input file reviewed by path (milestone definition, task breakdown, architecture, UI spec, security findings, performance findings).
+- Work through all six checklist sections (Scope & Business Intent, Architectural Soundness, UI & User Experience, Security Posture, Performance Budget, Cross-Cutting Risks) — do not skip any.
+- Record Revision Requests addressed to specific agents when returning REVISION REQUIRED.
+- Record Approval Conditions with a Verified By owner when returning APPROVED WITH CONDITIONS.
+- Issue one of the three verdicts verbatim: **APPROVED**, **APPROVED WITH CONDITIONS**, or **REVISION REQUIRED**.
+
+On re-review of a revised plan, read every input file's `## Revision History` table first and verify the body reflects the claimed changes — an entry in the revision history is not the same as a fix.
+
+---
+
 ## Interaction Rules
 
 - The CEO runs only after Product, Architecture, UI, Security, and Performance have all completed their planning outputs for the milestone.
