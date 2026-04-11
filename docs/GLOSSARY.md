@@ -18,6 +18,8 @@
     [TERM_NAME] entries in the final document.
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — Glossary
 
 All terms are listed alphabetically within each category. Terms shown in **bold** within

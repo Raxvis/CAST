@@ -1,6 +1,7 @@
 ---
 name: reviewer
 description: "Code review agent. Use for reviewing code quality, standards compliance, and architecture adherence."
+model: claude-sonnet-4-6
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -9,17 +10,18 @@ produced by the Coder Agent against quality standards, architecture documents, a
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Replace [AI_MODEL] with the model your agents use.
-3. The Review Checklist is applied to every Coder submission — update items to match your
+2. The Review Checklist is applied to every Coder submission — update items to match your
    project's specific quality standards.
-4. Update the Interaction Rules to reflect your team's review workflow.
+3. Update the Interaction Rules to reflect your team's review workflow.
 -->
+
+<!-- Placeholders — see README.md → Placeholder Reference -->
 
 > **Agent Activation:** When this file is loaded as context, you are operating as the Reviewer Agent. Follow all instructions below as your role definition.
 
 # [PROJECT_NAME] — Reviewer Agent
 
-**Model**: [AI_MODEL]
+**Model**: `claude-sonnet-4-6`
 
 ---
 

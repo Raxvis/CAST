@@ -14,6 +14,8 @@
     update both files.
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — Extended Design Details
 
 ---

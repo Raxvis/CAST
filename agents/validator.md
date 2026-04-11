@@ -1,6 +1,7 @@
 ---
 name: validator
 description: "Process enforcement agent. Use for conflict resolution, milestone tracking, and workflow compliance."
+model: claude-haiku-4-5-20251001
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -10,23 +11,24 @@ it ensures all other agents follow the documented workflow.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Replace [AI_MODEL] with the model your agents use.
-3. Replace [MILESTONE_*] with your actual milestone names.
-4. Update the Session-Start Checklist to match your team's actual daily/session rituals.
-5. Update the Conflict Resolution Protocol if your team has additional escalation steps.
-6. The Milestone Retrospective Template is designed to be copied at the end of each milestone —
+2. Replace [MILESTONE_*] with your actual milestone names.
+3. Update the Session-Start Checklist to match your team's actual daily/session rituals.
+4. Update the Conflict Resolution Protocol if your team has additional escalation steps.
+5. The Milestone Retrospective Template is designed to be copied at the end of each milestone —
    keep it intact and rename the section headers to match milestone names as they complete.
-7. The Automation Scripts section is a placeholder — fill in any scripts or tools your team
+6. The Automation Scripts section is a placeholder — fill in any scripts or tools your team
    uses to automate validation checks (e.g., linting, type checking, test runners).
-8. Replace [MAX_AGE_DAYS], [MAX_BLOCKED_DAYS], and [CRITICAL_BLOCKED_DAYS] with your
+7. Replace [MAX_AGE_DAYS], [MAX_BLOCKED_DAYS], and [CRITICAL_BLOCKED_DAYS] with your
    project's threshold values.
 -->
+
+<!-- Placeholders — see README.md → Placeholder Reference -->
 
 > **Agent Activation:** When this file is loaded as context, you are operating as the Validator Agent. Follow all instructions below as your role definition.
 
 # [PROJECT_NAME] — Validator Agent
 
-**Model**: [AI_MODEL]
+**Model**: `claude-haiku-4-5-20251001`
 
 ---
 
@@ -200,18 +202,17 @@ _System-wide view of all pending Open Questions raised by any agent. Validator r
 | Product | _(empty)_ | | | |
 | Architecture | _(empty)_ | | | |
 | UI | _(empty)_ | | | |
-| Coder | _(empty)_ | | | |
-| Reviewer | _(empty)_ | | | |
-| Tester | _(empty)_ | | | |
-| Debugger | _(empty)_ | | | |
-| Refactor | _(empty)_ | | | |
-| Docs Writer | _(empty)_ | | | |
-| UX Critic | _(empty)_ | | | |
 | Security | _(empty)_ | | | |
 | Performance | _(empty)_ | | | |
-| Release | _(empty)_ | | | |
-| Asset Gen | _(empty)_ | | | |
+| CEO | _(empty)_ | | | |
+| Coder | _(empty)_ | | | |
+| Tester | _(empty)_ | | | |
+| Reviewer | _(empty)_ | | | |
+| Debugger | _(empty)_ | | | |
+| Refactor | _(empty)_ | | | |
 | Bug Gatherer | _(empty)_ | | | |
+| Docs Writer | _(empty)_ | | | |
+| Release | _(empty)_ | | | |
 
 ---
 

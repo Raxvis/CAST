@@ -18,6 +18,8 @@
     document and link to it from the Rationale field.
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — Design Rationale
 
 This document records significant design and technical decisions made during the

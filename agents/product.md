@@ -1,6 +1,7 @@
 ---
 name: product
-description: "Product requirements agent. Use for defining features, acceptance criteria, milestone planning, and validating completed work."
+description: "Product requirements agent. Use for defining features, acceptance criteria, and validating completed work."
+model: claude-opus-4-6
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -9,20 +10,21 @@ criteria, milestone definitions, and final sign-off on completed work.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Replace [AI_MODEL] with the model your agents use.
-3. Replace [MILESTONE_NAME] placeholders with your actual milestone names.
-4. Replace [FEATURE_*] placeholders with your actual feature names.
-5. Replace [CRITERION_*] with real acceptance criteria for each feature.
-6. The Task Validation Checklist is designed to be copied for each task review — keep it intact.
-7. The Playtesting Feedback Log and Regression Testing sections may be renamed to match your
+2. Replace [MILESTONE_NAME] placeholders with your actual milestone names.
+3. Replace [FEATURE_*] placeholders with your actual feature names.
+4. Replace [CRITERION_*] with real acceptance criteria for each feature.
+5. The Task Validation Checklist is designed to be copied for each task review — keep it intact.
+6. The Playtesting Feedback Log and Regression Testing sections may be renamed to match your
    project's review process (e.g., "User Testing" instead of "Playtesting" for non-game projects).
 -->
+
+<!-- Placeholders — see README.md → Placeholder Reference -->
 
 > **Agent Activation:** When this file is loaded as context, you are operating as the Product Agent. Follow all instructions below as your role definition.
 
 # [PROJECT_NAME] — Product Agent
 
-**Model**: [AI_MODEL]
+**Model**: `claude-opus-4-6`
 
 ---
 

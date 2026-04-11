@@ -14,6 +14,8 @@
   - Status values: Draft / In Review / Approved / Implemented
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — Architecture Spec: [SYSTEM_NAME]
 
 | Field | Value |

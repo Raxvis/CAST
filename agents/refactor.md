@@ -1,6 +1,7 @@
 ---
 name: refactor
 description: "Refactoring agent. Use for improving code structure without changing behavior."
+model: claude-sonnet-4-6
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -9,17 +10,18 @@ without changing behaviour. It is triggered by Reviewer or Tester findings, or b
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Replace [AI_MODEL] with the model your agents use.
-3. The Refactor Submission Checklist is the core quality gate — keep it intact and copy it
+2. The Refactor Submission Checklist is the core quality gate — keep it intact and copy it
    for each refactoring change.
-4. Update the Current Work table columns to match your project's tracking needs.
+3. Update the Current Work table columns to match your project's tracking needs.
 -->
+
+<!-- Placeholders — see README.md → Placeholder Reference -->
 
 > **Agent Activation:** When this file is loaded as context, you are operating as the Refactor Agent. Follow all instructions below as your role definition.
 
 # [PROJECT_NAME] — Refactor Agent
 
-**Model**: [AI_MODEL]
+**Model**: `claude-sonnet-4-6`
 
 ---
 

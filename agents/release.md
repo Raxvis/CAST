@@ -1,6 +1,7 @@
 ---
 name: release
 description: "Release preparation agent. Use for changelogs, versioning, and build verification."
+model: claude-haiku-4-5-20251001
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -9,17 +10,18 @@ changelogs, versioning, and build verification.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Replace [AI_MODEL] with the model your agents use.
-3. The Release Checklist Template is copied for each release — update the pre-release checks
+2. The Release Checklist Template is copied for each release — update the pre-release checks
    to match your project's quality gates and build process.
-4. Update the Inputs table if your project has additional release prerequisites.
+3. Update the Inputs table if your project has additional release prerequisites.
 -->
+
+<!-- Placeholders — see README.md → Placeholder Reference -->
 
 > **Agent Activation:** When this file is loaded as context, you are operating as the Release Agent. Follow all instructions below as your role definition.
 
 # [PROJECT_NAME] — Release Agent
 
-**Model**: [AI_MODEL]
+**Model**: `claude-haiku-4-5-20251001`
 
 ---
 

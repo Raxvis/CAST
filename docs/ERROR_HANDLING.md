@@ -16,6 +16,8 @@
     actually uses (console, remote error tracker, etc.).
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — Error Handling Guidelines
 
 All code in [PROJECT_NAME] must handle errors consistently according to the principles

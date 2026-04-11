@@ -14,6 +14,8 @@
   - Reference any linked milestone task documents in the Completion Reports section.
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — Milestone Validation Report
 
 ---

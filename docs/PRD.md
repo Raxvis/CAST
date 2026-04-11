@@ -18,6 +18,8 @@
     reading flow if placed inline.
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — Product Requirements Document
 
 **Version:** [VERSION]

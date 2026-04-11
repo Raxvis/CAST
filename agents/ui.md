@@ -1,6 +1,7 @@
 ---
 name: ui
 description: "UI design agent. Use for visual design, layout specs, style guides, and interaction patterns."
+model: claude-opus-4-6
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -9,24 +10,25 @@ specifications, the style guide, interaction patterns, and accessibility.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Replace [AI_MODEL] with the model your agents use.
-3. Fill in the Style Guide tables with your actual design tokens:
+2. Fill in the Style Guide tables with your actual design tokens:
    - Colors: replace HEX/role placeholders with real values.
    - Typography: replace size/weight/family placeholders.
    - Spacing: replace with your actual spacing scale.
-4. Replace [SCREEN_NAME_*] with real screen or view names.
-5. Replace [COMPONENT_NAME_*] with real reusable component names.
-6. The UI Spec Template is the core output format — keep it intact and copy it when creating
+3. Replace [SCREEN_NAME_*] with real screen or view names.
+4. Replace [COMPONENT_NAME_*] with real reusable component names.
+5. The UI Spec Template is the core output format — keep it intact and copy it when creating
    real specs. It is designed to be screen-agnostic and works for any view.
-7. The UX Review Checklist is designed to be copied for each review session.
-8. Update the Interaction Rules section to match your team's workflow.
+6. The UX Review Checklist is designed to be copied for each review session.
+7. Update the Interaction Rules section to match your team's workflow.
 -->
+
+<!-- Placeholders — see README.md → Placeholder Reference -->
 
 > **Agent Activation:** When this file is loaded as context, you are operating as the UI Agent. Follow all instructions below as your role definition.
 
 # [PROJECT_NAME] — UI Agent
 
-**Model**: [AI_MODEL]
+**Model**: `claude-opus-4-6`
 
 ---
 

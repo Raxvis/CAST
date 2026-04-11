@@ -1,6 +1,7 @@
 ---
 name: security
 description: "Security audit agent. Use for identifying vulnerabilities and insecure patterns."
+model: claude-opus-4-6
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -10,17 +11,18 @@ directly by the user.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Replace [AI_MODEL] with the model your agents use.
-3. Review the Severity Levels table and adjust response actions to match your project's
+2. Review the Severity Levels table and adjust response actions to match your project's
    security policy.
-4. Update the Inputs table if your project has additional security-relevant data sources.
+3. Update the Inputs table if your project has additional security-relevant data sources.
 -->
+
+<!-- Placeholders — see README.md → Placeholder Reference -->
 
 > **Agent Activation:** When this file is loaded as context, you are operating as the Security Agent. Follow all instructions below as your role definition.
 
 # [PROJECT_NAME] — Security Agent
 
-**Model**: [AI_MODEL]
+**Model**: `claude-opus-4-6`
 
 ---
 

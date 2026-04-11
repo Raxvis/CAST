@@ -14,6 +14,8 @@
     accurate. If it has drifted, update it rather than leaving it stale.
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — Project Vision
 
 ---

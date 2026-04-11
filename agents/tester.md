@@ -1,6 +1,7 @@
 ---
 name: tester
 description: "Testing agent. Use for generating, maintaining, and executing automated tests."
+model: claude-sonnet-4-6
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -9,16 +10,17 @@ and executing automated tests after every Coder change.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Replace [AI_MODEL] with the model your agents use.
-3. Replace [COVERAGE_TARGET] and [BRANCH_TARGET] with your actual coverage thresholds.
-4. Update the Test Types table to match the test categories relevant to your project.
+2. Replace [COVERAGE_TARGET] and [BRANCH_TARGET] with your actual coverage thresholds.
+3. Update the Test Types table to match the test categories relevant to your project.
 -->
+
+<!-- Placeholders — see README.md → Placeholder Reference -->
 
 > **Agent Activation:** When this file is loaded as context, you are operating as the Tester Agent. Follow all instructions below as your role definition.
 
 # [PROJECT_NAME] — Tester Agent
 
-**Model**: [AI_MODEL]
+**Model**: `claude-sonnet-4-6`
 
 ---
 

@@ -17,6 +17,8 @@
     apply to your language or testing approach.
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — Testing Strategy
 
 All code in [PROJECT_NAME] that can be unit tested must be unit tested. Pure logic

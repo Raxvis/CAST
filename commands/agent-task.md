@@ -1,0 +1,150 @@
+<!-- TEMPLATE INSTRUCTIONS
+PURPOSE: This file defines the /agent-task slash command. It runs a mini engineering
+pipeline for a single one-off task without requiring a milestone, planning artifacts,
+or CEO verdict.
+
+/agent-task is for small, self-contained work: bug fixes, typos, adding a log line,
+refactoring one function, updating dependencies. It is NOT for new features, new
+modules, new data schemas, or cross-cutting changes — those belong in /agent-plan
+followed by /agent-code.
+
+All work artifacts (bug updates, progress log entries) are written to `artifacts/`.
+Templates and guidelines are read from `docs/`. Never mix the two: `docs/` is
+reference-only, `artifacts/` is where live work lives.
+
+HOW TO CUSTOMIZE:
+1. Replace [PROJECT_NAME] with your project name.
+2. Replace [TEST_CMD] with your project's test command.
+3. Replace [MAX_LOOP_COUNT] with the number of Coder-Tester-Reviewer cycles allowed
+   before escalation (default: 3).
+4. Delete this comment block once the command is customized for your project.
+
+INSTALLATION: Copy this file to `.claude/commands/agent-task.md` in your target project.
+Claude Code registers any file in `.claude/commands/` as a slash command named after
+the file. Invoke it with `/agent-task <task description>`.
+-->
+
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
+# /agent-task — One-Off Task Pipeline
+
+Run a mini engineering pipeline for a single, self-contained task. Unlike `/agent-code`, this command does not require a milestone, planning artifacts, or a CEO verdict. It is designed for small, focused work that does not justify a full planning stage.
+
+## Related agent files
+
+This command invokes the following agents. Open any of them for the full role definition and interaction rules:
+
+- [coder](../agents/coder.md) — implements the task
+- [tester](../agents/tester.md) — writes and runs tests; gates Reviewer behind a green test suite
+- [reviewer](../agents/reviewer.md) — reviews the code and classifies findings as Defects or Issues
+- [debugger](../agents/debugger.md) — investigates Defect findings when raised
+- [bug-gatherer](../agents/bug-gatherer.md) — files investigated defects as structured bug reports
+- [refactor](../agents/refactor.md) — addresses Issue findings and loops back to Reviewer
+- [product](../agents/product.md) — validates the finished task against the original task description
+
+This command explicitly does NOT invoke [architect](../agents/architect.md), [ui](../agents/ui.md), [security](../agents/security.md), [performance](../agents/performance.md), or [ceo](../agents/ceo.md). If the task turns out to need any of those, Pre-Flight or Reviewer will halt and tell you to run `/agent-plan` instead.
+
+## When to use this command
+
+**Good fits:**
+- Fixing a bug already filed in `artifacts/BUGS.md`
+- Fixing a typo or small correctness issue
+- Adding a log line, metric, or debug output
+- Refactoring a single function without changing its contract
+- Updating a dependency and its usages
+- Adding a flag or option that follows an existing pattern
+- Adding or updating tests for existing code
+- Small documentation corrections in `docs/` or `CLAUDE.md`
+
+**Not a fit — use `/agent-plan` followed by `/agent-code` instead:**
+- Introducing a new module or file set
+- Adding a new data schema or changing an existing one
+- Adding a new screen, endpoint, or CLI subcommand
+- Any change that crosses more than two modules
+- Any change that introduces new architectural decisions
+- Any change that introduces a new dependency
+- Any change that needs cross-cutting UI/UX review
+
+If in doubt, run `/agent-plan` first. The planning gate exists because ad-hoc changes that turn out to need design work produce drift that is expensive to untangle later.
+
+## Arguments
+
+- `$ARGUMENTS`: Required. A free-form description of the task. May reference a specific file path, a bug ID (e.g., "Fix BUG-002: `done` silently succeeds on missing ID"), or a plain description ("Add a `--json` flag to the `list` command following the pattern in `add.ts`").
+
+## Instructions
+
+This command orchestrates a mini engineering pipeline: Coder → Tester → Reviewer → Product. It reuses the same Defect / Issue routing as `/agent-code` but skips the planning stage entirely.
+
+### Pre-Flight Check
+
+Before any work begins:
+
+1. Read `CLAUDE.md`, `docs/CODE_PATTERNS.md`, `docs/FILE_CONVENTIONS.md`, and any topic-specific reference doc (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`) that applies to the project.
+2. Read `artifacts/BUGS.md` if the task description references a bug ID.
+3. Read any files named in the task description.
+4. **Scope check.** If the task description implies an architectural change, a new module, a new screen, a new endpoint, or a cross-cutting change, **stop and instruct the user to run `/agent-plan` instead**. Do not attempt to inline architect or UI work into a one-off task. A helpful response: "This task introduces <specific scope>, which needs a planning stage. Run `/agent-plan \"<feature description>\"` first, then `/agent-code` to implement."
+
+### Step 1 — Coder
+
+Launch the **coder** agent to:
+
+- Read the task description, relevant existing code, and the reference docs gathered in Pre-Flight.
+- Implement the change in production code, following the conventions in `CLAUDE.md`, `docs/CODE_PATTERNS.md`, and `docs/FILE_CONVENTIONS.md`.
+- Complete the Pre-Handoff Checklist before handing off.
+
+### Step 2 — Tester
+
+After Coder hands off, launch the **tester** agent to:
+
+- Write or update unit tests covering the changed code.
+- Run `[TEST_CMD]` to verify all tests pass.
+- If tests fail, return findings to Coder (loop back to Step 1).
+
+Tester must pass before Reviewer runs. No exceptions.
+
+### Step 3 — Reviewer
+
+After Tester passes, launch the **reviewer** agent to:
+
+- Review the code against project conventions, existing patterns in adjacent code, and any topic-specific doc that applies.
+- Classify every finding as a **Defect** or an **Issue** using the same routing as `/agent-code`:
+  - **Defect** → **debugger** → **bug-gatherer** → **product** for triage. If Product triages as "fix now", the defect returns to Coder.
+  - **Issue** → **refactor** → back to **reviewer** (Tester re-runs first).
+- If the Reviewer's findings reveal missing design context (e.g., "this change should not exist without a new architecture document" or "this introduces a pattern not used elsewhere"), **stop and instruct the user to run `/agent-plan` to introduce the missing context**. Do not attempt to retrofit design work into a one-off task.
+
+The Reviewer loop may cycle; track the count and escalate after `[MAX_LOOP_COUNT]` cycles on the same task.
+
+### Step 4 — Product Validation
+
+After Reviewer approves, launch the **product** agent to validate the task against its description. Since `/agent-task` does not produce a milestone, the task description itself serves as the acceptance criteria. Product verifies:
+
+1. The change does what the task description said it would.
+2. No regressions in adjacent features.
+3. The change did not sneak in scope beyond what was asked. If new scope appeared, flag it and either trim or escalate to `/agent-plan`.
+
+If any check fails, return to Coder (loop back to Step 1) with the specific gap cited.
+
+### Completion
+
+After the task passes Product validation:
+
+1. Run `[TEST_CMD]` one final time to confirm everything still passes.
+2. Append a one-line entry to `artifacts/STANDUP.md` with the date, task summary, and any bug ID resolved.
+3. If the task resolved a bug filed in `artifacts/BUGS.md`, update the bug's status (Open → Fixed) and add the investigation / fix fields.
+4. Summarize what changed, what tests were affected, and any follow-up items or deferred scope.
+
+### Error Handling
+
+- If the Coder-Tester-Reviewer loop exceeds `[MAX_LOOP_COUNT]` cycles on the same task, stop and escalate to the user with the specific blocker.
+- If the task description is ambiguous enough that Coder cannot proceed without a design decision, stop and ask the user to clarify before continuing. Do not guess.
+- If the change turns out to touch more modules than initially expected, stop and recommend running `/agent-plan` for a proper milestone scope. Do not attempt to finish a large change inside a one-off task — that defeats the purpose of the planning gate.
+- If tests fail due to environment rather than code, Tester flags the failure as "Environment Issue" and the user decides whether to continue.
+
+### Scope Boundaries (what this command will NOT do)
+
+`/agent-task` explicitly does not:
+- Produce milestone definitions, task breakdowns, architecture documents, UI specs, security reviews, performance reviews, or CEO verdicts. Those are outputs of `/agent-plan`.
+- Write files to `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, or `artifacts/reviews/`. Those directories are owned by `/agent-plan` outputs.
+- Write any work artifact to `docs/`. `docs/` is reference-only.
+
+If the work you are doing needs any of the above, run `/agent-plan` first. The planning gate exists for a reason.

@@ -4,12 +4,16 @@ It describes every agent, how they interact, and the conventions that govern the
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with the name of your project.
-2. Replace [AI_MODEL] with the model used by all agents (e.g., the model powering your AI assistant).
-3. Replace [FEATURE_AREA_*] placeholders with real feature areas, modules, or subsystems in your project.
-4. Replace [ARTIFACT_TYPE_*] with the categories of deliverables your project produces.
-5. Review the Agent table and remove rows for agents your project does not need.
-6. Update the ASCII diagram to reflect any changes to the agent lineup.
-7. Update the Documentation Placement table to match your actual folder/file conventions.
+2. Replace [FEATURE_AREA_*] placeholders with real feature areas, modules, or subsystems in your project.
+3. Replace [ARTIFACT_TYPE_*] with the categories of deliverables your project produces.
+4. Review the Agent table and remove rows for agents your project does not need.
+5. Update the ASCII diagram to reflect any changes to the agent lineup.
+6. Update the Documentation Placement table to match your actual folder/file conventions.
+
+Per-agent AI models are pre-configured in each agent file's YAML frontmatter and are
+not placeholders. Planning agents run on claude-opus-4-6, engineering agents on
+claude-sonnet-4-6, and utility agents on claude-haiku-4-5-20251001. Override the
+model: line in an individual agent file if you need a different pin.
 -->
 
 # [PROJECT_NAME] — Agent System Overview
@@ -18,30 +22,31 @@ HOW TO CUSTOMIZE:
 
 This directory contains the working documentation for each specialized agent that assists in developing [PROJECT_NAME]. Each agent owns a domain, maintains its own decisions log, and hands off work to other agents via structured outputs.
 
-All agents run on **[AI_MODEL]**.
+Each agent runs on a model tier matched to its workload: planning agents on Opus 4.6, engineering agents on Sonnet 4.6, utility agents on Haiku 4.5. The exact model for each agent is pinned in its YAML frontmatter.
 
 ---
 
 ## Agent Roster
 
-| Agent | File | Role |
-|---|---|---|
-| Product | `product.md` | Owns requirements, validates completed tasks against acceptance criteria, maintains the feature backlog, and signs off on milestones. |
-| Architecture | `architect.md` | Owns system design, module boundaries, data schemas, and code review standards. Produces architecture documents that Coder implements. |
-| UI | `ui.md` | Owns visual design, layout specifications, the style guide, and interaction patterns. Produces screen specs that Coder implements. |
-| Coder | `coder.md` | Implements features as directed by Product, Architecture, and UI. Writes all production code and performs pre-handoff self-review. |
-| Reviewer | `reviewer.md` | Reviews everything the Coder produces. Evaluates code against quality standards, architecture documents, and UI specifications. |
-| Tester | `tester.md` | Generates and maintains automated test coverage. Runs after every change the Coder makes. |
-| Debugger | `debugger.md` | Investigates bugs found by Reviewer, Tester, or the user. Logs to `docs/BUGS.md`, explains defects, and provides alternative solutions. |
-| Refactor | `refactor.md` | Improves code structure without changing behaviour. Triggered by Reviewer or Tester issues, or invoked by the user. |
-| Docs Writer | `docs-writer.md` | Produces and maintains developer-facing documentation. Runs after any other agent completes work. Accepts direct user input. |
-| UX Critic | `ux-critic.md` | Evaluates user flows against usability heuristics. Runs after Product and Coder. Files issues with Bug Gatherer. |
-| Security | `security.md` | Identifies vulnerabilities and insecure patterns. Runs after Architecture changes or plans. Can be invoked by the user. |
-| Performance | `performance.md` | Profiles, identifies bottlenecks, and proposes optimisations. Runs after Architecture changes and provides feedback to Architecture. |
-| Release | `release.md` | Owns release preparation: changelogs, versioning, and build verification. |
-| Asset Gen | `asset-gen.md` | Specifies and produces visual assets. Coordinates with UI for design consistency and Coder for integration. |
-| Validator | `validator.md` | Owns the process. Enforces agent protocols, resolves conflicts between agents, tracks milestone progress, and runs retrospectives. |
-| Bug Gatherer | `bug-gatherer.md` | Collects and structures bug reports from testers or stakeholders. Produces standardized reports that Product triages and Coder fixes. |
+The **Tier** column indicates which Minimum Viable Agent Set tier each agent belongs to. Tiers form a gradient: `T1` is always required, `T2` is strongly recommended, `T3` adds the Defect/Issue routing that `/agent-task` needs, and `T4` adds the planning-stage producers that `/agent-plan` and `/agent-code` need. See `README.md` → Minimum Viable Agent Set for the full tier description and for which agents you can delete when pruning the roster.
+
+| Agent | File | Tier | Role |
+|---|---|---|---|
+| Product | `product.md` | T1 | Owns requirements, validates completed tasks against acceptance criteria, maintains the feature backlog, and signs off on milestones. |
+| Architecture | `architect.md` | T2 | Owns system design, module boundaries, data schemas, and code review standards. Produces architecture documents that Coder implements. |
+| UI | `ui.md` | T4 | Owns visual design, layout specifications, the style guide, and interaction patterns. Produces screen specs that Coder implements. |
+| Security | `security.md` | T4 | Identifies vulnerabilities and insecure patterns. Runs after Architecture produces or updates a document. Findings flow to CEO for final planning review. |
+| Performance | `performance.md` | T4 | Profiles, identifies bottlenecks, and proposes optimisations. Runs after Architecture produces or updates a document. Findings flow to CEO for final planning review. |
+| CEO | `ceo.md` | T4 | Final reviewer of the planning stage. Reads milestone, architecture, UI spec, and security/performance findings and issues a go/no-go verdict before engineering begins. |
+| Coder | `coder.md` | T1 | Implements features as directed by Product, Architecture, and UI. Writes all production code and performs pre-handoff self-review. |
+| Tester | `tester.md` | T1 | Generates and maintains automated test coverage. Runs after every change the Coder makes. |
+| Reviewer | `reviewer.md` | T1 | Reviews everything the Coder produces. Classifies findings as Defects (→ Debugger) or Issues (→ Refactor). |
+| Debugger | `debugger.md` | T2 | Investigates defects raised by Reviewer. Logs investigation and hands reports to Bug Gatherer. |
+| Refactor | `refactor.md` | T3 | Improves code structure without changing behaviour. Triggered by Reviewer issues. Flows back to Reviewer on completion. |
+| Bug Gatherer | `bug-gatherer.md` | T3 | Collects and structures bug reports from Debugger and other sources. Produces standardized reports that Product triages. |
+| Docs Writer | `docs-writer.md` | T2 | Produces and maintains developer-facing documentation. Runs after any other agent completes work. Accepts direct user input. |
+| Release | `release.md` | Opt | Owns release preparation: changelogs, versioning, and build verification. Keep for projects with formal releases. |
+| Validator | `validator.md` | Opt | Owns the process. Enforces agent protocols, resolves conflicts between agents, tracks milestone progress, and runs retrospectives. Keep for large teams or complex workflows. |
 
 ---
 
@@ -52,6 +57,8 @@ When agents disagree, the following hierarchy applies:
 1. **Product** — business requirements and user experience goals take highest priority
 2. **Architecture** — system design constraints and technical feasibility
 3. **UI** — visual and interaction design
+
+The **CEO** agent does not override Product on business intent, but it may block a milestone from leaving the planning stage on technical, security, performance, or cross-cutting risk grounds. CEO disputes with Product escalate to Validator.
 
 The **Validator** agent does not override any of the above; it enforces that all agents follow the documented process.
 
@@ -90,70 +97,67 @@ Agents with specialized responsibilities include additional sections after the c
 
 ## Agent Interaction Diagram
 
-```
-                           ┌─────────────┐
-                           │   Product   │
-                           └──────┬──────┘
-                                  │ requirements & acceptance criteria
-                  ┌───────────────┼───────────────┐
-                  ▼               ▼               │
-         ┌──────────────┐ ┌─────────────┐         │
-         │ Architecture │ │     UI      │         │
-         └──┬───┬───┬───┘ └──────┬──────┘         │
-            │   │   │            │                │
-            │   │   │  arch docs │ UI specs       │
-            │   │   │            │                │
-            │   │   │     ┌──────┴──────┐         │
-            │   │   └────►│  Asset Gen  │         │
-            │   │         └──────┬──────┘         │
-            │   │                │ asset specs    │
-            │   │                ▼                │
-            │   │         ┌──────────────┐◄───────┘
-            │   │         │    Coder     │
-            │   │         └──────┬───────┘
-            │   │                │ every change
-            │   │                ▼
-            │   │         ┌──────────────┐
-            │   │         │   Tester     │ (automated gate)
-            │   │         └──────┬───────┘
-            │   │                │ tests must pass
-            │   │                ▼
-            │   │         ┌──────────────┐
-            │   │         │   Reviewer   │◄──────────────┐
-            │   │         └──────┬───────┘               │
-            │   │                │ defects / issues       │
-            │   │         ┌──────┴───────┐               │
-            │   │         ▼              ▼               │
-            │   │  ┌──────────────┐ ┌──────────────┐     │
-            │   │  │   Debugger   │ │   Refactor   │─────┘
-            │   │  └──────┬───────┘ └──────────────┘
-            │   │         │ logs via          ▲ loops back
-            │   │         ▼                  │ to Tester then
-            │   │  ┌──────────────┐          │ Reviewer until
-            │   │  │ Bug Gatherer │          │ both approve
-            │   │  └──────┬───────┘
-            │   │         │ structured reports
-            │   │         ▼
-            │   │  ┌──────────────┐
-            │   │  │   Product    │ (triages bugs, validates work)
-            │   │  └──────────────┘
-            │   │
-            │   └────────►┌──────────────┐
-            │             │   Security   │ (after arch changes)
-            └────────────►└──────────────┘
-            │
-            └────────────►┌──────────────┐
-                          │ Performance  │ (after arch changes,
-                          └──────────────┘  feeds back to Architecture)
+### Planning Stage (`/agent-plan`)
 
-         ┌──────────────┐
-         │  UX Critic   │ (after Product & Coder)
-         └──────┬───────┘
-                │ files issues with Bug Gatherer
-                ▼
-         ┌──────────────┐
-         │ Bug Gatherer │ (single entry point for all bugs)
-         └──────────────┘
+```
+                    ┌─────────────┐
+                    │   Product   │
+                    └──────┬──────┘
+                           │ milestone & acceptance criteria
+               ┌───────────┴───────────┐
+               ▼                       ▼
+        ┌──────────────┐        ┌─────────────┐
+        │ Architecture │        │     UI      │
+        └──┬────────┬──┘        └──────┬──────┘
+           │        │                  │
+           ▼        ▼                  │
+   ┌────────────┐ ┌─────────────┐      │
+   │  Security  │ │ Performance │      │
+   └──────┬─────┘ └──────┬──────┘      │
+          │              │             │
+          │ findings      │ findings     │ UI spec
+          ▼              ▼             ▼
+         ┌────────────────────────────────┐
+         │              CEO               │
+         │  (final planning-stage review) │
+         └────────────────┬───────────────┘
+                          │ APPROVED / APPROVED WITH CONDITIONS
+                          ▼
+                   engineering stage
+```
+
+### Engineering Stage (`/agent-code`)
+
+```
+                  ┌──────────────┐
+                  │    Coder     │◄──────────────────┐
+                  └──────┬───────┘                   │
+                         │ every change              │
+                         ▼                           │
+                  ┌──────────────┐                   │
+                  │    Tester    │ (automated gate)  │
+                  └──────┬───────┘                   │
+                         │ tests must pass           │
+                         ▼                           │
+                  ┌──────────────┐◄─────────┐        │
+                  │   Reviewer   │          │        │
+                  └──────┬───────┘          │        │
+                         │                  │        │
+             ┌───────────┴───────────┐      │        │
+             ▼                       ▼      │        │
+      ┌──────────────┐        ┌──────────────┐       │
+      │   Debugger   │        │   Refactor   │───────┘
+      └──────┬───────┘        └──────────────┘   loops back to
+             │ investigation                     Tester → Reviewer
+             ▼
+      ┌──────────────┐
+      │ Bug Gatherer │ (single entry point for all bugs)
+      └──────┬───────┘
+             │ structured reports
+             ▼
+      ┌──────────────┐
+      │   Product    │ (triages bugs, validates work)
+      └──────────────┘
 
   ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
   │  Docs Writer │    │   Release    │    │  Validator   │
@@ -162,38 +166,97 @@ Agents with specialized responsibilities include additional sections after the c
   └──────────────┘    └──────────────┘    └──────────────┘
 ```
 
+### One-Off Task Pipeline (`/agent-task`)
+
+```
+                  ┌──────────────────┐
+                  │ Task Description │
+                  │  (no milestone)  │
+                  └────────┬─────────┘
+                           │ scope check
+                           ▼
+                  ┌──────────────┐
+                  │    Coder     │◄──────────────────┐
+                  └──────┬───────┘                   │
+                         │ every change              │
+                         ▼                           │
+                  ┌──────────────┐                   │
+                  │    Tester    │ (automated gate)  │
+                  └──────┬───────┘                   │
+                         │ tests must pass           │
+                         ▼                           │
+                  ┌──────────────┐◄─────────┐        │
+                  │   Reviewer   │          │        │
+                  └──────┬───────┘          │        │
+                         │                  │        │
+             ┌───────────┴───────────┐      │        │
+             ▼                       ▼      │        │
+      ┌──────────────┐        ┌──────────────┐       │
+      │   Debugger   │        │   Refactor   │───────┘
+      └──────┬───────┘        └──────────────┘   loops back to
+             │ investigation                     Tester → Reviewer
+             ▼
+      ┌──────────────┐
+      │ Bug Gatherer │
+      └──────┬───────┘
+             │ structured reports
+             ▼
+      ┌──────────────┐
+      │   Product    │ (validates against task description)
+      └──────────────┘
+```
+
+If Reviewer finds the change needs new architectural decisions, the pipeline
+halts and instructs the user to re-run via `/agent-plan`.
+
 ---
 
 ## Workflow
 
-### Per-Milestone Workflow
+The workflow is split into two stages, each wrapped by a slash command, plus a third command for self-contained one-off work:
 
-1. **Product** defines milestone goals and acceptance criteria.
+- **Planning Stage** — `/agent-plan` — produces planning documents only.
+- **Engineering Stage** — `/agent-code` — implements an approved milestone.
+- **One-Off Task** — `/agent-task` — runs a mini engineering pipeline for a single self-contained task without a milestone or planning artifacts.
+
+### Planning Stage Workflow (`/agent-plan`)
+
+1. **Product** defines the milestone goals, tasks, and acceptance criteria.
 2. **Architecture** produces architecture documents for all new modules.
-3. **Security** and **Performance** review architecture plans and provide feedback.
-4. **UI** produces screen specifications for all new interfaces.
-5. **Coder** implements features using the above documents as authoritative references.
-6. **Tester** runs tests after every Coder change. **Reviewer** reviews every Coder submission.
-7. **Debugger** investigates any bugs found. **Refactor** addresses structural issues, then flows back to **Tester** and **Reviewer** to confirm completeness.
-8. **UX Critic** evaluates user flows after Product and Coder complete work.
-9. **Docs Writer** updates documentation after each agent completes work.
-10. **Product** validates completed work against acceptance criteria.
-11. **Release** prepares changelog, versioning, and build verification.
-12. **Validator** runs a milestone retrospective.
+3. **UI** produces screen specifications for all new interfaces. (Runs in parallel with Architecture.)
+4. **Security** reviews the architecture document and files findings.
+5. **Performance** reviews the architecture document against the performance budgets and files findings. (Runs in parallel with Security.)
+6. **CEO** reads the milestone definition, architecture document, UI specification, and security/performance findings, applies the CEO Review Checklist, and issues a verdict: **APPROVED**, **APPROVED WITH CONDITIONS**, or **REVISION REQUIRED**.
+7. On REVISION REQUIRED, the named agent revises and the CEO re-reviews. Planning does not advance until the CEO issues an approval-level verdict.
 
-### Per-Task Workflow
+### Engineering Stage Workflow (`/agent-code`)
 
-1. **Product** writes a task definition with acceptance criteria.
-2. **Architecture** and/or **UI** produce relevant specifications if not already available.
-3. **Security** reviews architecture changes. **Performance** evaluates and feeds back to Architecture.
-4. **Coder** implements the task, completes the Pre-Handoff Checklist, and marks the task ready for review.
-5. **Tester** runs tests (automated gate). If tests fail, work returns to **Coder**. Tester must pass before proceeding.
-6. **Reviewer** reviews the code (only after Tester passes). If changes are required, work returns to **Coder** or **Refactor**. **Refactor** flows back to step 5 (Tester then Reviewer) — this loop repeats until both approve.
-7. **Debugger** investigates any defects found by Tester or Reviewer. Logs to `docs/BUGS.md` via **Bug Gatherer**.
-8. **UX Critic** evaluates user-facing flows and files issues with **Bug Gatherer**.
-9. **Product** reviews and signs off or returns with feedback. If rejected, work returns to step 4.
-10. **Docs Writer** updates documentation.
-11. **Validator** records the outcome in the process log.
+Run per task within the approved milestone:
+
+1. **Coder** implements the task, completes the Pre-Handoff Checklist, and hands off.
+2. **Tester** writes or updates tests and runs the test suite (automated gate). If tests fail, work returns to **Coder**. Tester must pass before Reviewer runs.
+3. **Reviewer** reviews the code against the architecture document, UI specification, project conventions, and any CEO Approval Conditions. Findings are classified as:
+   - **Defects** — route to **Debugger** → **Bug Gatherer** → **Product** for triage. If Product triages as fix-now, the defect returns to Coder.
+   - **Issues** — route to **Refactor**. Refactor hands off back to **Tester** and **Reviewer** until the issue is resolved.
+4. **Product** validates the finished task against its acceptance criteria. On rejection, work returns to Coder.
+5. **Docs Writer** updates documentation after each agent completes work.
+6. **Validator** records the outcome in the process log.
+7. After every task in the milestone is complete, **Release** prepares changelog, versioning, and build verification, and **Validator** runs the milestone retrospective.
+
+### One-Off Task Workflow (`/agent-task`)
+
+Run for a single self-contained task (bug fix, typo, small refactor, dependency bump) that does not justify a full planning stage:
+
+1. **Pre-flight scope check.** Read `CLAUDE.md` and any relevant `docs/` reference material (code patterns, file conventions, topic-specific docs). If the task description implies new modules, new schemas, new screens, new endpoints, or cross-cutting changes, **halt and instruct the user to run `/agent-plan` first**. No milestone is loaded and no planning artifacts are consulted.
+2. **Coder** implements the change following the conventions in `CLAUDE.md` and `docs/`, completes the Pre-Handoff Checklist, and hands off.
+3. **Tester** writes or updates unit tests and runs the test suite (automated gate). If tests fail, work returns to **Coder**. Tester must pass before Reviewer runs.
+4. **Reviewer** reviews the code against project conventions and adjacent patterns. Findings are classified as:
+   - **Defects** — route to **Debugger** → **Bug Gatherer** → **Product** for triage. If Product triages as fix-now, the defect returns to Coder.
+   - **Issues** — route to **Refactor**. Refactor hands off back to **Tester** and **Reviewer** until the issue is resolved.
+   - If Reviewer discovers the change needs new architectural decisions or cross-cutting design work, **halt and instruct the user to re-run via `/agent-plan`**. Do not retrofit design work into a one-off task.
+5. **Product** validates the finished change against the task description itself (no milestone means the description is the acceptance criteria). Product also checks that no out-of-scope changes snuck in. On rejection, work returns to Coder.
+6. **Completion**: append a one-line entry to `artifacts/STANDUP.md` with the date, task summary, and any bug ID resolved. If the task resolved a bug filed in `artifacts/BUGS.md`, update the bug's status (Open → Fixed) and add the investigation/fix fields.
+7. `/agent-task` does **not** write to `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, or `artifacts/reviews/` — those directories are owned by `/agent-plan` outputs.
 
 ### Cross-Reference Rules
 
@@ -239,28 +302,44 @@ When two agents cover related territory, one is the **primary owner** and the ot
 |---|---|---|---|
 | Code quality assessment | Reviewer | Tester | Reviewer owns conventions, correctness, style, and architecture adherence. Tester owns test adequacy, coverage metrics, and pass/fail results. Tester does not assess code quality; Reviewer does not write or run tests. |
 | Architecture adherence | Architecture | Reviewer | Architecture has final say on module boundary disputes and design questions. Reviewer flags violations during code review and defers to Architecture if Coder disagrees. |
-| Documentation of code | Docs Writer | Coder | Coder documents in-code references (architecture doc citations, UI spec citations) via the Pre-Handoff Checklist. Docs Writer maintains all files in `docs/` and ensures documentation stays current after every agent action. Coder does not update `docs/` directly. |
+| Documentation of code | Docs Writer | Coder | Coder documents in-code references (architecture doc citations, UI spec citations) via the Pre-Handoff Checklist. Docs Writer maintains all files in `docs/` (reference material only) and ensures documentation stays current after every agent action. Coder does not update `docs/` directly. Work artifacts (bug reports, planning specs, progress logs) belong in `artifacts/`, not `docs/`. |
 | Bug severity assignment | Bug Gatherer | Debugger | Bug Gatherer suggests initial severity when filing the report (status: New). Debugger does not change severity — it adds investigation fields (root cause, alternative solutions). Product sets final severity during triage. |
 | Implementation scope | Coder | Refactor | Coder implements new features and fixes assigned bugs. Refactor restructures existing code without changing behaviour. When Reviewer or Tester flags a structural issue, it goes to Refactor. When a feature or bug fix is needed, it goes to Coder. |
 | Pre-submission quality checks | Coder (self-check) | Product (validation) | Coder's Pre-Handoff Checklist is a self-assessment before submission. Product's Task Validation Checklist is an independent verification. Both are required — they are complementary, not redundant. Coder checks before submitting; Product validates after receiving. |
+| Scope classification | Human (via command choice) | Reviewer | The user decides whether a change belongs in `/agent-task` (self-contained) or `/agent-plan` (cross-cutting). Reviewer enforces the boundary during Step 3 — if a `/agent-task` change reveals missing design context, Reviewer halts and instructs the user to re-run via `/agent-plan`. |
 
 ---
 
 ## Documentation Placement
 
+Two top-level directories separate reference from work:
+
+- **`docs/`** — Reference material only: requirements, conventions, design rationale, templates. Never receives live work artifacts.
+- **`artifacts/`** — All work artifacts produced by the agents: milestone definitions, planning-stage architecture and UI specs, security/performance/CEO reviews, bug reports, and the session progress log. See `artifacts/README.md` for the full structure.
+
+The table below records **where each agent writes its work artifacts**. Templates referenced by agents live in `docs/`; instances produced by the agents live in `artifacts/`.
+
 | Document Type | Owner | Location | Tracking Format |
 |---|---|---|---|
-| Feature requirements | Product | `product.md` → Current Work | Task / Milestone / Status / Notes |
-| Architecture documents | Architecture | `architect.md` → Architecture Documents table | Document / Module / Status / Milestone |
-| Screen specifications | UI | `ui.md` → Screen Specifications table | Screen / Milestone / Status / Notes |
+| Feature requirements (backlog) | Product | `product.md` → Current Work | Task / Milestone / Status / Notes |
+| Milestone definitions and tasks | Product | `artifacts/milestones/milestone-{N}-{slug}.md` + `-tasks.md` | Per `docs/MILESTONE_TASKS.md` template |
+| Architecture documents (planning) | Architecture | `artifacts/architecture/arch-milestone-{N}.md` | Per `docs/ARCH_MODULE.md` / `ARCH_SYSTEM.md` / `ARCH_DATA_SCHEMA.md` |
+| Architecture document index | Architecture | `architect.md` → Architecture Documents table | Document / Module / Status / Milestone |
+| Screen specifications (planning) | UI | `artifacts/ui-specs/ui-milestone-{N}.md` | Per `docs/UI_SPEC.md` |
+| Screen specification index | UI | `ui.md` → Screen Specifications table | Screen / Milestone / Status / Notes |
 | Code review verdicts | Reviewer | `reviewer.md` → Current Work | Submission / Source Agent / Date / Verdict / Notes |
 | Test results and coverage | Tester | `tester.md` → Current Work | Change / Source Agent / Tests Run / Pass-Fail / Coverage Delta |
-| Bug investigations | Debugger | `docs/BUGS.md` | Bug ID / Source / Status / Assigned To / Notes |
-| Bug reports (initial) | Bug Gatherer | `docs/BUGS.md` via Bug Report Template | See `bug-gatherer.md` → Bug Report Template |
-| Security audit findings | Security | `security.md` → Current Work | Finding / Severity / Module / Status / Notes |
-| Performance analysis | Performance | `performance.md` → Current Work | Finding / Metric / Impact / Status / Notes |
-| UX evaluations | UX Critic | Filed with Bug Gatherer | Via Bug Gatherer Bug Report Template |
-| Asset specifications | Asset Gen | `asset-gen.md` → Asset Inventory | Asset Name / Category / Format / Size / Status |
+| Bug investigations | Debugger | `artifacts/BUGS.md` | Bug ID / Source / Status / Assigned To / Notes |
+| Bug reports (initial) | Bug Gatherer | `artifacts/BUGS.md` via Bug Report Template | See `bug-gatherer.md` → Bug Report Template |
+| Security audit findings (planning) | Security | `artifacts/reviews/security-review-milestone-{N}.md` | Finding / Severity / Module / Status / Notes |
+| Security findings index | Security | `security.md` → Current Work | Finding / Severity / Module / Status / Notes |
+| Performance analysis (planning) | Performance | `artifacts/reviews/performance-review-milestone-{N}.md` | Finding / Metric / Impact / Status / Notes |
+| Performance findings index | Performance | `performance.md` → Current Work | Finding / Metric / Impact / Status / Notes |
+| CEO planning reviews | CEO | `artifacts/reviews/ceo-review-milestone-{N}.md` | Milestone / Status / Verdict / Notes |
+| CEO review index | CEO | `ceo.md` → Current Work | Milestone / Status / Verdict / Notes |
+| Milestone completion reports | Product | `artifacts/milestones/milestone-{N}-{slug}-completion.md` | Per `docs/MILESTONE_COMPLETION.md` |
+| Milestone validation records | Product | `artifacts/milestones/milestone-{N}-{slug}-validation.md` | Per `docs/MILESTONE_VALIDATION.md` |
+| Rolling session log | Any agent | `artifacts/STANDUP.md` | Date / Agent / Change / Notes |
 | Developer documentation | Docs Writer | `docs/` directory | Per `docs/README.md` index |
 | Changelog and versioning | Release | `docs/CHANGELOG.md` | Per Release Checklist Template |
 | Milestone retrospectives | Validator | `validator.md` → Milestone Retrospective | Per Milestone Retrospective Template |
@@ -285,10 +364,9 @@ Each agent file contains reusable templates:
 | UX Review Checklist | `ui.md` |
 | Refactor Submission Checklist | `refactor.md` |
 | Bug Investigation Fields | `debugger.md` |
-| Usability Heuristics | `ux-critic.md` |
 | Severity Levels | `security.md` |
 | Performance Budget Tracking | `performance.md` |
-| Asset Inventory | `asset-gen.md` |
+| CEO Review Checklist | `ceo.md` |
 | Release Checklist | `release.md` |
 | Milestone Retrospective | `validator.md` |
 | Process Checklist (Per Task) | `validator.md` |

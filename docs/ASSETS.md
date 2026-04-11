@@ -13,6 +13,8 @@
   - Add rows to any section as needed; add entirely new sections if your project has unique asset types.
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — Asset Inventory
 
 ---

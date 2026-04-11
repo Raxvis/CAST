@@ -1,6 +1,7 @@
 ---
 name: coder
 description: "Implementation agent. Use for writing features, fixes, and production code."
+model: claude-sonnet-4-6
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -9,20 +10,21 @@ code and completing implementation tasks as directed by Product, Architecture, a
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Replace [AI_MODEL] with the model your agents use.
-3. Replace [MILESTONE_*] with your actual milestone names.
-4. Replace [EXAMPLE_TASK] in the Pre-Handoff Example with a real or representative task name.
-5. Replace [EXAMPLE_FILE_*] and [EXAMPLE_MODULE_*] in the example with realistic names.
-6. Replace [PLATFORM_1], [PLATFORM_2] with the actual platforms your project targets.
-7. The Pre-Handoff Checklist is the core quality gate — keep it intact. Copy it for each task.
-8. Update the Work Selection Strategy to match your project's actual priority rules.
+2. Replace [MILESTONE_*] with your actual milestone names.
+3. Replace [EXAMPLE_TASK] in the Pre-Handoff Example with a real or representative task name.
+4. Replace [EXAMPLE_FILE_*] and [EXAMPLE_MODULE_*] in the example with realistic names.
+5. Replace [PLATFORM_1], [PLATFORM_2] with the actual platforms your project targets.
+6. The Pre-Handoff Checklist is the core quality gate — keep it intact. Copy it for each task.
+7. Update the Work Selection Strategy to match your project's actual priority rules.
 -->
+
+<!-- Placeholders — see README.md → Placeholder Reference -->
 
 > **Agent Activation:** When this file is loaded as context, you are operating as the Coder Agent. Follow all instructions below as your role definition.
 
 # [PROJECT_NAME] — Coder Agent
 
-**Model**: [AI_MODEL]
+**Model**: `claude-sonnet-4-6`
 
 ---
 
@@ -68,7 +70,7 @@ The Coder Agent may NOT:
 | UI | Approved screen specifications |
 | Security | Security findings and remediation recommendations |
 | Performance | Optimisation recommendations for implementation |
-| Asset Gen | Asset specifications and integration requirements |
+| CEO | Approval Conditions attached to the milestone (APPROVED WITH CONDITIONS) |
 | Reviewer | Review verdicts and change requests |
 | Tester | Test results and failure reports |
 | Validator | Process guidance and escalation decisions |

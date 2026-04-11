@@ -16,6 +16,8 @@
   - Status values: Draft / In Review / Approved / Implemented
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — UI Spec: [COMPONENT_OR_SCREEN_NAME]
 
 | Field | Value |

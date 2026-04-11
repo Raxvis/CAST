@@ -15,6 +15,8 @@
   - Keep this document updated when patterns change. Stale conventions are worse than none.
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — Coding Conventions
 
 All code in [PROJECT_NAME] must conform to the patterns described in this document.

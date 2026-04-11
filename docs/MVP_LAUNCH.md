@@ -15,6 +15,8 @@
   - Status values used throughout: Complete / In Progress / Not Started / Blocked / N/A.
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — Launch Readiness Audit
 
 **Version**: [VERSION]

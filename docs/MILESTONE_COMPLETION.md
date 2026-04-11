@@ -14,6 +14,8 @@
   - Copy this template to `docs/milestones/[MILESTONE_NAME]_COMPLETION.md` for each milestone.
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — [MILESTONE_NAME] Completion Report
 
 ---

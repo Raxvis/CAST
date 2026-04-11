@@ -17,6 +17,12 @@
 This file is the entry point for all project documentation. If you are looking for a
 specific piece of information, start here to find the correct document.
 
+> **Scope of this directory:** `docs/` holds **reference material only** — requirements,
+> conventions, design rationale, and reusable templates. It does not contain work artifacts.
+> Milestone plans, per-milestone architecture and UI specs, bug reports, CEO reviews, and
+> session logs live in `artifacts/`. See `artifacts/README.md` for the full layout and the
+> root `README.md` for the split rationale.
+
 ---
 
 ## Design Documents
@@ -46,45 +52,71 @@ These documents describe how the project is built and the conventions that gover
 
 ---
 
-## Project Tracking
+## Topic-Specific Technical Documents
 
-These documents track the live state of the project: bugs, progress, and milestones.
+These three files are scoped to a project type rather than being universal. **Keep the
+one(s) that match your project and delete the rest.** The shipped `CLAUDE.md` has
+commented `@import` lines for all three — uncomment the relevant line(s) to load the
+matching patterns into session context.
 
 | File | Description |
 |------|-------------|
-| `BUGS.md` | Active bug tracker. Documents known issues, reproduction steps, and resolution status. |
+| `FRONTEND.md` | User-facing visual interfaces (web, mobile, desktop GUI, game UI). Covers navigation, state management, component patterns, performance budgets, input handling, platform differences. |
+| `BACKEND.md` | API servers, message workers, scheduled jobs, and data pipelines. Covers request/response boundaries, persistence, HTTP status semantics, authentication, middleware ordering, observability, and background work. |
+| `CLI.md` | Command-line tools and terminal utilities. Covers argv parsing, stdin/stdout/stderr discipline, exit codes, terminal formatting, cross-platform concerns, signal handling, and interactive prompts. |
+
+Projects that span multiple categories (e.g., a full-stack app with a backend API and a
+web frontend) can keep more than one. Projects that don't fit any category can delete all
+three and write their own.
+
+---
+
+## Project Registers and Reference Logs
+
+These documents live in `docs/` because they are reference material maintained over the
+life of the project rather than per-work-item artifacts.
+
+| File | Description |
+|------|-------------|
 | `CHANGELOG.md` | Chronological log of notable changes across releases and milestones. Maintained by the release agent. |
 | `ASSETS.md` | Registry of all project assets (images, fonts, etc.) with status and source information. |
 | `MVP_LAUNCH.md` | Checklist and criteria for the initial public release. |
-| `STANDUP.md` | Running log of progress updates, blockers, and decisions from work sessions. |
-| `MILESTONE_VALIDATION.md` | Template for milestone acceptance records. Copy to `docs/milestones/[MILESTONE_NAME]_VALIDATION.md` for each milestone. |
+
+Live work tracking — the active bug tracker and the rolling session log — lives in
+`artifacts/`, not here:
+
+- `artifacts/BUGS.md` — active bug tracker (Bug Gatherer files, Debugger investigates)
+- `artifacts/STANDUP.md` — rolling session progress log
 
 ---
 
 ## Templates
 
-Reusable document templates to be copied and filled in when documenting new modules,
-systems, data schemas, UI screens, or task breakdowns.
+Reusable document templates. These files live in `docs/` as reference; agents read them
+and produce **instances** under `artifacts/`. Never fill in a template in place — copy it
+to the appropriate `artifacts/` subdirectory first.
 
-| File | Description |
-|------|-------------|
-| `ARCH_MODULE.md` | Template for documenting a single code module (purpose, interface, dependencies, error handling). |
-| `ARCH_SYSTEM.md` | Template for documenting a high-level system composed of multiple modules. |
-| `ARCH_DATA_SCHEMA.md` | Template for documenting a data schema or save format. |
-| `UI_SPEC.md` | Template for specifying a UI screen or component (layout, states, interactions, accessibility). |
-| `MILESTONE_TASKS.md` | Template for breaking a milestone into concrete, actionable tasks with acceptance criteria. Copy to `docs/milestones/[MILESTONE_NAME]_TASKS.md` for each milestone. |
-| `MILESTONE_COMPLETION.md` | Template for milestone completion reports. Copy to `docs/milestones/` after a milestone is validated. |
+| File | Description | Instance Location |
+|------|-------------|-------------------|
+| `ARCH_MODULE.md` | Template for documenting a single code module | `artifacts/architecture/` |
+| `ARCH_SYSTEM.md` | Template for documenting a high-level system | `artifacts/architecture/` |
+| `ARCH_DATA_SCHEMA.md` | Template for documenting a data schema or save format | `artifacts/architecture/` |
+| `UI_SPEC.md` | Template for specifying a UI screen or component | `artifacts/ui-specs/` |
+| `MILESTONE_DEFINITION.md` | Template for the milestone definition file (what and why) | `artifacts/milestones/milestone-{N}-{slug}.md` |
+| `MILESTONE_TASKS.md` | Template for the task breakdown file (how; one row per task) | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
+| `MILESTONE_COMPLETION.md` | Template for milestone completion reports | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
+| `MILESTONE_VALIDATION.md` | Template for milestone acceptance records | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
 
 ---
 
 ## How to Use This Documentation
 
-1. **Starting a new feature?** Read `PRD.md` for requirements and `CODE_PATTERNS.md` for conventions.
+1. **Starting a new feature?** Run `/agent-plan`. Read `PRD.md` for requirements and `CODE_PATTERNS.md` for conventions.
 2. **Confused by a term?** Check `GLOSSARY.md` first.
 3. **Creating a new file?** Read `FILE_CONVENTIONS.md` before deciding where to put it.
 4. **Documenting a design decision?** Add an entry to `DESIGN_RATIONALE.md`.
-5. **Found a bug?** Log it in `BUGS.md`.
-6. **Completing a milestone?** Fill in `MILESTONE_VALIDATION.md`.
+5. **Found a bug?** Log it in `artifacts/BUGS.md` (not here — `docs/` is reference-only).
+6. **Completing a milestone?** Copy `MILESTONE_VALIDATION.md` into `artifacts/milestones/` and fill it in there.
 
 ---
 

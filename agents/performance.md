@@ -1,6 +1,7 @@
 ---
 name: performance
 description: "Performance agent. Use for profiling, identifying bottlenecks, and optimization."
+model: claude-opus-4-6
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -10,18 +11,19 @@ provides feedback directly to Architecture.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Replace [AI_MODEL] with the model your agents use.
-3. Replace [STARTUP_METRIC], [TICK_METRIC], [RENDER_METRIC], [MEMORY_METRIC], [STORAGE_METRIC]
+2. Replace [STARTUP_METRIC], [TICK_METRIC], [RENDER_METRIC], [MEMORY_METRIC], [STORAGE_METRIC]
    and their [TARGET] values with your actual performance metrics.
-4. The Performance Budget Tracking table mirrors targets defined in architect.md — keep them
+3. The Performance Budget Tracking table mirrors targets defined in architect.md — keep them
    in sync.
 -->
+
+<!-- Placeholders — see README.md → Placeholder Reference -->
 
 > **Agent Activation:** When this file is loaded as context, you are operating as the Performance Agent. Follow all instructions below as your role definition.
 
 # [PROJECT_NAME] — Performance Agent
 
-**Model**: [AI_MODEL]
+**Model**: `claude-opus-4-6`
 
 ---
 

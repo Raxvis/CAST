@@ -17,6 +17,8 @@
   - Dependencies: List task IDs that must be complete before this task can start, or "None".
 -->
 
+<!-- Placeholders — see README.md → Placeholder Reference -->
+
 # [PROJECT_NAME] — [MILESTONE_NAME] Task Breakdown
 
 ---
