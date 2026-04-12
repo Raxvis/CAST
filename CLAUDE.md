@@ -51,3 +51,56 @@ When editing templates, preserve placeholder tokens — do not replace them with
 - Every template file begins with an HTML comment block (`<!-- TEMPLATE INSTRUCTIONS -->`) explaining how to customize it
 - Agent files include YAML frontmatter (`name`, `description`) for Claude Code subagent registration; they are self-contained and removing one does not break others
 - `root/CLAUDE.md` contains `@import` directives at the bottom referencing docs that should be loaded as context
+
+## Release and Tagging Policy
+
+Whenever the template version is bumped, the new version must be tagged and released on GitHub at the same time the commit is pushed. This is a hard rule, not a preference — `scripts/bootstrap.sh`, `scripts/install.sh`, `scripts/install.ps1`, and `PROMPT.md` all reference the template version, and downstream users rely on GitHub tags to pin a known-good revision. A push without a corresponding tag leaves the canonical version floating and breaks reproducible installs.
+
+**A version bump is any change to one of the following synchronized locations:**
+
+- `README.md` — the version badge and the `Current template version` hero line
+- `scripts/install.sh` — the `TEMPLATE_VERSION` shell constant
+- `scripts/install.ps1` — the `$TemplateVersion` PowerShell variable
+- `PROMPT.md` — the `Template version targeted` header
+- `CHANGELOG.md` — a new version entry
+
+All five of these must land in the same commit. A commit that bumps one without the others is incomplete and should not be pushed.
+
+**Release checklist (run every time the version changes):**
+
+1. Update all five locations above in a single commit.
+2. Add a `CHANGELOG.md` entry for the new version, following the existing format (Added / Changed / Removed / Migration subsections as applicable). The entry must describe every substantive change since the prior version, not just the new feature.
+3. Commit the version bump with a message that starts with the new version number (e.g. `"Release v0.8.1: ..."`) so the tag-creation step can use the commit as the tag target.
+4. Push the commit to `origin main`.
+5. **Immediately after pushing**, create an annotated git tag at the same commit matching the new version:
+   ```bash
+   git tag -a v0.8.1 -m "CAST v0.8.1" <commit-sha>
+   git push origin v0.8.1
+   ```
+   The tag name is `v` followed by the semver string. Use an annotated tag (`-a`), never a lightweight tag — annotated tags carry the tagger, date, and message and are what GitHub Releases consume.
+6. **Immediately after pushing the tag**, create a GitHub Release at that tag with the release notes pulled from the corresponding `CHANGELOG.md` entry:
+   ```bash
+   gh release create v0.8.1 \
+     --title "CAST v0.8.1" \
+     --notes-file <(sed -n '/^## \[0\.8\.1\]/,/^## \[/p' CHANGELOG.md | head -n -1)
+   ```
+   Or use the `gh release create` interactive flow and paste the CHANGELOG section by hand. Do not skip this step — the GitHub Release is what `TEMPLATE_REPO_URL` consumers rely on to detect new versions, and it is what users see when they click "Releases" on the repo page.
+7. Verify: `gh release view v0.8.1` should show the release notes, and `git tag -l` should list the new tag. If either is missing, finish the release before moving on.
+
+**Do not do any of the following:**
+
+- Push a version-bump commit without creating the matching tag and release in the same session.
+- Bump the version in some locations but not others. All five synchronized locations must match.
+- Use a lightweight tag (`git tag v0.8.1 <sha>` without `-a`). Always use an annotated tag.
+- Skip the GitHub Release step because "the tag exists". The tag and the Release are separate artifacts; downstream tooling depends on both.
+- Bump the version without a `CHANGELOG.md` entry. Every tag must have a corresponding CHANGELOG section the release notes can cite.
+
+**When not to bump:** content changes that do not affect the template's externally visible behavior (README prose tweaks, typo fixes, internal refactors of agent decision logs) do not require a version bump. Bump only when one of these is true:
+
+- A new file is added that users would import or reference
+- An existing file's public contract changes (agent outputs, command stages, template slot names)
+- A file is renamed, moved, or removed
+- A bug in the adoption prompt, installer, or scripts is fixed in a way users should re-run with
+- The workflow gains or loses an agent, command, or stage
+
+If in doubt, bump — the cost of an unnecessary patch release is much lower than the cost of a silent behavior change reaching users at `main`.
