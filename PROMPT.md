@@ -231,21 +231,40 @@ Produce a detailed migration plan tailored to the classification. Structure it a
 
 ### Critical agent requirements
 
-Every CAST adoption must end with at least the Tier 1 minimum set existing:
+CAST ships **fifteen** agents. An adoption must account for every one of them — not only the required tiers but also Docs Writer, Release, and Validator, which are listed as "Optional based on project type" in the main README but **are still installed by default** by the scripts and should be installed by default by this prompt unless the user explicitly opts out. A common mistake is to migrate the tiered agents and silently drop Validator and Release — **do not do this**.
 
-- **Tier 1 (always required)**: `product`, `coder`, `reviewer`, `tester`
+**Tier 1 — Core development loop (always required):**
 
-If the user is keeping `/agent-task`, also require Tier 3:
+- `product`, `coder`, `reviewer`, `tester`
 
-- **Tier 3 (for `/agent-task`)**: `debugger`, `refactor`, `bug-gatherer` (on top of Tier 1)
+**Tier 2 — Strongly recommended for any serious project:**
 
-If the user is keeping `/agent-plan` and `/agent-code`, also require Tier 4:
+- `architect`, `debugger`, `docs-writer`
 
-- **Tier 4 (for `/agent-plan` + `/agent-code`)**: `architect`, `ui`, `security`, `performance`, `ceo` (on top of Tiers 1–3)
+**Tier 3 — Required for `/agent-task`** (on top of Tiers 1–2):
 
-Tier 2 is strongly recommended but not hard-required: `architect` (if not already in Tier 4), `debugger` (if not already in Tier 3), `docs-writer`.
+- `debugger`, `refactor`, `bug-gatherer`
 
-**For each missing required agent**, the plan must include a Create action. If the user has an existing file that fills the role under a different name, propose Rename + Update. If the fill is ambiguous, mark as Ask and list the candidates.
+**Tier 4 — Required for `/agent-plan` and `/agent-code`** (on top of Tiers 1–3):
+
+- `architect`, `ui`, `security`, `performance`, `ceo`
+
+**Tier 5 — Project-type optional but installed by default:**
+
+- `release` — owns changelog, version bumping, and release preparation. Keep for any project that ships formal releases or maintains `docs/CHANGELOG.md`. Drop only for personal scratch projects that never cut a release.
+- `validator` — owns process integrity, conflict resolution between agents, milestone tracking, retrospectives, and the session-start checklist. Keep for any project that runs `/agent-plan` or `/agent-code` — Validator is the arbiter when Product and Architecture disagree, when a Reviewer and Tester classification conflicts, or when a milestone stalls. Drop only if you have a strict single-developer workflow where there is no need for agent-vs-agent escalation.
+
+**Default install set: all 15 agents.** Every Tier 5 agent must appear as either Create or Preserve in the plan unless the user explicitly says "skip validator" or "skip release" during the Phase 4 approval gate. Do not silently omit them.
+
+**For each missing required agent** (Tiers 1–4) or each missing Tier 5 agent (unless the user opts out), the plan must include a Create action. If the user has an existing file that fills the role under a different name, propose Rename + Update. If the fill is ambiguous, mark as Ask and list the candidates.
+
+**Final check before closing the plan:** enumerate all 15 agent names and verify every one has a corresponding Create / Rename+Update / Update-in-place / Preserve action in the plan. If any of the 15 is missing from the plan, add the corresponding Create action before presenting the plan to the user. The 15 names are:
+
+```
+product, architect, ui, security, performance, ceo,
+coder, tester, reviewer, debugger, refactor,
+bug-gatherer, docs-writer, release, validator
+```
 
 ### Commands mapping
 
@@ -263,6 +282,35 @@ The three CAST commands are `/agent-plan`, `/agent-code`, `/agent-task`. For eac
 - `/agent-plan` ← `plan.md`, `planning.md`, `design.md`, `spec.md`, `prd.md`, `requirements.md`, `architect.md`
 - `/agent-code` ← `code.md`, `implement.md`, `engineer.md`, `build.md`, `work.md`, `develop.md`, `dev.md`
 - `/agent-task` ← `task.md`, `fix.md`, `do.md`, `patch.md`, `tweak.md`, `small.md`, `quick.md`
+
+### Agent similar-name candidates
+
+When scanning for existing agent files that might fill a CAST role under a different name, check these aliases. If a match is found, propose Rename + Update rather than Create. If no match is found, propose Create from the canonical CAST template.
+
+| CAST agent | Common aliases |
+|---|---|
+| `product` | `product-manager`, `pm`, `planner`, `owner`, `po`, `requirements`, `backlog` |
+| `architect` | `architect`, `architecture`, `designer`, `sys-design`, `system-design`, `tech-lead`, `techlead` |
+| `ui` | `ui`, `ux`, `designer`, `frontend-designer`, `screens`, `wireframe` |
+| `security` | `security`, `secops`, `appsec`, `auditor`, `pentester`, `sec` |
+| `performance` | `performance`, `perf`, `profiler`, `optimizer`, `benchmarker` |
+| `ceo` | `ceo`, `approver`, `gate`, `signoff`, `reviewer-final`, `exec`, `director` |
+| `coder` | `coder`, `implementer`, `engineer`, `developer`, `dev`, `builder`, `worker` |
+| `tester` | `tester`, `test`, `qa`, `quality`, `test-writer`, `test-runner` |
+| `reviewer` | `reviewer`, `code-reviewer`, `review`, `lint`, `critic` |
+| `debugger` | `debugger`, `debug`, `troubleshooter`, `investigator`, `diagnose`, `fix-finder` |
+| `refactor` | `refactor`, `refactorer`, `cleaner`, `restructurer`, `tidy` |
+| `bug-gatherer` | `bug-gatherer`, `bug-reporter`, `triage`, `bug-filer`, `issue-filer`, `reporter` |
+| `docs-writer` | `docs-writer`, `docs`, `documentation`, `writer`, `doc`, `technical-writer`, `tech-writer` |
+| `release` | `release`, `release-manager`, `releaser`, `shipper`, `deployer`, `publisher`, `versioner` |
+| `validator` | `validator`, `validation`, `process`, `coordinator`, `orchestrator`, `enforcer`, `referee`, `arbiter`, `meta`, `supervisor`, `workflow`, `workflow-validator` |
+
+**Two agents that are frequently missed** during adoption because their CAST role is abstract rather than tied to a concrete artifact:
+
+1. **`validator`** — owns **process integrity, conflict resolution, milestone tracking, and retrospectives**. A project rarely has a file literally named `validator.md`, but the role often exists under names like `coordinator`, `process`, `orchestrator`, `meta`, or "the agent that makes sure everyone follows the rules". If your inventory doesn't find a direct match, **still install validator** as a Create action — do not silently skip it.
+2. **`release`** — owns **changelog, versioning, and build verification**. If the project has a `CHANGELOG.md` (anywhere — root, `docs/`, or loose), it almost certainly has an implicit release workflow, even without a dedicated agent file. Install `release` as a Create action in that case and note it will take ownership of the existing changelog going forward.
+
+The Phase 3 final check (the 15-name enumeration above) catches both of these if they slip through the per-role scan.
 
 ### Docs mapping
 
@@ -381,6 +429,7 @@ Phase separation: <None / Implicit / Explicit>
 2. Your project has both frontend (React) and backend (Express) code. Should I install both `docs/FRONTEND.md` and `docs/BACKEND.md`? (Recommended: yes.)
 3. Your project is a React Native app. Should I install `docs/FRONTEND.md` and `docs/MOBILE.md` as a pair? (Recommended: yes — mobile projects need both the shared UI patterns and the mobile-specific delta.)
 4. You have a `features/` directory with 12 files matching CAST's pre-0.3.0 naming. Confirm renaming to `artifacts/` and updating all cross-references?
+5. CAST installs 15 agents by default, including `validator` (owns process integrity, conflict resolution, milestone tracking) and `release` (owns changelog and version bumping). Your project doesn't currently have either. Should I install both, install only one, or skip both? (Recommended: install both. Skip only if you're certain you don't need them — the scripts install them by default.)
 ```
 
 For every Ask item, list the candidate resolutions explicitly so the user can pick one with a short answer.
@@ -436,13 +485,35 @@ If the plan includes a rename of `features/` (or similar) → `artifacts/`, exec
 
 ### 5.4 — Install agent files
 
-For each agent action in the plan:
+Walk the canonical 15-agent list in this exact order and execute the planned action for each. **Do not skip any name on this list.** If the plan has no action for one of these names, that is a bug in the Phase 3 plan — stop and re-enter Phase 3 to add the missing action.
+
+Canonical install order:
+
+1. `product`
+2. `architect`
+3. `ui`
+4. `security`
+5. `performance`
+6. `ceo`
+7. `coder`
+8. `tester`
+9. `reviewer`
+10. `debugger`
+11. `refactor`
+12. `bug-gatherer`
+13. `docs-writer`
+14. `release`
+15. `validator`
+
+For each agent:
 
 1. Fetch the canonical CAST agent file via WebFetch: `https://raw.githubusercontent.com/Raxvis/CAST/main/agents/<name>.md`
 2. Substitute detected project values: `[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[TEST_CMD]`, `[DEV_SERVER_CMD]`, `[BUILD_CMD]`, and any others from the inventory.
 3. If the action is **Create**: write to `.claude/agents/<name>.md` directly.
 4. If the action is **Rename + Update**: read the existing file first, identify custom sections (anything not in CAST's standard section list), write the CAST template as the base, insert custom sections as an appendix after the standard sections, then move the old file to the new canonical name.
 5. If the action is **Update in place**: read the existing file, identify custom sections, replace CAST-owned sections with CAST's current versions, leave custom sections untouched.
+
+After completing the loop, **re-enumerate the 15 names and confirm each `.claude/agents/<name>.md` exists**. If any file is missing, that means the action was skipped. Create it from the canonical template before moving on to Phase 5.5.
 6. Verify YAML frontmatter is valid (`name`, `description`, `model` keys present, properly quoted description).
 
 **Standard CAST agent sections** (these are CAST-owned; replace during update):
@@ -536,7 +607,7 @@ After execution:
 2. **Run `./scripts/check-placeholders.sh`** and report any remaining unfilled tokens. Distinguish between:
    - Real unfilled placeholders (needs user action)
    - Sub-template placeholders in bug report forms or milestone templates (`[DATE]`, `[REPRODUCTION_STEPS]`) — these are expected and should NOT be substituted at install time.
-3. **Verify required agents exist** per the tier rules in Phase 3. List any missing required agents and flag them as errors.
+3. **Verify all 15 agents exist** after execution. Enumerate the canonical list — `product`, `architect`, `ui`, `security`, `performance`, `ceo`, `coder`, `tester`, `reviewer`, `debugger`, `refactor`, `bug-gatherer`, `docs-writer`, `release`, `validator` — and check each one against `.claude/agents/<name>.md`. Flag any missing as errors. The only acceptable reason for a Tier 5 agent (`release`, `validator`) to be absent is an explicit user opt-out during Phase 4; in that case, record the opt-out in the Phase 7 report. If any Tier 1–4 agent is missing, that is a hard failure — do not proceed to Phase 7 until the gap is fixed.
 4. **Verify required commands exist** for the command set the user chose to keep. List any missing and flag as errors.
 5. **Verify the docs/artifacts split**:
    - No files under `docs/` should contain the strings "# Milestone" in an H1 heading or "BUG-" at the start of a line (those would be work artifacts that leaked into reference).
