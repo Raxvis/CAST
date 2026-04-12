@@ -79,7 +79,7 @@ This command orchestrates a mini engineering pipeline: Coder → Tester → Revi
 
 Before any work begins:
 
-1. Read `CLAUDE.md`, `docs/CODE_PATTERNS.md`, `docs/FILE_CONVENTIONS.md`, and any topic-specific reference doc (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`) that applies to the project.
+1. Read `CLAUDE.md`, `docs/CODE_PATTERNS.md`, `docs/FILE_CONVENTIONS.md`, and any topic-specific reference doc (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) that applies to the project. Mobile projects typically need both `docs/FRONTEND.md` and `docs/MOBILE.md`.
 2. Read `artifacts/BUGS.md` if the task description references a bug ID.
 3. Read any files named in the task description.
 4. **Scope check.** If the task description implies an architectural change, a new module, a new screen, a new endpoint, or a cross-cutting change, **stop and instruct the user to run `/agent-plan` instead**. Do not attempt to inline architect or UI work into a one-off task. A helpful response: "This task introduces <specific scope>, which needs a planning stage. Run `/agent-plan \"<feature description>\"` first, then `/agent-code` to implement."

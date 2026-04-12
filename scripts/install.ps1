@@ -82,7 +82,7 @@ $ErrorActionPreference = 'Stop'
 # ---------- Template version ----------
 # Bumped alongside CHANGELOG.md at the template repo root.
 # Keep in sync with the TEMPLATE_VERSION constant in scripts/install.sh.
-$TemplateVersion = '0.7.0'
+$TemplateVersion = '0.8.0'
 
 if ($Help -or -not $Target) {
     if (-not $Target -and -not $Help) {

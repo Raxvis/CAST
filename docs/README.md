@@ -54,9 +54,9 @@ These documents describe how the project is built and the conventions that gover
 
 ## Topic-Specific Technical Documents
 
-These three files are scoped to a project type rather than being universal. **Keep the
+These four files are scoped to a project type rather than being universal. **Keep the
 one(s) that match your project and delete the rest.** The shipped `CLAUDE.md` has
-commented `@import` lines for all three — uncomment the relevant line(s) to load the
+commented `@import` lines for all four — uncomment the relevant line(s) to load the
 matching patterns into session context.
 
 | File | Description |
@@ -64,10 +64,13 @@ matching patterns into session context.
 | `FRONTEND.md` | User-facing visual interfaces (web, mobile, desktop GUI, game UI). Covers navigation, state management, component patterns, performance budgets, input handling, platform differences. |
 | `BACKEND.md` | API servers, message workers, scheduled jobs, and data pipelines. Covers request/response boundaries, persistence, HTTP status semantics, authentication, middleware ordering, observability, and background work. |
 | `CLI.md` | Command-line tools and terminal utilities. Covers argv parsing, stdin/stdout/stderr discipline, exit codes, terminal formatting, cross-platform concerns, signal handling, and interactive prompts. |
+| `MOBILE.md` | Native and cross-platform mobile apps (iOS, Android, React Native, Expo, Flutter, SwiftUI, Jetpack Compose). Covers the mobile-specific delta on top of `FRONTEND.md`: app lifecycle, OS permissions, native bridges, offline-first sync, local storage tiers, deep links, push notifications, device variety, and release engineering. |
 
 Projects that span multiple categories (e.g., a full-stack app with a backend API and a
-web frontend) can keep more than one. Projects that don't fit any category can delete all
-three and write their own.
+web frontend) can keep more than one. Mobile apps should keep **both** `FRONTEND.md` and
+`MOBILE.md` — the first covers the shared UI patterns, the second covers mobile-only
+concerns on top. Projects that don't fit any category can delete all four and write their
+own.
 
 ---
 

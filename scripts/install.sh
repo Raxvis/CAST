@@ -38,7 +38,7 @@ set -euo pipefail
 # Bumped alongside CHANGELOG.md at the template repo root.
 # Stamped into the installed project's template.values for traceability.
 
-TEMPLATE_VERSION="0.7.0"
+TEMPLATE_VERSION="0.8.0"
 
 # ---------- CLI parsing ----------
 

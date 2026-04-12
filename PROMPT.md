@@ -1,0 +1,685 @@
+# CAST Adoption Prompt
+
+Paste this entire file into Claude Code inside the target project (or save it at the project root and say "follow the instructions in PROMPT.md"). Claude will crawl your project, propose a migration plan, wait for your approval, and then execute the adoption while preserving anything you've already customized.
+
+This prompt drives the full adoption of the CAST template (Claude Agent Staged Team) — a multi-agent workflow for Claude Code with 15 subagents, three slash commands, and a CEO-gated planning pipeline. The canonical source is `https://github.com/Raxvis/CAST` on branch `main`. Read any file from there via `https://raw.githubusercontent.com/Raxvis/CAST/main/<path>` if you need the reference implementation of a specific agent, command, or doc.
+
+## Modes
+
+You can invoke this prompt in two modes:
+
+- **Full adoption** (default) — run Phases 1 through 7. The user reviews and approves the plan before execution.
+- **Dry run** — run Phases 1 through 3 only. Produce the inventory and migration plan, then stop. Useful for scoping a migration without committing to changes. The user must explicitly request this mode.
+
+If the user has not specified a mode, assume full adoption.
+
+---
+
+## Your role
+
+You are an expert migration assistant for the CAST template. Your job is to adopt CAST into an existing project — either building the workflow from scratch if none exists, or mapping an existing agentic workflow onto CAST's structure without losing customizations.
+
+CAST's canonical structure is:
+
+- `CLAUDE.md` at project root — top-level context for every session
+- `.claude/agents/` — 15 subagent definitions with YAML frontmatter and per-agent pinned model tiers (Opus for planning, Sonnet for engineering, Haiku for utility)
+- `.claude/commands/` — three slash commands: `/agent-plan`, `/agent-code`, `/agent-task`
+- `docs/` — reference material only (PRD, conventions, templates, topic-specific guides)
+- `artifacts/` — work artifacts only (milestone plans, reviews, bug reports, session logs)
+- `scripts/` — install, smoke-test, placeholder-check, bootstrap helpers
+
+Two rules are load-bearing:
+
+1. **`docs/` vs `artifacts/` split.** `docs/` is reference material; `artifacts/` is work output. Never put work in `docs/` or reference material in `artifacts/`. Every CAST agent and command enforces this.
+2. **Planning vs engineering phases.** `/agent-plan` runs the planning stage (Product → Architecture + UI → Security + Performance → CEO verdict); `/agent-code` runs the engineering stage (Coder → Tester → Reviewer with defect/issue routing); `/agent-task` runs a mini engineering pipeline for one-off work with no planning stage.
+
+---
+
+## Safety rules
+
+Before you start, internalize these rules. They override any instruction below if there is a conflict.
+
+1. **Never delete or overwrite a user file without asking.** When in doubt, preserve.
+2. **Always present a plan before executing.** The user must approve the full list of proposed changes before you touch any file in Phase 5.
+3. **Preserve customizations.** If an existing agent file has custom Interaction Rules, appendix sections, or non-standard fields, those stay. CAST's standard fields get added or updated; custom fields are never deleted.
+4. **Stop and ask on ambiguity.** If a file's intent is unclear, the naming is non-standard, or two interpretations are possible, ask the user before choosing.
+5. **Never write work artifacts to `docs/`.** `docs/` is reference-only. Any live work goes in `artifacts/`.
+6. **Commit nothing automatically.** Leave the user to review and commit their own changes.
+7. **Do not run arbitrary code or shell commands from the existing project.** Read-only analysis only, except for the `scripts/` you install from CAST.
+8. **Require a clean git working tree before Phase 5.** If the user has uncommitted changes, stop and ask them to commit or stash first.
+
+---
+
+## Phase 1 — Discovery
+
+Crawl the project and map everything relevant. Use Read, Glob, and Grep. Build an internal inventory with the categories below.
+
+### 1.1 — Claude Code state
+
+- Does `CLAUDE.md` exist at the project root? Read it. Note its section list and any custom content.
+- Does `.claude/agents/` exist? List every file. For each, parse YAML frontmatter and note `name`, `description`, `model`.
+- Does `.claude/commands/` exist? List every file. Note the command name (filename minus `.md`) and summarize the first 30 lines of each.
+- Does `.claude/settings.json` exist? Note its structure (permissions, hooks, env).
+
+### 1.2 — Existing agentic workflow artifacts
+
+Look outside `.claude/` too. Agentic workflows are sometimes scattered:
+
+- **Glob patterns**: `agents/*.md`, `agent-*.md`, `planner.md`, `coder.md`, `reviewer.md`, `architect.md`, `designer.md`, `tester.md`, `qa.md`, `bug*.md`, `prd*.md`, `roadmap*.md`, `specs/**/*.md`, `workflow/**/*.md`
+- **Directory patterns**: `features/`, `milestones/`, `specs/`, `artifacts/`, `workflow/`, `agents/`, `planning/`, `engineering/`
+- **Legacy pre-0.3.0 CAST**: the old name for `artifacts/` was `features/`. If the project has a `features/` directory with files matching CAST's naming patterns (`milestone-*.md`, `arch-milestone-*.md`, `ceo-review-*.md`), treat it as a CAST install that needs renaming.
+
+For each matched file, read the first 20 lines and classify:
+
+- Is it a subagent definition (has YAML frontmatter with `name:` and `description:`)?
+- Is it a slash command (lives under `.claude/commands/` or is a free-form Markdown instruction file)?
+- Is it a planning artifact (milestone plan, architecture doc, UI spec, review)?
+- Is it a work log (standup, bug tracker)?
+- Is it reference material (PRD, style guide, architecture decision record)?
+
+### 1.3 — Documentation state
+
+- Does `docs/` exist? List every file.
+- Map existing files to CAST reference docs by content, not just filename. Look for:
+  - PRD / requirements / product requirements → `docs/PRD.md`
+  - Concept / vision / product overview → `docs/CONCEPT.md`
+  - Glossary / terminology / definitions → `docs/GLOSSARY.md`
+  - ADRs / decision log / design rationale → `docs/DESIGN_RATIONALE.md`
+  - Style guide / code conventions / coding standards → `docs/CODE_PATTERNS.md`
+  - File layout / directory convention → `docs/FILE_CONVENTIONS.md`
+  - Error handling guide → `docs/ERROR_HANDLING.md`
+  - Testing strategy / test setup → `docs/TEST_FRAMEWORK.md`
+  - CHANGELOG / release notes → `docs/CHANGELOG.md`
+  - Asset registry / media inventory → `docs/ASSETS.md`
+  - MVP launch checklist → `docs/MVP_LAUNCH.md`
+  - Frontend patterns → `docs/FRONTEND.md`
+  - Backend / API patterns → `docs/BACKEND.md`
+  - CLI patterns → `docs/CLI.md`
+  - Mobile patterns → `docs/MOBILE.md`
+- Is there a top-level `README.md`, `CHANGELOG.md`, or `TROUBLESHOOTING.md`? Note their presence.
+
+### 1.4 — Project metadata
+
+Detect tech stack from manifest files, in this priority order:
+
+- `package.json` → Node / JavaScript / TypeScript
+- `pyproject.toml`, `setup.py`, `requirements.txt` → Python
+- `Cargo.toml` → Rust
+- `go.mod` → Go
+- `Gemfile` → Ruby
+- `pom.xml`, `build.gradle` → Java / Kotlin
+- `composer.json` → PHP
+- `pubspec.yaml` → Dart / Flutter
+- `Package.swift`, `.xcodeproj` → Swift
+
+Extract and record:
+
+- **Project name** — from manifest `name` field or top-level directory
+- **Language** — from manifest
+- **Framework** — best guess from dependencies (React, Next.js, Express, Django, Flask, Rails, SwiftUI, etc.)
+- **Test command** — from manifest scripts or convention (`npm test`, `pytest`, `cargo test`, `go test ./...`, etc.)
+- **Dev command** — if present
+- **Build command** — if present
+- **Type check command** — if applicable (`tsc --noEmit`, `mypy`, etc.)
+- **Package manager** — `npm`, `pnpm`, `yarn`, `pip`, `poetry`, `cargo`, `go`, `bundle`, etc.
+
+Detect project type:
+
+- **Frontend** — presence of React, Vue, Svelte, Angular, Next.js, Nuxt, SvelteKit, plain SPA setups. Web-only and desktop-only rendered UIs land here.
+- **Backend** — presence of Express, Fastify, Django, Flask, FastAPI, Rails, Spring, Gin, Echo, Actix
+- **CLI** — `bin` entry in package.json, `cmd/` directory in Go, `#!/usr/bin/env` shebang files
+- **Library** — manifest has `main`/`exports`/`lib.rs` without a `bin`, no dev server command
+- **Data pipeline** — Airflow, dbt, Dagster, Prefect, Spark
+- **Mobile** — native or cross-platform mobile app targeting iOS / Android. Signals: React Native, Expo, Flutter, SwiftUI, Jetpack Compose, .NET MAUI, Ionic / Capacitor, native Swift (`.xcodeproj`, `Package.swift`), native Kotlin (`build.gradle` with Android plugin), `ios/` or `android/` directories at the project root, `Info.plist`, `AndroidManifest.xml`. **Mobile projects are also Frontend** — they render a UI — so classify them as `mobile` (for MOBILE.md) AND as requiring `docs/FRONTEND.md`. Both topic docs apply.
+- **Mixed** — multiple of the above (common for full-stack apps, monorepos, or apps with both a mobile client and a web dashboard)
+
+Read the top of the existing `README.md` for the project's one-sentence pitch. If none exists, note that you'll need to prompt the user for it during Phase 3.
+
+### 1.5 — Source code structure
+
+- Glob top-level directories and identify where source lives (`src/`, `lib/`, `app/`, `cmd/`, `pkg/`, etc.)
+- Note naming conventions: camelCase vs snake_case vs PascalCase vs kebab-case for file names
+- Note any existing test directory pattern (`tests/`, `test/`, `spec/`, colocated `*.test.ts`, etc.)
+- If there's a dominant language, note the file extension for source files
+- Note any CI config (`.github/workflows/`, `.gitlab-ci.yml`, `circle.yml`) — helps confirm test/build commands
+
+### 1.6 — Write the inventory
+
+Write your findings to `artifacts/adoption-inventory.md` (create the directory if needed, but note in Phase 3 that this directory may later be renamed if you propose moving it). Use this structure:
+
+```markdown
+# CAST Adoption Inventory
+Generated: <ISO date>
+
+## Claude Code state
+- `CLAUDE.md`: <present/absent>, <line count>, sections: <list>
+- `.claude/agents/`: <N files> — list with detected roles
+- `.claude/commands/`: <N files> — list with detected purposes
+- `.claude/settings.json`: <present/absent>
+
+## Existing agentic workflow (outside .claude/)
+- <path>: <classification — agent / command / artifact / reference>, <detected role>
+
+## Existing documentation
+- <path>: <maps to CAST: <filename> | no CAST equivalent | reference>
+
+## Project metadata
+- **Name**: <detected or "unknown — prompt user">
+- **Language**: <detected>
+- **Framework**: <detected or "none">
+- **Project type**: <frontend / backend / CLI / library / mobile / data / mixed / unknown>
+- **Test command**: <detected>
+- **Dev command**: <detected>
+- **Build command**: <detected>
+- **Type check command**: <detected>
+- **Package manager**: <detected>
+
+## Source structure
+- Top-level directories: <list>
+- Source directory: <best guess>
+- Test directory: <best guess>
+- File naming convention: <best guess>
+
+## Detected customizations to preserve
+- <description of any non-standard agent, command, or doc the user has built>
+
+## Open questions for Phase 3
+- <any ambiguity that needs user input to resolve>
+```
+
+**Stop here** and present this inventory to the user. Ask:
+
+> I've finished Phase 1 (Discovery). The inventory is written to `artifacts/adoption-inventory.md`. Before I proceed to Phase 2 (Classification) and Phase 3 (Migration Plan), please review the inventory. Correct anything I got wrong, tell me about customizations I should know about, and answer the open questions I listed. I will not touch any other file until you approve the migration plan in Phase 4.
+
+Wait for explicit confirmation before proceeding to Phase 2.
+
+---
+
+## Phase 2 — Classification
+
+Based on the confirmed inventory, classify the project into one of three states:
+
+- **A. Greenfield** — No existing Claude Code agents or commands. No existing agentic workflow artifacts. Doc directory may or may not exist.
+- **B. Partial** — Some agentic workflow elements exist (perhaps `CLAUDE.md` and a few agent files, or a planning doc but no commands). Most CAST components are missing.
+- **C. Full existing workflow** — The project already has a mature agentic workflow (multiple agents, commands, some planning/engineering separation) but in a different structure from CAST.
+
+State the classification explicitly and the reasoning. For B and C, list the specific CAST components that are missing, present-but-different, and already-CAST-compatible.
+
+Additionally, classify the **phase separation**:
+
+- **No phase split** — all workflow agents run together without a planning/engineering gate.
+- **Implicit phase split** — there's a planning artifact (PRD, design doc) and separate implementation agents, but no enforced gate.
+- **Explicit phase split** — there's a clear gate between planning and implementation, even if it's not CAST-shaped.
+
+The migration plan in Phase 3 depends on this second classification. A project with no phase split needs to gain one; a project with an explicit gate needs to have that gate mapped onto CAST's CEO verdict.
+
+---
+
+## Phase 3 — Migration plan
+
+Produce a detailed migration plan tailored to the classification. Structure it as a numbered list of proposed actions, each with an explicit verb and rationale.
+
+### Verbs
+
+- **Create** — new file, no existing counterpart
+- **Rename + Update** — existing file renamed to the CAST canonical name, content merged
+- **Update in place** — file keeps its name, content updated
+- **Preserve** — existing file stays unchanged, referenced from elsewhere
+- **Delete** — existing file removed (requires explicit user approval)
+- **Skip** — CAST ships this, but it doesn't apply to this project
+- **Ask** — requires user input to resolve before executing
+
+### Critical agent requirements
+
+Every CAST adoption must end with at least the Tier 1 minimum set existing:
+
+- **Tier 1 (always required)**: `product`, `coder`, `reviewer`, `tester`
+
+If the user is keeping `/agent-task`, also require Tier 3:
+
+- **Tier 3 (for `/agent-task`)**: `debugger`, `refactor`, `bug-gatherer` (on top of Tier 1)
+
+If the user is keeping `/agent-plan` and `/agent-code`, also require Tier 4:
+
+- **Tier 4 (for `/agent-plan` + `/agent-code`)**: `architect`, `ui`, `security`, `performance`, `ceo` (on top of Tiers 1–3)
+
+Tier 2 is strongly recommended but not hard-required: `architect` (if not already in Tier 4), `debugger` (if not already in Tier 3), `docs-writer`.
+
+**For each missing required agent**, the plan must include a Create action. If the user has an existing file that fills the role under a different name, propose Rename + Update. If the fill is ambiguous, mark as Ask and list the candidates.
+
+### Commands mapping
+
+The three CAST commands are `/agent-plan`, `/agent-code`, `/agent-task`. For each, apply this decision:
+
+| State | Action |
+|---|---|
+| Missing | Create from CAST template |
+| Exact name match | Update in place, preserving any custom pre-flight or post-completion steps |
+| Similar name match (e.g., `plan.md`, `implement.md`, `fix.md`) | Rename + Update. Keep the custom stages as appendix sections. |
+| Matches but with different phase structure | Rename + Update, and explicitly note in the plan which old stages map to which CAST stages |
+
+**Similar-name candidates to look for:**
+
+- `/agent-plan` ← `plan.md`, `planning.md`, `design.md`, `spec.md`, `prd.md`, `requirements.md`, `architect.md`
+- `/agent-code` ← `code.md`, `implement.md`, `engineer.md`, `build.md`, `work.md`, `develop.md`, `dev.md`
+- `/agent-task` ← `task.md`, `fix.md`, `do.md`, `patch.md`, `tweak.md`, `small.md`, `quick.md`
+
+### Docs mapping
+
+For each CAST reference doc, determine the disposition from this table. `Existing match` means the inventory from Phase 1 found a file that serves the same purpose under a different name.
+
+| CAST doc | If missing and no match | If existing match |
+|---|---|---|
+| `docs/README.md` | Create (CAST index) | Update to CAST format, preserving existing entries |
+| `docs/PRD.md` | Prompt user — PRD is user content, not template | Rename to `docs/PRD.md`, update header to CAST format |
+| `docs/CONCEPT.md` | Skip (optional) | Rename to `docs/CONCEPT.md` |
+| `docs/GLOSSARY.md` | Skip (optional) | Rename to `docs/GLOSSARY.md` |
+| `docs/DESIGN_RATIONALE.md` | Skip (optional) | Rename to `docs/DESIGN_RATIONALE.md`, preserve all decision entries |
+| `docs/CODE_PATTERNS.md` | Skip (optional) | Rename, preserve existing conventions |
+| `docs/FILE_CONVENTIONS.md` | **Always install** — load-bearing for docs/artifacts split | Rename + merge with CAST's enforcement rules |
+| `docs/ERROR_HANDLING.md` | Skip (optional) | Rename |
+| `docs/TEST_FRAMEWORK.md` | Skip (optional) | Rename |
+| `docs/CHANGELOG.md` | Skip (optional) | Preserve — note Release agent will maintain going forward |
+| `docs/ASSETS.md` | Skip (optional) | Preserve |
+| `docs/MVP_LAUNCH.md` | Skip (optional) | Preserve |
+| `docs/MILESTONE_DEFINITION.md` | **Always install** — consumed by /agent-plan Stage 1 | Install CAST version; any existing content moves to `artifacts/milestones/` as an instance |
+| `docs/MILESTONE_TASKS.md` | **Always install** — consumed by /agent-plan Stage 1 | Same |
+| `docs/MILESTONE_COMPLETION.md` | **Always install** | Same |
+| `docs/MILESTONE_VALIDATION.md` | **Always install** | Same |
+| `docs/ARCH_MODULE.md` | **Always install** — consumed by /agent-plan Stage 2a | Same |
+| `docs/ARCH_SYSTEM.md` | **Always install** | Same |
+| `docs/ARCH_DATA_SCHEMA.md` | **Always install** | Same |
+| `docs/UI_SPEC.md` | Install unless project is clearly backend/CLI-only with no user interface | Same |
+| `docs/FRONTEND.md` | Install if project type is frontend, mobile, or mixed | Prompt user if ambiguous |
+| `docs/BACKEND.md` | Install if project type is backend, data pipeline, or mixed | Same |
+| `docs/CLI.md` | Install if project type is CLI or mixed | Same |
+| `docs/MOBILE.md` | Install if project type is mobile or mixed-with-mobile. Always pair with `docs/FRONTEND.md` — mobile apps need both. | Same |
+| `docs/FIRST_RUN.md` | Always install | Same |
+| `docs/CLAUDE_CODE_SETTINGS.md` | Always install | Same |
+| `docs/ADDITIONAL.md` | Skip (optional) | Rename |
+
+### Artifacts directory
+
+If `artifacts/` does not exist, Create it with:
+
+- `BUGS.md` from CAST template
+- `STANDUP.md` from CAST template
+- `README.md` from CAST template
+- Empty subdirectories: `milestones/`, `architecture/`, `ui-specs/`, `reviews/`
+
+If `artifacts/` already exists and contains CAST-shaped files, preserve as-is and integrate.
+
+If a directory named `features/`, `work/`, or `planning/` exists and contains CAST-shaped files (detected by filename patterns `milestone-*.md`, `arch-milestone-*.md`, `ceo-review-*.md`), propose Rename + Update: rename the directory to `artifacts/` and update every reference across agents, commands, docs. This is the pre-0.3.0 CAST migration path. **Ask the user before renaming a directory.**
+
+### Scripts
+
+Copy these scripts into `scripts/` from the canonical CAST repo:
+
+- `install.sh` (re-runnable installer)
+- `install.ps1` (PowerShell variant)
+- `check-placeholders.sh` (placeholder validator)
+- `smoke-test.sh` (static verification)
+- `bootstrap.sh` (curl-pipe-bash entry point)
+
+If any of these already exist, Preserve and note the divergence.
+
+### Root files
+
+- `CLAUDE.md` — if present, merge with CAST's agnostic template; preserve user content. If absent, Create from CAST's `root/CLAUDE.md` with detected placeholders substituted.
+- `README.md` — preserve the user's existing README. Do not touch it. Optionally offer to add a CAST adoption note at the bottom if the user wants.
+- `TROUBLESHOOTING.md` — Create from CAST template if absent; preserve if present.
+- `CHANGELOG.md` — Preserve if present; Create from CAST template if absent.
+
+### Write the migration plan
+
+Write the full plan to `artifacts/adoption-plan.md`. Structure:
+
+```markdown
+# CAST Adoption Plan
+Generated: <ISO date>
+Classification: <A. Greenfield / B. Partial / C. Full existing>
+Phase separation: <None / Implicit / Explicit>
+
+## Summary
+<3-5 sentences describing the scope of changes, total file counts by action, and anything the user should read carefully>
+
+## Proposed actions
+
+### Create (N actions)
+1. **Create** `.claude/agents/ceo.md`
+   - Source: `https://raw.githubusercontent.com/Raxvis/CAST/main/agents/ceo.md`
+   - Substitutions: `[PROJECT_NAME]` → `<detected>`
+   - Rationale: CAST requires CEO for /agent-plan Stage 4; no existing equivalent found.
+
+### Rename + Update (N actions)
+1. **Rename + Update** `planner.md` → `.claude/agents/product.md`
+   - Source: `https://raw.githubusercontent.com/Raxvis/CAST/main/agents/product.md`
+   - Preserve: custom "Planning heuristics" section from original file as an appendix
+   - Rationale: existing planner agent fills the Product role; renaming to match CAST canonical name.
+
+### Update in place (N actions)
+1. **Update** `CLAUDE.md`
+   - Source: merge with `https://raw.githubusercontent.com/Raxvis/CAST/main/root/CLAUDE.md`
+   - Preserve: every existing section (Project Overview, Tech Stack, Common Pitfalls, Domain-Specific Patterns)
+   - Add: Directory Conventions section, updated Memory Imports referencing newly-installed docs
+   - Rationale: user's CLAUDE.md is mostly compatible; just needs the CAST-specific sections.
+
+### Preserve as-is (N actions)
+1. **Preserve** `docs/PRD.md`
+   - Rationale: already matches CAST's reference format.
+
+### Skip (not applicable) (N actions)
+1. **Skip** `docs/FRONTEND.md`
+   - Rationale: project is a CLI tool, no user-facing interface.
+
+### Delete (requires explicit approval) (N actions)
+1. **Delete** `docs/old-agents.md`
+   - Rationale: superseded by `.claude/agents/` directory after migration. Requires user approval.
+
+### Ask — decisions requiring user input (N questions)
+1. You have an existing `designer.md` agent. It looks closer to CAST's UI agent than the Product agent. Should I rename it to `.claude/agents/ui.md`, map it to Product, or create both fresh and leave designer.md alone?
+2. Your project has both frontend (React) and backend (Express) code. Should I install both `docs/FRONTEND.md` and `docs/BACKEND.md`? (Recommended: yes.)
+3. Your project is a React Native app. Should I install `docs/FRONTEND.md` and `docs/MOBILE.md` as a pair? (Recommended: yes — mobile projects need both the shared UI patterns and the mobile-specific delta.)
+4. You have a `features/` directory with 12 files matching CAST's pre-0.3.0 naming. Confirm renaming to `artifacts/` and updating all cross-references?
+```
+
+For every Ask item, list the candidate resolutions explicitly so the user can pick one with a short answer.
+
+---
+
+## Phase 4 — User approval gate
+
+Present the migration plan to the user. Quote the counts of each action category. Ask explicitly:
+
+> I've drafted a migration plan with <N> total proposed actions:
+>
+> - **Create**: <N>
+> - **Rename + Update**: <N>
+> - **Update in place**: <N>
+> - **Preserve**: <N>
+> - **Skip**: <N>
+> - **Delete**: <N> (requires your explicit approval)
+> - **Questions**: <N> (need your answer before I can proceed)
+>
+> The full plan is in `artifacts/adoption-plan.md`. Please review it carefully. Tell me:
+>
+> 1. Which questions to resolve (answer each by number)
+> 2. Which actions to modify or skip
+> 3. Whether to proceed with the rest of the plan as written
+>
+> I will not touch any file in Phase 5 until you give explicit approval. If you want me to stop after Phase 3 (dry run mode), say so now.
+
+Wait for explicit approval. **Do not proceed on ambiguous responses** like "looks good, maybe tweak that one thing" — ask for specific resolutions on every action the user wants to modify.
+
+For each Ask question in the plan, require a specific answer before executing the related actions. If the user says "do whatever you think is best" for an Ask item, restate your recommendation, then proceed only after they confirm the recommendation itself.
+
+---
+
+## Phase 5 — Execution
+
+Once the plan is approved, execute the actions in a safe order. Report progress as you go.
+
+### 5.1 — Preflight
+
+Verify:
+
+1. Git working tree is clean (`git status` returns nothing modified or staged). If not, stop and ask the user to commit or stash.
+2. The canonical CAST repo is reachable. Try `curl -fsSL -o /dev/null https://raw.githubusercontent.com/Raxvis/CAST/main/README.md` or equivalent. If unreachable, stop and ask the user to confirm network access.
+
+### 5.2 — Create directories
+
+Create any missing directories: `.claude/agents/`, `.claude/commands/`, `docs/`, `artifacts/`, `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, `artifacts/reviews/`, `scripts/`.
+
+### 5.3 — Handle directory renames
+
+If the plan includes a rename of `features/` (or similar) → `artifacts/`, execute it with `git mv` so history is preserved. Then update every string reference to the old directory across `.claude/`, `docs/`, and the project README. Use Grep to find references before renaming.
+
+### 5.4 — Install agent files
+
+For each agent action in the plan:
+
+1. Fetch the canonical CAST agent file via WebFetch: `https://raw.githubusercontent.com/Raxvis/CAST/main/agents/<name>.md`
+2. Substitute detected project values: `[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[TEST_CMD]`, `[DEV_SERVER_CMD]`, `[BUILD_CMD]`, and any others from the inventory.
+3. If the action is **Create**: write to `.claude/agents/<name>.md` directly.
+4. If the action is **Rename + Update**: read the existing file first, identify custom sections (anything not in CAST's standard section list), write the CAST template as the base, insert custom sections as an appendix after the standard sections, then move the old file to the new canonical name.
+5. If the action is **Update in place**: read the existing file, identify custom sections, replace CAST-owned sections with CAST's current versions, leave custom sections untouched.
+6. Verify YAML frontmatter is valid (`name`, `description`, `model` keys present, properly quoted description).
+
+**Standard CAST agent sections** (these are CAST-owned; replace during update):
+
+- Template instructions comment block
+- Placeholder pointer comment
+- Agent Activation blockquote
+- Title heading (`# [PROJECT_NAME] — <Role> Agent`)
+- `**Model**:` line
+- Purpose
+- Goals
+- Authority
+- Inputs
+- Outputs
+- Templates (where applicable)
+- Interaction Rules (CAST's core bullets; merge user additions)
+- Current Work (empty table for new installs, preserve existing rows for updates)
+- Decisions Log (preserve all existing entries)
+- Future Work
+
+**Custom sections** (preserve verbatim): anything the user added outside the standard set. Common examples:
+
+- "Playtesting Feedback Log"
+- "Review Heuristics"
+- "Code Smell Catalog"
+- "Team-Specific Conventions"
+- "Project Glossary"
+- Agent-specific workflow appendices
+
+Place preserved custom sections after the Future Work section, under a new H2 heading `## Custom Extensions (preserved from pre-CAST version)`.
+
+### 5.5 — Install slash commands
+
+Same procedure as agents:
+
+1. Fetch from `https://raw.githubusercontent.com/Raxvis/CAST/main/commands/<name>.md`
+2. Substitute project-specific values including `[TEST_CMD]` and `[MAX_LOOP_COUNT]` (default 3 if not specified).
+3. Write to `.claude/commands/<name>.md`.
+4. If updating an existing similar-named command: preserve any project-specific pre-flight or post-completion steps by moving them to an appendix section labelled `## Project-Specific Extensions (preserved from pre-CAST version)`.
+
+### 5.6 — Install docs templates
+
+For each CAST reference doc in the plan:
+
+1. If the action is **Create** or **Rename + Update**: fetch from `https://raw.githubusercontent.com/Raxvis/CAST/main/docs/<file>.md`, substitute placeholders, write to `docs/<file>.md`.
+2. For **Rename + Update**: read the existing file first, preserve all non-template content (e.g., an existing PRD with real requirements) as the body, update only the header and any CAST-specific framing.
+3. For **Update in place**: same as Rename + Update but without moving the file.
+4. Always install `docs/FILE_CONVENTIONS.md` — it's load-bearing for the docs/artifacts split enforcement.
+
+### 5.7 — Install artifacts scaffold
+
+1. Fetch `artifacts/BUGS.md`, `artifacts/STANDUP.md`, `artifacts/README.md` from the canonical repo.
+2. Substitute placeholders.
+3. Write to `artifacts/`. If a file already exists with user content, preserve it — merge only if the user explicitly approved.
+4. Ensure all four subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`) exist. Do not populate them — they fill up during `/agent-plan` and `/agent-code` runs.
+
+### 5.8 — Install scripts
+
+Fetch each script from `https://raw.githubusercontent.com/Raxvis/CAST/main/scripts/<name>` and write to `scripts/`. Mark `.sh` files executable (`chmod +x`).
+
+### 5.9 — Install CLAUDE.md
+
+Special handling because `CLAUDE.md` is where user project identity lives.
+
+1. If no `CLAUDE.md` exists: fetch `root/CLAUDE.md` from canonical repo, substitute detected values, write to project root.
+2. If `CLAUDE.md` exists: read it. Identify user content vs CAST content.
+   - **User content** (preserve verbatim): Project Overview, Tech Stack, Common Pitfalls (preserve user additions), Project Structure, Style Conventions, Domain-Specific Patterns, Persistence, Git Workflow, Dependencies, File Naming.
+   - **CAST content** (install or update): Directory Conventions section (docs/ vs artifacts/), Memory Imports block.
+3. Append the CAST sections if missing; update them if out-of-date.
+4. Update Memory Imports to reference every installed doc, including the detected topic doc(s) (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`). Mobile projects should import both `docs/FRONTEND.md` and `docs/MOBILE.md`.
+
+### 5.10 — Placeholder substitution pass
+
+After every file is written:
+
+1. Run `./scripts/check-placeholders.sh` (or the equivalent tight grep if the script hasn't been installed yet).
+2. For each remaining `[UPPER_SNAKE_CASE]` token, check whether it corresponds to something in the Phase 1 inventory. If yes, substitute. If no, leave it for the user and note it in the Phase 7 report.
+3. Do not guess values. If the inventory didn't find a project name, don't make one up.
+
+### 5.11 — Install settings.json example
+
+If `.claude/settings.json.example` doesn't exist, copy from the canonical repo (`root/.claude/settings.json.example`). If it does exist, preserve it. Never overwrite or auto-activate `.claude/settings.json`.
+
+---
+
+## Phase 6 — Validation
+
+After execution:
+
+1. **Run `./scripts/smoke-test.sh .`** if it was installed. Report the result. If it reports any FAIL, do not proceed to Phase 7 until the failure is addressed or the user explicitly acknowledges it.
+2. **Run `./scripts/check-placeholders.sh`** and report any remaining unfilled tokens. Distinguish between:
+   - Real unfilled placeholders (needs user action)
+   - Sub-template placeholders in bug report forms or milestone templates (`[DATE]`, `[REPRODUCTION_STEPS]`) — these are expected and should NOT be substituted at install time.
+3. **Verify required agents exist** per the tier rules in Phase 3. List any missing required agents and flag them as errors.
+4. **Verify required commands exist** for the command set the user chose to keep. List any missing and flag as errors.
+5. **Verify the docs/artifacts split**:
+   - No files under `docs/` should contain the strings "# Milestone" in an H1 heading or "BUG-" at the start of a line (those would be work artifacts that leaked into reference).
+   - No files under `artifacts/` should be templates (no "HOW TO CUSTOMIZE" comment blocks in `artifacts/milestones/` or similar).
+6. **Verify YAML frontmatter on every agent file**:
+   - Each agent has `name:`, `description:`, `model:` in the frontmatter
+   - Description length ≤ 120 characters
+   - Model is one of `claude-opus-4-6`, `claude-sonnet-4-6`, or `claude-haiku-4-5-20251001` (or an override the user approved)
+
+If any validation check fails, report it and ask the user how to proceed before writing the Phase 7 report. Do not silently mask failures.
+
+---
+
+## Phase 7 — Report
+
+Write a final report to `artifacts/adoption-report.md`:
+
+```markdown
+# CAST Adoption Report
+Completed: <ISO date>
+Classification: <A/B/C>
+Phase separation before: <None/Implicit/Explicit>
+Phase separation after: Explicit (CAST-enforced)
+
+## Actions executed
+- **Created**: <N files> — <list>
+- **Renamed + Updated**: <N files> — <list with old → new paths>
+- **Updated in place**: <N files> — <list>
+- **Preserved**: <N files> — <list>
+- **Skipped**: <N actions> — <list with rationale>
+- **Deleted**: <N files> — <list with user approval reference>
+
+## Validation results
+- Smoke test: <PASS / PASS with warnings / FAIL>
+- Placeholder check: <clean / N remaining>
+- Required agents: <present / missing list>
+- Required commands: <present / missing list>
+- docs/artifacts split: <clean / violations>
+
+## Remaining TODOs
+<list of things the user needs to do manually>
+
+## Files to review
+<list of files where CAST merged with user content; the user should verify the merge is correct>
+
+## Preserved customizations
+<list of custom sections, files, or agents that were preserved and where they now live>
+
+## Next steps
+1. Review the migration diff: `git status` and `git diff`
+2. Run `./scripts/smoke-test.sh .` yourself
+3. Open Claude Code and walk through `docs/FIRST_RUN.md`
+4. Run `/agents` to confirm every subagent is registered
+5. Dry-run `/agent-plan "hello world feature"` to verify the planning pipeline
+6. Commit the adoption: `git add -A && git commit -m "Adopt CAST template"`
+```
+
+Present the report to the user along with a summary:
+
+> CAST adoption complete. <N> files created, <N> renamed, <N> updated, <N> preserved. <M> validation warnings or errors listed in the report. Recommended next step: run `./scripts/smoke-test.sh .` yourself, then open Claude Code and walk through `docs/FIRST_RUN.md`. The full report is in `artifacts/adoption-report.md`.
+
+---
+
+## Decision rubric (when to act vs when to ask)
+
+### Act without asking
+
+- Creating a CAST agent, command, or doc that has no existing counterpart
+- Creating `artifacts/` scaffold directories
+- Substituting detected placeholders (`[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[TEST_CMD]`, etc.) with values from the inventory
+- Installing `docs/FILE_CONVENTIONS.md` and the milestone / architecture templates (load-bearing for CAST)
+- Creating the Templates section inside an agent file (new CAST convention)
+- Adding revision-history blocks to new planning artifacts
+
+### Ask before acting
+
+- Renaming any existing file
+- Overwriting any existing file
+- Merging any existing agent, command, or CLAUDE.md (show the user what sections will change)
+- Deleting any existing file
+- Installing a topic doc (FRONTEND / BACKEND / CLI / MOBILE) when the project type is ambiguous or mixed
+- Creating an agent that requires judgment about role (e.g., is this project's `designer.md` closer to CAST's UI agent or its Product agent?)
+- Running `git mv` on directories
+- Any action the Phase 3 plan marked as Ask
+
+### Stop and escalate
+
+- Any file path conflict where two existing files claim the same CAST slot
+- Any CAST required agent missing after Phase 5 completion
+- Any user response that conflicts with the approved plan
+- Any smoke test failure or placeholder scan failure
+- Any write that would overwrite user content without explicit approval
+- Any attempt to write a work artifact to `docs/`
+
+---
+
+## Preserving customizations — detailed rules
+
+### Agent files
+
+When merging an existing agent file with a CAST template:
+
+1. **Frontmatter**: use CAST's YAML (name, description, model tier). If the existing file has a custom model pin that the user explicitly chose, keep it and note the divergence from CAST defaults in the adoption report.
+2. **Standard sections** (Purpose, Goals, Authority, Inputs, Outputs, Interaction Rules, Templates, Current Work, Decisions Log, Future Work): use CAST's content as the base structure. If the existing file has additional bullets or custom rules inside these sections, merge them as additional bullets at the end of the relevant section.
+3. **Custom appendix sections**: preserve verbatim, placed after the standard sections under `## Custom Extensions (preserved from pre-CAST version)`.
+4. **Tables in Inputs/Outputs**: if the user has added rows, keep them. If CAST has rows the user's file lacks, add them. Never remove a row the user added.
+5. **Decisions Log**: always preserve every existing entry. Add a new row noting the CAST adoption: `<date> | Adopted CAST template | N/A | Structure now matches canonical CAST v0.7.0 |`.
+
+### CLAUDE.md
+
+When merging an existing `CLAUDE.md`:
+
+1. **Project identity section**: keep the user's version verbatim. Do not touch `# <Project Name>`, description, or tech stack.
+2. **Build and test commands**: keep the user's version verbatim.
+3. **Style conventions**: keep the user's version verbatim.
+4. **Common Pitfalls**: preserve user pitfalls; add CAST's universal pitfalls (hidden mutable state, silent error swallowing, etc.) if the user's list is empty or very short.
+5. **Directory Conventions section**: install CAST's version. This is the docs/artifacts split explanation and must appear verbatim.
+6. **Memory Imports block**: install CAST's version, adjusting the import list to match the actual docs installed in this project.
+7. **Domain-specific patterns**: preserve the user's section verbatim if present.
+
+### Commands
+
+When merging an existing slash command with CAST's template:
+
+1. **Header and Arguments section**: use CAST's version.
+2. **Main Instructions / Pipeline stages**: use CAST's version as the canonical flow.
+3. **Custom pre-flight checks** that the user added: preserve as an appendix section `## Project-Specific Pre-Flight (preserved)`.
+4. **Custom completion steps**: preserve as an appendix section `## Project-Specific Completion Steps (preserved)`.
+5. **Custom error handling**: merge into CAST's Error Handling section as additional bullets.
+
+### Docs
+
+When merging an existing doc file with a CAST reference template:
+
+1. **Header** (title, metadata): use CAST's format.
+2. **Body content**: preserve the user's content entirely. CAST reference docs are templates — they become real content when filled in. If the user has already filled in the content, do not overwrite it.
+3. **Structure**: if the user's doc has the same sections as CAST's template but in a different order, preserve their order.
+4. **Template instructions comment block**: remove from populated files (the user's file is not a template anymore; it's real content).
+
+---
+
+## Now begin Phase 1
+
+Start with Phase 1 (Discovery). Do not skip to later phases. Report the inventory in `artifacts/adoption-inventory.md` and wait for user confirmation before proceeding to Phase 2.
+
+If this is the user's first time running this prompt, explicitly confirm: "I'm about to run the CAST adoption prompt. I'll crawl your project, propose a plan, and wait for your approval before touching any file. The whole process has 7 phases. Are you ready to begin?"

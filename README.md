@@ -15,7 +15,7 @@
 
 > **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three slash commands, and a CEO-gated planning pipeline — shipped as plain Markdown, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v0.7.0-blue)
+![Template version](https://img.shields.io/badge/template-v0.8.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Install](https://img.shields.io/badge/install-bash_%7C_powershell-brightgreen)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
@@ -59,9 +59,9 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 - **Three slash commands** — `/agent-plan`, `/agent-code`, `/agent-task` — as plain Markdown orchestration scripts Claude Code reads at session start.
 - **A hard `docs/` vs `artifacts/` split** — `docs/` holds reference material (requirements, conventions, templates); `artifacts/` holds live work (plans, reviews, bugs, session logs). The CEO gate, placeholder check, and smoke test all enforce the split.
 - **A one-line curl installer**, a bash installer, a PowerShell installer, a placeholder validator, a smoke test, and a fully populated `example/` fixture so you can see exactly what a real planning run produces.
-- **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`) for project-type-specific patterns.
+- **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v0.7.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v0.8.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
@@ -164,11 +164,12 @@ Each file defines one slash command that orchestrates a multi-agent workflow sta
 
 Reference material only. These are not agent definitions and not work artifacts — they are shared knowledge that multiple agents and human contributors reference: domain rules, quality standards, coding conventions, and reusable document templates. Agents must read from `docs/` but must not write work artifacts to `docs/`.
 
-**Topic-specific reference docs.** Three files in `docs/` are scoped to a project type rather than being universal: `FRONTEND.md`, `BACKEND.md`, and `CLI.md`. Keep the one(s) that match your project and delete the rest. The shipped `root/CLAUDE.md` is agnostic and has commented `@import` lines for all three — uncomment the relevant line(s) after install so the right patterns get loaded into session context.
+**Topic-specific reference docs.** Four files in `docs/` are scoped to a project type rather than being universal: `FRONTEND.md`, `BACKEND.md`, `CLI.md`, and `MOBILE.md`. Keep the one(s) that match your project and delete the rest. The shipped `root/CLAUDE.md` is agnostic and has commented `@import` lines for all four — uncomment the relevant line(s) after install so the right patterns get loaded into session context.
 
 - **`docs/FRONTEND.md`** — user-facing visual interfaces (web, mobile, desktop GUI, game UI). Covers navigation, state management, UI components, performance, input handling, platform differences.
 - **`docs/BACKEND.md`** — API servers, background workers, data pipelines. Covers request boundaries, persistence, error handling and HTTP status codes, auth, middleware, observability, background jobs.
 - **`docs/CLI.md`** — command-line tools and terminal utilities. Covers argv parsing, stdin/stdout/stderr discipline, exit codes, terminal output formatting, cross-platform concerns, signal handling.
+- **`docs/MOBILE.md`** — native and cross-platform mobile apps (iOS, Android, React Native, Expo, Flutter, SwiftUI, Jetpack Compose). Covers the mobile-specific delta on top of `FRONTEND.md`: app lifecycle, permissions, native bridges, offline-first sync, local storage tiers, deep links, push notifications, device variety, release engineering. Import both `FRONTEND.md` and `MOBILE.md` for a mobile project.
 
 A project that spans two types (e.g., a full-stack web app with a backend API and a React frontend) can keep both files and import both. A project that doesn't fit any of the three categories can delete all three and write its own.
 
@@ -572,6 +573,7 @@ Templates and reference documentation. Never holds work artifacts.
 | `docs/FRONTEND.md` | Topic-specific reference for frontend projects; delete if not applicable |
 | `docs/BACKEND.md` | Topic-specific reference for API servers, workers, and pipelines; delete if not applicable |
 | `docs/CLI.md` | Topic-specific reference for command-line tools; delete if not applicable |
+| `docs/MOBILE.md` | Topic-specific reference for native and cross-platform mobile apps (iOS, Android, React Native, Expo, Flutter, SwiftUI, Jetpack Compose). Pair with `docs/FRONTEND.md` for mobile projects; delete if not applicable |
 | `docs/CHANGELOG.md` | Chronological log of notable changes across releases and milestones, maintained by the release agent |
 | `docs/ASSETS.md` | Registry of all project assets (images, fonts, etc.) with status and source information |
 | `docs/MVP_LAUNCH.md` | Checklist and criteria for the initial public release |

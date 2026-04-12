@@ -8,6 +8,40 @@ The current template version is recorded in the root `README.md` and stamped int
 
 ---
 
+## [0.8.0] — 2026-04-12
+
+Adds a fourth topic-specific reference doc for mobile projects and wires it into every place that enumerates the topic-doc set.
+
+### Added
+
+- **`docs/MOBILE.md`** — native and cross-platform mobile reference covering the mobile-specific delta on top of `docs/FRONTEND.md`: app lifecycle and background transitions, OS permission prompts (lazy asking, denial handling, foreground re-check), native bridges and platform APIs, offline-first writes and sync reconciliation, the three local-storage tiers (secure storage, key-value, structured DB, file system), deep links / Universal Links / App Links, push notifications and background fetch, build variants (debug/staging/release with per-variant bundle IDs and signing), device and screen variety (foldables, tablets, safe-area insets, font scaling), release engineering (phased rollouts, OTA updates, privacy manifests, crash reporting), on-device performance budgets, and 9 mobile-specific common pitfalls. Targets React Native, Expo, Flutter, SwiftUI, Jetpack Compose, .NET MAUI, and native Swift / Kotlin projects. Roughly 300 lines.
+
+### Changed
+
+- **Topic-doc set expanded from three to four.** Every place that enumerates the topic docs now lists FRONTEND, BACKEND, CLI, and MOBILE. Mobile projects are explicitly instructed to import **both** `docs/FRONTEND.md` and `docs/MOBILE.md` — the first covers the shared UI patterns (navigation, components, state, performance) and the second covers mobile-only concerns on top.
+- **`root/CLAUDE.md` Memory Imports block** gained `@import docs/MOBILE.md` alongside the existing three topic imports.
+- **`root/CLAUDE.md` Common Pitfalls section** now references MOBILE.md for mobile-specific pitfalls (app-lifecycle state loss).
+- **`README.md`** top hero, topic-docs subsection, and file listing table all expanded to mention MOBILE.md and the recommendation to pair it with FRONTEND.md for mobile projects.
+- **`docs/README.md`** Topic-Specific Technical Documents section now lists four files instead of three, with an explicit note that mobile apps should keep both FRONTEND and MOBILE.
+- **`commands/agent-task.md`** pre-flight reading list includes MOBILE.md.
+- **`PROMPT.md` (CAST adoption prompt)** updates across three sections:
+  - Phase 1 documentation scanner now maps existing "mobile patterns" references to `docs/MOBILE.md`.
+  - Phase 1 project-type detection classifies Mobile explicitly and notes that mobile projects also require `docs/FRONTEND.md`. Native Swift, native Kotlin, React Native, Expo, Flutter, SwiftUI, Jetpack Compose, .NET MAUI, Ionic/Capacitor, and `ios/`/`android/` directories are listed as mobile signals.
+  - Phase 3 docs-mapping table includes a MOBILE.md row.
+  - Example Ask question for a React Native project recommends installing both FRONTEND and MOBILE as a pair.
+  - Phase 5.9 CLAUDE.md install step updated to reference the full four-doc set.
+  - Decision rubric "ask before acting" bullet updated to include MOBILE.
+
+### Migration from 0.7.0
+
+Purely additive. An existing 0.7.0 project that does nothing still works on 0.8.0. Mobile projects that want the new reference doc should:
+
+1. Copy `docs/MOBILE.md` from the canonical repo into their project's `docs/` directory.
+2. Add `@import docs/MOBILE.md` to the Memory Imports block in `CLAUDE.md`, alongside the existing `@import docs/FRONTEND.md`.
+3. Optionally populate the placeholders in `docs/MOBILE.md` for their specific framework, minimum OS versions, crash reporter, and bundle IDs.
+
+---
+
 ## [0.7.0] — 2026-04-11
 
 One-line curl-pipe-bash install.

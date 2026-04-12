@@ -2,16 +2,17 @@
   FILE: CLAUDE.md (placed at project root)
   PURPOSE: Provides an AI coding assistant with persistent context about the project.
   This file is intentionally agnostic — it does not assume frontend, backend, CLI,
-  library, or data-pipeline. Topic-specific patterns live in docs/FRONTEND.md,
-  docs/BACKEND.md, and docs/CLI.md; keep the one(s) that match your project and
-  delete the rest.
+  mobile, library, or data-pipeline. Topic-specific patterns live in
+  docs/FRONTEND.md, docs/BACKEND.md, docs/CLI.md, and docs/MOBILE.md; keep the
+  one(s) that match your project and delete the rest. Mobile projects should
+  import both docs/FRONTEND.md and docs/MOBILE.md.
 
   HOW TO CUSTOMIZE:
   - Replace every [PLACEHOLDER] token with project-specific values.
   - See README.md for the full placeholder reference table.
   - Delete sections not relevant to your project (e.g., Persistence for a stateless service).
   - Update Memory Imports to match your actual docs and to include the topic-specific
-    doc (FRONTEND/BACKEND/CLI) your project needs.
+    doc(s) your project needs (FRONTEND, BACKEND, CLI, MOBILE).
   - Add project-specific patterns under "Domain-Specific Patterns" as they emerge.
   - Delete this comment block before committing.
 -->
@@ -46,7 +47,7 @@
 
 ## Common Pitfalls
 
-These are universal traps. Topic-specific pitfalls (frontend re-renders, backend N+1 queries, CLI signal handling) live in the relevant `docs/FRONTEND.md` / `docs/BACKEND.md` / `docs/CLI.md`.
+These are universal traps. Topic-specific pitfalls (frontend re-renders, backend N+1 queries, CLI signal handling, mobile app-lifecycle state loss) live in the relevant `docs/FRONTEND.md` / `docs/BACKEND.md` / `docs/CLI.md` / `docs/MOBILE.md`.
 
 - **Hidden mutable state.** Shared state that is silently mutated across module boundaries produces heisenbugs. Prefer immutability and explicit copy-on-write patterns.
 - **Silent error swallowing.** Catching errors and returning a default is worse than a crash — it masks the failure mode. Catch only at explicit boundaries and always log.
@@ -178,6 +179,7 @@ add docs your agents frequently reference, remove any that don't apply.
 @import docs/FRONTEND.md
 @import docs/BACKEND.md
 @import docs/CLI.md
+@import docs/MOBILE.md
 -->
 
 <!-- Add once they contain real project content:
