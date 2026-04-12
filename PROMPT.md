@@ -1,8 +1,10 @@
 # CAST Adoption Prompt
 
+**Template version targeted:** `v0.8.1` · **Canonical source:** [`https://github.com/Raxvis/CAST`](https://github.com/Raxvis/CAST) on branch `main`
+
 Paste this entire file into Claude Code inside the target project (or save it at the project root and say "follow the instructions in PROMPT.md"). Claude will crawl your project, propose a migration plan, wait for your approval, and then execute the adoption while preserving anything you've already customized.
 
-This prompt drives the full adoption of the CAST template (Claude Agent Staged Team) — a multi-agent workflow for Claude Code with 15 subagents, three slash commands, and a CEO-gated planning pipeline. The canonical source is `https://github.com/Raxvis/CAST` on branch `main`. Read any file from there via `https://raw.githubusercontent.com/Raxvis/CAST/main/<path>` if you need the reference implementation of a specific agent, command, or doc.
+This prompt drives the full adoption of the CAST template (Claude Agent Staged Team) — a multi-agent workflow for Claude Code with 15 subagents, three slash commands, and a CEO-gated planning pipeline. Read any file from the canonical source via `https://raw.githubusercontent.com/Raxvis/CAST/main/<path>` if you need the reference implementation of a specific agent, command, or doc. When this prompt mentions a template version number, fetch `https://raw.githubusercontent.com/Raxvis/CAST/main/README.md` and check the `**Template version:**` line at the top — if it shows a version newer than the one stamped at the top of this prompt, tell the user before proceeding so they can decide whether to re-run from an updated prompt.
 
 ## Modes
 
@@ -258,13 +260,33 @@ CAST ships **fifteen** agents. An adoption must account for every one of them �
 
 **For each missing required agent** (Tiers 1–4) or each missing Tier 5 agent (unless the user opts out), the plan must include a Create action. If the user has an existing file that fills the role under a different name, propose Rename + Update. If the fill is ambiguous, mark as Ask and list the candidates.
 
-**Final check before closing the plan:** enumerate all 15 agent names and verify every one has a corresponding Create / Rename+Update / Update-in-place / Preserve action in the plan. If any of the 15 is missing from the plan, add the corresponding Create action before presenting the plan to the user. The 15 names are:
+**Final check before closing the plan:** enumerate all 15 agent names from the table below and verify every one has a corresponding Create / Rename+Update / Update-in-place / Preserve action in the plan. If any of the 15 is missing from the plan, add the corresponding Create action before presenting the plan to the user.
 
-```
-product, architect, ui, security, performance, ceo,
-coder, tester, reviewer, debugger, refactor,
-bug-gatherer, docs-writer, release, validator
-```
+### Canonical CAST agent roster (v0.8.1)
+
+Use this table as the authoritative reference when comparing an existing project's agents against CAST. The description column is pulled verbatim from each agent file's YAML frontmatter — match role against role, not name against name. The model column shows the pinned tier; override per-agent only when the user has a reason.
+
+| # | Agent | Tier | Model | Role (from agent frontmatter) |
+|---|---|---|---|---|
+| 1 | `product` | 1 | `claude-opus-4-6` | Product requirements agent. Use for defining features, acceptance criteria, and validating completed work. |
+| 2 | `architect` | 2 / 4 | `claude-opus-4-6` | System design agent. Use for architecture decisions, module design, data schemas, and technical planning. |
+| 3 | `ui` | 4 | `claude-opus-4-6` | UI design agent. Use for visual design, layout specs, style guides, and interaction patterns. |
+| 4 | `security` | 4 | `claude-opus-4-6` | Security audit agent. Use for identifying vulnerabilities and insecure patterns. |
+| 5 | `performance` | 4 | `claude-opus-4-6` | Performance agent. Use for profiling, identifying bottlenecks, and optimization. |
+| 6 | `ceo` | 4 | `claude-opus-4-6` | Planning sign-off agent. Use for final milestone review, CEO verdicts, and gating engineering on planning quality. |
+| 7 | `coder` | 1 | `claude-sonnet-4-6` | Implementation agent. Use for writing features, fixes, and production code. |
+| 8 | `tester` | 1 | `claude-sonnet-4-6` | Testing agent. Use for generating, maintaining, and executing automated tests. |
+| 9 | `reviewer` | 1 | `claude-sonnet-4-6` | Code review agent. Use for reviewing code quality, standards compliance, and architecture adherence. |
+| 10 | `debugger` | 2 / 3 | `claude-sonnet-4-6` | Bug investigation agent. Use for isolating defects, root cause analysis, and diagnosing failures. |
+| 11 | `refactor` | 3 | `claude-sonnet-4-6` | Refactoring agent. Use for improving code structure without changing behavior. |
+| 12 | `bug-gatherer` | 3 | `claude-haiku-4-5-20251001` | Bug reporting agent. Use for collecting, structuring, and submitting bug reports. |
+| 13 | `docs-writer` | 2 | `claude-haiku-4-5-20251001` | Documentation agent. Use for creating and maintaining developer-facing documentation. |
+| 14 | `release` | 5 | `claude-haiku-4-5-20251001` | Release preparation agent. Use for changelogs, versioning, and build verification. |
+| 15 | `validator` | 5 | `claude-haiku-4-5-20251001` | Process enforcement agent. Use for conflict resolution, milestone tracking, and workflow compliance. |
+
+**How to compare against existing project agents.** When the Phase 1 inventory finds an agent file in the project under any name, match it by **role**, not by filename. Read the Role column in the table above and ask: "Does this existing file do what that role describes?" An existing `planner.md` whose purpose is "defines features and acceptance criteria" maps to `product`. An existing `coordinator.md` whose purpose is "resolves conflicts between roles and tracks milestones" maps to `validator`. An existing `shipper.md` whose purpose is "runs the release cut and updates the changelog" maps to `release`. Use the Agent similar-name candidates table further down for alias hints, but the description column above is the tiebreaker — the role always wins over the filename.
+
+**One-line summary you can keep in context:** 15 agents = 6 planning-tier on Opus (product, architect, ui, security, performance, ceo) + 5 engineering-tier on Sonnet (coder, tester, reviewer, debugger, refactor) + 4 utility-tier on Haiku (bug-gatherer, docs-writer, release, validator). Every adoption must account for all 15, not just the 13 in Tiers 1–4.
 
 ### Commands mapping
 
@@ -485,25 +507,7 @@ If the plan includes a rename of `features/` (or similar) → `artifacts/`, exec
 
 ### 5.4 — Install agent files
 
-Walk the canonical 15-agent list in this exact order and execute the planned action for each. **Do not skip any name on this list.** If the plan has no action for one of these names, that is a bug in the Phase 3 plan — stop and re-enter Phase 3 to add the missing action.
-
-Canonical install order:
-
-1. `product`
-2. `architect`
-3. `ui`
-4. `security`
-5. `performance`
-6. `ceo`
-7. `coder`
-8. `tester`
-9. `reviewer`
-10. `debugger`
-11. `refactor`
-12. `bug-gatherer`
-13. `docs-writer`
-14. `release`
-15. `validator`
+Walk the canonical 15-agent list in the order given by the Canonical CAST Agent Roster table in Phase 3 (rows 1 through 15, top to bottom — that is the install order) and execute the planned action for each. **Do not skip any name on this list.** If the plan has no action for one of these names, that is a bug in the Phase 3 plan — stop and re-enter Phase 3 to add the missing action.
 
 For each agent:
 
@@ -607,7 +611,7 @@ After execution:
 2. **Run `./scripts/check-placeholders.sh`** and report any remaining unfilled tokens. Distinguish between:
    - Real unfilled placeholders (needs user action)
    - Sub-template placeholders in bug report forms or milestone templates (`[DATE]`, `[REPRODUCTION_STEPS]`) — these are expected and should NOT be substituted at install time.
-3. **Verify all 15 agents exist** after execution. Enumerate the canonical list — `product`, `architect`, `ui`, `security`, `performance`, `ceo`, `coder`, `tester`, `reviewer`, `debugger`, `refactor`, `bug-gatherer`, `docs-writer`, `release`, `validator` — and check each one against `.claude/agents/<name>.md`. Flag any missing as errors. The only acceptable reason for a Tier 5 agent (`release`, `validator`) to be absent is an explicit user opt-out during Phase 4; in that case, record the opt-out in the Phase 7 report. If any Tier 1–4 agent is missing, that is a hard failure — do not proceed to Phase 7 until the gap is fixed.
+3. **Verify all 15 agents exist** after execution. Walk the Canonical CAST Agent Roster table in Phase 3 and check each row's agent name against `.claude/agents/<name>.md`. Flag any missing file as an error. The only acceptable reason for a Tier 5 agent (`release`, `validator`) to be absent is an explicit user opt-out during Phase 4; in that case, record the opt-out in the Phase 7 report. If any Tier 1–4 agent is missing, that is a hard failure — do not proceed to Phase 7 until the gap is fixed. Additionally, for each existing agent file, read the `description:` field from its YAML frontmatter and confirm it matches (or is a reasonable project-specific adaptation of) the Role column in the canonical roster — a divergent description means the file is impersonating a CAST agent name without actually fulfilling the CAST role.
 4. **Verify required commands exist** for the command set the user chose to keep. List any missing and flag as errors.
 5. **Verify the docs/artifacts split**:
    - No files under `docs/` should contain the strings "# Milestone" in an H1 heading or "BUG-" at the start of a line (those would be work artifacts that leaked into reference).

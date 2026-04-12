@@ -8,6 +8,25 @@ The current template version is recorded in the root `README.md` and stamped int
 
 ---
 
+## [0.8.1] — 2026-04-12
+
+PROMPT.md reliability fixes. No template content changes — this release is entirely about making the adoption prompt produce complete, accurate 15-agent installs when migrating existing projects.
+
+### Changed
+
+- **`PROMPT.md` gained a Canonical CAST Agent Roster table** listing all 15 agents with the exact name, tier assignment, pinned model, and role description pulled verbatim from each agent file's YAML frontmatter. This is now the single source of truth the adoption prompt consults when matching existing project agents against CAST roles. Existing logic that enumerated agent names inline (Phase 3 final check, Phase 5.4 install order, Phase 6 verification) now references the table by name instead of repeating the list, so future roster changes only have to happen in one place.
+- **`PROMPT.md` Phase 1–6 role-matching now compares by description, not filename.** When the Phase 1 inventory finds an agent file under a non-CAST name, Claude is instructed to read its purpose and match against the Role column of the roster table — the filename is a hint but the description is the tiebreaker. This fixes a failure mode where existing `planner.md`, `coordinator.md`, or `shipper.md` files got mapped to the wrong CAST role (or no role at all) because the prompt only walked by name.
+- **`PROMPT.md` Phase 6 validation now also checks description fidelity.** After confirming each `.claude/agents/<name>.md` file exists, the validation step reads the `description:` field from its YAML frontmatter and confirms it matches (or is a reasonable project-specific adaptation of) the canonical Role column. A file with the name `ceo.md` but the description "writes marketing copy" is flagged as impersonating a CAST agent name without fulfilling the CAST role.
+- **`PROMPT.md` gained a version header** at the top (`Template version targeted: v0.8.1`) and a self-version-check instruction: before executing, fetch `https://raw.githubusercontent.com/Raxvis/CAST/main/README.md` and compare the canonical template version against the version stamped at the top of the prompt. If the canonical version is newer, Claude tells the user so they can decide whether to re-run from an updated prompt.
+- **`README.md` template version** bumped to 0.8.1 in the badge and hero line.
+- **`scripts/install.sh` and `scripts/install.ps1`** `TEMPLATE_VERSION` bumped to 0.8.1.
+
+### Migration from 0.8.0
+
+Purely additive. An existing 0.8.0 install needs no changes — the template content is unchanged. The bump is for users who want the improved adoption prompt when migrating new projects. Re-download `PROMPT.md` from the canonical repo if you plan to run another adoption.
+
+---
+
 ## [0.8.0] — 2026-04-12
 
 Adds a fourth topic-specific reference doc for mobile projects and wires it into every place that enumerates the topic-doc set.
