@@ -54,7 +54,7 @@ When editing templates, preserve placeholder tokens — do not replace them with
 
 ## Release and Tagging Policy
 
-Whenever the template version is bumped, the new version must be tagged and released on GitHub at the same time the commit is pushed. This is a hard rule, not a preference — `scripts/bootstrap.sh`, `scripts/install.sh`, `scripts/install.ps1`, and `PROMPT.md` all reference the template version, and downstream users rely on GitHub tags to pin a known-good revision. A push without a corresponding tag leaves the canonical version floating and breaks reproducible installs.
+Whenever the template version is bumped, the new version must be tagged and released on GitHub at the same time the commit is pushed. This is a hard rule, not a preference — `scripts/install.sh`, `scripts/install.ps1`, and `PROMPT.md` all reference the template version, and downstream users rely on GitHub tags to pin a known-good revision. (`scripts/bootstrap.sh` intentionally does NOT hard-code a version — it always clones `main` — so the curl one-liner stays on the latest release. But users who want to pin an older version clone the repo and `git checkout v0.X.Y` before running `install.sh`, which is only possible if the tag exists.) A push without a corresponding tag leaves the canonical version floating and breaks reproducible installs.
 
 **A version bump is any change to one of the following synchronized locations:**
 
@@ -70,28 +70,33 @@ All five of these must land in the same commit. A commit that bumps one without 
 
 1. Update all five locations above in a single commit.
 2. Add a `CHANGELOG.md` entry for the new version, following the existing format (Added / Changed / Removed / Migration subsections as applicable). The entry must describe every substantive change since the prior version, not just the new feature.
-3. Commit the version bump with a message that starts with the new version number (e.g. `"Release v0.8.1: ..."`) so the tag-creation step can use the commit as the tag target.
+3. Commit the version bump with a message that starts with the new version number (e.g. `"Release v<NEW>: ..."`) so the tag-creation step can use the commit as the tag target.
 4. Push the commit to `origin main`.
 5. **Immediately after pushing**, create an annotated git tag at the same commit matching the new version:
    ```bash
-   git tag -a v0.8.1 -m "CAST v0.8.1" <commit-sha>
-   git push origin v0.8.1
+   git tag -a v<NEW> -m "CAST v<NEW>" <commit-sha>
+   git push origin v<NEW>
    ```
    The tag name is `v` followed by the semver string. Use an annotated tag (`-a`), never a lightweight tag — annotated tags carry the tagger, date, and message and are what GitHub Releases consume.
-6. **Immediately after pushing the tag**, create a GitHub Release at that tag with the release notes pulled from the corresponding `CHANGELOG.md` entry:
+6. **Immediately after pushing the tag**, create a GitHub Release at that tag with the release notes pulled from the corresponding `CHANGELOG.md` entry. Extract the section between the new version heading and the next one, then pass it to `gh release create`:
    ```bash
-   gh release create v0.8.1 \
-     --title "CAST v0.8.1" \
-     --notes-file <(sed -n '/^## \[0\.8\.1\]/,/^## \[/p' CHANGELOG.md | head -n -1)
+   awk '/^## \[<NEW>\]/,/^## \[/' CHANGELOG.md | sed '$d' > /tmp/notes.md
+   gh release create v<NEW> \
+     --title "CAST v<NEW>" \
+     --notes-file /tmp/notes.md \
+     --latest
+   rm /tmp/notes.md
    ```
-   Or use the `gh release create` interactive flow and paste the CHANGELOG section by hand. Do not skip this step — the GitHub Release is what `TEMPLATE_REPO_URL` consumers rely on to detect new versions, and it is what users see when they click "Releases" on the repo page.
-7. Verify: `gh release view v0.8.1` should show the release notes, and `git tag -l` should list the new tag. If either is missing, finish the release before moving on.
+   The `--latest` flag marks this as the repo's latest release (what `https://github.com/Raxvis/CAST/releases/latest` redirects to). Omit `--latest` only for patch releases of a non-current minor version. Do NOT pass `--target <sha>` — `gh` expects a branch name there, and the tag already points at the right commit.
+7. Verify: `gh release view v<NEW>` should show the release notes, and `git tag -l` should list the new tag. If either is missing, finish the release before moving on.
+
+Throughout these steps, replace `<NEW>` with the actual new semver string (e.g. `0.8.2`) and `<commit-sha>` with the full or short SHA of the version-bump commit.
 
 **Do not do any of the following:**
 
 - Push a version-bump commit without creating the matching tag and release in the same session.
 - Bump the version in some locations but not others. All five synchronized locations must match.
-- Use a lightweight tag (`git tag v0.8.1 <sha>` without `-a`). Always use an annotated tag.
+- Use a lightweight tag (`git tag v<NEW> <sha>` without `-a`). Always use an annotated tag.
 - Skip the GitHub Release step because "the tag exists". The tag and the Release are separate artifacts; downstream tooling depends on both.
 - Bump the version without a `CHANGELOG.md` entry. Every tag must have a corresponding CHANGELOG section the release notes can cite.
 

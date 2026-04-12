@@ -622,4 +622,14 @@ Live work artifacts produced by the agents. Copied as a seed into the target pro
 
 ## License and contributing
 
-CAST is a Markdown template — every agent definition, slash command, and helper script is plain text you can fork, edit, and republish. If you find a rough edge, open an issue or a pull request on [`Raxvis/CAST`](https://github.com/Raxvis/CAST). Significant changes should bump the template version in `scripts/install.sh`, `scripts/install.ps1`, and the badge at the top of this README, and add a `CHANGELOG.md` entry with migration notes.
+CAST is a Markdown template — every agent definition, slash command, and helper script is plain text you can fork, edit, and republish. If you find a rough edge, open an issue or a pull request on [`Raxvis/CAST`](https://github.com/Raxvis/CAST).
+
+Significant changes must bump the template version in **five synchronized locations** and ship an annotated git tag plus a GitHub Release at the same push. The full policy is in [`CLAUDE.md`](CLAUDE.md) → Release and Tagging Policy. Short version:
+
+1. `README.md` — the version badge and the `Current template version` hero line
+2. `scripts/install.sh` — the `TEMPLATE_VERSION` shell constant
+3. `scripts/install.ps1` — the `$TemplateVersion` PowerShell variable
+4. `PROMPT.md` — the `Template version targeted` header
+5. `CHANGELOG.md` — a new version entry following the existing format
+
+All five land in the same commit. Immediately after pushing: annotated tag (`git tag -a v<new>`) + GitHub Release (`gh release create v<new> --notes-file ... --latest`).

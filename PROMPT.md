@@ -718,7 +718,7 @@ When merging an existing agent file with a CAST template:
 2. **Standard sections** (Purpose, Goals, Authority, Inputs, Outputs, Interaction Rules, Templates, Current Work, Decisions Log, Future Work): use CAST's content as the base structure. If the existing file has additional bullets or custom rules inside these sections, merge them as additional bullets at the end of the relevant section.
 3. **Custom appendix sections**: preserve verbatim, placed after the standard sections under `## Custom Extensions (preserved from pre-CAST version)`.
 4. **Tables in Inputs/Outputs**: if the user has added rows, keep them. If CAST has rows the user's file lacks, add them. Never remove a row the user added.
-5. **Decisions Log**: always preserve every existing entry. Add a new row noting the CAST adoption: `<date> | Adopted CAST template | N/A | Structure now matches canonical CAST v0.7.0 |`.
+5. **Decisions Log**: always preserve every existing entry. Add a new row noting the CAST adoption: `<date> | Adopted CAST template | N/A | Structure now matches canonical CAST <version> |`. For `<version>`, use the version you stamped at the top of this prompt (the "Template version targeted" header), or — if you fetched a newer canonical version from `https://raw.githubusercontent.com/Raxvis/CAST/main/README.md` during the preflight version check — use that newer number. Never hard-code a version number in this row.
 
 ### CLAUDE.md
 
