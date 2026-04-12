@@ -65,6 +65,22 @@ Current template version: `v0.8.0` — see [`CHANGELOG.md`](CHANGELOG.md) for th
 
 ---
 
+## Which entry point fits your situation?
+
+CAST ships four install paths. Pick the one that matches your project state and environment:
+
+| Situation | Entry point | Why |
+|---|---|---|
+| **Greenfield project** or an existing project with **no prior agentic workflow** | `scripts/bootstrap.sh` (curl one-liner below) | Fastest path. ~30 seconds. Doesn't require Claude Code to be running yet. |
+| **Windows without WSL** | Clone the repo and run `scripts\install.ps1` | Curl-pipe-bash doesn't map to PowerShell, so the one-liner can't run natively on Windows CMD/PowerShell. `install.ps1` is the functionally-equivalent twin. |
+| **Existing agentic workflow you want to migrate** (custom agents, different naming, partial CAST, pre-0.3.0 `features/` directory) | Paste [`PROMPT.md`](PROMPT.md) into Claude Code inside your project | `PROMPT.md` crawls your project, proposes a migration plan, waits for your approval, and merges CAST into your existing structure while preserving customizations. The scripts can't do this — they're deterministic templating, not judgment calls. |
+| **CI pipeline or scripted install** | `scripts/install.sh --values template.values` | Non-interactive. Reproducible. Plugs into CI with a pre-filled values file. No Claude Code session required. |
+| **Just need to verify an existing install** | `scripts/smoke-test.sh .` and `scripts/check-placeholders.sh` | Static checks in under 5 seconds. No API credits. |
+
+If you don't know which situation you're in, run the curl one-liner below — it handles greenfield and plain existing projects. If it fails or you realize you have customizations to preserve, switch to `PROMPT.md`.
+
+---
+
 ## Install in one line
 
 From inside an existing project directory on macOS, Linux, or WSL:
