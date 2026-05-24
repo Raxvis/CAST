@@ -252,15 +252,15 @@ const [platformSpecificValue] = [Platform].select({
 ## Architecture Document Templates
 
 When documenting a new module, system, data schema, UI screen, or milestone task
-breakdown, use the corresponding template from `docs/`:
+breakdown, use the corresponding template from `templates/`:
 
 | What you are documenting | Template to copy |
 |--------------------------|-----------------|
-| A single code module | `ARCH_MODULE.md` |
-| A high-level system | `ARCH_SYSTEM.md` |
-| A data/save schema | `ARCH_DATA_SCHEMA.md` |
-| A UI screen or component | `UI_SPEC.md` |
-| A milestone's task list | `MILESTONE_TASKS.md` |
+| A single code module | `templates/ARCH_MODULE.md` |
+| A high-level system | `templates/ARCH_SYSTEM.md` |
+| A data/save schema | `templates/ARCH_DATA_SCHEMA.md` |
+| A UI screen or component | `templates/UI_SPEC.md` |
+| A milestone's task list | `templates/MILESTONE_TASKS.md` |
 
 Copy the template to the correct location per `FILE_CONVENTIONS.md` before filling it in.
 Do not create architecture or specification documents from scratch.

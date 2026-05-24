@@ -11,7 +11,7 @@
   - Fill in the Delivered section with all features and changes completed in this milestone.
   - List deferred items that were originally planned but moved to a future milestone.
   - Capture lessons learned to improve future milestone planning and execution.
-  - Copy this template to `docs/milestones/[MILESTONE_NAME]_COMPLETION.md` for each milestone.
+  - Copy this template to `artifacts/milestones/milestone-{N}-{slug}-completion.md` for each milestone.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
@@ -96,8 +96,8 @@ _If no known issues, replace this table with "No known issues."_
 
 ## References
 
-- **Task Breakdown**: `docs/milestones/[MILESTONE_NAME]_TASKS.md`
-- **Validation Report**: `docs/milestones/[MILESTONE_NAME]_VALIDATION.md`
+- **Task Breakdown**: `artifacts/milestones/milestone-{N}-{slug}-tasks.md`
+- **Validation Report**: `artifacts/milestones/milestone-{N}-{slug}-validation.md`
 
 ---
 

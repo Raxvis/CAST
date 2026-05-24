@@ -10,8 +10,8 @@
   - Replace [PROJECT_NAME] with your project name.
   - If your project uses different milestone or module identifiers, update the naming
     patterns below to match.
-  - Do NOT relax the `docs/` vs `artifacts/` split. It is load-bearing — agents rely on it
-    to decide where to write every output.
+  - Do NOT relax the `docs/` / `templates/` / `artifacts/` split. It is load-bearing — agents
+    rely on it to decide where to read templates and write every output.
   - Delete this comment block before committing.
 -->
 
@@ -23,21 +23,23 @@ This document governs where every project file belongs. Read it before creating 
 
 ---
 
-## The Core Rule: `docs/` vs `artifacts/`
+## The Core Rule: `docs/` vs `templates/` vs `artifacts/`
 
-The project has **two separate top-level directories** for non-code content. The split is strict and there are no exceptions.
+The project has **three top-level directories** for non-code content. The split is strict and there are no exceptions.
 
 | Directory | Purpose | What lives here |
 |---|---|---|
-| `docs/` | **Reference material only.** Describes *how the project works*. | Requirements, conventions, design rationale, templates, glossaries, quality standards. |
+| `docs/` | **Reference material only.** Describes *how the project works*. | Requirements, conventions, design rationale, glossaries, quality standards. |
+| `templates/` | **Document templates only.** Skeletons copied to produce work. | Architecture, UI spec, and milestone templates. Read and copied, never filled in place. |
 | `artifacts/` | **Work artifacts only.** Instances of *actual work*. | Milestone plans, per-milestone architecture and UI specs, security/performance/CEO reviews, bug reports, session logs, completion records. |
 
 When deciding where a file belongs, ask:
 
-1. **Is this content reusable guidance that applies across many pieces of work?** → `docs/`
-2. **Is this content about a specific milestone, feature, bug, review, or work session?** → `artifacts/`
+1. **Is this a reusable document skeleton that gets copied and filled in?** → `templates/`
+2. **Is this other reusable guidance that applies across many pieces of work?** → `docs/`
+3. **Is this content about a specific milestone, feature, bug, review, or work session?** → `artifacts/`
 
-Agents write work outputs to `artifacts/` and read reference material and templates from `docs/`. `/agent-plan`, `/agent-code`, and `/agent-task` all write exclusively under `artifacts/`; none of them should ever write to `docs/`.
+Agents write work outputs to `artifacts/`, read reference material from `docs/`, and read document templates from `templates/`. `/agent-plan`, `/agent-code`, and `/agent-task` all write exclusively under `artifacts/`; none of them should ever write to `docs/` or `templates/`.
 
 ---
 
@@ -60,16 +62,23 @@ docs/
   CHANGELOG.md                   # Release history (release agent owns)
   ASSETS.md                      # Asset registry
   MVP_LAUNCH.md                  # Launch checklist
+```
 
-  # Templates — copied and filled into artifacts/ as instances
+### `templates/` — document templates
+
+```
+templates/
   ARCH_MODULE.md                 # Module architecture template
   ARCH_SYSTEM.md                 # System architecture template
   ARCH_DATA_SCHEMA.md            # Data schema template
   UI_SPEC.md                     # UI specification template
-  MILESTONE_TASKS.md             # Milestone definition + task breakdown template
+  MILESTONE_DEFINITION.md        # Milestone definition template
+  MILESTONE_TASKS.md             # Milestone task breakdown template
   MILESTONE_COMPLETION.md        # Milestone completion report template
   MILESTONE_VALIDATION.md        # Milestone validation / acceptance template
 ```
+
+Templates are copied — never filled in place — to produce instances under `artifacts/`.
 
 ### `artifacts/` — work artifacts
 
@@ -125,20 +134,20 @@ These files live directly in `docs/` and must not be moved, renamed, or copied e
 | `ASSETS.md` | Asset registry |
 | `MVP_LAUNCH.md` | Launch readiness checklist |
 
-### Document Templates (`docs/`)
+### Document Templates (`templates/`)
 
-Templates live at the top of `docs/` and are copied — never filled in place — to produce instances under `artifacts/`.
+Templates live in `templates/` and are copied — never filled in place — to produce instances under `artifacts/`.
 
 | Template | Instance Destination |
 |---|---|
-| `docs/ARCH_MODULE.md` | `artifacts/architecture/[MODULE]_MODULE.md` |
-| `docs/ARCH_SYSTEM.md` | `artifacts/architecture/[SYSTEM]_SYSTEM.md` |
-| `docs/ARCH_DATA_SCHEMA.md` | `artifacts/architecture/[SCHEMA]_SCHEMA.md` |
-| `docs/UI_SPEC.md` | `artifacts/ui-specs/[SCREEN]_SCREEN.md` or `ui-milestone-{N}.md` |
-| `docs/MILESTONE_DEFINITION.md` | `artifacts/milestones/milestone-{N}-{slug}.md` |
-| `docs/MILESTONE_TASKS.md` | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
-| `docs/MILESTONE_COMPLETION.md` | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
-| `docs/MILESTONE_VALIDATION.md` | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
+| `templates/ARCH_MODULE.md` | `artifacts/architecture/[MODULE]_MODULE.md` |
+| `templates/ARCH_SYSTEM.md` | `artifacts/architecture/[SYSTEM]_SYSTEM.md` |
+| `templates/ARCH_DATA_SCHEMA.md` | `artifacts/architecture/[SCHEMA]_SCHEMA.md` |
+| `templates/UI_SPEC.md` | `artifacts/ui-specs/[SCREEN]_SCREEN.md` or `ui-milestone-{N}.md` |
+| `templates/MILESTONE_DEFINITION.md` | `artifacts/milestones/milestone-{N}-{slug}.md` |
+| `templates/MILESTONE_TASKS.md` | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
+| `templates/MILESTONE_COMPLETION.md` | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
+| `templates/MILESTONE_VALIDATION.md` | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
 
 ### Milestone Artifacts (`artifacts/milestones/`)
 
@@ -234,7 +243,7 @@ The following behaviors violate these conventions. Do not do them:
 
 - **Writing work artifacts to `docs/`.** Bug reports, milestone plans, CEO reviews, and session logs do not belong in `docs/`. They go in `artifacts/`.
 - **Writing reference material to `artifacts/`.** Coding conventions, glossaries, templates, and design rationale do not belong in `artifacts/`. They go in `docs/`.
-- **Filling in templates in place.** `docs/MILESTONE_TASKS.md` is the template — copy it to `artifacts/milestones/milestone-{N}-{slug}-tasks.md` before filling it in.
+- **Filling in templates in place.** `templates/MILESTONE_TASKS.md` is the template — copy it to `artifacts/milestones/milestone-{N}-{slug}-tasks.md` before filling it in.
 - **Creating files at the repository root.** Exception: `README.md`, `CLAUDE.md`, `CHANGELOG.md` at project root, and tool configuration files that require root placement by convention.
 - **Creating new subdirectories without updating this file.** Any new subdirectory under `docs/` or `artifacts/` must be added to the tree diagrams above.
 - **Using free-form naming.** All artifact names must follow the patterns in this document.

@@ -15,7 +15,7 @@
 
 > **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three slash commands, and a CEO-gated planning pipeline — shipped as plain Markdown, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v0.9.0-blue)
+![Template version](https://img.shields.io/badge/template-v0.10.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
 
@@ -56,11 +56,11 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 
 - **15 specialist subagents** pinned to the right Claude model tier per workload (Opus for planning, Sonnet for engineering, Haiku for utility).
 - **Three slash commands** — `/agent-plan`, `/agent-code`, `/agent-task` — as plain Markdown orchestration scripts Claude Code reads at session start.
-- **A hard `docs/` vs `artifacts/` split** — `docs/` holds reference material (requirements, conventions, templates); `artifacts/` holds live work (plans, reviews, bugs, session logs). The CEO gate, placeholder check, and smoke test all enforce the split.
+- **A hard `docs/` / `templates/` / `artifacts/` split** — `docs/` holds reference material (requirements, conventions), `templates/` holds reusable document skeletons, and `artifacts/` holds live work (plans, reviews, bugs, session logs). The CEO gate, placeholder check, and smoke test all enforce the split.
 - **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v0.9.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v0.10.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
@@ -108,19 +108,21 @@ CAST/
   root/                  # Files intended for the project root
   agents/                # Agent role definitions (copied to .claude/agents/)
   commands/              # Slash commands (copied to .claude/commands/)
-  docs/                  # Reference material: requirements, conventions, templates
+  docs/                  # Reference material: requirements, conventions, rationale
+  templates/             # Document templates instantiated into artifacts/
   artifacts/             # Work artifacts: plans, reviews, bugs, session logs
   example/               # Populated fixture: a full "Acme Todo" project walkthrough
 ```
 
-### The `docs/` vs `artifacts/` split
+### The `docs/` / `templates/` / `artifacts/` split
 
-This template enforces a strict separation between **reference material** and **work artifacts**:
+This template enforces a strict separation between **reference material**, **document templates**, and **work artifacts**:
 
-- **`docs/` is documentation only.** It holds things that describe how the project works: the PRD, concept, glossary, coding conventions, file placement rules, error handling standards, testing strategy, design rationale, and **templates** for architecture docs, UI specs, milestones, and bug reports. `docs/` must never contain feature plans, milestone instances, bug reports, CEO reviews, or progress logs.
+- **`docs/` is documentation only.** It holds things that describe how the project works: the PRD, concept, glossary, coding conventions, file placement rules, error handling standards, testing strategy, and design rationale. `docs/` must never contain feature plans, milestone instances, bug reports, CEO reviews, or progress logs.
+- **`templates/` is document templates only.** It holds the reusable skeletons for architecture docs, UI specs, and milestone files. Agents copy them — never fill them in place — to produce instances under `artifacts/`.
 - **`artifacts/` is work artifacts only.** It holds instances of work: milestone definitions produced by the Product agent, architecture documents produced by the Architect agent for a specific milestone, UI specs produced by the UI agent, security and performance reviews, CEO planning verdicts, bug reports, and the rolling session log.
 
-If you are unsure where a file belongs, ask: _"Is this reusable reference material or a specific piece of work?"_ Reference → `docs/`. Work → `artifacts/`. Both `/agent-plan` and `/agent-code` write exclusively to `artifacts/`; neither command should ever modify `docs/`.
+If you are unsure where a file belongs, ask: _"Is this a reusable template, other reference material, or a specific piece of work?"_ Template → `templates/`. Other reference → `docs/`. Work → `artifacts/`. Both `/agent-plan` and `/agent-code` write exclusively to `artifacts/`; neither command should ever modify `docs/` or `templates/`.
 
 ### root/
 
@@ -381,8 +383,8 @@ Agents communicate through shared documents. When one agent completes work, the 
 
 - **Current Work tables** in each agent file track in-progress and completed tasks.
 - **`artifacts/BUGS.md`** is the shared bug tracker (Bug Gatherer files, Debugger investigates, Coder fixes).
-- **Planning architecture documents** at `artifacts/architecture/arch-milestone-{N}.md` are the contract between Architect and Coder for a specific milestone. Templates live at `docs/ARCH_MODULE.md`, `docs/ARCH_SYSTEM.md`, and `docs/ARCH_DATA_SCHEMA.md`.
-- **Planning UI specifications** at `artifacts/ui-specs/ui-milestone-{N}.md` are the contract between UI and Coder. Template lives at `docs/UI_SPEC.md`.
+- **Planning architecture documents** at `artifacts/architecture/arch-milestone-{N}.md` are the contract between Architect and Coder for a specific milestone. Templates live at `templates/ARCH_MODULE.md`, `templates/ARCH_SYSTEM.md`, and `templates/ARCH_DATA_SCHEMA.md`.
+- **Planning UI specifications** at `artifacts/ui-specs/ui-milestone-{N}.md` are the contract between UI and Coder. Template lives at `templates/UI_SPEC.md`.
 - **CEO planning verdicts** at `artifacts/reviews/ceo-review-milestone-{N}.md` gate entry into the engineering stage.
 
 ### Minimum Viable Agent Set
@@ -470,9 +472,9 @@ If you do not want a CEO planning gate, **delete both `/agent-plan` and `/agent-
 | `commands/agent-code.md` | Defines the `/agent-code` slash command; orchestrates the Engineering Stage per task (Coder → Tester → Reviewer, with Defects through Debugger → Bug Gatherer → Product and Issues through Refactor → Reviewer) |
 | `commands/agent-task.md` | Defines the `/agent-task` slash command; runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone or CEO verdict |
 
-### docs/ (reference material, 27 files)
+### docs/ (reference material, 19 files)
 
-Templates and reference documentation. Never holds work artifacts.
+Reference documentation. Never holds work artifacts. Document templates live in `templates/` (below).
 
 | File | Description |
 |---|---|
@@ -495,14 +497,21 @@ Templates and reference documentation. Never holds work artifacts.
 | `docs/CHANGELOG.md` | Chronological log of notable changes across releases and milestones, maintained by the release agent |
 | `docs/ASSETS.md` | Registry of all project assets (images, fonts, etc.) with status and source information |
 | `docs/MVP_LAUNCH.md` | Checklist and criteria for the initial public release |
-| `docs/MILESTONE_DEFINITION.md` | Template for the milestone definition file: goal, success metrics, in/out of scope, top-level acceptance criteria. Instance at `artifacts/milestones/milestone-{N}-{slug}.md`. |
-| `docs/MILESTONE_TASKS.md` | Template for the task breakdown file: one row per task with dependencies, acceptance criteria, and files touched. Instance at `artifacts/milestones/milestone-{N}-{slug}-tasks.md`. |
-| `docs/MILESTONE_VALIDATION.md` | Template for milestone validation / acceptance records. Instance at `artifacts/milestones/milestone-{N}-{slug}-validation.md`. |
-| `docs/MILESTONE_COMPLETION.md` | Template for milestone completion reports. Instance at `artifacts/milestones/milestone-{N}-{slug}-completion.md`. |
-| `docs/ARCH_MODULE.md` | Template for documenting a single code module (instances live in `artifacts/architecture/`) |
-| `docs/ARCH_SYSTEM.md` | Template for documenting a high-level system (instances live in `artifacts/architecture/`) |
-| `docs/ARCH_DATA_SCHEMA.md` | Template for documenting a data schema or save format (instances live in `artifacts/architecture/`) |
-| `docs/UI_SPEC.md` | Template for specifying a UI screen or component (instances live in `artifacts/ui-specs/`) |
+
+### templates/ (document templates, 8 files)
+
+Reusable document skeletons. Agents copy them — never fill in place — to produce instances under `artifacts/`. See [`templates/README.md`](templates/README.md).
+
+| File | Description |
+|---|---|
+| `templates/MILESTONE_DEFINITION.md` | Template for the milestone definition file: goal, success metrics, in/out of scope, top-level acceptance criteria. Instance at `artifacts/milestones/milestone-{N}-{slug}.md`. |
+| `templates/MILESTONE_TASKS.md` | Template for the task breakdown file: one row per task with dependencies, acceptance criteria, and files touched. Instance at `artifacts/milestones/milestone-{N}-{slug}-tasks.md`. |
+| `templates/MILESTONE_VALIDATION.md` | Template for milestone validation / acceptance records. Instance at `artifacts/milestones/milestone-{N}-{slug}-validation.md`. |
+| `templates/MILESTONE_COMPLETION.md` | Template for milestone completion reports. Instance at `artifacts/milestones/milestone-{N}-{slug}-completion.md`. |
+| `templates/ARCH_MODULE.md` | Template for documenting a single code module (instances live in `artifacts/architecture/`) |
+| `templates/ARCH_SYSTEM.md` | Template for documenting a high-level system (instances live in `artifacts/architecture/`) |
+| `templates/ARCH_DATA_SCHEMA.md` | Template for documenting a data schema or save format (instances live in `artifacts/architecture/`) |
+| `templates/UI_SPEC.md` | Template for specifying a UI screen or component (instances live in `artifacts/ui-specs/`) |
 
 ### artifacts/ (work artifacts)
 

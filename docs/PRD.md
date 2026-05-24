@@ -286,7 +286,7 @@ which will result in [BUSINESS_OUTCOME].
 ## Timeline
 
 The project is organized into the following milestones. Each milestone has a dedicated
-task file (`docs/milestones/[MILESTONE_NAME]_TASKS.md`) listing concrete acceptance criteria.
+task file (`artifacts/milestones/milestone-{N}-{slug}-tasks.md`) listing concrete acceptance criteria.
 
 | Milestone | Description |
 |-----------|-------------|

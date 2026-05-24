@@ -75,7 +75,7 @@ You can interrupt the planning run as soon as Product starts writing — you are
 
 **If Product never writes a file:** the Product agent is not loading. Check `.claude/agents/product.md` for frontmatter issues, or re-run `/agents` to confirm Product is listed.
 
-**If `/agent-plan` halts with a "missing template" error:** your `docs/` directory is missing `MILESTONE_TASKS.md` or another planning template that the command references. Re-copy `docs/` from the template.
+**If `/agent-plan` halts with a "missing template" error:** your `templates/` directory is missing `MILESTONE_TASKS.md` or another planning template that the command references. Re-copy `templates/` from the template.
 
 ---
 

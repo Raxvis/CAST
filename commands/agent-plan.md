@@ -47,8 +47,8 @@ This command orchestrates the **Planning Stage** of the agent workflow. It runs 
 Launch the **product** agent to:
 
 1. Define the feature scope, goals, and success metrics.
-2. Write the milestone definition at `artifacts/milestones/milestone-{N}-{slug}.md` using `docs/MILESTONE_DEFINITION.md` as the template. This file captures what the milestone is and why it matters — goal, success metrics, in-scope, out-of-scope, top-level acceptance criteria, dependencies and risks, cross-cutting concerns.
-3. Write the task breakdown at `artifacts/milestones/milestone-{N}-{slug}-tasks.md` using `docs/MILESTONE_TASKS.md` as the template. This file captures how the work is decomposed — one task per row with ID, dependencies, per-task acceptance criteria, and files touched.
+2. Write the milestone definition at `artifacts/milestones/milestone-{N}-{slug}.md` using `templates/MILESTONE_DEFINITION.md` as the template. This file captures what the milestone is and why it matters — goal, success metrics, in-scope, out-of-scope, top-level acceptance criteria, dependencies and risks, cross-cutting concerns.
+3. Write the task breakdown at `artifacts/milestones/milestone-{N}-{slug}-tasks.md` using `templates/MILESTONE_TASKS.md` as the template. This file captures how the work is decomposed — one task per row with ID, dependencies, per-task acceptance criteria, and files touched.
 4. Reference existing context in `docs/PRD.md`, `docs/CONCEPT.md`, and `docs/GLOSSARY.md`.
 
 The two files are deliberately separate: the definition is the CEO's primary read during planning review, the breakdown is the Coder's primary read during engineering. Keeping them in separate files means each audience can find what they need without scrolling past the other.
@@ -56,14 +56,14 @@ The two files are deliberately separate: the definition is the CEO's primary rea
 Input to pass:
 - Feature request: `$ARGUMENTS`
 - Output directory: `artifacts/milestones/`
-- Templates: `docs/MILESTONE_DEFINITION.md` (for the definition file) and `docs/MILESTONE_TASKS.md` (for the task breakdown)
+- Templates: `templates/MILESTONE_DEFINITION.md` (for the definition file) and `templates/MILESTONE_TASKS.md` (for the task breakdown)
 
 ### Stage 2a — Architecture
 
 After Product completes, launch the **architect** agent to:
 
 1. Read the milestone definition and task breakdown from Stage 1.
-2. Produce the architecture document at `artifacts/architecture/arch-milestone-{N}.md` using the templates in `docs/ARCH_MODULE.md`, `docs/ARCH_SYSTEM.md`, and `docs/ARCH_DATA_SCHEMA.md` as appropriate.
+2. Produce the architecture document at `artifacts/architecture/arch-milestone-{N}.md` using the templates in `templates/ARCH_MODULE.md`, `templates/ARCH_SYSTEM.md`, and `templates/ARCH_DATA_SCHEMA.md` as appropriate.
 3. Define module boundaries, data schemas, cross-module contracts, and data flows.
 4. Reference existing architecture artifacts in `artifacts/architecture/` for consistency and name any new dependencies in the Decisions Log.
 
@@ -74,7 +74,7 @@ Input to pass: the milestone definition and task breakdown from Stage 1.
 In parallel with Architecture, launch the **ui** agent to:
 
 1. Read the milestone definition from Stage 1.
-2. Produce the UI specification at `artifacts/ui-specs/ui-milestone-{N}.md` using the template in `docs/UI_SPEC.md`.
+2. Produce the UI specification at `artifacts/ui-specs/ui-milestone-{N}.md` using the template in `templates/UI_SPEC.md`.
 3. Define screen layouts, component structure, interaction states, and accessibility notes.
 4. Reference existing UI specs in `artifacts/ui-specs/` for consistency.
 

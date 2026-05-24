@@ -1,6 +1,6 @@
 # CAST Adoption Prompt
 
-**Template version targeted:** `v0.9.0` · **Canonical source:** [`https://github.com/Raxvis/CAST`](https://github.com/Raxvis/CAST)
+**Template version targeted:** `v0.10.0` · **Canonical source:** [`https://github.com/Raxvis/CAST`](https://github.com/Raxvis/CAST)
 
 ## How to use this prompt
 
@@ -54,7 +54,8 @@ CAST's canonical structure is:
 - `CLAUDE.md` at project root — top-level context for every session
 - `.claude/agents/` — 15 subagent definitions with YAML frontmatter and per-agent pinned model tiers (Opus for planning, Sonnet for engineering, Haiku for utility)
 - `.claude/commands/` — three slash commands: `/agent-plan`, `/agent-code`, `/agent-task`
-- `docs/` — reference material only (PRD, conventions, templates, topic-specific guides)
+- `docs/` — reference material only (PRD, conventions, topic-specific guides)
+- `templates/` — reusable document templates (architecture, UI spec, milestone files) copied into `artifacts/` as instances
 - `artifacts/` — work artifacts only (milestone plans, reviews, bug reports, session logs)
 
 Two rules are load-bearing:
@@ -289,7 +290,7 @@ CAST ships **fifteen** agents. An adoption must account for every one of them �
 
 **Final check before closing the plan:** enumerate all 15 agent names from the table below and verify every one has a corresponding Create / Rename+Update / Update-in-place / Preserve action in the plan. If any of the 15 is missing from the plan, add the corresponding Create action before presenting the plan to the user.
 
-### Canonical CAST agent roster (v0.9.0)
+### Canonical CAST agent roster (v0.10.0)
 
 Use this table as the authoritative reference when comparing an existing project's agents against CAST. The description column is pulled verbatim from each agent file's YAML frontmatter — match role against role, not name against name. The model column shows the pinned tier; override per-agent only when the user has a reason.
 
@@ -361,11 +362,11 @@ When scanning for existing agent files that might fill a CAST role under a diffe
 
 The Phase 3 final check (the 15-name enumeration above) catches both of these if they slip through the per-role scan.
 
-### Docs mapping
+### Docs and templates mapping
 
-For each CAST reference doc, determine the disposition from this table. `Existing match` means the inventory from Phase 1 found a file that serves the same purpose under a different name.
+For each CAST reference doc and document template, determine the disposition from this table. `Existing match` means the inventory from Phase 1 found a file that serves the same purpose under a different name. The `templates/*` rows install to the top-level `templates/` directory, not `docs/`.
 
-| CAST doc | If missing and no match | If existing match |
+| CAST file | If missing and no match | If existing match |
 |---|---|---|
 | `docs/README.md` | Create (CAST index) | Update to CAST format, preserving existing entries |
 | `docs/PRD.md` | Prompt user — PRD is user content, not template | Rename to `docs/PRD.md`, update header to CAST format |
@@ -379,14 +380,14 @@ For each CAST reference doc, determine the disposition from this table. `Existin
 | `docs/CHANGELOG.md` | Skip (optional) | Preserve — note Release agent will maintain going forward |
 | `docs/ASSETS.md` | Skip (optional) | Preserve |
 | `docs/MVP_LAUNCH.md` | Skip (optional) | Preserve |
-| `docs/MILESTONE_DEFINITION.md` | **Always install** — consumed by /agent-plan Stage 1 | Install CAST version; any existing content moves to `artifacts/milestones/` as an instance |
-| `docs/MILESTONE_TASKS.md` | **Always install** — consumed by /agent-plan Stage 1 | Same |
-| `docs/MILESTONE_COMPLETION.md` | **Always install** | Same |
-| `docs/MILESTONE_VALIDATION.md` | **Always install** | Same |
-| `docs/ARCH_MODULE.md` | **Always install** — consumed by /agent-plan Stage 2a | Same |
-| `docs/ARCH_SYSTEM.md` | **Always install** | Same |
-| `docs/ARCH_DATA_SCHEMA.md` | **Always install** | Same |
-| `docs/UI_SPEC.md` | Install unless project is clearly backend/CLI-only with no user interface | Same |
+| `templates/MILESTONE_DEFINITION.md` | **Always install** — consumed by /agent-plan Stage 1 | Install CAST version; any existing content moves to `artifacts/milestones/` as an instance |
+| `templates/MILESTONE_TASKS.md` | **Always install** — consumed by /agent-plan Stage 1 | Same |
+| `templates/MILESTONE_COMPLETION.md` | **Always install** | Same |
+| `templates/MILESTONE_VALIDATION.md` | **Always install** | Same |
+| `templates/ARCH_MODULE.md` | **Always install** — consumed by /agent-plan Stage 2a | Same |
+| `templates/ARCH_SYSTEM.md` | **Always install** | Same |
+| `templates/ARCH_DATA_SCHEMA.md` | **Always install** | Same |
+| `templates/UI_SPEC.md` | Install unless project is clearly backend/CLI-only with no user interface | Same |
 | `docs/FRONTEND.md` | Install if project type is frontend, mobile, or mixed | Prompt user if ambiguous |
 | `docs/BACKEND.md` | Install if project type is backend, data pipeline, or mixed | Same |
 | `docs/CLI.md` | Install if project type is CLI or mixed | Same |
@@ -573,14 +574,15 @@ Same procedure as agents:
 3. Write to `.claude/commands/<name>.md`.
 4. If updating an existing similar-named command: preserve any project-specific pre-flight or post-completion steps by moving them to an appendix section labelled `## Project-Specific Extensions (preserved from pre-CAST version)`.
 
-### 5.6 — Install docs templates
+### 5.6 — Install reference docs and templates
 
-For each CAST reference doc in the plan:
+For each CAST reference doc and document template in the plan:
 
-1. If the action is **Create** or **Rename + Update**: read from `<CAST_SOURCE>/docs/<file>.md`, substitute placeholders, write to `docs/<file>.md`.
+1. If the action is **Create** or **Rename + Update**: read from the source path shown in the mapping table — `<CAST_SOURCE>/docs/<file>.md` for reference docs, `<CAST_SOURCE>/templates/<file>.md` for the `templates/*` rows — substitute placeholders, and write to the same relative path in the target project (`docs/<file>.md` or `templates/<file>.md` respectively).
 2. For **Rename + Update**: read the existing file first, preserve all non-template content (e.g., an existing PRD with real requirements) as the body, update only the header and any CAST-specific framing.
 3. For **Update in place**: same as Rename + Update but without moving the file.
-4. Always install `docs/FILE_CONVENTIONS.md` — it's load-bearing for the docs/artifacts split enforcement.
+4. Always install `docs/FILE_CONVENTIONS.md` — it's load-bearing for the docs/templates/artifacts split enforcement.
+5. The eight `templates/*` files (architecture, UI spec, and milestone templates) install verbatim into the project's top-level `templates/` directory. Create the directory if it does not exist.
 
 ### 5.7 — Install artifacts scaffold
 

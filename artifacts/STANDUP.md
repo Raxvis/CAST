@@ -48,7 +48,7 @@ _No sessions recorded yet. Add the first entry using the template above._
 | Document | Purpose |
 |----------|---------|
 | `BUGS.md` | Active bug tracker — reference when reporting blockers |
-| `MILESTONE_TASKS.md` | Current milestone task breakdown — reference for planned work |
+| `templates/MILESTONE_TASKS.md` | Milestone task breakdown template — reference for planned work |
 | `milestones/[MILESTONE]_VALIDATION.md` | Milestone acceptance record — reference when validating completed work |
 
 ---

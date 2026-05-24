@@ -18,10 +18,10 @@ This file is the entry point for all project documentation. If you are looking f
 specific piece of information, start here to find the correct document.
 
 > **Scope of this directory:** `docs/` holds **reference material only** — requirements,
-> conventions, design rationale, and reusable templates. It does not contain work artifacts.
-> Milestone plans, per-milestone architecture and UI specs, bug reports, CEO reviews, and
-> session logs live in `artifacts/`. See `artifacts/README.md` for the full layout and the
-> root `README.md` for the split rationale.
+> conventions, and design rationale. Reusable document templates live in `templates/`; work
+> artifacts (milestone plans, per-milestone architecture and UI specs, bug reports, CEO
+> reviews, session logs) live in `artifacts/`. See `artifacts/README.md` for the full layout
+> and the root `README.md` for the split rationale.
 
 ---
 
@@ -107,20 +107,21 @@ Live work tracking — the active bug tracker and the rolling session log — li
 
 ## Templates
 
-Reusable document templates. These files live in `docs/` as reference; agents read them
-and produce **instances** under `artifacts/`. Never fill in a template in place — copy it
-to the appropriate `artifacts/` subdirectory first.
+Reusable document templates live in the top-level **`templates/`** directory, not here — see
+[`templates/README.md`](../templates/README.md) for the full index. Agents read them and
+produce **instances** under `artifacts/`. Never fill in a template in place — copy it to the
+appropriate `artifacts/` subdirectory first.
 
 | File | Description | Instance Location |
 |------|-------------|-------------------|
-| `ARCH_MODULE.md` | Template for documenting a single code module | `artifacts/architecture/` |
-| `ARCH_SYSTEM.md` | Template for documenting a high-level system | `artifacts/architecture/` |
-| `ARCH_DATA_SCHEMA.md` | Template for documenting a data schema or save format | `artifacts/architecture/` |
-| `UI_SPEC.md` | Template for specifying a UI screen or component | `artifacts/ui-specs/` |
-| `MILESTONE_DEFINITION.md` | Template for the milestone definition file (what and why) | `artifacts/milestones/milestone-{N}-{slug}.md` |
-| `MILESTONE_TASKS.md` | Template for the task breakdown file (how; one row per task) | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
-| `MILESTONE_COMPLETION.md` | Template for milestone completion reports | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
-| `MILESTONE_VALIDATION.md` | Template for milestone acceptance records | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
+| `templates/ARCH_MODULE.md` | Template for documenting a single code module | `artifacts/architecture/` |
+| `templates/ARCH_SYSTEM.md` | Template for documenting a high-level system | `artifacts/architecture/` |
+| `templates/ARCH_DATA_SCHEMA.md` | Template for documenting a data schema or save format | `artifacts/architecture/` |
+| `templates/UI_SPEC.md` | Template for specifying a UI screen or component | `artifacts/ui-specs/` |
+| `templates/MILESTONE_DEFINITION.md` | Template for the milestone definition file (what and why) | `artifacts/milestones/milestone-{N}-{slug}.md` |
+| `templates/MILESTONE_TASKS.md` | Template for the task breakdown file (how; one row per task) | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
+| `templates/MILESTONE_COMPLETION.md` | Template for milestone completion reports | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
+| `templates/MILESTONE_VALIDATION.md` | Template for milestone acceptance records | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
 
 ---
 
@@ -131,7 +132,7 @@ to the appropriate `artifacts/` subdirectory first.
 3. **Creating a new file?** Read `FILE_CONVENTIONS.md` before deciding where to put it.
 4. **Documenting a design decision?** Add an entry to `DESIGN_RATIONALE.md`.
 5. **Found a bug?** Log it in `artifacts/BUGS.md` (not here — `docs/` is reference-only).
-6. **Completing a milestone?** Copy `MILESTONE_VALIDATION.md` into `artifacts/milestones/` and fill it in there.
+6. **Completing a milestone?** Copy `templates/MILESTONE_VALIDATION.md` into `artifacts/milestones/` and fill it in there.
 
 ---
 

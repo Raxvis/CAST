@@ -3,7 +3,7 @@
   PURPOSE: Template for the milestone definition artifact produced by the Product
   agent during /agent-plan Stage 1. A milestone definition describes WHAT the
   milestone is and WHY it matters. The task-level breakdown ("how") lives in a
-  separate sibling file using docs/MILESTONE_TASKS.md as its template.
+  separate sibling file using templates/MILESTONE_TASKS.md as its template.
 
   HOW TO CUSTOMIZE:
   - Replace [PROJECT_NAME] with your project name.

@@ -228,7 +228,7 @@ Mobile performance budgets are tighter than web. You are optimizing for a mid-ra
 - `docs/FRONTEND.md` — shared UI patterns for any rendered surface (navigation, state, components, input). This file layers the mobile-specific delta on top of those patterns.
 - `docs/CODE_PATTERNS.md` — universal coding conventions (naming, module layout, error handling). Applies regardless of target.
 - `docs/FILE_CONVENTIONS.md` — where platform-specific files, native modules, and release configs live in the repository.
-- `docs/UI_SPEC.md` — the template for documenting a single screen or component, including mobile-specific states (permission denied, offline, background).
+- `templates/UI_SPEC.md` — the template for documenting a single screen or component, including mobile-specific states (permission denied, offline, background).
 - `artifacts/ui-specs/` — the active UI spec instances produced per milestone by the UI agent.
 - `docs/TEST_FRAMEWORK.md` — testing strategy, including real-device vs simulator testing and the UI testing tool used for mobile flows.
 

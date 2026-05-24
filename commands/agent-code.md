@@ -123,7 +123,7 @@ After Reviewer approves, the **product** agent validates the task against its ac
 After all tasks for the milestone are complete (or the specified task is done):
 
 1. Run `[TEST_CMD]` one final time to confirm everything still passes.
-2. Write a milestone completion record at `artifacts/milestones/milestone-{N}-{slug}-completion.md` using the template in `docs/MILESTONE_COMPLETION.md`.
+2. Write a milestone completion record at `artifacts/milestones/milestone-{N}-{slug}-completion.md` using the template in `templates/MILESTONE_COMPLETION.md`.
 3. Append a final entry to `artifacts/STANDUP.md` summarizing the run.
 4. Summarize what was implemented, test results, any defects filed in `artifacts/BUGS.md`, and the status of every Approval Condition from the CEO.
 5. Suggest next steps — additional tasks, a release via the **release** agent, or a new planning run via `/agent-plan`.

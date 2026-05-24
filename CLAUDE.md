@@ -11,12 +11,13 @@ This is **CAST — Claude Agent Staged Team**, a multi-agent AI-assisted develop
 - **`root/`** — Files copied to a target project's root (CLAUDE.md template)
 - **`agents/`** — 15 agent role definitions plus a master `README.md` (product, architect, ui, security, performance, ceo, coder, tester, reviewer, debugger, refactor, bug-gatherer, docs-writer, release, validator). Each file includes YAML frontmatter for Claude Code subagent auto-discovery and defines one agent's purpose, authority, inputs, outputs, and decision log. Copied to `.claude/agents/` in the target project
 - **`commands/`** — Slash command definitions (`/agent-plan`, `/agent-code`, `/agent-task`) that orchestrate the planning and engineering stages of the agent workflow plus a mini pipeline for one-off tasks. Copied to `.claude/commands/` in the target project
-- **`docs/`** — **Reference material only.** Requirements, conventions, design rationale, and reusable templates (PRD, architecture templates, UI spec template, milestone templates, etc.). Never receives work artifacts.
+- **`docs/`** — **Reference material only.** Requirements, conventions, and design rationale (PRD, code patterns, file conventions, glossary, etc.). Never receives work artifacts.
+- **`templates/`** — **Document templates only.** Reusable skeletons (architecture templates, UI spec template, milestone templates) that agents copy into `artifacts/` as instances. Never filled in place.
 - **`artifacts/`** — **Work artifacts only.** Milestone plans, per-milestone architecture and UI specs, security/performance/CEO reviews, bug reports, and the session log. Everything produced by `/agent-plan` and `/agent-code` lands here.
 
-## The docs/artifacts Split
+## The docs/templates/artifacts Split
 
-This is a hard rule enforced across the template: **`docs/` is documentation, `artifacts/` is work**. When editing templates or writing new content, every path reference in a template file must respect this split. Agents read templates and reference material from `docs/` and write instances of that work to `artifacts/`. Never introduce a path that writes work output to `docs/` or a path that looks up a template under `artifacts/`.
+This is a hard rule enforced across the template: **`docs/` is documentation, `templates/` is reusable document skeletons, `artifacts/` is work**. When editing templates or writing new content, every path reference in a template file must respect this split. Agents read reference material from `docs/`, read document templates from `templates/`, and write instances of that work to `artifacts/`. Never introduce a path that writes work output to `docs/` or `templates/`, or a path that looks up a template under `docs/` or `artifacts/`.
 
 ## Placeholder Convention
 

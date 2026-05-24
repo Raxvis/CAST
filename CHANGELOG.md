@@ -8,6 +8,29 @@ The current template version is recorded in the root `README.md`, `PROMPT.md`, a
 
 ---
 
+## [0.10.0] — 2026-05-24
+
+Reorganized document templates into a dedicated top-level `templates/` directory, turning the previous two-way `docs/` vs `artifacts/` split into a three-way `docs/` / `templates/` / `artifacts/` split.
+
+### Added
+
+- **`templates/` directory** — the eight reusable document templates now live here instead of `docs/`: `ARCH_MODULE.md`, `ARCH_SYSTEM.md`, `ARCH_DATA_SCHEMA.md`, `UI_SPEC.md`, `MILESTONE_DEFINITION.md`, `MILESTONE_TASKS.md`, `MILESTONE_COMPLETION.md`, `MILESTONE_VALIDATION.md`.
+- **`templates/README.md`** — index for the new directory listing each template, the agent that produces it, the command stage it is used in, and its `artifacts/` instance destination.
+
+### Changed
+
+- **Three-way split is now the canonical rule.** `docs/` holds reference material, `templates/` holds reusable document skeletons, and `artifacts/` holds work instances. Updated the split definition in `CLAUDE.md`, `root/CLAUDE.md`, `docs/FILE_CONVENTIONS.md`, `docs/README.md`, `agents/README.md`, and the root `README.md`.
+- **All template path references updated** from `docs/<TEMPLATE>.md` to `templates/<TEMPLATE>.md` across `agents/architect.md`, `agents/product.md`, `agents/ui.md`, `agents/README.md`, `commands/agent-plan.md`, `commands/agent-code.md`, `docs/CODE_PATTERNS.md`, `docs/FRONTEND.md`, `docs/MOBILE.md`, `docs/FIRST_RUN.md`, `artifacts/README.md`, and `artifacts/STANDUP.md`.
+- **`PROMPT.md` adoption flow** — the docs/templates mapping table now lists the `templates/*` rows with their new install location, and step 5.6 reads templates from `<CAST_SOURCE>/templates/` and writes them to the project's top-level `templates/` directory.
+
+### Fixed
+
+- **`templates/MILESTONE_COMPLETION.md`** pointed its instance and cross-reference paths at `docs/milestones/` — a split violation, since milestones are work artifacts. Corrected to `artifacts/milestones/milestone-{N}-{slug}-{completion,tasks,validation}.md`.
+
+### Migration
+
+- Projects that already adopted CAST should move the eight template files from `docs/` into a new top-level `templates/` directory; no agent or command behavior changes beyond the template lookup path. Re-running `PROMPT.md` against an existing install creates `templates/` and relocates the templates automatically.
+
 ## [0.9.0] — 2026-05-23
 
 Template cleanup: removed install scripts and settings example, fixed documentation inconsistencies, and corrected stale cross-references.

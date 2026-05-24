@@ -312,20 +312,21 @@ When two agents cover related territory, one is the **primary owner** and the ot
 
 ## Documentation Placement
 
-Two top-level directories separate reference from work:
+Three top-level directories separate reference, templates, and work:
 
-- **`docs/`** — Reference material only: requirements, conventions, design rationale, templates. Never receives live work artifacts.
+- **`docs/`** — Reference material only: requirements, conventions, design rationale. Never receives live work artifacts.
+- **`templates/`** — Reusable document templates (architecture, UI spec, milestone files). Agents read them and produce instances under `artifacts/`; never filled in place.
 - **`artifacts/`** — All work artifacts produced by the agents: milestone definitions, planning-stage architecture and UI specs, security/performance/CEO reviews, bug reports, and the session progress log. See `artifacts/README.md` for the full structure.
 
-The table below records **where each agent writes its work artifacts**. Templates referenced by agents live in `docs/`; instances produced by the agents live in `artifacts/`.
+The table below records **where each agent writes its work artifacts**. Templates referenced by agents live in `templates/`; instances produced by the agents live in `artifacts/`.
 
 | Document Type | Owner | Location | Tracking Format |
 |---|---|---|---|
 | Feature requirements (backlog) | Product | `product.md` → Current Work | Task / Milestone / Status / Notes |
-| Milestone definitions and tasks | Product | `artifacts/milestones/milestone-{N}-{slug}.md` + `-tasks.md` | Per `docs/MILESTONE_TASKS.md` template |
-| Architecture documents (planning) | Architecture | `artifacts/architecture/arch-milestone-{N}.md` | Per `docs/ARCH_MODULE.md` / `ARCH_SYSTEM.md` / `ARCH_DATA_SCHEMA.md` |
+| Milestone definitions and tasks | Product | `artifacts/milestones/milestone-{N}-{slug}.md` + `-tasks.md` | Per `templates/MILESTONE_TASKS.md` template |
+| Architecture documents (planning) | Architecture | `artifacts/architecture/arch-milestone-{N}.md` | Per `templates/ARCH_MODULE.md` / `ARCH_SYSTEM.md` / `ARCH_DATA_SCHEMA.md` |
 | Architecture document index | Architecture | `architect.md` → Architecture Documents table | Document / Module / Status / Milestone |
-| Screen specifications (planning) | UI | `artifacts/ui-specs/ui-milestone-{N}.md` | Per `docs/UI_SPEC.md` |
+| Screen specifications (planning) | UI | `artifacts/ui-specs/ui-milestone-{N}.md` | Per `templates/UI_SPEC.md` |
 | Screen specification index | UI | `ui.md` → Screen Specifications table | Screen / Milestone / Status / Notes |
 | Code review verdicts | Reviewer | `reviewer.md` → Current Work | Submission / Source Agent / Date / Verdict / Notes |
 | Test results and coverage | Tester | `tester.md` → Current Work | Change / Source Agent / Tests Run / Pass-Fail / Coverage Delta |
@@ -337,8 +338,8 @@ The table below records **where each agent writes its work artifacts**. Template
 | Performance findings index | Performance | `performance.md` → Current Work | Finding / Metric / Impact / Status / Notes |
 | CEO planning reviews | CEO | `artifacts/reviews/ceo-review-milestone-{N}.md` | Milestone / Status / Verdict / Notes |
 | CEO review index | CEO | `ceo.md` → Current Work | Milestone / Status / Verdict / Notes |
-| Milestone completion reports | Product | `artifacts/milestones/milestone-{N}-{slug}-completion.md` | Per `docs/MILESTONE_COMPLETION.md` |
-| Milestone validation records | Product | `artifacts/milestones/milestone-{N}-{slug}-validation.md` | Per `docs/MILESTONE_VALIDATION.md` |
+| Milestone completion reports | Product | `artifacts/milestones/milestone-{N}-{slug}-completion.md` | Per `templates/MILESTONE_COMPLETION.md` |
+| Milestone validation records | Product | `artifacts/milestones/milestone-{N}-{slug}-validation.md` | Per `templates/MILESTONE_VALIDATION.md` |
 | Rolling session log | Any agent | `artifacts/STANDUP.md` | Date / Agent / Change / Notes |
 | Developer documentation | Docs Writer | `docs/` directory | Per `docs/README.md` index |
 | Changelog and versioning | Release | `docs/CHANGELOG.md` | Per Release Checklist Template |

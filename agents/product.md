@@ -93,10 +93,10 @@ When producing milestone artifacts, read the corresponding template from `docs/`
 
 | Artifact type | Template to read | Instance destination |
 |---|---|---|
-| Milestone definition (goal, scope, success metrics, top-level acceptance criteria) | `docs/MILESTONE_DEFINITION.md` | `artifacts/milestones/milestone-{N}-{slug}.md` |
-| Task breakdown (per-task IDs, dependencies, files touched, acceptance criteria) | `docs/MILESTONE_TASKS.md` | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
-| Milestone completion report (after `/agent-code` finishes) | `docs/MILESTONE_COMPLETION.md` | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
-| Milestone validation record (acceptance evidence) | `docs/MILESTONE_VALIDATION.md` | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
+| Milestone definition (goal, scope, success metrics, top-level acceptance criteria) | `templates/MILESTONE_DEFINITION.md` | `artifacts/milestones/milestone-{N}-{slug}.md` |
+| Task breakdown (per-task IDs, dependencies, files touched, acceptance criteria) | `templates/MILESTONE_TASKS.md` | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
+| Milestone completion report (after `/agent-code` finishes) | `templates/MILESTONE_COMPLETION.md` | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
+| Milestone validation record (acceptance evidence) | `templates/MILESTONE_VALIDATION.md` | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
 
 The Task Validation Checklist template below this section is Product's internal review form — it stays inline because it is short and specific to Product's validation loop, not a typed artifact consumed by other agents.
 

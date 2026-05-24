@@ -32,7 +32,7 @@ artifacts/
   STANDUP.md                       # Rolling session progress log
 
   milestones/
-    milestone-{N}-{slug}.md        # Milestone definition (from docs/MILESTONE_TASKS.md)
+    milestone-{N}-{slug}.md        # Milestone definition (from templates/MILESTONE_TASKS.md)
     milestone-{N}-{slug}-tasks.md  # Task breakdown for that milestone
 
   architecture/
@@ -87,7 +87,7 @@ The following belong in `docs/`, not `artifacts/`:
 - File placement rules (`docs/FILE_CONVENTIONS.md`)
 - Error handling guidelines (`docs/ERROR_HANDLING.md`)
 - Testing strategy (`docs/TEST_FRAMEWORK.md`)
-- Document templates (`docs/ARCH_MODULE.md`, `docs/UI_SPEC.md`, `docs/MILESTONE_TASKS.md`, etc.)
+- Document templates (`templates/ARCH_MODULE.md`, `templates/UI_SPEC.md`, `templates/MILESTONE_TASKS.md`, etc.)
 - Release changelog (`docs/CHANGELOG.md`)
 - Asset registry (`docs/ASSETS.md`)
 
