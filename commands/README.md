@@ -1,11 +1,8 @@
 <!-- TEMPLATE INSTRUCTIONS
 PURPOSE: This file is the in-directory index for the commands/ directory. It is
-reference material for readers browsing the template repo — it does NOT get copied
-to target projects during install, because Claude Code would otherwise try to
-register it as a slash command named /README.
-
-The install scripts (scripts/install.sh and scripts/install.ps1) explicitly
-exclude README.md when copying commands/*.md into .claude/commands/.
+reference material for readers browsing the template repo — it should NOT be
+copied to target projects during adoption, because Claude Code would otherwise
+try to register it as a slash command named /README.
 
 HOW TO CUSTOMIZE: no customization needed. This file is metadata about the directory.
 -->
@@ -26,7 +23,7 @@ commands/agent-task.md  →  <target>/.claude/commands/agent-task.md
 
 Claude Code auto-discovers any `.md` file in `.claude/commands/` at session start and registers it as a slash command named after the file (without the `.md` extension). No configuration is required beyond putting the files in the right place.
 
-**This README file is NOT copied to the target project.** The install scripts exclude it explicitly, because a `.claude/commands/README.md` would be registered as a `/README` slash command.
+**This README file should NOT be copied to the target project.** A `.claude/commands/README.md` would be registered as a `/README` slash command, which is not intended.
 
 ## The three commands in this directory
 

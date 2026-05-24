@@ -1,9 +1,8 @@
 <!-- TEMPLATE INSTRUCTIONS
   FILE: FIRST_RUN.md
   PURPOSE: A short interactive checklist the user runs the first time they open
-  Claude Code in a freshly-installed template. Covers what the smoke-test script
-  cannot: does Claude Code actually load the subagents, do the slash commands
-  appear, and does /agent-plan actually run end-to-end.
+  Claude Code in a freshly-installed template. Verifies that Claude Code actually
+  loads the subagents, the slash commands appear, and /agent-plan runs end-to-end.
 
   This file is reference material and stays in docs/. It does not get populated
   per-project; every project uses it the same way.
@@ -11,9 +10,7 @@
 
 # First-Run Checklist
 
-This checklist verifies that a freshly-installed template is wired up correctly inside Claude Code. Run the static smoke test first (`./scripts/smoke-test.sh <target>`), then walk through this file interactively.
-
-The static smoke test cannot verify these steps — only a real Claude Code session can.
+This checklist verifies that a freshly-installed template is wired up correctly inside Claude Code. Walk through it interactively in a Claude Code session after adoption.
 
 ---
 
@@ -28,7 +25,7 @@ claude
 
 **Verify:** `CLAUDE.md` loads automatically at session start. You should see your populated project identity in the session context (the first line of your `CLAUDE.md` mentions the project name you filled in).
 
-**If it fails:** your `CLAUDE.md` is probably at the wrong path. It must live at the project root, not inside `docs/` or anywhere else. See `TROUBLESHOOTING.md` → "`CLAUDE.md` context is not being loaded".
+**If it fails:** your `CLAUDE.md` is probably at the wrong path. It must live at the project root, not inside `docs/` or anywhere else. See the CAST template's `TROUBLESHOOTING.md` → "`CLAUDE.md` context is not being loaded".
 
 ---
 
@@ -92,7 +89,7 @@ For a lighter-weight verification that the engineering pipeline is working:
 
 **Verify:** the Coder agent picks up the task, makes the one-line change, the Tester agent runs, the Reviewer agent approves, and the Product agent validates. You can roll the commit back afterward.
 
-**If any agent in the chain halts:** read the halt message. It should cite the specific agent and the specific reason. Cross-reference `TROUBLESHOOTING.md`.
+**If any agent in the chain halts:** read the halt message. It should cite the specific agent and the specific reason. Cross-reference the CAST template's `TROUBLESHOOTING.md`.
 
 ---
 
@@ -164,4 +161,4 @@ Each probe is a single prompt to launch the named agent explicitly. Each takes u
 
 ---
 
-_See also: `scripts/smoke-test.sh` for the static half of the verification, `TROUBLESHOOTING.md` for symptom-based diagnostics, and `example/` for a worked fixture showing what successful outputs look like._
+_See also: the CAST template's `TROUBLESHOOTING.md` for symptom-based diagnostics and `example/` for a worked fixture showing what successful outputs look like._

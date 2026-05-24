@@ -1,9 +1,8 @@
 # Example: Acme Todo
 
 This directory is a **fixture**, not a real, buildable project. It shows what a
-populated instance of the multi-agent workflow template at `/Users/raxvis/work/claude/`
-looks like after a solo developer has run `/agent-plan` and `/agent-code` for
-Milestone 1 of a small project.
+populated instance of the CAST template looks like after a solo developer has
+run `/agent-plan` and `/agent-code` for Milestone 1 of a small project.
 
 ## The Mock Project
 
@@ -18,7 +17,8 @@ See `CLAUDE.md` for the full project overview and `docs/PRD.md` for requirements
 
 1. `/agent-plan` ran on 2026-04-08, producing the Milestone 1 plan, the
    architecture and UI specs, and the security/performance/CEO reviews under
-   `artifacts/milestones/01-task-crud/`.
+   `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`,
+   and `artifacts/reviews/`.
 2. The CEO verdict was **APPROVED WITH CONDITIONS** (three conditions covering
    parameterized SQL, WAL mode plus an index on `completed`, and migration
    on first invocation).
@@ -32,8 +32,8 @@ Read these in order for the clearest picture:
 
 1. **`CLAUDE.md`** — the root context file an agent sees at every session.
 2. **`docs/PRD.md`** — requirements and acceptance criteria for M1 and M2.
-3. **`artifacts/milestones/01-task-crud/MILESTONE.md`** — the M1 plan.
-4. **`artifacts/milestones/01-task-crud/CEO_REVIEW.md`** — the APPROVED WITH
+3. **`artifacts/milestones/milestone-1-task-crud.md`** — the M1 plan.
+4. **`artifacts/reviews/ceo-review-milestone-1.md`** — the APPROVED WITH
    CONDITIONS verdict and the three conditions that shaped implementation.
 5. **`artifacts/BUGS.md`** — BUG-001 (fixed during T-3) and BUG-002 (deferred).
 6. **`artifacts/STANDUP.md`** — the rolling session log across the three days.
@@ -48,7 +48,7 @@ Read these in order for the clearest picture:
 
 - **No `.claude/` directory.** In a real populated project this would hold
   unchanged copies of the template agent and command files. Including them
-  here would just duplicate `/Users/raxvis/work/claude/agents/` verbatim.
+  here would just duplicate the template's `agents/` directory verbatim.
 - **No `src/` directory.** This fixture demonstrates the *planning and review
   artifacts*, not a working build. Acme Todo is not a real package.
 - **No full `docs/` set.** Only `PRD.md`, `CONCEPT.md`, and `GLOSSARY.md`

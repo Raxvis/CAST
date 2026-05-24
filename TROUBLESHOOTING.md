@@ -60,19 +60,6 @@ Common problems adopting or running this template, with the most likely cause an
 
 ---
 
-## `check-placeholders.sh` reports matches after I ran the install script
-
-**Cause.** The install script only substitutes the placeholders you answered prompts for (or that were in your values file). Essentials mode covers about 9 placeholders; `--full` covers all ~50. Any unanswered placeholder is left in place for you to fill in by hand. Sub-templates (`[DATE]`, `[REPRODUCTION_STEPS]`, `[TASK_NAME]`) are also intentionally left alone because they are filled in per-use, not per-install.
-
-**Fix.**
-1. Review the script's output. Matches grouped under bug-report templates, milestone validation forms, or standup entries are sub-templates — leave them alone.
-2. For real project-level placeholders (`[PROJECT_NAME]`, `[LANGUAGE]`, etc.) that are still unresolved, either:
-   - Re-run the installer with `--full` to answer the remaining prompts, or
-   - Edit `template.values` to add the missing keys, then re-run with `--values template.values --force`.
-3. To silence a file that always produces known-false-positive matches, pass it to the script: `./scripts/check-placeholders.sh docs/MY_TEMPLATE.md`.
-
----
-
 ## `/agent-code` fails at pre-flight with "CEO review not found"
 
 **Cause.** `/agent-code` reads `artifacts/reviews/ceo-review-milestone-{N}.md` before running any task. If that file does not exist, the planning stage was never completed (or was not completed for the milestone you specified).
@@ -93,33 +80,6 @@ Common problems adopting or running this template, with the most likely cause an
 2. Run `/agent-plan "<feature description>"` to produce the planning artifacts for that scope. This runs Product → Architecture + UI → Security + Performance → CEO and ends with a verdict file at `artifacts/reviews/ceo-review-milestone-{N}.md`.
 3. After the CEO issues **APPROVED** or **APPROVED WITH CONDITIONS**, run `/agent-code <milestone>` to execute the engineering stage against the approved plan.
 4. If you disagree with the scope classification and think the change is really self-contained, you can re-run `/agent-task` with a more precise task description that narrows the scope (name the specific file, the specific bug ID, or the specific existing pattern the change follows). Do not try to sneak a design change through `/agent-task` — the gate exists to prevent drift, and the Reviewer in Step 3 will catch it anyway.
-
----
-
-## Install script fails with `declare: -A: invalid option`
-
-**Cause.** The shipped `scripts/install.sh` is written to be compatible with bash 3.2 (the default on macOS) and uses parallel arrays rather than associative arrays. If you edited it to use `declare -A`, it will fail on macOS default bash.
-
-**Fix.**
-1. Restore the unmodified script from the template, or revert your edits.
-2. If you need associative arrays, invoke the script explicitly with a newer bash: `bash4 scripts/install.sh ...` or install bash 5 via Homebrew (`brew install bash`) and update the shebang line.
-
----
-
-## Install script fails with `sed: invalid command code` on macOS
-
-**Cause.** GNU sed and BSD sed handle in-place edits differently. BSD sed (macOS default) requires an explicit empty-string argument: `sed -i '' "s/..."`. GNU sed (Linux) uses just `sed -i "s/..."`. The shipped script detects which flavor is installed; local edits can break the detection.
-
-**Fix.**
-1. Check you did not remove the flavor detection block:
-   ```
-   if sed --version >/dev/null 2>&1; then
-     SED_INPLACE=(-i)
-   else
-     SED_INPLACE=(-i '')
-   fi
-   ```
-2. If you customized the sed calls, use `"${SED_INPLACE[@]}"` (the expanded array) instead of hard-coding `-i` or `-i ''`.
 
 ---
 
@@ -186,13 +146,3 @@ Common problems adopting or running this template, with the most likely cause an
 3. Update `agents/docs-writer.md` and the responsible agent's file if the source of the error is a stale path reference there.
 4. Re-read `docs/FILE_CONVENTIONS.md` → The Core Rule. If you are writing a template document or coding convention, it belongs in `docs/`. If you are writing a milestone plan, bug report, review, or session log, it belongs in `artifacts/`. The slash commands enforce this; direct agent invocation does not.
 
----
-
-## The install script overwrote my customized agent files
-
-**Cause.** Running `scripts/install.sh <target> --force` with an already-populated target replaces the agent files in `.claude/agents/` with fresh template copies.
-
-**Fix.**
-1. Recover your edits from git: `git diff HEAD~1 .claude/agents/` and revert the affected files, or cherry-pick specific changes back in.
-2. For future runs, do not use `--force` on a populated project. If you need to pull in template updates, merge them into your existing files manually, referencing `CHANGELOG.md` for what changed.
-3. Consider committing your customized `.claude/agents/` files immediately after install so you always have a recovery point.

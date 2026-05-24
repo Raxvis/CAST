@@ -8,7 +8,7 @@ This is **CAST — Claude Agent Staged Team**, a multi-agent AI-assisted develop
 
 ## Directory Structure
 
-- **`root/`** — Files copied to a target project's root (CLAUDE.md template, config templates)
+- **`root/`** — Files copied to a target project's root (CLAUDE.md template)
 - **`agents/`** — 15 agent role definitions plus a master `README.md` (product, architect, ui, security, performance, ceo, coder, tester, reviewer, debugger, refactor, bug-gatherer, docs-writer, release, validator). Each file includes YAML frontmatter for Claude Code subagent auto-discovery and defines one agent's purpose, authority, inputs, outputs, and decision log. Copied to `.claude/agents/` in the target project
 - **`commands/`** — Slash command definitions (`/agent-plan`, `/agent-code`, `/agent-task`) that orchestrate the planning and engineering stages of the agent workflow plus a mini pipeline for one-off tasks. Copied to `.claude/commands/` in the target project
 - **`docs/`** — **Reference material only.** Requirements, conventions, design rationale, and reusable templates (PRD, architecture templates, UI spec template, milestone templates, etc.). Never receives work artifacts.
@@ -54,21 +54,19 @@ When editing templates, preserve placeholder tokens — do not replace them with
 
 ## Release and Tagging Policy
 
-Whenever the template version is bumped, the new version must be tagged and released on GitHub at the same time the commit is pushed. This is a hard rule, not a preference — `scripts/install.sh`, `scripts/install.ps1`, and `PROMPT.md` all reference the template version, and downstream users rely on GitHub tags to pin a known-good revision. (`scripts/bootstrap.sh` intentionally does NOT hard-code a version — it always clones `main` — so the curl one-liner stays on the latest release. But users who want to pin an older version clone the repo and `git checkout v0.X.Y` before running `install.sh`, which is only possible if the tag exists.) A push without a corresponding tag leaves the canonical version floating and breaks reproducible installs.
+Whenever the template version is bumped, the new version must be tagged and released on GitHub at the same time the commit is pushed. This is a hard rule, not a preference — `PROMPT.md` references the template version, and downstream users rely on GitHub tags to pin a known-good revision. A push without a corresponding tag leaves the canonical version floating and breaks reproducible installs.
 
 **A version bump is any change to one of the following synchronized locations:**
 
 - `README.md` — the version badge and the `Current template version` hero line
-- `scripts/install.sh` — the `TEMPLATE_VERSION` shell constant
-- `scripts/install.ps1` — the `$TemplateVersion` PowerShell variable
 - `PROMPT.md` — the `Template version targeted` header
 - `CHANGELOG.md` — a new version entry
 
-All five of these must land in the same commit. A commit that bumps one without the others is incomplete and should not be pushed.
+All three of these must land in the same commit. A commit that bumps one without the others is incomplete and should not be pushed.
 
 **Release checklist (run every time the version changes):**
 
-1. Update all five locations above in a single commit.
+1. Update all three locations above in a single commit.
 2. Add a `CHANGELOG.md` entry for the new version, following the existing format (Added / Changed / Removed / Migration subsections as applicable). The entry must describe every substantive change since the prior version, not just the new feature.
 3. Commit the version bump with a message that starts with the new version number (e.g. `"Release v<NEW>: ..."`) so the tag-creation step can use the commit as the tag target.
 4. Push the commit to `origin main`.
@@ -95,7 +93,7 @@ Throughout these steps, replace `<NEW>` with the actual new semver string (e.g. 
 **Do not do any of the following:**
 
 - Push a version-bump commit without creating the matching tag and release in the same session.
-- Bump the version in some locations but not others. All five synchronized locations must match.
+- Bump the version in some locations but not others. All three synchronized locations must match.
 - Use a lightweight tag (`git tag v<NEW> <sha>` without `-a`). Always use an annotated tag.
 - Skip the GitHub Release step because "the tag exists". The tag and the Release are separate artifacts; downstream tooling depends on both.
 - Bump the version without a `CHANGELOG.md` entry. Every tag must have a corresponding CHANGELOG section the release notes can cite.
@@ -105,7 +103,7 @@ Throughout these steps, replace `<NEW>` with the actual new semver string (e.g. 
 - A new file is added that users would import or reference
 - An existing file's public contract changes (agent outputs, command stages, template slot names)
 - A file is renamed, moved, or removed
-- A bug in the adoption prompt, installer, or scripts is fixed in a way users should re-run with
+- A bug in the adoption prompt is fixed in a way users should re-run with
 - The workflow gains or loses an agent, command, or stage
 
 If in doubt, bump — the cost of an unnecessary patch release is much lower than the cost of a silent behavior change reaching users at `main`.

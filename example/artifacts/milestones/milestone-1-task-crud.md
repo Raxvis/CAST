@@ -2,6 +2,12 @@
 
 **Status**: Planning approved (CEO: APPROVED WITH CONDITIONS)
 
+## Revision History
+
+| Rev | Date | Agent | Change |
+|-----|------|-------|--------|
+| v1 | 2026-04-08 | product | Initial milestone definition |
+
 ---
 
 ## Header

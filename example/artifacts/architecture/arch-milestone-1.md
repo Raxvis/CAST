@@ -1,5 +1,13 @@
 # Acme Todo — Architecture Spec: Milestone 1 (Task CRUD + SQLite persistence)
 
+## Revision History
+
+| Rev | Date | Agent | Change |
+|-----|------|-------|--------|
+| v1 | 2026-04-08 | architect | Initial architecture spec |
+
+---
+
 | Field | Value |
 |-------|-------|
 | **Version** | 1.0 |

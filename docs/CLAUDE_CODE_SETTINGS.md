@@ -12,7 +12,7 @@ Delete only if your project has a policy against per-project Claude Code setting
 
 # `.claude/settings.json` — Claude Code Project Settings
 
-This file is reference material for configuring Claude Code at the project level. The template ships a minimal example at `.claude/settings.json.example`; copy it to `.claude/settings.json` and edit as needed. `.claude/settings.json` is picked up automatically whenever Claude Code starts a session in the project root.
+This file is reference material for configuring Claude Code at the project level. Create a `.claude/settings.json` file in your project root and edit as needed. It is picked up automatically whenever Claude Code starts a session in the project root.
 
 For the authoritative reference, see the Claude Code documentation on project settings. This doc only covers the patterns a project using this template is most likely to want.
 
@@ -28,13 +28,13 @@ The most useful things you can put here:
 2. **Environment variables** — project-local values that Claude Code passes to every Bash tool call.
 3. **Hooks** — shell commands that fire on specific events (tool calls, session start, etc.).
 
-This template's shipped example only configures permission rules. Hooks and status lines are genuinely useful but have steeper learning curves and are left as opt-in extensions.
+Hooks and status lines are genuinely useful but have steeper learning curves and are left as opt-in extensions.
 
 ---
 
-## The shipped example
+## Recommended starting point
 
-`.claude/settings.json.example` contains the following minimal safe defaults:
+A minimal safe starting configuration for `.claude/settings.json`:
 
 ```json
 {
@@ -54,15 +54,6 @@ This template's shipped example only configures permission rules. Hooks and stat
 ```
 
 This auto-approves a short list of read-only shell commands so Claude Code runs them without prompting. These are the commands Claude Code fires most frequently while exploring a codebase, and they have no destructive side effects on any project. Adding them to the allow list dramatically reduces interruption without sacrificing safety.
-
-**To adopt the example:**
-
-```
-cp .claude/settings.json.example .claude/settings.json
-# Edit .claude/settings.json and remove the _comment_* fields, then commit.
-```
-
-Leaving the `.example` suffix in place means Claude Code ignores it — it only reads `settings.json` (no suffix). You can keep both files: `.example` is the version-controlled "known-good starting point," `.claude/settings.json` is the active (possibly edited) configuration.
 
 ---
 
@@ -148,4 +139,4 @@ If a command in the `allow` list still prompts, your pattern probably doesn't ma
 
 ---
 
-_See also: `TROUBLESHOOTING.md` for common settings-related failure modes, and the official Claude Code settings documentation for the full field reference._
+_See also: the CAST template's `TROUBLESHOOTING.md` for common settings-related failure modes, and the official Claude Code settings documentation for the full field reference._

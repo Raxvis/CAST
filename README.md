@@ -15,9 +15,8 @@
 
 > **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three slash commands, and a CEO-gated planning pipeline — shipped as plain Markdown, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v0.8.1-blue)
+![Template version](https://img.shields.io/badge/template-v0.9.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
-![Install](https://img.shields.io/badge/install-bash_%7C_powershell-brightgreen)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
 
 CAST gives you a real team structure with clear handoffs, typed artifacts, and a review gate you can't accidentally skip. The name is a double pun: a *cast* is a group of specialists each playing a defined role, and the pipeline runs in *stages* — planning (Product → Architecture + UI → Security + Performance → CEO sign-off) followed by engineering (Coder → Tester → Reviewer, with defect and issue routing).
@@ -58,86 +57,45 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 - **15 specialist subagents** pinned to the right Claude model tier per workload (Opus for planning, Sonnet for engineering, Haiku for utility).
 - **Three slash commands** — `/agent-plan`, `/agent-code`, `/agent-task` — as plain Markdown orchestration scripts Claude Code reads at session start.
 - **A hard `docs/` vs `artifacts/` split** — `docs/` holds reference material (requirements, conventions, templates); `artifacts/` holds live work (plans, reviews, bugs, session logs). The CEO gate, placeholder check, and smoke test all enforce the split.
-- **A one-line curl installer**, a bash installer, a PowerShell installer, a placeholder validator, a smoke test, and a fully populated `example/` fixture so you can see exactly what a real planning run produces.
+- **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v0.8.1` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v0.9.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
-## Which entry point fits your situation?
+## Install
 
-CAST ships four install paths. Pick the one that matches your project state and environment:
+1. Get a local copy of CAST:
+   ```bash
+   # Shallow clone (fastest)
+   git clone --depth 1 https://github.com/Raxvis/CAST.git /path/to/CAST
 
-| Situation | Entry point | Why |
-|---|---|---|
-| **Greenfield project** or an existing project with **no prior agentic workflow** | `scripts/bootstrap.sh` (curl one-liner below) | Fastest path. ~30 seconds. Doesn't require Claude Code to be running yet. |
-| **Windows without WSL** | Clone the repo and run `scripts\install.ps1` | Curl-pipe-bash doesn't map to PowerShell, so the one-liner can't run natively on Windows CMD/PowerShell. `install.ps1` is the functionally-equivalent twin. |
-| **Existing agentic workflow you want to migrate** (custom agents, different naming, partial CAST, pre-0.3.0 `features/` directory) | Paste [`PROMPT.md`](PROMPT.md) into Claude Code inside your project | `PROMPT.md` crawls your project, proposes a migration plan, waits for your approval, and merges CAST into your existing structure while preserving customizations. The scripts can't do this — they're deterministic templating, not judgment calls. |
-| **CI pipeline or scripted install** | `scripts/install.sh --values template.values` | Non-interactive. Reproducible. Plugs into CI with a pre-filled values file. No Claude Code session required. |
-| **Just need to verify an existing install** | `scripts/smoke-test.sh .` and `scripts/check-placeholders.sh` | Static checks in under 5 seconds. No API credits. |
+   # Or download and extract the zip from:
+   # https://github.com/Raxvis/CAST/archive/refs/heads/main.zip
+   ```
 
-If you don't know which situation you're in, run the curl one-liner below — it handles greenfield and plain existing projects. If it fails or you realize you have customizations to preserve, switch to `PROMPT.md`.
+2. Open Claude Code inside your project and point it at the prompt:
+   ```
+   cd /path/to/your-project
+   claude
+   > follow the instructions in /path/to/CAST/PROMPT.md
+   ```
 
----
+Claude reads all template files from your local copy — no network access to GitHub is required during execution. It will:
 
-## Install in one line
+1. **Crawl your project** — detect tech stack, existing agents, docs, and customizations.
+2. **Propose a migration plan** — numbered list of every file it will create, rename, update, or skip.
+3. **Wait for your approval** — nothing is touched until you explicitly approve.
+4. **Execute the plan** — install agents, commands, docs, and artifacts, substituting detected project values.
+5. **Validate** — verify all 15 agents exist, the docs/artifacts split is clean, and YAML frontmatter is valid.
 
-From inside an existing project directory on macOS, Linux, or WSL:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/Raxvis/CAST/main/scripts/bootstrap.sh | bash
-```
-
-The installer prompts for a handful of essential placeholders (project name, language, framework, test/dev/build commands), then writes `CLAUDE.md`, `.claude/agents/`, `.claude/commands/`, `docs/`, `artifacts/`, and the helper scripts into the current directory.
+This works for greenfield projects, existing projects with no agentic workflow, and existing projects with a mature agentic workflow you want to migrate to CAST.
 
 **Next steps after install:**
 
-1. `./scripts/smoke-test.sh .` — static verification that everything landed correctly.
-2. Open the project in Claude Code and walk through [`docs/FIRST_RUN.md`](docs/FIRST_RUN.md) for the interactive checklist (`/agents`, `/agent-plan` dry run, optional per-agent smoke probes).
-3. Commit the populated template as your first commit.
-
-**Requirements:** `bash`, `git`, and an interactive terminal (or a `--values` file for headless environments). Windows without WSL: clone the repo and run `scripts\install.ps1` directly — curl-pipe-bash doesn't map to PowerShell.
-
-> **Safety note:** Inspect any curl-pipe-bash command before running it. `curl -fsSL https://raw.githubusercontent.com/Raxvis/CAST/main/scripts/bootstrap.sh | less` prints the script without executing it.
-
-<details>
-<summary><strong>Other install variants</strong> — specific directory, non-interactive, full prompts, overwrite</summary>
-
-```bash
-# Install into a specific directory instead of the current one:
-curl -fsSL https://raw.githubusercontent.com/Raxvis/CAST/main/scripts/bootstrap.sh | bash -s -- /path/to/project
-
-# Non-interactive install with answers pre-filled in a values file:
-curl -fsSL https://raw.githubusercontent.com/Raxvis/CAST/main/scripts/bootstrap.sh | bash -s -- . --values template.values
-
-# Prompt for every supported placeholder, not just essentials:
-curl -fsSL https://raw.githubusercontent.com/Raxvis/CAST/main/scripts/bootstrap.sh | bash -s -- . --full
-
-# Overwrite an already-populated target:
-curl -fsSL https://raw.githubusercontent.com/Raxvis/CAST/main/scripts/bootstrap.sh | bash -s -- . --force
-```
-
-</details>
-
-<details>
-<summary><strong>Cloned-repo install</strong> — bash or PowerShell if you'd rather not pipe from curl</summary>
-
-```bash
-# macOS, Linux, WSL
-git clone https://github.com/Raxvis/CAST.git
-./CAST/scripts/install.sh /path/to/your-project
-```
-
-```powershell
-# Windows PowerShell 5.1+ or PowerShell Core 7+
-git clone https://github.com/Raxvis/CAST.git
-.\CAST\scripts\install.ps1 C:\path\to\your-project
-```
-
-All three entry points share the same CLI surface and `template.values` output format, so you can switch between them freely.
-
-</details>
+1. Walk through [`docs/FIRST_RUN.md`](docs/FIRST_RUN.md) for the interactive checklist (`/agents`, `/agent-plan` dry run, optional per-agent smoke probes).
+2. Commit the populated template as your first commit.
 
 ---
 
@@ -146,13 +104,13 @@ All three entry points share the same CLI surface and `template.values` output f
 ```
 CAST/
   README.md              # This file — master index and usage guide
+  PROMPT.md              # Adoption prompt — Claude reads this to install CAST
   root/                  # Files intended for the project root
   agents/                # Agent role definitions (copied to .claude/agents/)
   commands/              # Slash commands (copied to .claude/commands/)
   docs/                  # Reference material: requirements, conventions, templates
   artifacts/             # Work artifacts: plans, reviews, bugs, session logs
   example/               # Populated fixture: a full "Acme Todo" project walkthrough
-  scripts/               # Install, bootstrap, smoke-test, and placeholder-check scripts
 ```
 
 ### The `docs/` vs `artifacts/` split
@@ -166,7 +124,7 @@ If you are unsure where a file belongs, ask: _"Is this reusable reference materi
 
 ### root/
 
-Files in this directory are copied directly to the root of the target project. They configure the development environment, define coding conventions, and provide the top-level context that every agent reads first.
+Contains the `CLAUDE.md` template that is copied to the root of the target project. This file defines project identity, structure, conventions, and run commands — the top-level context that every agent reads first.
 
 ### agents/
 
@@ -187,7 +145,7 @@ Reference material only. These are not agent definitions and not work artifacts 
 - **`docs/CLI.md`** — command-line tools and terminal utilities. Covers argv parsing, stdin/stdout/stderr discipline, exit codes, terminal output formatting, cross-platform concerns, signal handling.
 - **`docs/MOBILE.md`** — native and cross-platform mobile apps (iOS, Android, React Native, Expo, Flutter, SwiftUI, Jetpack Compose). Covers the mobile-specific delta on top of `FRONTEND.md`: app lifecycle, permissions, native bridges, offline-first sync, local storage tiers, deep links, push notifications, device variety, release engineering. Import both `FRONTEND.md` and `MOBILE.md` for a mobile project.
 
-A project that spans two types (e.g., a full-stack web app with a backend API and a React frontend) can keep both files and import both. A project that doesn't fit any of the three categories can delete all three and write its own.
+A project that spans two types (e.g., a full-stack web app with a backend API and a React frontend) can keep both files and import both. A project that doesn't fit any of the four categories can delete all four and write its own.
 
 ### artifacts/
 
@@ -197,7 +155,7 @@ Work artifacts produced by the agents during `/agent-plan` and `/agent-code`: mi
 
 ## Placeholders
 
-Project-specific content in every template file is marked with `[UPPER_SNAKE_CASE]` tokens — things like `[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[TEST_CMD]`. The installer prompts for the essentials and substitutes them across every file; you fill the rest in by hand after install. The placeholder check script (`./scripts/check-placeholders.sh`) scans the target and reports anything still unfilled.
+Project-specific content in every template file is marked with `[UPPER_SNAKE_CASE]` tokens — things like `[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[TEST_CMD]`. The adoption prompt (`PROMPT.md`) detects project values and substitutes them during install; any remaining unfilled tokens are reported in the adoption report for you to fill in by hand.
 
 <details>
 <summary><strong>Full placeholder reference</strong> (12 categories, ~60 tokens) — expand if you're populating files manually or writing a values file</summary>
@@ -332,11 +290,10 @@ Each agent file has its model hard-coded in the YAML frontmatter — there is no
 
 ## Prerequisites
 
-Before running Quick Start, confirm the following:
+Before installing, confirm the following:
 
 - **Claude Code CLI installed and authenticated.** This template is built for Claude Code specifically. The slash commands (`/agent-plan`, `/agent-code`) and subagent auto-discovery rely on Claude Code's `.claude/commands/` and `.claude/agents/` conventions. Other AI coding assistants do not read these files. Install and sign in to Claude Code before continuing.
 - **A target project directory.** Either a new empty git repo or an existing project where you want to introduce the agent workflow. The template does not create the project for you.
-- **A shell that can run the install script.** macOS Terminal, Linux bash/zsh, or WSL run `scripts/install.sh` (bash 3.2+). Windows users without WSL run `scripts\install.ps1` (PowerShell 5.1+ or PowerShell Core 7+). The two scripts are functionally equivalent — they share CLI flags, prompt lists, and `template.values` output format. The manual copy path in Quick Start still works from any shell if you prefer not to use the installer.
 - **An Anthropic account with API access** to the model tiers pinned in the agent files: Opus 4.6 for planning agents, Sonnet 4.6 for engineering agents, Haiku 4.5 for utility agents. You can override the `model:` line in an individual agent file if you need a different pin.
 
 ## Known Limitations
@@ -347,7 +304,7 @@ A common source of confusion: this repo is a **template**, not a framework. Sett
 - **The slash commands are orchestration scripts written in Markdown.** `/agent-plan` and `/agent-code` tell Claude Code to invoke a specific sequence of subagents. They are not compiled, not executable, and not testable outside Claude Code. Reading them is reading their full behavior.
 - **The workflow is Claude Code-specific.** Copilot CLI, Gemini CLI, Cursor, and other AI tools do not honor `.claude/agents/` or `.claude/commands/`. Porting the template to another tool requires manual adaptation — read each agent file as a prompt and invoke it however that tool supports role prompts.
 - **No code is written by copying this template.** You get a directory layout, agent role files, slash command definitions, document templates, and empty work-artifact scaffolding. Your first real output appears after you run `/agent-plan` on a feature.
-- **Templates contain nested placeholders.** Some files (bug report forms, milestone validation records) include their own fill-in-per-use placeholders like `[DATE]`, `[REPRODUCTION_STEPS]`, `[TASK_NAME]`. The placeholder check script will flag these — they are not bugs in your customization, they are deliberate sub-templates filled in each time the form is used.
+- **Templates contain nested placeholders.** Some files (bug report forms, milestone validation records) include their own fill-in-per-use placeholders like `[DATE]`, `[REPRODUCTION_STEPS]`, `[TASK_NAME]`. These are not bugs in your customization — they are deliberate sub-templates filled in each time the form is used.
 
 Common problems you may hit during adoption or first use — slash command not recognized, subagent not delegating, `features/` references after upgrade, CEO returning REVISION REQUIRED — are covered in [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md). Skim it before filing a new issue.
 
@@ -366,69 +323,13 @@ The example deliberately omits `.claude/` (those files are unchanged copies of t
 
 ## Quick Start
 
-The install script at the top of this README is the recommended path. It prompts for the essential placeholders, copies every template file into the target, substitutes your answers, writes a `template.values` record, and runs the placeholder check. You then run `./scripts/smoke-test.sh .` and walk through `docs/FIRST_RUN.md`.
-
-If you need a different path — Windows without WSL, copy-by-hand, or fine-grained control over which files land where — expand the manual path below.
-
-**Installer CLI flags** (all three entry points, same effect):
-
-| bash | PowerShell | Effect |
-|---|---|---|
-| `--full` | `-Full` | Prompt for every supported placeholder, not just essentials |
-| `--values FILE` | `-Values FILE` | Non-interactive, read answers from a file |
-| `--force` | `-Force` | Overwrite an existing populated target |
-| `--help` / `-h` | `-Help` | Print full usage |
-
-The installer solves cross-file placeholder consistency by construction — every substitution comes from a single values file, so you can't type `[PROJECT_NAME]` as "Acme" in one file and "Acme Dashboard" in another.
-
-<details>
-<summary><strong>Manual path</strong> — copy and substitute by hand (expand if you can't or won't use the installer)</summary>
-
-1. **Copy template files** into the target project:
-
-   ```bash
-   cp root/CLAUDE.md /path/to/your-project/CLAUDE.md
-   mkdir -p /path/to/your-project/.claude/agents /path/to/your-project/.claude/commands
-   cp agents/*.md /path/to/your-project/.claude/agents/
-   cp commands/*.md /path/to/your-project/.claude/commands/
-   cp -r docs/ /path/to/your-project/docs/
-   cp -r artifacts/ /path/to/your-project/artifacts/
-   ```
-
-   Agent files in `.claude/agents/` are auto-discovered by Claude Code as subagents. Files in `.claude/commands/` register as slash commands named after the file.
-
-   **Windows PowerShell equivalent:**
-
-   ```powershell
-   Copy-Item root/CLAUDE.md C:\path\to\your-project\CLAUDE.md
-   New-Item -ItemType Directory -Force C:\path\to\your-project\.claude\agents, C:\path\to\your-project\.claude\commands
-   Copy-Item agents\*.md C:\path\to\your-project\.claude\agents\
-   Copy-Item commands\*.md C:\path\to\your-project\.claude\commands\
-   Copy-Item -Recurse docs C:\path\to\your-project\docs
-   Copy-Item -Recurse artifacts C:\path\to\your-project\artifacts
-   ```
-
-2. **Search for every placeholder** across all files and replace each one with the appropriate project-specific value. Process placeholder categories top-to-bottom as they appear in the expandable Placeholder Reference above — every category has fill-in work.
-
-3. **Delete optional agent files** that do not apply to your project. Each agent file is self-contained; refer to the Minimum Viable Agent Set section to identify candidates for deletion.
-
-4. **Commit the populated template** as part of your project's initial commit so contributors and agents share the same baseline context.
-
-5. **Verify all placeholders are replaced:**
-
-   ```bash
-   # Tight one-liner
-   grep -rEn '\[[A-Z][A-Z0-9_]+\]' --include='*.md' --exclude=README.md --exclude=CHANGELOG.md --exclude=TROUBLESHOOTING.md .
-
-   # Or the bundled script, which groups by file and exits non-zero for CI
-   ./scripts/check-placeholders.sh
-   ```
-
-   Both approaches are best-effort. Files containing sub-templates (bug report forms with `[DATE]`, `[REPRODUCTION_STEPS]`) will produce matches even after customization — review each match and decide whether it's a real unreplaced token or a deliberate fill-in-per-use marker.
-
-6. **Remove this README** from your project once populated, or repurpose it as a contributor guide.
-
-</details>
+1. Get a local copy of CAST (shallow clone or zip download — see Install above).
+2. Open Claude Code inside your target project directory.
+3. Say: `follow the instructions in /path/to/CAST/PROMPT.md`
+4. Claude crawls your project, proposes a migration plan, and waits for your approval.
+5. After approval, Claude installs agents, commands, docs, artifacts, and `CLAUDE.md` — substituting detected project values.
+6. Walk through [`docs/FIRST_RUN.md`](docs/FIRST_RUN.md) to verify everything loaded correctly.
+7. Commit the populated template as your first commit.
 
 ---
 
@@ -532,14 +433,15 @@ If you do not want a CEO planning gate, **delete both `/agent-plan` and `/agent-
 <details>
 <summary><strong>Every file in the template with a one-line description</strong> — expand if you need a map</summary>
 
-### root/ (2 files)
+### root/ (1 file)
 
 | File | Description |
 |---|---|
 | `root/CLAUDE.md` | Top-level context file read first by every agent; defines project identity, structure, conventions, and run commands |
-| `root/.claude/settings.json.example` | Minimal safe Claude Code project-settings example (auto-approves read-only shell commands). Copied to `<target>/.claude/settings.json.example` on install; rename to `settings.json` to activate |
 
-### agents/ → `.claude/agents/` (16 files)
+### agents/ → `.claude/agents/` (15 agents + README)
+
+> **Note:** `agents/README.md` is metadata about the directory. It should NOT be copied to `.claude/agents/` in the target project — Claude Code would try to register it as a subagent.
 
 | File | Description |
 |---|---|
@@ -568,7 +470,7 @@ If you do not want a CEO planning gate, **delete both `/agent-plan` and `/agent-
 | `commands/agent-code.md` | Defines the `/agent-code` slash command; orchestrates the Engineering Stage per task (Coder → Tester → Reviewer, with Defects through Debugger → Bug Gatherer → Product and Issues through Refactor → Reviewer) |
 | `commands/agent-task.md` | Defines the `/agent-task` slash command; runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone or CEO verdict |
 
-### docs/ (reference material, 20 files)
+### docs/ (reference material, 27 files)
 
 Templates and reference documentation. Never holds work artifacts.
 
@@ -622,14 +524,12 @@ Live work artifacts produced by the agents. Copied as a seed into the target pro
 
 ## License and contributing
 
-CAST is a Markdown template — every agent definition, slash command, and helper script is plain text you can fork, edit, and republish. If you find a rough edge, open an issue or a pull request on [`Raxvis/CAST`](https://github.com/Raxvis/CAST).
+CAST is a Markdown template — every agent definition, slash command, and document template is plain text you can fork, edit, and republish. If you find a rough edge, open an issue or a pull request on [`Raxvis/CAST`](https://github.com/Raxvis/CAST).
 
-Significant changes must bump the template version in **five synchronized locations** and ship an annotated git tag plus a GitHub Release at the same push. The full policy is in [`CLAUDE.md`](CLAUDE.md) → Release and Tagging Policy. Short version:
+Significant changes must bump the template version in **three synchronized locations** and ship an annotated git tag plus a GitHub Release at the same push. The full policy is in [`CLAUDE.md`](CLAUDE.md) → Release and Tagging Policy. Short version:
 
 1. `README.md` — the version badge and the `Current template version` hero line
-2. `scripts/install.sh` — the `TEMPLATE_VERSION` shell constant
-3. `scripts/install.ps1` — the `$TemplateVersion` PowerShell variable
-4. `PROMPT.md` — the `Template version targeted` header
-5. `CHANGELOG.md` — a new version entry following the existing format
+2. `PROMPT.md` — the `Template version targeted` header
+3. `CHANGELOG.md` — a new version entry following the existing format
 
-All five land in the same commit. Immediately after pushing: annotated tag (`git tag -a v<new>`) + GitHub Release (`gh release create v<new> --notes-file ... --latest`).
+All three land in the same commit. Immediately after pushing: annotated tag (`git tag -a v<new>`) + GitHub Release (`gh release create v<new> --notes-file ... --latest`).

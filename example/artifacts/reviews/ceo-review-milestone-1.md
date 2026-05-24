@@ -1,5 +1,13 @@
 # Acme Todo — CEO Review: Milestone 1 (Task CRUD + SQLite Persistence)
 
+## Revision History
+
+| Rev | Date | Agent | Change |
+|-----|------|-------|--------|
+| v1 | 2026-04-08 | ceo | Initial CEO review |
+
+---
+
 **Reviewer**: CEO Agent
 **Model**: claude-sonnet-4-6
 **Date**: 2026-04-08

@@ -74,6 +74,18 @@ own.
 
 ---
 
+## Setup and Configuration
+
+These files help with first-time setup and Claude Code configuration. They are reference
+material — every project uses them the same way; no per-project customization needed.
+
+| File | Description |
+|------|-------------|
+| `FIRST_RUN.md` | Interactive checklist to run in Claude Code after a fresh install. Verifies that subagents load, slash commands register, and the pipeline runs end-to-end. |
+| `CLAUDE_CODE_SETTINGS.md` | Reference for `.claude/settings.json` — explains permission rules, environment variables, and hooks, with a recommended starting configuration. |
+
+---
+
 ## Project Registers and Reference Logs
 
 These documents live in `docs/` because they are reference material maintained over the

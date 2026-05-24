@@ -1,10 +1,38 @@
 # CAST Adoption Prompt
 
-**Template version targeted:** `v0.8.1` · **Canonical source:** [`https://github.com/Raxvis/CAST`](https://github.com/Raxvis/CAST) on branch `main`
+**Template version targeted:** `v0.9.0` · **Canonical source:** [`https://github.com/Raxvis/CAST`](https://github.com/Raxvis/CAST)
 
-Paste this entire file into Claude Code inside the target project (or save it at the project root and say "follow the instructions in PROMPT.md"). Claude will crawl your project, propose a migration plan, wait for your approval, and then execute the adoption while preserving anything you've already customized.
+## How to use this prompt
 
-This prompt drives the full adoption of the CAST template (Claude Agent Staged Team) — a multi-agent workflow for Claude Code with 15 subagents, three slash commands, and a CEO-gated planning pipeline. Read any file from the canonical source via `https://raw.githubusercontent.com/Raxvis/CAST/main/<path>` if you need the reference implementation of a specific agent, command, or doc. When this prompt mentions a template version number, fetch `https://raw.githubusercontent.com/Raxvis/CAST/main/README.md` and check the `**Template version:**` line at the top — if it shows a version newer than the one stamped at the top of this prompt, tell the user before proceeding so they can decide whether to re-run from an updated prompt.
+1. Get a local copy of CAST — any method works:
+   ```bash
+   # Option A: shallow clone (fastest, no history needed)
+   git clone --depth 1 https://github.com/Raxvis/CAST.git /path/to/CAST
+
+   # Option B: download and extract the zip
+   # https://github.com/Raxvis/CAST/archive/refs/heads/main.zip
+   ```
+2. Open Claude Code inside your target project:
+   ```bash
+   cd /path/to/your-project
+   claude
+   ```
+3. Tell Claude to follow this prompt, referencing the local path:
+   ```
+   follow the instructions in /path/to/CAST/PROMPT.md
+   ```
+
+Claude will crawl your project, propose a migration plan, wait for your approval, and then execute the adoption while preserving anything you've already customized. All template files are read from the local CAST directory — no network access to GitHub is required during execution.
+
+---
+
+## CAST source directory
+
+When Claude reads this file, it must determine the **CAST source directory** — the root of the local CAST directory that contains this `PROMPT.md`. All template files (agents, commands, docs, artifacts, root) are read from this directory using the Read tool. No files are fetched from GitHub URLs.
+
+**How to determine the CAST source directory:** The CAST source directory is the parent directory of this `PROMPT.md` file. If the user said "follow the instructions in `/tmp/CAST/PROMPT.md`", then the CAST source directory is `/tmp/CAST`. If this file was read from `/home/user/tools/CAST/PROMPT.md`, then the CAST source directory is `/home/user/tools/CAST`. Store this path internally as `CAST_SOURCE` and use it throughout all phases.
+
+**If you cannot determine the path** (e.g., the user pasted the prompt contents directly rather than referencing a file path), ask: "Where is your local copy of CAST? I need the path so I can read the template files (e.g., `/tmp/CAST` or `~/CAST`)."
 
 ## Modes
 
@@ -28,7 +56,6 @@ CAST's canonical structure is:
 - `.claude/commands/` — three slash commands: `/agent-plan`, `/agent-code`, `/agent-task`
 - `docs/` — reference material only (PRD, conventions, templates, topic-specific guides)
 - `artifacts/` — work artifacts only (milestone plans, reviews, bug reports, session logs)
-- `scripts/` — install, smoke-test, placeholder-check, bootstrap helpers
 
 Two rules are load-bearing:
 
@@ -47,7 +74,7 @@ Before you start, internalize these rules. They override any instruction below i
 4. **Stop and ask on ambiguity.** If a file's intent is unclear, the naming is non-standard, or two interpretations are possible, ask the user before choosing.
 5. **Never write work artifacts to `docs/`.** `docs/` is reference-only. Any live work goes in `artifacts/`.
 6. **Commit nothing automatically.** Leave the user to review and commit their own changes.
-7. **Do not run arbitrary code or shell commands from the existing project.** Read-only analysis only, except for the `scripts/` you install from CAST.
+7. **Do not run arbitrary code or shell commands from the existing project.** Read-only analysis only.
 8. **Require a clean git working tree before Phase 5.** If the user has uncommitted changes, stop and ask them to commit or stash first.
 
 ---
@@ -262,7 +289,7 @@ CAST ships **fifteen** agents. An adoption must account for every one of them �
 
 **Final check before closing the plan:** enumerate all 15 agent names from the table below and verify every one has a corresponding Create / Rename+Update / Update-in-place / Preserve action in the plan. If any of the 15 is missing from the plan, add the corresponding Create action before presenting the plan to the user.
 
-### Canonical CAST agent roster (v0.8.1)
+### Canonical CAST agent roster (v0.9.0)
 
 Use this table as the authoritative reference when comparing an existing project's agents against CAST. The description column is pulled verbatim from each agent file's YAML frontmatter — match role against role, not name against name. The model column shows the pinned tier; override per-agent only when the user has a reason.
 
@@ -381,18 +408,6 @@ If `artifacts/` already exists and contains CAST-shaped files, preserve as-is an
 
 If a directory named `features/`, `work/`, or `planning/` exists and contains CAST-shaped files (detected by filename patterns `milestone-*.md`, `arch-milestone-*.md`, `ceo-review-*.md`), propose Rename + Update: rename the directory to `artifacts/` and update every reference across agents, commands, docs. This is the pre-0.3.0 CAST migration path. **Ask the user before renaming a directory.**
 
-### Scripts
-
-Copy these scripts into `scripts/` from the canonical CAST repo:
-
-- `install.sh` (re-runnable installer)
-- `install.ps1` (PowerShell variant)
-- `check-placeholders.sh` (placeholder validator)
-- `smoke-test.sh` (static verification)
-- `bootstrap.sh` (curl-pipe-bash entry point)
-
-If any of these already exist, Preserve and note the divergence.
-
 ### Root files
 
 - `CLAUDE.md` — if present, merge with CAST's agnostic template; preserve user content. If absent, Create from CAST's `root/CLAUDE.md` with detected placeholders substituted.
@@ -417,19 +432,19 @@ Phase separation: <None / Implicit / Explicit>
 
 ### Create (N actions)
 1. **Create** `.claude/agents/ceo.md`
-   - Source: `https://raw.githubusercontent.com/Raxvis/CAST/main/agents/ceo.md`
+   - Source: `<CAST_SOURCE>/agents/ceo.md`
    - Substitutions: `[PROJECT_NAME]` → `<detected>`
    - Rationale: CAST requires CEO for /agent-plan Stage 4; no existing equivalent found.
 
 ### Rename + Update (N actions)
 1. **Rename + Update** `planner.md` → `.claude/agents/product.md`
-   - Source: `https://raw.githubusercontent.com/Raxvis/CAST/main/agents/product.md`
+   - Source: `<CAST_SOURCE>/agents/product.md`
    - Preserve: custom "Planning heuristics" section from original file as an appendix
    - Rationale: existing planner agent fills the Product role; renaming to match CAST canonical name.
 
 ### Update in place (N actions)
 1. **Update** `CLAUDE.md`
-   - Source: merge with `https://raw.githubusercontent.com/Raxvis/CAST/main/root/CLAUDE.md`
+   - Source: merge with `<CAST_SOURCE>/root/CLAUDE.md`
    - Preserve: every existing section (Project Overview, Tech Stack, Common Pitfalls, Domain-Specific Patterns)
    - Add: Directory Conventions section, updated Memory Imports referencing newly-installed docs
    - Rationale: user's CLAUDE.md is mostly compatible; just needs the CAST-specific sections.
@@ -495,11 +510,11 @@ Once the plan is approved, execute the actions in a safe order. Report progress 
 Verify:
 
 1. Git working tree is clean (`git status` returns nothing modified or staged). If not, stop and ask the user to commit or stash.
-2. The canonical CAST repo is reachable. Try `curl -fsSL -o /dev/null https://raw.githubusercontent.com/Raxvis/CAST/main/README.md` or equivalent. If unreachable, stop and ask the user to confirm network access.
+2. The CAST source directory exists and contains the expected files. Read `<CAST_SOURCE>/README.md` to confirm. If missing, stop and ask the user to confirm the clone path.
 
 ### 5.2 — Create directories
 
-Create any missing directories: `.claude/agents/`, `.claude/commands/`, `docs/`, `artifacts/`, `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, `artifacts/reviews/`, `scripts/`.
+Create any missing directories: `.claude/agents/`, `.claude/commands/`, `docs/`, `artifacts/`, `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, `artifacts/reviews/`.
 
 ### 5.3 — Handle directory renames
 
@@ -511,7 +526,7 @@ Walk the canonical 15-agent list in the order given by the Canonical CAST Agent 
 
 For each agent:
 
-1. Fetch the canonical CAST agent file via WebFetch: `https://raw.githubusercontent.com/Raxvis/CAST/main/agents/<name>.md`
+1. Read the CAST agent file from the local source: `<CAST_SOURCE>/agents/<name>.md`
 2. Substitute detected project values: `[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[TEST_CMD]`, `[DEV_SERVER_CMD]`, `[BUILD_CMD]`, and any others from the inventory.
 3. If the action is **Create**: write to `.claude/agents/<name>.md` directly.
 4. If the action is **Rename + Update**: read the existing file first, identify custom sections (anything not in CAST's standard section list), write the CAST template as the base, insert custom sections as an appendix after the standard sections, then move the old file to the new canonical name.
@@ -553,7 +568,7 @@ Place preserved custom sections after the Future Work section, under a new H2 he
 
 Same procedure as agents:
 
-1. Fetch from `https://raw.githubusercontent.com/Raxvis/CAST/main/commands/<name>.md`
+1. Read from `<CAST_SOURCE>/commands/<name>.md`
 2. Substitute project-specific values including `[TEST_CMD]` and `[MAX_LOOP_COUNT]` (default 3 if not specified).
 3. Write to `.claude/commands/<name>.md`.
 4. If updating an existing similar-named command: preserve any project-specific pre-flight or post-completion steps by moving them to an appendix section labelled `## Project-Specific Extensions (preserved from pre-CAST version)`.
@@ -562,44 +577,36 @@ Same procedure as agents:
 
 For each CAST reference doc in the plan:
 
-1. If the action is **Create** or **Rename + Update**: fetch from `https://raw.githubusercontent.com/Raxvis/CAST/main/docs/<file>.md`, substitute placeholders, write to `docs/<file>.md`.
+1. If the action is **Create** or **Rename + Update**: read from `<CAST_SOURCE>/docs/<file>.md`, substitute placeholders, write to `docs/<file>.md`.
 2. For **Rename + Update**: read the existing file first, preserve all non-template content (e.g., an existing PRD with real requirements) as the body, update only the header and any CAST-specific framing.
 3. For **Update in place**: same as Rename + Update but without moving the file.
 4. Always install `docs/FILE_CONVENTIONS.md` — it's load-bearing for the docs/artifacts split enforcement.
 
 ### 5.7 — Install artifacts scaffold
 
-1. Fetch `artifacts/BUGS.md`, `artifacts/STANDUP.md`, `artifacts/README.md` from the canonical repo.
+1. Read `artifacts/BUGS.md`, `artifacts/STANDUP.md`, `artifacts/README.md` from `<CAST_SOURCE>/artifacts/`.
 2. Substitute placeholders.
 3. Write to `artifacts/`. If a file already exists with user content, preserve it — merge only if the user explicitly approved.
 4. Ensure all four subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`) exist. Do not populate them — they fill up during `/agent-plan` and `/agent-code` runs.
 
-### 5.8 — Install scripts
-
-Fetch each script from `https://raw.githubusercontent.com/Raxvis/CAST/main/scripts/<name>` and write to `scripts/`. Mark `.sh` files executable (`chmod +x`).
-
-### 5.9 — Install CLAUDE.md
+### 5.8 — Install CLAUDE.md
 
 Special handling because `CLAUDE.md` is where user project identity lives.
 
-1. If no `CLAUDE.md` exists: fetch `root/CLAUDE.md` from canonical repo, substitute detected values, write to project root.
+1. If no `CLAUDE.md` exists: read `<CAST_SOURCE>/root/CLAUDE.md`, substitute detected values, write to project root.
 2. If `CLAUDE.md` exists: read it. Identify user content vs CAST content.
    - **User content** (preserve verbatim): Project Overview, Tech Stack, Common Pitfalls (preserve user additions), Project Structure, Style Conventions, Domain-Specific Patterns, Persistence, Git Workflow, Dependencies, File Naming.
    - **CAST content** (install or update): Directory Conventions section (docs/ vs artifacts/), Memory Imports block.
 3. Append the CAST sections if missing; update them if out-of-date.
 4. Update Memory Imports to reference every installed doc, including the detected topic doc(s) (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`). Mobile projects should import both `docs/FRONTEND.md` and `docs/MOBILE.md`.
 
-### 5.10 — Placeholder substitution pass
+### 5.9 — Placeholder substitution pass
 
 After every file is written:
 
-1. Run `./scripts/check-placeholders.sh` (or the equivalent tight grep if the script hasn't been installed yet).
-2. For each remaining `[UPPER_SNAKE_CASE]` token, check whether it corresponds to something in the Phase 1 inventory. If yes, substitute. If no, leave it for the user and note it in the Phase 7 report.
+1. Scan all installed files for remaining `[UPPER_SNAKE_CASE]` tokens using grep: `grep -rEn '\[[A-Z][A-Z0-9_]+\]' --include='*.md'`
+2. For each remaining token, check whether it corresponds to something in the Phase 1 inventory. If yes, substitute. If no, leave it for the user and note it in the Phase 7 report.
 3. Do not guess values. If the inventory didn't find a project name, don't make one up.
-
-### 5.11 — Install settings.json example
-
-If `.claude/settings.json.example` doesn't exist, copy from the canonical repo (`root/.claude/settings.json.example`). If it does exist, preserve it. Never overwrite or auto-activate `.claude/settings.json`.
 
 ---
 
@@ -607,16 +614,15 @@ If `.claude/settings.json.example` doesn't exist, copy from the canonical repo (
 
 After execution:
 
-1. **Run `./scripts/smoke-test.sh .`** if it was installed. Report the result. If it reports any FAIL, do not proceed to Phase 7 until the failure is addressed or the user explicitly acknowledges it.
-2. **Run `./scripts/check-placeholders.sh`** and report any remaining unfilled tokens. Distinguish between:
+1. **Scan for remaining placeholders** using `grep -rEn '\[[A-Z][A-Z0-9_]+\]' --include='*.md'`. Distinguish between:
    - Real unfilled placeholders (needs user action)
    - Sub-template placeholders in bug report forms or milestone templates (`[DATE]`, `[REPRODUCTION_STEPS]`) — these are expected and should NOT be substituted at install time.
-3. **Verify all 15 agents exist** after execution. Walk the Canonical CAST Agent Roster table in Phase 3 and check each row's agent name against `.claude/agents/<name>.md`. Flag any missing file as an error. The only acceptable reason for a Tier 5 agent (`release`, `validator`) to be absent is an explicit user opt-out during Phase 4; in that case, record the opt-out in the Phase 7 report. If any Tier 1–4 agent is missing, that is a hard failure — do not proceed to Phase 7 until the gap is fixed. Additionally, for each existing agent file, read the `description:` field from its YAML frontmatter and confirm it matches (or is a reasonable project-specific adaptation of) the Role column in the canonical roster — a divergent description means the file is impersonating a CAST agent name without actually fulfilling the CAST role.
-4. **Verify required commands exist** for the command set the user chose to keep. List any missing and flag as errors.
-5. **Verify the docs/artifacts split**:
+2. **Verify all 15 agents exist** after execution. Walk the Canonical CAST Agent Roster table in Phase 3 and check each row's agent name against `.claude/agents/<name>.md`. Flag any missing file as an error. The only acceptable reason for a Tier 5 agent (`release`, `validator`) to be absent is an explicit user opt-out during Phase 4; in that case, record the opt-out in the Phase 7 report. If any Tier 1–4 agent is missing, that is a hard failure — do not proceed to Phase 7 until the gap is fixed. Additionally, for each existing agent file, read the `description:` field from its YAML frontmatter and confirm it matches (or is a reasonable project-specific adaptation of) the Role column in the canonical roster — a divergent description means the file is impersonating a CAST agent name without actually fulfilling the CAST role.
+3. **Verify required commands exist** for the command set the user chose to keep. List any missing and flag as errors.
+4. **Verify the docs/artifacts split**:
    - No files under `docs/` should contain the strings "# Milestone" in an H1 heading or "BUG-" at the start of a line (those would be work artifacts that leaked into reference).
    - No files under `artifacts/` should be templates (no "HOW TO CUSTOMIZE" comment blocks in `artifacts/milestones/` or similar).
-6. **Verify YAML frontmatter on every agent file**:
+5. **Verify YAML frontmatter on every agent file**:
    - Each agent has `name:`, `description:`, `model:` in the frontmatter
    - Description length ≤ 120 characters
    - Model is one of `claude-opus-4-6`, `claude-sonnet-4-6`, or `claude-haiku-4-5-20251001` (or an override the user approved)
@@ -645,7 +651,6 @@ Phase separation after: Explicit (CAST-enforced)
 - **Deleted**: <N files> — <list with user approval reference>
 
 ## Validation results
-- Smoke test: <PASS / PASS with warnings / FAIL>
 - Placeholder check: <clean / N remaining>
 - Required agents: <present / missing list>
 - Required commands: <present / missing list>
@@ -662,16 +667,15 @@ Phase separation after: Explicit (CAST-enforced)
 
 ## Next steps
 1. Review the migration diff: `git status` and `git diff`
-2. Run `./scripts/smoke-test.sh .` yourself
-3. Open Claude Code and walk through `docs/FIRST_RUN.md`
-4. Run `/agents` to confirm every subagent is registered
-5. Dry-run `/agent-plan "hello world feature"` to verify the planning pipeline
-6. Commit the adoption: `git add -A && git commit -m "Adopt CAST template"`
+2. Open Claude Code and walk through `docs/FIRST_RUN.md`
+3. Run `/agents` to confirm every subagent is registered
+4. Dry-run `/agent-plan "hello world feature"` to verify the planning pipeline
+5. Commit the adoption: `git add -A && git commit -m "Adopt CAST template"`
 ```
 
 Present the report to the user along with a summary:
 
-> CAST adoption complete. <N> files created, <N> renamed, <N> updated, <N> preserved. <M> validation warnings or errors listed in the report. Recommended next step: run `./scripts/smoke-test.sh .` yourself, then open Claude Code and walk through `docs/FIRST_RUN.md`. The full report is in `artifacts/adoption-report.md`.
+> CAST adoption complete. <N> files created, <N> renamed, <N> updated, <N> preserved. <M> validation warnings or errors listed in the report. Recommended next step: open Claude Code and walk through `docs/FIRST_RUN.md`. The full report is in `artifacts/adoption-report.md`.
 
 ---
 
@@ -702,7 +706,7 @@ Present the report to the user along with a summary:
 - Any file path conflict where two existing files claim the same CAST slot
 - Any CAST required agent missing after Phase 5 completion
 - Any user response that conflicts with the approved plan
-- Any smoke test failure or placeholder scan failure
+- Any placeholder scan failure
 - Any write that would overwrite user content without explicit approval
 - Any attempt to write a work artifact to `docs/`
 
@@ -718,7 +722,7 @@ When merging an existing agent file with a CAST template:
 2. **Standard sections** (Purpose, Goals, Authority, Inputs, Outputs, Interaction Rules, Templates, Current Work, Decisions Log, Future Work): use CAST's content as the base structure. If the existing file has additional bullets or custom rules inside these sections, merge them as additional bullets at the end of the relevant section.
 3. **Custom appendix sections**: preserve verbatim, placed after the standard sections under `## Custom Extensions (preserved from pre-CAST version)`.
 4. **Tables in Inputs/Outputs**: if the user has added rows, keep them. If CAST has rows the user's file lacks, add them. Never remove a row the user added.
-5. **Decisions Log**: always preserve every existing entry. Add a new row noting the CAST adoption: `<date> | Adopted CAST template | N/A | Structure now matches canonical CAST <version> |`. For `<version>`, use the version you stamped at the top of this prompt (the "Template version targeted" header), or — if you fetched a newer canonical version from `https://raw.githubusercontent.com/Raxvis/CAST/main/README.md` during the preflight version check — use that newer number. Never hard-code a version number in this row.
+5. **Decisions Log**: always preserve every existing entry. Add a new row noting the CAST adoption: `<date> | Adopted CAST template | N/A | Structure now matches canonical CAST <version> |`. For `<version>`, use the version stamped at the top of this prompt (the "Template version targeted" header). Never hard-code a version number in this row.
 
 ### CLAUDE.md
 

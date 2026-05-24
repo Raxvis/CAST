@@ -227,3 +227,6 @@ They provide the baseline context all agents need.
 @import docs/FILE_CONVENTIONS.md
 @import docs/ERROR_HANDLING.md
 @import artifacts/README.md
+
+<!-- Topic-specific context: this is a CLI project -->
+@import docs/CLI.md

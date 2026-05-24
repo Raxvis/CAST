@@ -1,5 +1,11 @@
 # Acme Todo — M1: Task CRUD + SQLite Persistence Completion Report
 
+## Revision History
+
+| Rev | Date | Agent | Change |
+|-----|------|-------|--------|
+| v1 | 2026-04-10 | product | Initial completion report |
+
 ---
 
 ## Header

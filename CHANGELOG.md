@@ -4,7 +4,41 @@ This file tracks changes to the multi-agent workflow **template itself**. It is 
 
 Format is loosely based on [Keep a Changelog](https://keepachangelog.com/). Versions follow semantic versioning: major = breaking structural changes that require migration, minor = additive or reorganizing changes, patch = doc fixes and small corrections.
 
-The current template version is recorded in the root `README.md` and stamped into each installed project's `template.values` file by `scripts/install.sh`.
+The current template version is recorded in the root `README.md`, `PROMPT.md`, and `CHANGELOG.md`.
+
+---
+
+## [0.9.0] — 2026-05-23
+
+Template cleanup: removed install scripts and settings example, fixed documentation inconsistencies, and corrected stale cross-references.
+
+### Removed
+
+- **`scripts/` directory deleted** — `install.sh`, `install.ps1`, `bootstrap.sh`, `check-placeholders.sh`, and `smoke-test.sh` removed. The adoption prompt (`PROMPT.md`) is now the sole installation method.
+- **`root/.claude/settings.json.example` deleted** — `docs/CLAUDE_CODE_SETTINGS.md` provides the same guidance inline without requiring users to rename a file.
+
+### Changed
+
+- **Template version bumped to 0.9.0** in `README.md` (badge and hero line), `PROMPT.md` (version header and roster table), and `CHANGELOG.md`.
+- **`README.md` docs file count corrected** from "20 files" to "27 files" in the File Listing section.
+- **`README.md` topic-doc count corrected** from "three categories" to "four categories" — stale since v0.8.0 added `docs/MOBILE.md`.
+- **`README.md` `root/` description updated** to reflect that only `CLAUDE.md` remains after the settings example deletion.
+- **`README.md` `agents/` File Listing section** now notes that `agents/README.md` should not be copied to target projects, matching the existing note on `commands/README.md`.
+- **`CLAUDE.md` `root/` directory description updated** — removed "config templates" since only the `CLAUDE.md` template remains.
+- **`docs/README.md` gained a "Setup and Configuration" section** listing `FIRST_RUN.md` and `CLAUDE_CODE_SETTINGS.md`, which were previously absent from the documentation index.
+- **`docs/FIRST_RUN.md` and `docs/CLAUDE_CODE_SETTINGS.md`** — references to `TROUBLESHOOTING.md` clarified as "the CAST template's `TROUBLESHOOTING.md`" since the file lives at the template repo root and is not copied to target projects.
+- **`docs/DESIGN_RATIONALE.md`** — added a scope clarification explaining the relationship between this project-wide decision log and the Architect agent's inline Decisions Log.
+- **`example/README.md`** — fixed broken artifact paths (`01-task-crud/MILESTONE.md` → `milestones/milestone-1-task-crud.md`, `01-task-crud/CEO_REVIEW.md` → `reviews/ceo-review-milestone-1.md`) and replaced hardcoded absolute paths (`/Users/raxvis/work/claude/`) with generic references.
+- **All 8 example planning artifacts** gained `## Revision History` sections as required by `commands/agent-plan.md` and `docs/FILE_CONVENTIONS.md`.
+- **`example/CLAUDE.md`** — added `@import docs/CLI.md` to Memory Imports since the example project is a CLI tool.
+
+### Added
+
+- **`.gitignore`** — minimal ignore file for OS files (`.DS_Store`, `Thumbs.db`) and editor directories (`.vscode/`, `.idea/`).
+
+### Migration from 0.8.1
+
+If your project has copies of `scripts/install.sh`, `scripts/install.ps1`, `scripts/bootstrap.sh`, `scripts/check-placeholders.sh`, `scripts/smoke-test.sh`, or `root/.claude/settings.json.example` from a prior adoption, you can safely delete them — they are no longer part of the template. The adoption prompt (`PROMPT.md`) and `docs/CLAUDE_CODE_SETTINGS.md` cover the same ground.
 
 ---
 
