@@ -8,6 +8,19 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [1.0.1] — 2026-07-03
+
+Codifies the fallback behavior for permission-blocked writes during adoption. Previously, if a session could not get approval to write under `.claude/` (non-interactive or restricted-permission sessions), the outcome was unspecified. Interactive adoption is unchanged — you approve the write prompts and nothing is staged.
+
+### Added
+
+- **Staging fallback in `references/execution.md`** — when a target path is permission-blocked, `/cast-init` builds the affected files completely (substitution, scaffolding strip, customization merges), writes them to `.cast-stage/` mirroring the final layout, runs Phase 6 validation against the staged copies, and ends the report with the exact move command(s) that complete the install. Partially-staged adoptions must always be reported.
+- **`TROUBLESHOOTING.md` entry** — "`/cast-init` finished but says files are staged in `.cast-stage/`" with the finish-up steps.
+
+### Migration
+
+- No installed-project changes. Re-running `/cast-init` is only needed if a prior run silently skipped `.claude/` files in a restricted session — re-run it and follow the staging instructions.
+
 ## [1.0.0] — 2026-07-03
 
 CAST is now a skill. Adoption moves from "clone the repo and follow `PROMPT.md`" to installing the `/cast-init` skill — either `npx skills add Raxvis/CAST` or the Claude Code plugin marketplace (`/plugin marketplace add Raxvis/CAST` + `/plugin install cast@cast`) — and running `/cast-init` inside the target project. Installed projects keep the same shape except that the three pipeline commands are now pipeline **skills** under `.claude/skills/`.

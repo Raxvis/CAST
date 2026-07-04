@@ -13,6 +13,17 @@ These blocks are documentation for people browsing the CAST repo; installed file
 
 When updating an existing installed file that still carries one of these blocks from a pre-1.0 install, remove it as part of the update — it is CAST-owned scaffolding, not a user customization.
 
+## Global rule — permission-blocked writes fall back to staging
+
+If the session's permission system blocks writes to a target path (most commonly `.claude/agents/` and `.claude/skills/` in non-interactive sessions), do not retry indefinitely, skip the files, or abort the adoption. Instead:
+
+1. Build every blocked file completely — placeholder substitution, scaffolding strip, customization merges — exactly as if writing to the real destination.
+2. Write the finished files to a `.cast-stage/` directory at the project root, mirroring the final layout (e.g. `.cast-stage/agents/coder.md` for `.claude/agents/coder.md`, `.cast-stage/skills/agent-plan/SKILL.md` for `.claude/skills/agent-plan/SKILL.md`).
+3. Run all Phase 6 validation checks against the staged copies so the user moves verified files, not unverified ones.
+4. State prominently in the Phase 7 report — and in the closing summary — that the adoption is staged, list exactly which paths are staged, and give the precise `mv` command(s) that complete the install, ending with the removal of the empty `.cast-stage/` directory.
+
+Files that were written directly (typically `docs/`, `templates/`, `artifacts/`, root `CLAUDE.md`) are unaffected — stage only what was blocked. Never leave a partially-staged adoption unreported: if `.cast-stage/` exists when the report is written, the report must say so.
+
 ## 5.1 — Preflight
 
 Verify:

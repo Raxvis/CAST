@@ -37,6 +37,23 @@ Common problems adopting or running this template, with the most likely cause an
 
 ---
 
+## `/cast-init` finished but says files are staged in `.cast-stage/`
+
+**Cause.** The session's permission system blocked writes under `.claude/` (this mostly happens in non-interactive or restricted-permission sessions — in a normal interactive session you would simply be prompted to approve the writes). Rather than skipping or failing, `/cast-init` builds, substitutes, and validates the blocked files in a `.cast-stage/` directory mirroring the final layout, and tells you how to finish.
+
+**Fix.**
+1. Read the adoption report (`artifacts/adoption-report.md`) — it lists exactly which paths are staged and the precise move command(s).
+2. Run the move command(s) from the project root. Typically:
+   ```
+   mv .cast-stage/agents .claude/agents
+   mv .cast-stage/skills/agent-plan .cast-stage/skills/agent-code .cast-stage/skills/agent-task .claude/skills/
+   rmdir .cast-stage/skills .cast-stage
+   ```
+3. Restart your Claude Code session so the moved agents and skills register.
+4. To avoid staging entirely, run `/cast-init` in an interactive session and approve the `.claude/` write prompts when asked.
+
+---
+
 ## `/agent-plan` or `/agent-code` is not recognized
 
 **Cause.** Claude Code registers skills from `.claude/skills/` at session start. If the directory did not exist when you started the session, or if the pipeline skills are not there yet, they will not appear. (Before CAST v1.0.0 the pipelines were slash commands in `.claude/commands/` — if you upgraded, the old files should have been migrated and removed by `/cast-init`.)
