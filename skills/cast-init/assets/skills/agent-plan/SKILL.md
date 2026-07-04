@@ -128,12 +128,12 @@ Both Security and Performance must complete before Stage 4 begins. If either req
 
 After Security, Performance, and UI have all completed, launch the **ceo** agent to:
 
-1. Read every Stage 1–3 artifact: milestone definition, architecture document, UI specification, security findings, and performance findings.
-2. Apply the CEO Review Checklist from `.claude/agents/ceo.md`.
+1. Read every Stage 1–3 artifact: milestone definition, task breakdown, architecture document, UI specification, security findings, and performance findings.
+2. Produce the review using `templates/CEO_REVIEW.md` as the template — copy it, fill in every section, and list all six inputs reviewed by path.
 3. Save the review to `artifacts/reviews/ceo-review-milestone-{N}.md`.
 4. Produce a verdict: **APPROVED**, **APPROVED WITH CONDITIONS**, or **REVISION REQUIRED**.
 
-Input to pass: all artifacts from Stages 1–3.
+Input to pass: all artifacts from Stages 1–3, and the template `templates/CEO_REVIEW.md`.
 
 **If REVISION REQUIRED**: the CEO's Revision Requests identify which agent owns each change. Re-run the affected stage with the revision notes, then re-run the CEO review on the revised plan. Planning does not advance until the CEO issues APPROVED or APPROVED WITH CONDITIONS.
 

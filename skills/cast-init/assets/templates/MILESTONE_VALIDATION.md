@@ -1,22 +1,38 @@
 <!-- TEMPLATE INSTRUCTIONS
   FILE: MILESTONE_VALIDATION.md
-  PURPOSE: Milestone validation report template. Use this document to formally verify that
-           a milestone's requirements have been met before marking it complete and moving
-           to the next phase of development.
+  PURPOSE: Validation record template, used at two grains by the Product Agent:
+           - Per task: copy the "Task Validation Checklist" section for each task the
+             Product Agent validates during /agent-code or /agent-task (Step 4).
+           - Per milestone: fill the whole document to formally verify that a
+             milestone's requirements have been met before marking it complete.
 
   HOW TO CUSTOMIZE:
   - Replace [PROJECT_NAME] with your project name.
   - Replace [MILESTONE_NAME] with the specific milestone being validated (e.g., "M2: Core Loop").
-  - Replace [VALIDATOR] with the name or role of the person conducting the validation.
-  - Fill in the Validation Checklist with the specific acceptance criteria for this milestone.
+  - Replace [VALIDATOR] with the name or role of the person or agent conducting the validation.
+  - Duplicate the Task Validation Checklist section once per validated task; fill in every
+    field and do not skip sections.
+  - Fill in the Milestone Validation Checklist with the specific acceptance criteria for
+    this milestone.
+  - Rename the "User Validation Feedback Log" section to match your review process
+    (e.g., "User Testing", "QA Session", "Demo Review", "Playtesting").
+  - Duplicate a Regression Checklist block per major feature area.
   - Update Known Issues with any bugs or gaps discovered during validation.
   - Set the final Validation Status to one of: Approved / Approved with Notes / Changes Requested.
   - Reference any linked milestone task documents in the Completion Reports section.
+  - Instance destination: artifacts/milestones/milestone-{N}-{slug}-validation.md.
+    Never fill this template in place.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # [PROJECT_NAME] — Milestone Validation Report
+
+## Revision History
+
+| # | Date | Agent | Reason |
+|---|---|---|---|
+| v1 | [DATE] | product | Initial version |
 
 ---
 
@@ -37,7 +53,82 @@
 
 ---
 
-## Validation Checklist
+## Task Validation Checklist
+
+_Duplicate this section for each task validated by the Product Agent. Fill in every field. Do not skip sections._
+
+### Task Validation: [TASK_NAME]
+
+**Date**: [DATE]
+**Reviewer**: Product Agent
+**Milestone**: [MILESTONE_NAME]
+
+#### Functional Validation
+
+- [ ] All acceptance criteria from the task definition are met
+- [ ] Feature behaves correctly under normal usage
+- [ ] Feature behaves correctly under edge cases (empty state, maximum values, error states)
+- [ ] No regressions in adjacent features
+
+**Notes**:
+
+#### Visual Validation
+
+- [ ] Matches the UI specification (layout, spacing, typography, color)
+- [ ] All interactive states are implemented (default, pressed, disabled, loading, error, empty)
+- [ ] Visual feedback is present for all user actions
+- [ ] Animations and transitions (if specified) are implemented
+
+**Notes**:
+
+#### Data Validation
+
+- [ ] Data persists correctly across sessions (if applicable)
+- [ ] Data displays correctly in all formatting edge cases (zero, very large, very small, null)
+- [ ] No data is lost or corrupted in error scenarios
+
+**Notes**:
+
+#### Integration Validation
+
+- [ ] Feature integrates correctly with adjacent features
+- [ ] No unintended side effects on other parts of the system
+- [ ] Events, callbacks, and state updates flow correctly end-to-end
+
+**Notes**:
+
+#### Code Quality
+
+- [ ] Code follows the project's style conventions (reviewed with Architecture if complex)
+- [ ] No placeholder code, debug output, or commented-out blocks left in
+- [ ] New modules/functions are appropriately named
+
+**Notes**:
+
+#### Testing
+
+- [ ] Manually tested on each target platform ([TARGET_PLATFORMS])
+- [ ] Edge cases were tested, not just the happy path
+
+**Notes**:
+
+#### Issues Found
+
+| # | Description | Severity | Blocking? |
+|---|---|---|---|
+| | | | |
+
+#### Sign-Off
+
+- [ ] **APPROVED** — Task is complete. No further action required.
+- [ ] **APPROVED WITH NOTES** — Task is complete. Non-blocking issues noted above.
+- [ ] **REJECTED** — Task is returned to Coder. See Issues Found for required changes.
+
+**Sign-Off Notes**:
+
+---
+
+## Milestone Validation Checklist
 
 ### Functionality
 
@@ -61,6 +152,51 @@
 |---|----------|-------|----------|--------|--------|
 | T1 | [Scenario name] | [Brief steps] | [Expected result] | [Actual result] | Pass / Fail |
 | T2 | [Scenario name] | [Brief steps] | [Expected result] | [Actual result] | Pass / Fail |
+
+---
+
+## User Validation Feedback Log
+
+_Rename this section to match your review process (e.g., "User Testing", "QA Session", "Demo Review"). Duplicate the session block per session._
+
+### [SESSION_TYPE] Session — [DATE]
+
+**Participants**: [PARTICIPANT_ROLES]
+**Build / Version**: [VERSION_OR_MILESTONE]
+**Duration**: [DURATION]
+
+#### What Was Tested
+
+- [FEATURE_OR_AREA_1]
+- [FEATURE_OR_AREA_2]
+
+#### Observations
+
+| # | Observation | Area | Severity | Backlog Item? |
+|---|---|---|---|---|
+| | | | | |
+
+#### Summary
+
+[Overall impression and priority actions]
+
+---
+
+## Regression Testing
+
+_Duplicate a checklist block for each major feature area._
+
+### [FEATURE_AREA_1] — Regression Checklist
+
+- [ ] [CHECK_1]
+- [ ] [CHECK_2]
+- [ ] [CHECK_3]
+
+### [FEATURE_AREA_2] — Regression Checklist
+
+- [ ] [CHECK_1]
+- [ ] [CHECK_2]
+- [ ] [CHECK_3]
 
 ---
 

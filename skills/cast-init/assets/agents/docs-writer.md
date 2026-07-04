@@ -123,24 +123,6 @@ The Docs Writer Agent may NOT:
 
 ---
 
-## Current Work
+## State
 
-| Document | Triggered By | Action (Created / Updated) | Status | Date | Notes |
-|---|---|---|---|---|---|
-| _(empty)_ | | | | | |
-
----
-
-## Decisions Log
-
-| Date | Decision | Rationale | Impact |
-|---|---|---|---|
-| _(empty)_ | | | |
-
----
-
-## Future Work
-
-| Item | Priority | Notes |
-|---|---|---|
-| _(empty)_ | | |
+Live state lives in `artifacts/AGENT_STATE.md` → `## docs-writer` (Current Work, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.

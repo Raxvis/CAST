@@ -164,7 +164,7 @@ Once the plan is approved, execute the actions in a safe order, reporting progre
 5. **Install agent files** — all 15 in roster order, with placeholder substitution and custom-section preservation; never install `agents/README.md`; re-enumerate all 15 afterward.
 6. **Install pipeline skills** — `agent-plan`, `agent-code`, `agent-task` to `.claude/skills/<name>/SKILL.md`, substituting `[PROJECT_NAME]`, `[TEST_CMD]`, `[MAX_LOOP_COUNT]`; migrate any pre-1.0 command files and propose deleting them.
 7. **Install reference docs and templates** — per the disposition tables; `docs/FILE_CONVENTIONS.md` always.
-8. **Install artifacts scaffold** — `BUGS.md`, `STANDUP.md`, `README.md`, four empty subdirectories.
+8. **Install artifacts scaffold** — `BUGS.md`, `STANDUP.md`, `AGENT_STATE.md`, `README.md`, four empty subdirectories.
 9. **Install CLAUDE.md** — merge with the user's existing file per the preservation rules.
 10. **Placeholder substitution pass** — scan for remaining `[UPPER_SNAKE_CASE]` tokens; substitute only from inventory values; never guess.
 

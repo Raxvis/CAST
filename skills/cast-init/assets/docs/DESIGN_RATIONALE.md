@@ -40,7 +40,7 @@ A decision is significant enough to record here if any of the following are true
 If a decision was obvious, required no deliberation, and has no meaningful alternative,
 it does not need an entry here.
 
-**Scope vs. Architect's Decisions Log:** Each agent file (especially `architect.md`) has its own inline Decisions Log for milestone-scoped architectural choices made during that agent's work. This document is for project-wide decisions that span milestones or outlast any single agent's scope — e.g., "why SQLite over Postgres," "why this state management pattern," "why monorepo." If a milestone-specific architectural decision turns out to have project-wide implications, promote it here with a reference to the original.
+**Scope vs. Architect's Decisions Log:** Each agent has its own Decisions Log (in `artifacts/AGENT_STATE.md`, one section per agent — the architect section especially) for milestone-scoped architectural choices made during that agent's work. This document is for project-wide decisions that span milestones or outlast any single agent's scope — e.g., "why SQLite over Postgres," "why this state management pattern," "why monorepo." If a milestone-specific architectural decision turns out to have project-wide implications, promote it here with a reference to the original.
 
 ---
 

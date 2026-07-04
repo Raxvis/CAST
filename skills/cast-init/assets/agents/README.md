@@ -79,19 +79,17 @@ Every agent file follows a core structure of standard sections, listed below. Ag
 | **Inputs** | What this agent receives from other agents or external sources. |
 | **Outputs** | What this agent produces and who consumes it. |
 | **Interaction Rules** | How this agent communicates with other agents. |
-| **Current Work** | Active tasks, queues, and in-progress items. |
-| **Decisions Log** | Record of notable decisions made by this agent and their rationale. Log when: accepting a non-standard approach, deviating from convention, choosing between alternatives, or establishing a precedent that future work should follow. Standard format: `Date / Decision / Rationale / Impact`. The Architect agent uses an extended five-column format (`Date / Decision / Alternatives Considered / Rationale / Impact`) to capture architectural decision records. |
-| **Future Work** | Deferred items, nice-to-haves, and post-launch ideas. |
+| **State** | Pointer to the agent's live working state in `artifacts/AGENT_STATE.md` → `## <agent>`. The mutable tables that used to live inside each agent file — Current Work, Decisions Log, Future Work, queues, and dashboards — live there now, one section per agent, so agent definitions stay immutable and cheap to load. Agents read their section on activation and append rows, never rewriting history. Decisions Log format: `Date / Decision / Rationale / Impact`; log when accepting a non-standard approach, deviating from convention, choosing between alternatives, or establishing a precedent. The architect section uses the extended five-column format (`Date / Decision / Alternatives Considered / Rationale / Impact`). |
 
 ### Domain-Specific Extensions
 
 Agents with specialized responsibilities include additional sections after the core sections. Examples:
 
-- **Architect**: Architecture Document Templates, Code Review Checklist, Performance Budgets, Technical Validation Feedback
-- **UI**: Style Guide, Screen Specifications, UX Review Checklist
-- **Validator**: Session-Start Checklist, Conflict Resolution Protocol, Agent Status Dashboard
-- **Product**: Task Validation Checklist, User Validation Feedback Log
-- **Coder**: Pre-Handoff Checklist, Work Selection Strategy, Implementation Status
+- **Architect**: Task Handoff Matrix, Concurrency Rules, Parallel Workflow Model (document templates live in `templates/ARCH_*.md`; the Architecture Documents index lives in `artifacts/AGENT_STATE.md`)
+- **UI**: Style Guide (spec and review formats live in `templates/UI_SPEC.md` and `templates/UX_REVIEW.md`)
+- **Validator**: Session-Start Checklist, Conflict Resolution Protocol, Blocked Agent Protocol, Milestone Retrospective Template (the live Agent Status Dashboard and Conflicts tables live in `artifacts/AGENT_STATE.md` → `## validator`)
+- **Product**: Templates pointer to `templates/MILESTONE_VALIDATION.md` (task validation checklist, feedback log, regression checklists)
+- **Coder**: Pre-Handoff Checklist, Work Selection Strategy
 - **Bug Gatherer**: Workflow, Severity Rubric (canonical bug entry format lives in `artifacts/BUGS.md`)
 
 ---
@@ -274,7 +272,7 @@ Run for a single self-contained task (bug fix, typo, small refactor, dependency 
 
 At the start of every working session:
 
-1. **Validator** reviews the Agent Status Dashboard and confirms no agents are in a blocked state.
+1. **Validator** reviews the Agent Status Dashboard (`artifacts/AGENT_STATE.md` → `## validator`) and confirms no agents are in a blocked state.
 2. **Product** confirms the current milestone and priority order.
 3. **Coder** selects the next unstarted task from the Work Queue.
 
@@ -323,52 +321,51 @@ The table below records **where each agent writes its work artifacts**. Template
 
 | Document Type | Owner | Location | Tracking Format |
 |---|---|---|---|
-| Feature requirements (backlog) | Product | `product.md` → Current Work | Task / Milestone / Status / Notes |
+| Feature requirements (backlog) | Product | `artifacts/AGENT_STATE.md` → `## product` → Current Work | Task / Milestone / Status / Notes |
 | Milestone definitions and tasks | Product | `artifacts/milestones/milestone-{N}-{slug}.md` + `-tasks.md` | Per `templates/MILESTONE_DEFINITION.md` (definition) and `templates/MILESTONE_TASKS.md` (breakdown) |
 | Architecture documents (planning) | Architecture | `artifacts/architecture/arch-milestone-{N}.md` | Per `templates/ARCH_MODULE.md` / `ARCH_SYSTEM.md` / `ARCH_DATA_SCHEMA.md` |
-| Architecture document index | Architecture | `architect.md` → Architecture Documents table | Document / Module / Status / Milestone |
+| Architecture document index | Architecture | `artifacts/AGENT_STATE.md` → `## architect` → Architecture Documents | Document / Module / Status / Milestone |
 | Screen specifications (planning) | UI | `artifacts/ui-specs/ui-milestone-{N}.md` | Per `templates/UI_SPEC.md` |
-| Screen specification index | UI | `ui.md` → Screen Specifications table | Screen / Milestone / Status / Notes |
-| Code review verdicts | Reviewer | `reviewer.md` → Current Work | Submission / Source Agent / Date / Verdict / Notes |
-| Test results and coverage | Tester | `tester.md` → Current Work | Change / Source Agent / Tests Run / Pass-Fail / Coverage Delta |
+| Screen specification index | UI | `artifacts/AGENT_STATE.md` → `## ui` → Screen Specifications | Screen / Milestone / Status / Notes |
+| Code review verdicts | Reviewer | `artifacts/AGENT_STATE.md` → `## reviewer` → Current Work | Submission / Source Agent / Date / Verdict / Notes |
+| Test results and coverage | Tester | `artifacts/AGENT_STATE.md` → `## tester` → Current Work | Change / Source Agent / Tests Run / Pass-Fail / Coverage Delta |
 | Bug investigations | Debugger | `artifacts/BUGS.md` | Bug ID / Source / Status / Assigned To / Notes |
 | Bug reports (initial) | Bug Gatherer | `artifacts/BUGS.md` | Canonical entry format at the top of `artifacts/BUGS.md` |
 | Security audit findings (planning) | Security | `artifacts/reviews/security-review-milestone-{N}.md` | Finding / Severity / Module / Status / Notes |
-| Security findings index | Security | `security.md` → Current Work | Finding / Severity / Module / Status / Notes |
+| Security findings index | Security | `artifacts/AGENT_STATE.md` → `## security` → Current Work | Finding / Severity / Module / Status / Notes |
 | Performance analysis (planning) | Performance | `artifacts/reviews/performance-review-milestone-{N}.md` | Finding / Metric / Impact / Status / Notes |
-| Performance findings index | Performance | `performance.md` → Current Work | Finding / Metric / Impact / Status / Notes |
+| Performance findings index | Performance | `artifacts/AGENT_STATE.md` → `## performance` → Current Work | Finding / Metric / Impact / Status / Notes |
 | CEO planning reviews | CEO | `artifacts/reviews/ceo-review-milestone-{N}.md` | Milestone / Status / Verdict / Notes |
-| CEO review index | CEO | `ceo.md` → Current Work | Milestone / Status / Verdict / Notes |
+| CEO review index | CEO | `artifacts/AGENT_STATE.md` → `## ceo` → Current Work | Milestone / Status / Verdict / Notes |
 | Milestone completion reports | Product | `artifacts/milestones/milestone-{N}-{slug}-completion.md` | Per `templates/MILESTONE_COMPLETION.md` |
 | Milestone validation records | Product | `artifacts/milestones/milestone-{N}-{slug}-validation.md` | Per `templates/MILESTONE_VALIDATION.md` |
 | Rolling session log | Any agent | `artifacts/STANDUP.md` | Date / Agent / Change / Notes |
 | Developer documentation | Docs Writer | `docs/` directory | Per `docs/README.md` index |
 | Changelog and versioning | Release | `docs/CHANGELOG.md` | Per Release Checklist Template |
 | Milestone retrospectives | Validator | `validator.md` → Milestone Retrospective | Per Milestone Retrospective Template |
-| Decisions | Each agent | Agent's own Decisions Log table | Date / Decision / Rationale / Impact |
+| Decisions | Each agent | `artifacts/AGENT_STATE.md` → agent's Decisions Log | Date / Decision / Rationale / Impact |
 
 ---
 
 ## Templates
 
-Each agent file contains reusable templates:
+Reusable document templates live in the top-level `templates/` directory (see `templates/README.md`); shorter role-internal checklists remain in the agent files:
 
 | Template | Location |
 |---|---|
-| Task Validation Checklist | `product.md` |
-| Module Architecture Doc | `architect.md` |
-| System Architecture Doc | `architect.md` |
-| Data Schema Doc | `architect.md` |
-| Code Review Checklist | `architect.md` |
+| Task Validation Checklist (+ feedback log, regression checklists) | `templates/MILESTONE_VALIDATION.md` |
+| Module Architecture Doc | `templates/ARCH_MODULE.md` |
+| System Architecture Doc | `templates/ARCH_SYSTEM.md` |
+| Data Schema Doc | `templates/ARCH_DATA_SCHEMA.md` |
+| UI Spec Template | `templates/UI_SPEC.md` |
+| UX Review Checklist | `templates/UX_REVIEW.md` |
+| CEO Review Checklist | `templates/CEO_REVIEW.md` |
 | Pre-Handoff Checklist | `coder.md` |
-| Review Checklist | `reviewer.md` |
-| UI Spec Template | `ui.md` |
-| UX Review Checklist | `ui.md` |
+| Review Checklist (incl. architecture-adherence items owned by Architecture) | `reviewer.md` |
 | Refactor Submission Checklist | `refactor.md` |
 | Bug Investigation Fields | `debugger.md` |
 | Severity Levels | `security.md` |
-| Performance Budget Tracking | `performance.md` |
-| CEO Review Checklist | `ceo.md` |
+| Performance Budget Tracking | `artifacts/AGENT_STATE.md` → `## performance` |
 | Release Checklist | `release.md` |
 | Milestone Retrospective | `validator.md` |
 | Process Checklist (Per Task) | `validator.md` |

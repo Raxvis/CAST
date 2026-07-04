@@ -120,7 +120,7 @@ Each probe is a single prompt to launch the named agent explicitly. Each takes u
 |---|---|---|
 | `product` | "Use the product agent to write acceptance criteria for 'add a dark mode toggle'." | Testable, specific criteria (not vague statements like "works well"). |
 | `architect` | "Use the architect agent to sketch module boundaries for a new authentication system." | A module table plus a Decisions Log entry that cites alternatives considered. |
-| `ui` | "Use the ui agent to spec the interaction states for a login form." | Covers default, focused, error, loading, and disabled states explicitly. |
+| `ui` | "Use the ui agent to spec the interaction states for a login form." | Covers all six canonical states (default, pressed, disabled, loading, error, empty) explicitly, per `templates/UI_SPEC.md`. |
 | `security` | "Use the security agent to review a function that concatenates user input into a SQL string." | A Critical finding with an OWASP citation and a concrete remediation. |
 | `performance` | "Use the performance agent to review a function that iterates 100k items inside a render loop." | A finding that cites a specific performance budget, not a generic "this is slow". |
 | `ceo` | "Use the ceo agent to review a milestone plan where Security has an unaddressed Critical finding." | Verdict is REVISION REQUIRED, not APPROVED WITH CONDITIONS — the CEO does not paper over Critical findings. |

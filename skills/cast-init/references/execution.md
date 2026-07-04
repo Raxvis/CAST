@@ -9,7 +9,7 @@ Every file written into the target project (agents, pipeline skills, docs, artif
 1. The leading `<!-- TEMPLATE INSTRUCTIONS ... -->` comment block.
 2. Any `<!-- Placeholders — see README.md → Placeholder Reference -->` pointer comment (it references the CAST repo's README, which does not exist in the target project).
 
-These blocks are documentation for people browsing the CAST repo; installed files must not carry them. **Exception: the eight `templates/*` files install verbatim, blocks included** — they are reusable skeletons, and their comment blocks instruct the agents that instantiate them (the instantiated copies in `artifacts/` must not carry the blocks, which is what the Phase 6 docs/artifacts-split check enforces).
+These blocks are documentation for people browsing the CAST repo; installed files must not carry them. **Exception: the `templates/*` skeletons (every `templates/*` file except `README.md`) install verbatim, blocks included** — they are reusable skeletons, and their comment blocks instruct the agents that instantiate them (the instantiated copies in `artifacts/` must not carry the blocks, which is what the Phase 6 docs/artifacts-split check enforces).
 
 When updating an existing installed file that still carries one of these blocks from a pre-1.0 install, remove it as part of the update — it is CAST-owned scaffolding, not a user customization.
 
@@ -40,7 +40,7 @@ Most greenfield adoptions are dominated by **Create** actions with no merge work
 
 1. Copy the payload subtrees mechanically with shell (`cp -R "<CAST_SOURCE>/docs/." docs/` etc., or per-file `cp` driven by the plan's Create list). This is permitted: the safety rule forbids executing the *target project's* code, not using the shell to copy CAST's own payload files.
 2. Run **one substitution pass** over the copied files, replacing every token listed in 5.4.2 with its inventory value (e.g. a scripted find-and-replace per token).
-3. Run **one scaffolding-strip pass** over the copied files per the global strip rule (skip the eight `templates/*` skeletons).
+3. Run **one scaffolding-strip pass** over the copied files per the global strip rule (skip the `templates/*` skeletons).
 4. Spot-check one file per class (an agent, a pipeline skill, a doc) to confirm substitution and strip landed, then rely on Phase 6 validation for full coverage.
 
 The per-file read-merge-write procedure in 5.4–5.8 remains **required** for every Rename+Update and Update-in-place action — customization preservation cannot be done mechanically. Never bulk-copy over an existing file.
@@ -81,9 +81,8 @@ After completing the loop, **re-enumerate the 15 names and confirm each `.claude
 - Outputs
 - Templates (where applicable)
 - Interaction Rules (CAST's core bullets; merge user additions)
-- Current Work (empty table for new installs, preserve existing rows for updates)
-- Decisions Log (preserve all existing entries)
-- Future Work
+- State (pointer to `artifacts/AGENT_STATE.md`; agent files no longer carry live tables — see the migration rule in 5.7)
+- Decisions Log / Current Work / Future Work tables, if present in a pre-1.2 file (they migrate to `artifacts/AGENT_STATE.md` per 5.7, not into the new agent file)
 
 **Custom sections** (preserve verbatim): anything the user added outside the standard set. Common examples:
 
@@ -110,19 +109,20 @@ For each of `agent-plan`, `agent-code`, `agent-task`:
 
 For each CAST reference doc and document template in the plan:
 
-1. If the action is **Create** or **Rename + Update**: read from the source path shown in the mapping table in `dispositions.md` — `<CAST_SOURCE>/docs/<file>.md` for reference docs, `<CAST_SOURCE>/templates/<file>.md` for the `templates/*` rows — substitute placeholders, and write to the same relative path in the target project (`docs/<file>.md` or `templates/<file>.md` respectively).
+1. If the action is **Create** or **Rename + Update**: read from the source path shown in the mapping table in `dispositions.md` — `<CAST_SOURCE>/docs/<file>.md` for reference docs, `<CAST_SOURCE>/templates/<file>.md` for the `templates/*` rows — substitute placeholders, and write to the same relative path in the target project (`docs/<file>.md` or `templates/<file>.md` respectively). Note that `docs/PIPELINE_LOOP.md` carries `[TEST_CMD]` and `[MAX_LOOP_COUNT]` (default 3) — substitute them with the same values used for the pipeline skills.
 2. For **Rename + Update**: read the existing file first, preserve all non-template content (e.g., an existing PRD with real requirements) as the body, update only the header and any CAST-specific framing.
 3. For **Update in place**: same as Rename + Update but without moving the file.
 4. Always install `docs/FILE_CONVENTIONS.md` — it's load-bearing for the docs/templates/artifacts split enforcement.
-5. The eight `templates/*` files (architecture, UI spec, and milestone templates) install verbatim into the project's top-level `templates/` directory. Create the directory if it does not exist. `templates/README.md` also installs, but as documentation — with placeholder substitution and the scaffolding strip applied, per its disposition row.
+5. The `templates/*` skeletons (architecture, UI spec, milestone, CEO review, and UX review templates — every `templates/*` file except `README.md`) install verbatim into the project's top-level `templates/` directory. Create the directory if it does not exist. `templates/README.md` also installs, but as documentation — with placeholder substitution and the scaffolding strip applied, per its disposition row.
 6. In installed README files (`docs/README.md`, `templates/README.md`, `artifacts/README.md`), replace any `[YYYY-MM-DD]` "Last updated" token with the install date.
 
 ## 5.7 — Install artifacts scaffold
 
-1. Read `BUGS.md`, `STANDUP.md`, `README.md` from `<CAST_SOURCE>/artifacts/`.
+1. Read `BUGS.md`, `STANDUP.md`, `AGENT_STATE.md`, `README.md` from `<CAST_SOURCE>/artifacts/`.
 2. Substitute placeholders.
 3. Write to `artifacts/`. If a file already exists with user content, preserve it — merge only if the user explicitly approved.
 4. Ensure all four subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`) exist. Do not populate them — they fill up during `/agent-plan` and `/agent-code` runs.
+5. **State migration rule**: if an existing pre-1.2 agent file carries populated state tables (Current Work, Decisions Log, Directives Queue, dashboards, etc.), move the populated rows into the matching `artifacts/AGENT_STATE.md` section during the update, then install the slimmed agent definition. Empty `_(empty)_` tables are simply dropped from the agent file — the empty schemas already exist in `AGENT_STATE.md`.
 
 ## 5.8 — Install CLAUDE.md
 
@@ -152,10 +152,10 @@ After every file is written:
 When merging an existing agent file with a CAST template:
 
 1. **Frontmatter**: use CAST's YAML (name, description, model tier). If the existing file has a custom model pin that the user explicitly chose, keep it and note the divergence from CAST defaults in the adoption report.
-2. **Standard sections** (Purpose, Goals, Authority, Inputs, Outputs, Interaction Rules, Templates, Current Work, Decisions Log, Future Work): use CAST's content as the base structure. If the existing file has additional bullets or custom rules inside these sections, merge them as additional bullets at the end of the relevant section.
+2. **Standard sections** (Purpose, Goals, Authority, Inputs, Outputs, Interaction Rules, Templates, State): use CAST's content as the base structure. If the existing file has additional bullets or custom rules inside these sections, merge them as additional bullets at the end of the relevant section.
 3. **Custom appendix sections**: preserve verbatim, placed after the standard sections under `## Custom Extensions (preserved from pre-CAST version)`.
 4. **Tables in Inputs/Outputs**: if the user has added rows, keep them. If CAST has rows the user's file lacks, add them. Never remove a row the user added.
-5. **Decisions Log**: always preserve every existing entry. Add a new row noting the CAST adoption: `<date> | Adopted CAST template | N/A | Structure now matches canonical CAST <version> |`. For `<version>`, use the version from this skill's frontmatter (`metadata.version` at the top of SKILL.md). Never hard-code a version number in this row.
+5. **Decisions Log**: always preserve every existing entry — populated rows move to the agent's section in `artifacts/AGENT_STATE.md` (see 5.7). Add a new row noting the CAST adoption: `<date> | Adopted CAST template | N/A | Structure now matches canonical CAST <version> |`. For `<version>`, use the version from this skill's frontmatter (`metadata.version` at the top of SKILL.md). Never hard-code a version number in this row.
 
 ## CLAUDE.md
 

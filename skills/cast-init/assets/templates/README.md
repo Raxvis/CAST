@@ -34,7 +34,9 @@ filled in place — copy first, then edit the copy.
 | `MILESTONE_DEFINITION.md` | Product | `/agent-plan` Stage 1 | `artifacts/milestones/milestone-{N}-{slug}.md` |
 | `MILESTONE_TASKS.md` | Product | `/agent-plan` Stage 1 | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
 | `MILESTONE_COMPLETION.md` | Product | `/agent-code` (after engineering) | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
-| `MILESTONE_VALIDATION.md` | Product | `/agent-plan` / milestone acceptance | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
+| `MILESTONE_VALIDATION.md` | Product | `/agent-code` + `/agent-task` per-task validation (Task Validation Checklist) and milestone acceptance | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
+| `CEO_REVIEW.md` | CEO | `/agent-plan` Stage 4 | `artifacts/reviews/ceo-review-milestone-{N}.md` |
+| `UX_REVIEW.md` | UI | UX review of Coder implementations | `artifacts/reviews/ux-review-milestone-{N}.md` |
 
 ---
 

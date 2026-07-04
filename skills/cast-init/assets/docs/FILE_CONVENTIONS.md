@@ -58,6 +58,7 @@ docs/
   CODE_PATTERNS.md               # Coding conventions
   FILE_CONVENTIONS.md            # This document
   ERROR_HANDLING.md              # Error handling guidelines
+  PIPELINE_LOOP.md               # Canonical engineering-loop contract
   TEST_FRAMEWORK.md              # Testing strategy
   CHANGELOG.md                   # Release history (release agent owns)
   ASSETS.md                      # Asset registry
@@ -75,7 +76,9 @@ templates/
   MILESTONE_DEFINITION.md        # Milestone definition template
   MILESTONE_TASKS.md             # Milestone task breakdown template
   MILESTONE_COMPLETION.md        # Milestone completion report template
-  MILESTONE_VALIDATION.md        # Milestone validation / acceptance template
+  MILESTONE_VALIDATION.md        # Task validation / milestone acceptance template
+  CEO_REVIEW.md                  # CEO planning-review template
+  UX_REVIEW.md                   # UX review template
 ```
 
 Templates are copied — never filled in place — to produce instances under `artifacts/`.
@@ -87,6 +90,7 @@ artifacts/
   README.md                                # Work directory index
   BUGS.md                                  # Active bug tracker (instance, not template)
   STANDUP.md                               # Rolling session progress log
+  AGENT_STATE.md                           # Live working state for every agent
 
   milestones/
     milestone-{N}-{slug}.md                # Milestone definition
@@ -148,6 +152,8 @@ Templates live in `templates/` and are copied — never filled in place — to p
 | `templates/MILESTONE_TASKS.md` | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
 | `templates/MILESTONE_COMPLETION.md` | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
 | `templates/MILESTONE_VALIDATION.md` | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
+| `templates/CEO_REVIEW.md` | `artifacts/reviews/ceo-review-milestone-{N}.md` |
+| `templates/UX_REVIEW.md` | `artifacts/reviews/ux-review-milestone-{N}.md` |
 
 ### Milestone Artifacts (`artifacts/milestones/`)
 
@@ -202,12 +208,13 @@ Two naming patterns are valid:
 | Logging a bug | Bug Gatherer adds an entry to `artifacts/BUGS.md` |
 | Completing a milestone | Product writes `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
 | Recording session progress | Any agent appends to `artifacts/STANDUP.md` (both `/agent-code` completion and `/agent-task` completion write entries here) |
+| Updating agent working state | Each agent appends to its own section in `artifacts/AGENT_STATE.md` |
 | Appending a `/agent-task` completion entry | Any agent appends to `artifacts/STANDUP.md` |
 | Updating reference documentation | Docs Writer edits the relevant file in `docs/` |
 | Adding a release changelog entry | Release appends to `docs/CHANGELOG.md` |
 | Creating any new reference doc | Docs Writer registers it in `docs/README.md` |
 
-**`/agent-task` scope note.** `/agent-task` is bounded to `artifacts/STANDUP.md` and `artifacts/BUGS.md` updates. It does **not** write to `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, or `artifacts/reviews/` — those directories are owned by `/agent-plan` outputs. If a one-off task turns out to need any of those, `/agent-task` halts and instructs the user to run `/agent-plan` first. See `TROUBLESHOOTING.md` for the full decision table on which command to use.
+**`/agent-task` scope note.** `/agent-task` is bounded to `artifacts/STANDUP.md`, `artifacts/BUGS.md`, and `artifacts/AGENT_STATE.md` updates. It does **not** write to `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, or `artifacts/reviews/` — those directories are owned by `/agent-plan` outputs. If a one-off task turns out to need any of those, `/agent-task` halts and instructs the user to run `/agent-plan` first. See `TROUBLESHOOTING.md` for the full decision table on which command to use.
 
 ---
 
@@ -233,7 +240,7 @@ Rules:
 - The body of the file is rewritten as needed; prior content is not preserved inline. Git history is the audit log.
 - The CEO reads this table first when re-reviewing a revised plan to identify which of its prior Revision Requests have been addressed.
 
-This block is mandatory for planning-stage artifacts produced by `/agent-plan`. It is **not** required for `artifacts/BUGS.md` or `artifacts/STANDUP.md`, which are append-only running logs.
+This block is mandatory for planning-stage artifacts produced by `/agent-plan`. It is **not** required for `artifacts/BUGS.md`, `artifacts/STANDUP.md`, or `artifacts/AGENT_STATE.md`, which are append-only running logs.
 
 ---
 
@@ -262,6 +269,7 @@ The following behaviors violate these conventions. Do not do them:
 | Release changelog | `docs/CHANGELOG.md` | fixed |
 | Active bug tracker | `artifacts/BUGS.md` | fixed |
 | Rolling session log | `artifacts/STANDUP.md` | fixed |
+| Agent working state | `artifacts/AGENT_STATE.md` | fixed |
 | Milestone definition | `artifacts/milestones/` | `milestone-{N}-{slug}.md` |
 | Milestone tasks | `artifacts/milestones/` | `milestone-{N}-{slug}-tasks.md` |
 | Milestone completion | `artifacts/milestones/` | `milestone-{N}-{slug}-completion.md` |

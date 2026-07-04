@@ -14,10 +14,12 @@ reference-only and must not receive work artifacts.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Adjust the Review Checklist to reflect the business and technical gates that matter most
-   for your project.
+2. The review checklist lives in templates/CEO_REVIEW.md — adjust that template to reflect
+   the business and technical gates that matter most for your project.
 3. The verdict vocabulary (APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED) is used
    by the /agent-plan pipeline skill — keep it consistent if you rely on that pipeline.
+4. Live working state (Current Work, Decisions Log) lives in artifacts/AGENT_STATE.md →
+   `## ceo`, not in this file.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
@@ -107,11 +109,11 @@ The CEO Agent may NOT:
 
 ## Templates
 
-The CEO review uses an inline template rather than a file under `docs/`. The CEO Review Checklist Template lives further down in this file — find it by searching for `## CEO Review Checklist Template`. Copy that template block verbatim when producing a new CEO review, fill in every field, and write the output to the instance destination below.
+When producing a CEO review, read `templates/CEO_REVIEW.md` **first** and follow its structure exactly. Copy the template, fill in every field, and write the instance to the destination below.
 
-| Artifact type | Format reference | Instance destination |
+| Artifact type | Template to read | Instance destination |
 |---|---|---|
-| CEO planning review (produced during `/agent-plan` Stage 4) | This file: `CEO Review Checklist Template` section below | `artifacts/reviews/ceo-review-milestone-{N}.md` |
+| CEO planning review (produced during `/agent-plan` Stage 4) | `templates/CEO_REVIEW.md` | `artifacts/reviews/ceo-review-milestone-{N}.md` |
 
 Every CEO review file written under `artifacts/reviews/` must:
 
@@ -136,130 +138,6 @@ On re-review of a revised plan, read every input file's `## Revision History` ta
 
 ---
 
-## Current Work
+## State
 
-| Milestone | Status | Verdict | Notes |
-|---|---|---|---|
-| _(empty)_ | | | |
-
----
-
-## Decisions Log
-
-| Date | Decision | Rationale | Impact |
-|---|---|---|---|
-| _(empty)_ | | | |
-
----
-
-## CEO Review Checklist Template
-
-_Copy this block for each milestone review. Fill in every field. Do not skip sections._
-
-```
-## CEO Review: [MILESTONE_NAME]
-**Date**: [DATE]
-**Reviewer**: CEO Agent
-**Inputs Reviewed**:
-- Milestone: [PATH_TO_MILESTONE_DOC]
-- Architecture: [PATH_TO_ARCH_DOC]
-- UI Spec: [PATH_TO_UI_SPEC]
-- Security Findings: [PATH_OR_NONE]
-- Performance Findings: [PATH_OR_NONE]
-
-**Review Cycle**: [v1 for first review; v2, v3, etc. for re-reviews of revised plans]
-
-On any re-review, read the `## Revision History` table at the top of every input file FIRST. Identify which of your prior Revision Requests have been addressed and which have not. An entry in the revision history is not the same as a fix — verify the body of each file reflects the claimed change.
-
----
-
-### 1. Scope & Business Intent
-- [ ] Milestone goals are clear and measurable.
-- [ ] Acceptance criteria are testable.
-- [ ] Scope is appropriate for a single milestone (not overloaded, not trivial).
-- [ ] The milestone advances a stated product objective.
-
-**Notes**:
-
----
-
-### 2. Architectural Soundness
-- [ ] Architecture document covers every module touched by the milestone.
-- [ ] Data schemas are versioned and migration-safe.
-- [ ] Module boundaries align with the feature scope.
-- [ ] No hidden dependencies on unplanned work.
-
-**Notes**:
-
----
-
-### 3. UI & User Experience
-- [ ] UI spec covers every screen or component the milestone introduces.
-- [ ] Interaction states (default, pressed, disabled, loading, error, empty) are specified.
-- [ ] UI spec is consistent with the architecture (state shape, events, data flow).
-- [ ] Accessibility considerations are recorded.
-
-**Notes**:
-
----
-
-### 4. Security Posture
-- [ ] All Critical and High findings have a remediation plan inside this milestone.
-- [ ] No Critical finding is deferred to "future work" without explicit Product acceptance.
-- [ ] New dependencies introduced by the architecture have been reviewed.
-
-**Notes**:
-
----
-
-### 5. Performance Budget
-- [ ] The milestone respects the project's performance budgets.
-- [ ] Hot paths are identified and have a measurement plan.
-- [ ] No budget violation is deferred without explicit Product acceptance.
-
-**Notes**:
-
----
-
-### 6. Cross-Cutting Risks
-- [ ] No UI requirement contradicts the architecture.
-- [ ] No architecture decision contradicts a Product acceptance criterion.
-- [ ] No security/performance finding invalidates a task in the milestone.
-- [ ] The milestone's tasks collectively satisfy every acceptance criterion.
-
-**Notes**:
-
----
-
-### Revision Requests
-
-| # | Addressed To | Section | Required Change |
-|---|---|---|---|
-| | | | |
-
----
-
-### Approval Conditions (for APPROVED WITH CONDITIONS)
-
-| # | Condition | Verified By | Verified At |
-|---|---|---|---|
-| | | | |
-
----
-
-### Verdict
-
-- [ ] **APPROVED** — Milestone may proceed to the engineering stage. No outstanding revisions.
-- [ ] **APPROVED WITH CONDITIONS** — Milestone may proceed. Coder must satisfy the Approval Conditions above; Reviewer and Product verify on completion.
-- [ ] **REVISION REQUIRED** — Milestone returned to the named agents. See Revision Requests. Re-review after revisions.
-
-**Verdict Notes**:
-```
-
----
-
-## Future Work
-
-| Item | Priority | Notes |
-|---|---|---|
-| _(empty)_ | | |
+Live state lives in `artifacts/AGENT_STATE.md` → `## ceo` (Current Work, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.

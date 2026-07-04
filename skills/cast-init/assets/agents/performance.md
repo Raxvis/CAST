@@ -11,10 +11,10 @@ provides feedback directly to Architecture.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. The Performance Budget Tracking table ships with default targets — replace them
-   with your actual performance metrics and budgets.
-3. The Performance Budget Tracking table mirrors targets defined in architect.md — keep them
-   in sync.
+2. The Performance Budget Tracking table (in artifacts/AGENT_STATE.md → `## performance`)
+   ships with default targets — replace them with your actual performance metrics and budgets.
+3. Live working state (Budget Tracking, Current Work findings, Decisions Log) lives in
+   artifacts/AGENT_STATE.md → `## performance`, not in this file.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
@@ -108,11 +108,11 @@ The Performance Agent may NOT:
 
 ## Templates
 
-Performance findings do not use a `docs/*.md` template — the finding format is defined below in the Performance Budget Tracking section. When producing a performance review, write the findings directly to the instance destination and follow this file's existing finding format.
+Performance findings do not use a `templates/*.md` skeleton — the finding requirements are defined below, and the canonical live budget table lives in `artifacts/AGENT_STATE.md` → `## performance` → Performance Budget Tracking. When producing a performance review, write the findings directly to the instance destination and follow the requirements below.
 
 | Artifact type | Format reference | Instance destination |
 |---|---|---|
-| Performance review (produced during `/agent-plan` Stage 3b) | This file: Performance Budget Tracking section below | `artifacts/reviews/performance-review-milestone-{N}.md` |
+| Performance review (produced during `/agent-plan` Stage 3b) | Finding requirements below + budget table in `artifacts/AGENT_STATE.md` → `## performance` | `artifacts/reviews/performance-review-milestone-{N}.md` |
 
 Every performance review file written under `artifacts/reviews/` must:
 
@@ -136,38 +136,6 @@ Budget-violating findings block the milestone until remediated or rolled into a 
 
 ---
 
-## Performance Budget Tracking
+## State
 
-_This is the canonical live tracking table. Targets are defined by Architecture in `architect.md` → Performance Budgets. Performance Agent owns Current values and Status updates._
-
-| Metric | Target | Current | Status | Notes |
-|---|---|---|---|---|
-| Startup time | < 2s | — | — | Default — tune per platform |
-| Update/tick duration | < 16ms | — | — | Default — only for projects with a hot loop |
-| Frame render time | < 16ms | — | — | Default — only for projects that render UI |
-| Memory footprint | < 200MB | — | — | Default — tune per platform |
-| Local storage use | < 50MB | — | — | Default — tune per platform |
-
----
-
-## Current Work
-
-| Finding | Metric Affected | Impact | Status | Date | Notes |
-|---|---|---|---|---|---|
-| _(empty)_ | | | | | |
-
----
-
-## Decisions Log
-
-| Date | Decision | Rationale | Impact |
-|---|---|---|---|
-| _(empty)_ | | | |
-
----
-
-## Future Work
-
-| Item | Priority | Notes |
-|---|---|---|
-| _(empty)_ | | |
+Live state lives in `artifacts/AGENT_STATE.md` → `## performance` (Performance Budget Tracking — the canonical live tracking table, Current Work findings, Decisions Log, Future Work). Read that section on activation; append new rows and update the budget table's Current/Status columns, never rewrite history. Log decisions per the format defined there.

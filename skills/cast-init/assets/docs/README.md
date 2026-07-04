@@ -49,6 +49,7 @@ These documents describe how the project is built and the conventions that gover
 | `FILE_CONVENTIONS.md` | Rules governing where each type of file and document belongs in the repository. Read before creating any new file. |
 | `ERROR_HANDLING.md` | Guidelines for handling errors across all error categories. Defines principles, patterns, and user-facing message standards. |
 | `TEST_FRAMEWORK.md` | Testing strategy, test runner setup, file conventions, coverage requirements, and best practices. |
+| `PIPELINE_LOOP.md` | The canonical engineering-loop contract (Coder → Tester → Reviewer → Product validation, Defect/Issue routing, loop-counter rules) consumed by `/agent-code` and `/agent-task`. |
 | `MODEL_OPTIMIZATION.md` | Model policy for the agent roster: the Claude Opus 4.x ladder, per-model behavior profiles, and the 4.6 → 4.7 → 4.8 upgrade checklists. |
 
 ---
@@ -103,6 +104,7 @@ Live work tracking — the active bug tracker and the rolling session log — li
 
 - `artifacts/BUGS.md` — active bug tracker (Bug Gatherer files, Debugger investigates)
 - `artifacts/STANDUP.md` — rolling session progress log
+- `artifacts/AGENT_STATE.md` — live working state for every agent (Current Work, Decisions Logs, dashboards)
 
 ---
 
@@ -122,7 +124,9 @@ appropriate `artifacts/` subdirectory first.
 | `templates/MILESTONE_DEFINITION.md` | Template for the milestone definition file (what and why) | `artifacts/milestones/milestone-{N}-{slug}.md` |
 | `templates/MILESTONE_TASKS.md` | Template for the task breakdown file (how; one row per task) | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
 | `templates/MILESTONE_COMPLETION.md` | Template for milestone completion reports | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
-| `templates/MILESTONE_VALIDATION.md` | Template for milestone acceptance records | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
+| `templates/MILESTONE_VALIDATION.md` | Template for per-task validation checklists and milestone acceptance records | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
+| `templates/CEO_REVIEW.md` | Template for the CEO's planning-stage review and verdict | `artifacts/reviews/ceo-review-milestone-{N}.md` |
+| `templates/UX_REVIEW.md` | Template for UI's UX review of implemented screens | `artifacts/reviews/ux-review-milestone-{N}.md` |
 
 ---
 

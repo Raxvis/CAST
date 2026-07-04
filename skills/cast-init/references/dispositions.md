@@ -17,6 +17,7 @@ For each CAST reference doc and document template, determine the disposition fro
 | `docs/FILE_CONVENTIONS.md` | **Always install** — load-bearing for docs/artifacts split | Rename + merge with CAST's enforcement rules |
 | `docs/ERROR_HANDLING.md` | Skip (optional) | Rename |
 | `docs/TEST_FRAMEWORK.md` | Skip (optional) | Rename |
+| `docs/PIPELINE_LOOP.md` | **Always install** — the engineering-loop contract consumed by /agent-code and /agent-task | Install CAST version; preserve user loop customizations as notes |
 | `docs/MODEL_OPTIMIZATION.md` | **Always install** — referenced by every agent's Model Configuration section | Install CAST version; preserve any user-added model pins as notes |
 | `docs/CHANGELOG.md` | Skip (optional) | Preserve — note Release agent will maintain going forward |
 | `docs/ASSETS.md` | Skip (optional) | Preserve |
@@ -29,7 +30,9 @@ For each CAST reference doc and document template, determine the disposition fro
 | `templates/ARCH_SYSTEM.md` | **Always install** | Same |
 | `templates/ARCH_DATA_SCHEMA.md` | **Always install** | Same |
 | `templates/UI_SPEC.md` | Install unless project is clearly backend/CLI-only with no user interface | Same |
-| `templates/README.md` | **Always install** — the in-directory index mapping each template to its producing agent and artifact destination. Unlike the eight skeletons, it installs with placeholder substitution and scaffolding strip (it is documentation, not a template) | Update to CAST format, preserving user-added rows |
+| `templates/CEO_REVIEW.md` | **Always install** — consumed by /agent-plan Stage 4 | Same |
+| `templates/UX_REVIEW.md` | Install unless project is clearly backend/CLI-only with no user interface (pairs with `templates/UI_SPEC.md`) | Same |
+| `templates/README.md` | **Always install** — the in-directory index mapping each template to its producing agent and artifact destination. Unlike the template skeletons, it installs with placeholder substitution and scaffolding strip (it is documentation, not a template) | Update to CAST format, preserving user-added rows |
 | `docs/FRONTEND.md` | Install if project type is frontend, mobile, or mixed | Prompt user if ambiguous |
 | `docs/BACKEND.md` | Install if project type is backend, data pipeline, or mixed | Same |
 | `docs/CLI.md` | Install if project type is CLI or mixed | Same |
@@ -44,6 +47,7 @@ If `artifacts/` does not exist, Create it with:
 
 - `BUGS.md` from CAST template
 - `STANDUP.md` from CAST template
+- `AGENT_STATE.md` from CAST template
 - `README.md` from CAST template
 - Empty subdirectories: `milestones/`, `architecture/`, `ui-specs/`, `reviews/`
 

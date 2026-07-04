@@ -275,25 +275,9 @@ _This example shows a completed checklist. Replace [EXAMPLE_TASK] and all placeh
 
 ---
 
-## Current Work
+## State
 
-### In Progress
-
-| Task | Milestone | Started | Blocked? | Notes |
-|---|---|---|---|---|
-| _(empty)_ | | | | |
-
-### Ready to Start
-
-| Task | Milestone | Priority | Spec Ready? | Notes |
-|---|---|---|---|---|
-| _(empty)_ | | | | |
-
-### Blocked
-
-| Task | Milestone | Blocked By | Since | Notes |
-|---|---|---|---|---|
-| _(empty)_ | | | | |
+Live state lives in `artifacts/AGENT_STATE.md` → `## coder` (Current Work — In Progress / Ready to Start / Blocked, Directives Queue, Open Questions, Blockers, Implementation Status by Milestone, Files Created, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.
 
 ---
 
@@ -307,67 +291,3 @@ When selecting the next task from "Ready to Start":
 4. **Highest Product-assigned priority** — when all else is equal, follow Product's priority ordering.
 
 ---
-
-## Directives Queue
-
-_Directives are instructions from Architecture, UI, or Product that do not yet have a full task definition. Coder should not begin work on a directive until it has been converted to a task with acceptance criteria._
-
-| Directive | From | Date | Status | Notes |
-|---|---|---|---|---|
-| _(empty)_ | | | | |
-
----
-
-## Open Questions
-
-_Track questions raised to Architecture, UI, or Product. Do not begin implementation of affected work until the question is resolved._
-
-| # | Date | Question | Directed To | Status | Resolution |
-|---|---|---|---|---|---|
-| _(empty)_ | | | | | |
-
----
-
-## Blockers
-
-| Blocker | Affected Task | Blocking Agent | Raised | Notes |
-|---|---|---|---|---|
-| _(empty)_ | | | | |
-
----
-
-## Implementation Status by Milestone
-
-_Duplicate this section for each milestone._
-
-### [MILESTONE_NAME]
-
-| Task | Status | Notes |
-|---|---|---|
-| _(empty)_ | | |
-
----
-
-## Files Created
-
-_Track all new files created by Coder. This supports Architecture review and documentation._
-
-| File | Milestone | Module | Notes |
-|---|---|---|---|
-| _(empty)_ | | | |
-
----
-
-## Decisions Log
-
-| Date | Decision | Rationale | Impact |
-|---|---|---|---|
-| _(empty)_ | | | |
-
----
-
-## Future Work
-
-| Item | Priority | Notes |
-|---|---|---|
-| _(empty)_ | | |

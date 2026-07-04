@@ -30,6 +30,7 @@ artifacts/
   README.md                        # This file
   BUGS.md                          # Active bug tracker (instance, not template)
   STANDUP.md                       # Rolling session progress log
+  AGENT_STATE.md                   # Live working state for every agent (one section per agent)
 
   milestones/
     milestone-{N}-{slug}.md        # Milestone definition (from templates/MILESTONE_DEFINITION.md)
@@ -47,6 +48,7 @@ artifacts/
     security-review-milestone-{N}.md
     performance-review-milestone-{N}.md
     ceo-review-milestone-{N}.md    # CEO planning-stage verdict
+    ux-review-milestone-{N}.md     # UX review of implemented screens
 ```
 
 The four subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`) are pre-created empty by `/cast-init` so the expected structure exists from day one; they fill up during `/agent-plan` and `/agent-code` runs. Do not create additional empty subdirectories beyond these.
@@ -66,6 +68,8 @@ The four subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`
 | CEO planning verdict | `artifacts/reviews/ceo-review-milestone-{N}.md` | CEO (during `/agent-plan`) |
 | Bug reports | Entries in `artifacts/BUGS.md` | Bug Gatherer |
 | Session progress log | Entries in `artifacts/STANDUP.md` | Any agent / user |
+| Agent working state (Current Work, Decisions Logs, dashboards) | The agent's own section in `artifacts/AGENT_STATE.md` | Each agent |
+| UX review of an implemented screen | `artifacts/reviews/ux-review-milestone-{N}.md` | UI (during engineering review) |
 | Milestone completion report | `artifacts/milestones/milestone-{N}-{slug}-completion.md` | Product (after `/agent-code`) |
 | Milestone validation record | `artifacts/milestones/milestone-{N}-{slug}-validation.md` | Product (after `/agent-code`) |
 

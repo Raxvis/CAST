@@ -16,9 +16,10 @@ HOW TO CUSTOMIZE:
    - Spacing: replace with your actual spacing scale.
 3. Replace [SCREEN_NAME_*] with real screen or view names.
 4. Replace [COMPONENT_NAME_*] with real reusable component names.
-5. The UI Spec Template is the core output format — keep it intact and copy it when creating
-   real specs. It is designed to be screen-agnostic and works for any view.
-6. The UX Review Checklist is designed to be copied for each review session.
+5. The spec and review formats live in templates/ (UI_SPEC.md, UX_REVIEW.md) — this file
+   only points at them. Customize the templates, not this file, to change the formats.
+6. Live working state (Current Work, Screen Specifications index, Decisions Log) lives in
+   artifacts/AGENT_STATE.md → `## ui`, not in this file.
 7. Update the Interaction Rules section to match your team's workflow.
 -->
 
@@ -109,13 +110,14 @@ The UI Agent may NOT:
 
 ## Templates
 
-When producing UI specifications, read the template from `templates/` **first** and follow its structure exactly. The template ensures every spec covers interaction states (default, focused, disabled, loading, error, empty), accessibility requirements, and platform-specific concerns consistently.
+When producing UI specifications or UX reviews, read the template from `templates/` **first** and follow its structure exactly. The spec template ensures every spec covers all six interaction states (default, pressed, disabled, loading, error, empty — the CEO gate checks every one), accessibility requirements, and platform-specific concerns consistently.
 
 | Artifact type | Template to read | Instance destination |
 |---|---|---|
 | Milestone UI specification (produced during `/agent-plan`) | `templates/UI_SPEC.md` | `artifacts/ui-specs/ui-milestone-{N}.md` |
 | Per-screen spec | `templates/UI_SPEC.md` | `artifacts/ui-specs/[SCREEN]_SCREEN.md` |
 | Per-component spec | `templates/UI_SPEC.md` | `artifacts/ui-specs/[COMPONENT]_COMPONENT.md` |
+| UX review of a Coder implementation | `templates/UX_REVIEW.md` | `artifacts/reviews/ux-review-milestone-{N}.md` |
 
 For CLI projects, `templates/UI_SPEC.md` is still the right template — adapt the "visual layout" sections to describe terminal output formats (column alignment, exit codes, color usage, error messages). See `docs/CLI.md` for CLI-specific UX patterns and the `example/artifacts/ui-specs/ui-milestone-1.md` fixture for a worked CLI UX spec.
 
@@ -132,11 +134,9 @@ Every UI artifact written under `artifacts/ui-specs/` must include the `## Revis
 
 ---
 
-## Current Work
+## State
 
-| Task | Milestone | Status | Notes |
-|---|---|---|---|
-| _(empty)_ | | | |
+Live state lives in `artifacts/AGENT_STATE.md` → `## ui` (Current Work, Screen Specifications index, Decisions Log, UX Playtesting Feedback, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.
 
 ---
 
@@ -190,271 +190,3 @@ _List reusable UI components here. Each entry should have a reference to its ful
 | [COMPONENT_NAME_3] | [One-line description] | [Link or section reference] |
 
 ---
-
-## Screen Specifications
-
-_Each screen should have its own UI Spec using the template below. Add completed specs here._
-
-| Screen | Milestone | Status | Notes |
-|---|---|---|---|
-| _(empty)_ | | | |
-
----
-
-## UI Spec Template
-
-_Copy this block when creating a specification for a new screen or significant component. Replace all bracketed placeholders._
-
-```
-# UI Spec: [SCREEN_OR_COMPONENT_NAME]
-**Status**: Draft | In Review | Approved | Superseded
-**Milestone**: [MILESTONE_NAME]
-**Author**: UI Agent
-**Reviewed By**: [REVIEWER]
-**Last Updated**: [DATE]
-
----
-
-## 1. Overview
-
-[One paragraph: what this screen or component does, what user need it serves, and what the
-primary interaction pattern is.]
-
-**Entry Point(s)**: [How the user arrives at this screen]
-**Exit Point(s)**: [Where the user can go from this screen]
-
----
-
-## 2. Position in User Flow
-
-```
-[PREVIOUS_SCREEN] ──► [THIS_SCREEN] ──► [NEXT_SCREEN]
-                           │
-                           └──► [ALTERNATE_PATH]
-```
-
----
-
-## 3. Layout Diagram
-
-```
-┌─────────────────────────────────┐
-│         [HEADER_AREA]           │  ← [HEIGHT / STYLE NOTES]
-├─────────────────────────────────┤
-│                                 │
-│         [MAIN_CONTENT]          │  ← [SCROLLABLE / FIXED]
-│                                 │
-├─────────────────────────────────┤
-│         [FOOTER_AREA]           │  ← [HEIGHT / STYLE NOTES]
-└─────────────────────────────────┘
-```
-
-_Note: All dimensions are reference values. Adjust for screen size and platform conventions._
-
----
-
-## 4. Visual Style
-
-| Property | Value | Notes |
-|---|---|---|
-| Background | `color-background` | |
-| Header background | `color-surface` | |
-| Primary text | `color-text-primary` | |
-| Secondary text | `color-text-secondary` | |
-| Dividers | `color-border` | |
-| Accent | `color-primary` | Used for [SPECIFIC_ELEMENT] |
-
----
-
-## 5. States
-
-### Default State
-
-[Describe the default appearance. What is shown when the user first lands on this screen with
-a typical amount of data?]
-
-### Empty State
-
-[What is shown when there is no data? Include placeholder text and any illustration/icon.]
-
-### Loading State
-
-[What is shown while data is being fetched or a long operation is in progress?]
-
-### Error State
-
-[What is shown when an operation fails? How does the user recover?]
-
-### [FEATURE_SPECIFIC_STATE] (if applicable)
-
-[Describe any domain-specific states unique to this screen.]
-
----
-
-## 6. Animations and Transitions
-
-| Trigger | Animation | Duration | Easing | Notes |
-|---|---|---|---|---|
-| Screen entry | [TYPE] | [DURATION] | [EASING] | |
-| [INTERACTION] | [TYPE] | [DURATION] | [EASING] | |
-| [STATE_CHANGE] | [TYPE] | [DURATION] | [EASING] | |
-
----
-
-## 7. Data Requirements
-
-| Data Field | Source | Display Format | Notes |
-|---|---|---|---|
-| [FIELD_1] | [MODULE_OR_STATE] | [FORMAT] | |
-| [FIELD_2] | [MODULE_OR_STATE] | [FORMAT] | |
-
----
-
-## 8. Accessibility
-
-- Minimum touch target size: [MINIMUM_DIMENSION] for all interactive elements
-- All interactive elements must have a descriptive label accessible to screen readers
-- Text contrast ratio: [RATIO] minimum for body text; [RATIO] minimum for large/header text
-- No information conveyed by color alone — always pair color with a label or icon
-- [ANY_OTHER_ACCESSIBILITY_REQUIREMENTS]
-
----
-
-## 9. Component Structure
-
-```
-[SCREEN_OR_COMPONENT_NAME]
-  ├── [CHILD_COMPONENT_1]
-  │     ├── [GRANDCHILD_1]
-  │     └── [GRANDCHILD_2]
-  ├── [CHILD_COMPONENT_2]
-  └── [CHILD_COMPONENT_3]
-```
-
----
-
-## 10. Interactive Element Reference
-
-| Element | Type | Action | Outcome |
-|---|---|---|---|
-| [ELEMENT_1] | [BUTTON / INPUT / TOGGLE / etc.] | [TAP / LONG_PRESS / etc.] | [WHAT_HAPPENS] |
-| [ELEMENT_2] | [TYPE] | [ACTION] | [OUTCOME] |
-
----
-
-## 11. Edge Cases
-
-| Scenario | Expected Behavior |
-|---|---|
-| [EDGE_CASE_1] | [EXPECTED] |
-| [EDGE_CASE_2] | [EXPECTED] |
-| [EDGE_CASE_3] | [EXPECTED] |
-
----
-
-## 12. Open Questions
-
-| # | Question | Owner | Resolution |
-|---|---|---|---|
-| 1 | [QUESTION] | [AGENT] | [Pending / Answer] |
-```
-
----
-
-## Decisions Log
-
-| Date | Decision | Rationale | Impact |
-|---|---|---|---|
-| _(empty)_ | | | |
-
----
-
-## UX Playtesting Feedback
-
-| Session Date | Observation | Screen Affected | Severity | Action |
-|---|---|---|---|---|
-| _(empty)_ | | | | |
-
----
-
-## UX Review Checklist Template
-
-_Copy this block when reviewing a Coder implementation against a UI spec._
-
-```
-## UX Review: [SCREEN_OR_COMPONENT_NAME]
-**Date**: [DATE]
-**Reviewer**: UI Agent
-**Spec Reference**: [SPEC_NAME_OR_LINK]
-
----
-
-### Responsiveness
-
-- [ ] Layout renders correctly at minimum supported screen size
-- [ ] Layout renders correctly at maximum supported screen size
-- [ ] No elements are clipped, overlapping, or obscured at any supported size
-
-### Readability
-
-- [ ] All text is legible at the specified sizes
-- [ ] No text is truncated unexpectedly
-- [ ] Contrast ratios meet accessibility targets
-
-### Touch Targets
-
-- [ ] All interactive elements meet the minimum touch target size requirement
-- [ ] Targets do not overlap
-- [ ] Feedback is present for all touch interactions (pressed state, animation, etc.)
-
-### Visual Hierarchy
-
-- [ ] The primary action is visually dominant
-- [ ] Secondary and tertiary elements are appropriately de-emphasized
-- [ ] Empty and error states are visually distinct from the default state
-
-### Consistency
-
-- [ ] Colors match the style guide
-- [ ] Typography matches the style guide
-- [ ] Spacing matches the style guide
-- [ ] Component appearance matches the component spec (if applicable)
-
-### Polish
-
-- [ ] Animations and transitions are implemented per the spec
-- [ ] No placeholder text or images remain in the implementation
-- [ ] No visual artifacts (misaligned pixels, incorrect shadows, clipped borders)
-
-### Accessibility
-
-- [ ] All interactive elements have accessible labels
-- [ ] No information is conveyed by color alone
-- [ ] Screen reader behavior is reasonable (if testable)
-
-### Overall Feel
-
-- [ ] The screen feels consistent with the rest of the product
-- [ ] The interaction pattern is intuitive — no UI explains itself, the affordance is clear
-- [ ] The visual weight and density feel appropriate for the content
-
-### Issues Found
-
-| # | Element / Area | Issue | Severity | Action Required |
-|---|---|---|---|---|
-| | | | | |
-
-### Verdict
-
-- [ ] **APPROVED** — Implementation matches spec. No changes required.
-- [ ] **APPROVED WITH NOTES** — Minor issues noted. Follow-up in next pass.
-- [ ] **CHANGES REQUIRED** — See Issues Found. Coder must revise before Product review.
-```
-
----
-
-## Future Work
-
-| Item | Priority | Notes |
-|---|---|---|
-| _(empty)_ | | |

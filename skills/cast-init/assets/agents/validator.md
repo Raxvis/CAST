@@ -118,15 +118,13 @@ The Validator Agent may NOT:
 - Validator reviews Coder's Pre-Handoff Checklist for completeness before it reaches Product.
 - Validator does not block work unless a process violation is actively occurring.
 - Validator issues a single written resolution for every conflict — not ongoing negotiations.
-- Validator tracks all unresolved conflicts in the Conflicts table below.
+- Validator tracks all unresolved conflicts in the Conflicts table in `artifacts/AGENT_STATE.md` → `## validator`.
 
 ---
 
-## Decisions Log
+## State
 
-| Date | Decision | Rationale | Impact |
-|---|---|---|---|
-| _(empty)_ | | | |
+Live state lives in `artifacts/AGENT_STATE.md` → `## validator` (Current Work, Conflicts, Process Violations, Open Questions Tracker, Agent Status Dashboard, Milestone Progress, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.
 
 ---
 
@@ -134,10 +132,10 @@ The Validator Agent may NOT:
 
 _Run at the beginning of every working session._
 
-- [ ] Review the Agent Status Dashboard — confirm no agents are in a blocked state.
+- [ ] Review the Agent Status Dashboard (`artifacts/AGENT_STATE.md` → `## validator`) — confirm no agents are in a blocked state.
 - [ ] Confirm the current milestone is clearly defined in Product's file.
 - [ ] Confirm Coder's Work Queue has at least one task that is "Ready to Start".
-- [ ] Confirm no unresolved conflicts are more than 14 days old (default — tune for your project; use the Date column in the Conflicts table).
+- [ ] Confirm no unresolved conflicts are more than 14 days old (default — tune for your project; use the Date column in the Conflicts table in `artifacts/AGENT_STATE.md` → `## validator`).
 - [ ] Review the Open Questions Tracker — confirm no questions have been pending for more than 2 sessions.
 - [ ] Review the Process Violations log — confirm all violations have a resolution or owner.
 - [ ] Confirm Architecture has an Approved document for every module Coder will touch this session.
@@ -149,19 +147,11 @@ _Run at the beginning of every working session._
 
 When two agents disagree and cannot resolve the issue independently:
 
-1. **Document the conflict** in the Conflicts table below. Include both positions and the specific point of disagreement.
+1. **Document the conflict** in the Conflicts table (`artifacts/AGENT_STATE.md` → `## validator`). Include both positions and the specific point of disagreement.
 2. **Apply the priority hierarchy**: Product > Architecture > UI. The higher-priority agent's position is the default resolution.
 3. **Check for exceptions**: If the lower-priority agent has a blocking technical or legal reason, escalate to a human stakeholder before applying the hierarchy.
 4. **Issue a written resolution**: Record the decision, rationale, and which agent must change course in the Conflicts table. Update the resolution status.
 5. **Notify all agents**: The Validator informs all agents of the resolution at the start of the next session.
-
----
-
-## Current Work
-
-| Task | Status | Notes |
-|---|---|---|
-| _(empty)_ | | |
 
 ---
 
@@ -187,72 +177,6 @@ _Run this checklist when a task is submitted for Product review._
 
 **Notes**:
 ```
-
----
-
-## Conflicts
-
-| # | Date | Agents Involved | Description | Resolution | Status |
-|---|---|---|---|---|---|
-| _(empty)_ | | | | | |
-
----
-
-## Process Violations
-
-| # | Date | Agent | Violation | Impact | Resolution |
-|---|---|---|---|---|---|
-| _(empty)_ | | | | | |
-
----
-
-## Open Questions Tracker
-
-_System-wide view of all pending Open Questions raised by any agent. Validator reviews this at session start to identify potential blockers._
-
-| # | Date | Raised By | Directed To | Question | Status | Resolution |
-|---|---|---|---|---|---|---|
-| _(empty)_ | | | | | | |
-
----
-
-## Agent Status Dashboard
-
-| Agent | Current Task | Status | Blocked By | Last Updated |
-|---|---|---|---|---|
-| Product | _(empty)_ | | | |
-| Architecture | _(empty)_ | | | |
-| UI | _(empty)_ | | | |
-| Security | _(empty)_ | | | |
-| Performance | _(empty)_ | | | |
-| CEO | _(empty)_ | | | |
-| Coder | _(empty)_ | | | |
-| Tester | _(empty)_ | | | |
-| Reviewer | _(empty)_ | | | |
-| Debugger | _(empty)_ | | | |
-| Refactor | _(empty)_ | | | |
-| Bug Gatherer | _(empty)_ | | | |
-| Docs Writer | _(empty)_ | | | |
-| Release | _(empty)_ | | | |
-
----
-
-## Milestone Progress
-
-| Milestone | Tasks Total | Complete | In Progress | Blocked | Not Started | % Done |
-|---|---|---|---|---|---|---|
-| [MILESTONE_1] | | | | | | |
-| [MILESTONE_2] | | | | | | |
-| [MILESTONE_3] | | | | | | |
-
----
-
-## Future Work
-
-| Item | Priority | Notes |
-|---|---|---|
-| Automate Pre-Handoff Checklist verification | Low | Would reduce Validator manual load |
-| _(add more)_ | | |
 
 ---
 
@@ -331,7 +255,7 @@ _Be specific and honest. This is not a blame log — it is a process improvement
 
 ## Blocked Agent Protocol
 
-When an agent is in a blocked state (as shown in the Agent Status Dashboard):
+When an agent is in a blocked state (as shown in the Agent Status Dashboard in `artifacts/AGENT_STATE.md` → `## validator`):
 
 1. **Immediate**: Validator identifies the blocking agent and confirms the blocker is real (not stale).
 2. **Same session**: Validator notifies the blocking agent and requests a timeline for resolution.

@@ -118,37 +118,31 @@ The Reviewer Agent may NOT:
 
 _Applied to every Coder submission._
 
+### Quality and conventions
+
 - [ ] Code follows project naming conventions
 - [ ] No untyped values or unsafe patterns
 - [ ] No unused imports, variables, or dead code
 - [ ] No hardcoded values that should be constants
-- [ ] Implementation matches the approved architecture document
-- [ ] Implementation matches the approved UI specification (if applicable)
+- [ ] No unnecessary duplication — shared logic is extracted appropriately
+- [ ] No commented-out code blocks or debug output left in production paths
 - [ ] Error handling follows the documented strategy in `docs/ERROR_HANDLING.md`
-- [ ] No performance anti-patterns
-- [ ] No new dependencies introduced without Architecture approval
+- [ ] No performance anti-patterns; stays within the performance budget defined in the architecture document (if applicable)
 - [ ] Pre-Handoff Checklist is complete
 
----
+### Architecture adherence
 
-## Current Work
+_These items are owned by Architecture (see architect.md); Reviewer applies them and defers to Architecture on module boundary disputes._
 
-| Submission | Source Agent | Date Received | Verdict | Date Completed | Notes |
-|---|---|---|---|---|---|
-| _(empty)_ | | | | | |
-
----
-
-## Decisions Log
-
-| Date | Decision | Rationale | Impact |
-|---|---|---|---|
-| _(empty)_ | | | |
+- [ ] Implementation matches the approved architecture document
+- [ ] Module boundaries are respected — no cross-boundary direct calls that bypass the defined interface
+- [ ] New modules and files are placed in the correct location per the project structure
+- [ ] Data schemas are implemented exactly as specified (no renamed fields, no extra fields)
+- [ ] Implementation matches the approved UI specification (if applicable)
+- [ ] No new dependencies introduced without Architecture approval
 
 ---
 
-## Future Work
+## State
 
-| Item | Priority | Notes |
-|---|---|---|
-| _(empty)_ | | |
+Live state lives in `artifacts/AGENT_STATE.md` → `## reviewer`. Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.

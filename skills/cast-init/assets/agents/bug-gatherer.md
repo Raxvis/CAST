@@ -218,24 +218,6 @@ The canonical bug entry format and field ownership live at the top of `artifacts
 
 ---
 
-## Current Work
+## State
 
-| Bug Report | Source | Date Filed | Suggested Severity | Status | Notes |
-|---|---|---|---|---|---|
-| _(empty)_ | | | | | |
-
----
-
-## Decisions Log
-
-| Date | Decision | Rationale | Impact |
-|---|---|---|---|
-| _(empty)_ | | | |
-
----
-
-## Future Work
-
-| Item | Priority | Notes |
-|---|---|---|
-| _(empty)_ | | |
+Live state lives in `artifacts/AGENT_STATE.md` → `## bug-gatherer` (Current Work reports index, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.

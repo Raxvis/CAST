@@ -91,7 +91,7 @@ The argument text the user provided when invoking this skill — a free-form des
 
 ## Instructions
 
-This skill orchestrates a mini engineering pipeline: Coder → Tester → Reviewer → Product. It reuses the same Defect / Issue routing as `/agent-code` but skips the planning stage entirely.
+This skill orchestrates a mini engineering pipeline by executing the canonical engineering loop defined in `docs/PIPELINE_LOOP.md` — the same loop `/agent-code` runs — but skips the planning stage entirely. This file carries only the deltas specific to one-off tasks.
 
 ### Pre-Flight Check
 
@@ -102,45 +102,18 @@ Before any work begins:
 3. Read any files named in the task description.
 4. **Scope check.** If the task description implies an architectural change, a new module, a new screen, a new endpoint, or a cross-cutting change, **stop and instruct the user to run `/agent-plan` instead**. Do not attempt to inline architect or UI work into a one-off task. A helpful response: "This task introduces <specific scope>, which needs a planning stage. Run `/agent-plan \"<feature description>\"` first, then `/agent-code` to implement."
 
-### Step 1 — Coder
+### The Loop
 
-Launch the **coder** agent to:
+Execute the engineering loop defined in `docs/PIPELINE_LOOP.md` — Coder → Tester → Reviewer (with the Defect and Issue routing) → Product validation — including its loop-counter rules, test-gate rule, and Environment Issue rule. The loop doc is the single canonical statement of that sequence; do not improvise routing.
 
-- Read the task description, relevant existing code, and the reference docs gathered in Pre-Flight.
-- Implement the change in production code, following the conventions in `CLAUDE.md`, `docs/CODE_PATTERNS.md`, and `docs/FILE_CONVENTIONS.md`.
-- Complete the Pre-Handoff Checklist before handing off.
+Deltas specific to this skill:
 
-### Step 2 — Tester
-
-After Coder hands off, launch the **tester** agent to:
-
-- Write or update unit tests covering the changed code.
-- Run `[TEST_CMD]` to verify all tests pass.
-- If tests fail, return findings to Coder (loop back to Step 1).
-
-Tester must pass before Reviewer runs. No exceptions.
-
-### Step 3 — Reviewer
-
-After Tester passes, launch the **reviewer** agent to:
-
-- Review the code against project conventions, existing patterns in adjacent code, and any topic-specific doc that applies.
-- Classify every finding as a **Defect** or an **Issue** using the same routing as `/agent-code`:
-  - **Defect** → **bug-gatherer** files it in `artifacts/BUGS.md` (status New) → **product** triages (sets final severity; status Triaged) → if "fix now", **debugger** investigates (status In Progress) and the defect returns to Coder with the root-cause analysis.
-  - **Issue** → **refactor** → back to **reviewer** (Tester re-runs first).
-- If the Reviewer's findings reveal missing design context (e.g., "this change should not exist without a new architecture document" or "this introduces a pattern not used elsewhere"), **stop and instruct the user to run `/agent-plan` to introduce the missing context**. Do not attempt to retrofit design work into a one-off task.
-
-The Reviewer loop may cycle; track the count and escalate after `[MAX_LOOP_COUNT]` cycles on the same task. Record the count in `artifacts/STANDUP.md` after each cycle (`Task <id>: loop <k>/[MAX_LOOP_COUNT]`) so an interrupted run resumes with the real count. Refactor→Reviewer rounds increment the same counter.
-
-### Step 4 — Product Validation
-
-After Reviewer approves, launch the **product** agent to validate the task against its description. Since `/agent-task` does not produce a milestone, the task description itself serves as the acceptance criteria. Product verifies:
-
-1. The change does what the task description said it would.
-2. No regressions in adjacent features.
-3. The change did not sneak in scope beyond what was asked. If new scope appeared, flag it and either trim or escalate to `/agent-plan`.
-
-If any check fails, return to Coder (loop back to Step 1) with the specific gap cited.
+- **Coder (Step 1)** reads the task description, the relevant existing code, and the reference docs gathered in Pre-Flight — there is no milestone, architecture document, or UI spec.
+- **Reviewer (Step 3)** reviews against project conventions, existing patterns in adjacent code, and any topic-specific doc that applies. If the Reviewer's findings reveal missing design context (e.g., "this change should not exist without a new architecture document" or "this introduces a pattern not used elsewhere"), **stop and instruct the user to run `/agent-plan` to introduce the missing context**. Do not attempt to retrofit design work into a one-off task.
+- **Product validation (Step 4)**: since `/agent-task` does not produce a milestone, the task description itself serves as the acceptance criteria. Product verifies:
+  1. The change does what the task description said it would.
+  2. No regressions in adjacent features.
+  3. The change did not sneak in scope beyond what was asked. If new scope appeared, flag it and either trim or escalate to `/agent-plan`.
 
 ### Completion
 
@@ -153,10 +126,9 @@ After the task passes Product validation:
 
 ### Error Handling
 
-- If the Coder-Tester-Reviewer loop exceeds `[MAX_LOOP_COUNT]` cycles on the same task, stop and escalate to the user with the specific blocker.
 - If the task description is ambiguous enough that Coder cannot proceed without a design decision, stop and ask the user to clarify before continuing. Do not guess.
 - If the change turns out to touch more modules than initially expected, stop and recommend running `/agent-plan` for a proper milestone scope. Do not attempt to finish a large change inside a one-off task — that defeats the purpose of the planning gate.
-- If tests fail due to environment rather than code, Tester flags the failure as "Environment Issue" and the user decides whether to continue.
+- Loop-cap escalation (`[MAX_LOOP_COUNT]`) and Environment Issue handling follow the rules in `docs/PIPELINE_LOOP.md`.
 
 ### Scope Boundaries (what this skill will NOT do)
 

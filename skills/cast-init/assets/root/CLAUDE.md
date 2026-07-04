@@ -157,7 +157,7 @@ The project uses a strict split between reference material, document templates, 
 
 - **`docs/`** — reference only: requirements, conventions, design rationale. Never receives work artifacts.
 - **`templates/`** — reusable document templates (architecture, UI spec, milestone files). Agents copy them into `artifacts/` as instances; never filled in place.
-- **`artifacts/`** — all live work: milestone plans, per-milestone architecture and UI specs, security/performance/CEO reviews, bug reports (`artifacts/BUGS.md`), and the rolling session log (`artifacts/STANDUP.md`). Everything produced by `/agent-plan` and `/agent-code` lands here.
+- **`artifacts/`** — all live work: milestone plans, per-milestone architecture and UI specs, security/performance/CEO reviews, bug reports (`artifacts/BUGS.md`), the rolling session log (`artifacts/STANDUP.md`), and every agent's live working state (`artifacts/AGENT_STATE.md`). Everything produced by `/agent-plan` and `/agent-code` lands here.
 
 When in doubt, read `docs/FILE_CONVENTIONS.md` and `artifacts/README.md`.
 

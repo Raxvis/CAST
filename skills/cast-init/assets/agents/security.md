@@ -151,24 +151,6 @@ Critical and High findings block the milestone until remediated or rolled into a
 
 ---
 
-## Current Work
+## State
 
-| Finding | Severity | Module | Status | Date | Notes |
-|---|---|---|---|---|---|
-| _(empty)_ | | | | | |
-
----
-
-## Decisions Log
-
-| Date | Decision | Rationale | Impact |
-|---|---|---|---|
-| _(empty)_ | | | |
-
----
-
-## Future Work
-
-| Item | Priority | Notes |
-|---|---|---|
-| _(empty)_ | | |
+Live state lives in `artifacts/AGENT_STATE.md` → `## security` (Current Work findings index, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.

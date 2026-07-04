@@ -10,8 +10,9 @@ description: >-
 
 <!-- TEMPLATE INSTRUCTIONS
 PURPOSE: This file defines the /agent-code pipeline skill. It runs the Engineering Stage of
-the multi-agent workflow for an approved milestone: Coder → Tester → Reviewer, with defects
-routed to Bug Gatherer → Product → Debugger, and quality issues routed to Refactor → Reviewer.
+the multi-agent workflow for an approved milestone by executing the canonical engineering
+loop defined in docs/PIPELINE_LOOP.md (Coder → Tester → Reviewer → Product validation, with
+Defect and Issue routing). This file carries only the deltas specific to milestone work.
 
 All work artifacts (bug reports, progress log entries, milestone completion records) are
 written to `artifacts/`. Templates are read from `templates/`; guidelines are read from
@@ -87,55 +88,13 @@ Before any task begins:
 
 ### Per-Task Loop
 
-For each task, run this sequence. The loop may cycle — track the count and escalate to the user after `[MAX_LOOP_COUNT]` full cycles on a single task. Record the count in `artifacts/STANDUP.md` after each cycle (`Task <id>: loop <k>/[MAX_LOOP_COUNT]`) so an interrupted run resumes with the real count. Refactor→Reviewer rounds increment the same counter.
+For each task, execute the engineering loop defined in `docs/PIPELINE_LOOP.md` — Coder → Tester → Reviewer (with the Defect and Issue routing) → Product validation — including its loop-counter rules, test-gate rule, and Environment Issue rule. The loop doc is the single canonical statement of that sequence; do not improvise routing.
 
-**Step 1 — Coder**
+Inputs specific to this skill, passed into the loop:
 
-Launch the **coder** agent to:
-
-- Read the task definition, architecture document, UI specification, and any Approval Conditions.
-- Implement the task in production code, following the conventions in `CLAUDE.md`, `docs/CODE_PATTERNS.md`, and `docs/FILE_CONVENTIONS.md`.
-- Complete the Pre-Handoff Checklist before handing off.
-
-**Step 2 — Tester**
-
-After Coder hands off, launch the **tester** agent to:
-
-- Write or update unit tests covering the changed code.
-- Run `[TEST_CMD]` to verify all tests pass.
-- If tests fail, return findings to Coder (loop back to Step 1).
-
-Tester must pass before Reviewer runs. No exceptions.
-
-**Step 3 — Reviewer**
-
-After Tester passes, launch the **reviewer** agent to:
-
-- Review the code against the architecture document, UI specification, project conventions, and any Approval Conditions from the CEO.
-- Classify every finding as a **Defect** (incorrect behaviour, broken functionality, violated contract) or an **Issue** (structural problem, convention violation, maintainability concern).
-- If there are no findings, proceed to Step 4.
-
-**Step 3a — Defects → Bug Gatherer → Product → Debugger**
-
-For every Reviewer finding classified as a **Defect**:
-
-1. Launch the **bug-gatherer** agent to file the finding as a structured bug report in `artifacts/BUGS.md` (status New), using the canonical entry format at the top of that file.
-2. Hand the filed report to the **product** agent for triage. Product decides whether the defect is fixed now, fixed later, or closed as not-a-bug, and sets the final severity (status Triaged).
-3. If Product triages the defect as "fix now", launch the **debugger** agent to investigate the root cause and update the existing record with the investigation fields (status In Progress).
-4. The defect returns to Coder (loop back to Step 1) with Debugger's root-cause analysis attached.
-
-**Step 3b — Issues → Refactor → Reviewer**
-
-For every Reviewer finding classified as an **Issue**:
-
-1. Launch the **refactor** agent to restructure the code without changing behaviour, citing the architectural principle or quality standard that justifies the change.
-2. After Refactor hands off, return to **Reviewer** (loop back to Step 3) to confirm the issue is resolved. Tester re-runs before Reviewer re-reviews, per the test gate rule.
-
-Step 3a and Step 3b may run in parallel when the findings are independent. A task does not advance to Step 4 until the Reviewer has approved a clean version.
-
-**Step 4 — Product Validation**
-
-After Reviewer approves, the **product** agent validates the task against its acceptance criteria using the Task Validation Checklist. If any criterion is not met, return to Coder (loop back to Step 1) with the cited criterion.
+- **Coder (Step 1)** reads the task definition from the task breakdown, the architecture document (`artifacts/architecture/arch-milestone-{N}.md`), the UI specification (`artifacts/ui-specs/ui-milestone-{N}.md`), and any Approval Conditions extracted in Pre-Flight, and follows the conventions in `CLAUDE.md`, `docs/CODE_PATTERNS.md`, and `docs/FILE_CONVENTIONS.md`.
+- **Reviewer (Step 3)** reviews against the architecture document, the UI specification, project conventions, and the CEO's Approval Conditions.
+- **Product validation (Step 4)** validates against the task's acceptance criteria using the Task Validation Checklist in `templates/MILESTONE_VALIDATION.md`.
 
 ### Completion
 
@@ -150,8 +109,7 @@ After all tasks for the milestone are complete (or the specified task is done):
 ### Error Handling
 
 - If a task is blocked by an unfinished dependency, skip it and record the blocker in `artifacts/STANDUP.md`.
-- If the Coder–Tester–Reviewer loop runs more than `[MAX_LOOP_COUNT]` times on the same task, stop and escalate to the user with the specific blocker.
 - If the architecture document or UI specification is ambiguous, flag it rather than guessing. Pause the task and notify the user to re-run the relevant stage of `/agent-plan`.
-- If tests fail due to environment rather than code, Tester flags the failure as "Environment Issue" and the Validator process rule applies — Coder is not blocked from continuing other work.
+- Loop-cap escalation (`[MAX_LOOP_COUNT]`) and Environment Issue handling follow the rules in `docs/PIPELINE_LOOP.md`.
 
 Do NOT write any work artifact to `docs/`; that directory is reference-only. All live work — bug reports, completion records, progress entries — goes under `artifacts/`.

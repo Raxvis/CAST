@@ -162,24 +162,6 @@ _Copy this block for every refactoring change before handing off to Tester first
 
 ---
 
-## Current Work
+## State
 
-| Task | Triggered By | Modules Affected | Status | Tester Approved | Reviewer Approved | Notes |
-|---|---|---|---|---|---|---|
-| _(empty)_ | | | | | | |
-
----
-
-## Decisions Log
-
-| Date | Decision | Rationale | Impact |
-|---|---|---|---|
-| _(empty)_ | | | |
-
----
-
-## Future Work
-
-| Item | Priority | Notes |
-|---|---|---|
-| _(empty)_ | | |
+Live state lives in `artifacts/AGENT_STATE.md` → `## refactor` (Current Work, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.
