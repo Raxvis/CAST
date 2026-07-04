@@ -11,7 +11,7 @@
 | Field | Value |
 |-------|-------|
 | **Version** | 1.0 |
-| **Author** | UI agent (claude-sonnet-4-6) |
+| **Author** | UI agent (claude-opus-4-8) |
 | **Date** | 2026-04-08 |
 | **Status** | Approved |
 | **Implements** | M1 — `task-crud` (tasks T-2, T-3, T-4, T-5) |

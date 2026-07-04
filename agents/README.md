@@ -11,9 +11,12 @@ HOW TO CUSTOMIZE:
 6. Update the Documentation Placement table to match your actual folder/file conventions.
 
 Per-agent AI models are pre-configured in each agent file's YAML frontmatter and are
-not placeholders. Planning agents run on claude-opus-4-6, engineering agents on
-claude-sonnet-4-6, and utility agents on claude-haiku-4-5-20251001. Override the
-model: line in an individual agent file if you need a different pin.
+not placeholders. Every agent is pinned to claude-opus-4-8 (the Claude Opus 4.x family
+is the optimized target; claude-opus-4-7 and claude-opus-4-6 are supported executing
+models with per-model notes in each agent's "Model Configuration" section). Role
+differentiation comes from recommended reasoning effort, not model tier. Override the
+model: line in an individual agent file if you need a different pin — see
+docs/MODEL_OPTIMIZATION.md for behavior profiles and upgrade paths.
 -->
 
 # [PROJECT_NAME] — Agent System Overview
@@ -22,7 +25,7 @@ model: line in an individual agent file if you need a different pin.
 
 This directory contains the working documentation for each specialized agent that assists in developing [PROJECT_NAME]. Each agent owns a domain, maintains its own decisions log, and hands off work to other agents via structured outputs.
 
-Each agent runs on a model tier matched to its workload: planning agents on Opus 4.6, engineering agents on Sonnet 4.6, utility agents on Haiku 4.5. The exact model for each agent is pinned in its YAML frontmatter.
+Every agent runs on the Claude Opus 4.x family, pinned to `claude-opus-4-8` by default in its YAML frontmatter; workload differentiation comes from recommended reasoning effort (`xhigh` for design/coding/review roles, `high` for planning and validation-of-work roles, `low` for mechanical utility roles). Opus 4.7 and Opus 4.6 are supported executing models — each agent file carries a **Model Configuration** section with per-model execution notes, and `docs/MODEL_OPTIMIZATION.md` holds the full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists.
 
 ---
 

@@ -8,6 +8,31 @@ The current template version is recorded in the root `README.md`, `PROMPT.md`, a
 
 ---
 
+## [0.11.0] — 2026-07-03
+
+Re-targeted the entire agent roster and all three commands at the Claude Opus 4.x family (Opus 4.8 / 4.7 / 4.6), replacing the previous Opus 4.6 / Sonnet 4.6 / Haiku 4.5 model-tier split. Every agent and command now carries model-conditional execution notes, and a new reference doc defines the per-model behavior profiles and upgrade paths.
+
+### Added
+
+- **`docs/MODEL_OPTIMIZATION.md`** — the model policy for the roster: the Opus 4.x ladder (`claude-opus-4-8` default, `claude-opus-4-7` supported, `claude-opus-4-6` minimum), the default roster assignment with recommended reasoning effort per agent, per-model behavior profiles (4.8 narrates and asks more but under-delegates without explicit triggers; 4.7 is the most literal and terse; 4.6 overtriggers on aggressive wording and over-delegates), the 4.6 → 4.7, 4.7 → 4.8, and 4.6 → 4.8 upgrade checklists, downgrade/pinning guidance, and a verification procedure. Registered in `docs/README.md`, the root `README.md` docs table, and the `PROMPT.md` docs mapping + disposition tables (Always install).
+- **`## Model Configuration` section in all 15 agent files** — a compact per-agent block stating the default model, the recommended reasoning effort (`xhigh` for architect/coder/reviewer/debugger, `high` for the other planning/engineering roles, `low` for the four utility roles), a supported-models table, and three role-specific execution notes — one each for Opus 4.8, 4.7, and 4.6 — so the same agent definition stays calibrated on whichever Opus 4.x model executes it.
+- **`## Model Compatibility` section in all three commands** (`/agent-plan`, `/agent-code`, `/agent-task`) — orchestration notes per executing model: Opus 4.8/4.7 delegate conservatively (the explicit stage invocations are load-bearing), Opus 4.6 over-delegates (spawn only the agents each stage names), plus per-stage effort recommendations and, for `/agent-code`, a coverage-first review-recall rule for Opus 4.8/4.7. Summarized in `commands/README.md`.
+
+### Changed
+
+- **All 15 agents re-pinned to `claude-opus-4-8`.** The YAML frontmatter `model:` line changed from `inherit` to an explicit `claude-opus-4-8` pin (frontmatter previously contradicted the documented per-tier pinning), and each body `**Model**:` line now names `claude-opus-4-8`. Workload differentiation moved from model tier to recommended reasoning effort — all three Opus 4.x models are priced identically, so the old cost-tiering no longer applies. `claude-haiku-4-5` remains a documented downgrade pin for the four utility agents.
+- **`PROMPT.md` roster table** now pins every agent to `claude-opus-4-8` and gains an Effort column; the Phase 6 frontmatter validation accepts `claude-opus-4-8` / `claude-opus-4-7` / `claude-opus-4-6` (or an approved override); version header bumped to v0.11.0.
+- **`README.md`** — model paragraph, prerequisites, docs file table (now 20 files), badge, and hero line updated to the Opus 4.x policy and v0.11.0.
+- **`agents/README.md`** — template instructions and the model overview paragraph now describe the Opus 4.x pinning and effort-based differentiation.
+- **`docs/FIRST_RUN.md`** — the per-agent model-access caveat now names `claude-opus-4-8` with 4.7/4.6 as the supported fallbacks.
+- **`example/artifacts/`** — the five stale `claude-sonnet-4-6` author-model references in the worked example updated to `claude-opus-4-8`.
+
+### Migration
+
+- Existing installs: in each `.claude/agents/*.md`, change the frontmatter `model:` line to `claude-opus-4-8` (or `claude-opus-4-7` / `claude-opus-4-6` if that is what your account serves), then copy the new `## Model Configuration` sections from the CAST agents and the `## Model Compatibility` sections from the CAST commands, and install `docs/MODEL_OPTIMIZATION.md`. Re-running `PROMPT.md` against an existing install applies all of this automatically.
+- If you previously relied on the Haiku pins for the utility agents (bug-gatherer, docs-writer, release, validator) for cost or latency, re-pin them to `claude-haiku-4-5` — the roles remain compatible; only the optimized default changed.
+- No directory structure, command stage, or artifact path changed in this release.
+
 ## [0.10.0] — 2026-05-24
 
 Reorganized document templates into a dedicated top-level `templates/` directory, turning the previous two-way `docs/` vs `artifacts/` split into a three-way `docs/` / `templates/` / `artifacts/` split.

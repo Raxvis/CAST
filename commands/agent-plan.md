@@ -34,6 +34,14 @@ This command invokes the following agents. Open any of them for the full role de
 - [performance](../agents/performance.md) — reviews the architecture for performance budget violations and files findings
 - [ceo](../agents/ceo.md) — reads every prior artifact and issues the APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED verdict
 
+## Model Compatibility
+
+Each stage runs on the model pinned in that agent's file (default: `claude-opus-4-8`; `claude-opus-4-7` and `claude-opus-4-6` are supported — full profiles and upgrade paths in `docs/MODEL_OPTIMIZATION.md`). Orchestration notes by executing model:
+
+- **Opus 4.8 / 4.7** — these models delegate conservatively; the explicit stage invocations below are load-bearing. Execute every stage exactly as written and do not collapse a stage into direct work because delegation feels unnecessary.
+- **Opus 4.6** — this model over-delegates; invoke only the agents named in the stages below and spawn no ad-hoc subagents beyond them.
+- **Effort** — run planning stages at `high` reasoning effort, and the Architecture stage at `xhigh` on Opus 4.7+ (Opus 4.6 caps at `high`).
+
 ## Arguments
 
 - `$ARGUMENTS`: Required. Description of the feature to plan, or an existing milestone identifier to re-plan.

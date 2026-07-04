@@ -1,7 +1,7 @@
 ---
 name: ceo
 description: "Planning sign-off agent. Use for final milestone review, CEO verdicts, and gating engineering on planning quality."
-model: claude-opus-4-6
+model: claude-opus-4-8
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -26,7 +26,27 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — CEO Agent
 
-**Model**: `claude-opus-4-6`
+**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
+
+---
+
+## Model Configuration
+
+This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `high`.
+
+| Executing model | ID | Status |
+|---|---|---|
+| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
+| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
+| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
+
+Execution notes, depending on the model running this agent:
+
+- **Opus 4.8** — Strongest multi-document synthesis for this gate. Its prose runs warmer — keep verdicts in the exact APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED format with no softening.
+- **Opus 4.7** — Follows the verdict criteria to the letter — ideal for gating. Ensure every condition you attach is concrete and independently checkable.
+- **Opus 4.6** — Applies the gate strictly but may try to delegate re-review to subagents — do not: read the four input documents directly and issue the verdict yourself.
+
+Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
 
 ---
 

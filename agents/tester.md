@@ -1,7 +1,7 @@
 ---
 name: tester
 description: "Testing agent. Use for generating, maintaining, and executing automated tests."
-model: claude-sonnet-4-6
+model: claude-opus-4-8
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -20,7 +20,27 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Tester Agent
 
-**Model**: `claude-sonnet-4-6`
+**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
+
+---
+
+## Model Configuration
+
+This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `high`.
+
+| Executing model | ID | Status |
+|---|---|---|
+| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
+| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
+| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
+
+Execution notes, depending on the model running this agent:
+
+- **Opus 4.8** — Reports results faithfully, but follows reporting filters literally — report every failing or flaky case with its output; never summarize failures away.
+- **Opus 4.7** — Tests exactly the stated scope and will not invent unlisted edge cases — enumerate edge cases in the task spec. Explicit run instructions are mandatory; it reaches for tools less by default.
+- **Opus 4.6** — May overbuild test scaffolding — write the smallest test set that proves the acceptance criteria.
+
+Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: coder
 description: "Implementation agent. Use for writing features, fixes, and production code."
-model: claude-sonnet-4-6
+model: claude-opus-4-8
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -24,7 +24,27 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Coder Agent
 
-**Model**: `claude-sonnet-4-6`
+**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
+
+---
+
+## Model Configuration
+
+This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `xhigh`.
+
+| Executing model | ID | Status |
+|---|---|---|
+| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
+| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
+| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
+
+Execution notes, depending on the model running this agent:
+
+- **Opus 4.8** — Strongest long-horizon implementation — hand it the complete task spec in one turn. It may pause on minor choices (naming, defaults): pick a reasonable option and note it in the handoff instead of asking.
+- **Opus 4.7** — The most literal implementer — it builds exactly what the spec says and nothing more, and ambiguity becomes a question rather than an assumption. Keep the run-tests / run-linter instructions explicit; it reaches for tools less by default.
+- **Opus 4.6** — Add scope discipline — make only the changes the task directly requests; no extra helpers, abstractions, or defensive error handling for scenarios that cannot happen. Use effort `high` (`xhigh` requires Opus 4.7+).
+
+Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
 
 ---
 

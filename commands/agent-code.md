@@ -43,6 +43,15 @@ The planning-stage outputs this command reads were produced earlier by [architec
 
 - `$ARGUMENTS`: Required. The milestone to implement, or a specific task identifier within that milestone.
 
+## Model Compatibility
+
+Each stage runs on the model pinned in that agent's file (default: `claude-opus-4-8`; `claude-opus-4-7` and `claude-opus-4-6` are supported — full profiles and upgrade paths in `docs/MODEL_OPTIMIZATION.md`). Orchestration notes by executing model:
+
+- **Opus 4.8 / 4.7** — these models delegate conservatively; the explicit stage invocations below are load-bearing. Execute every stage exactly as written, including the Defect/Issue routing loops.
+- **Opus 4.6** — this model over-delegates; invoke only the agents named in the stages below and spawn no ad-hoc subagents beyond them.
+- **Effort** — run the Coder and Reviewer stages at `xhigh` on Opus 4.7+ (`high` on Opus 4.6); Tester, routing, and Product validation at `high`.
+- **Review recall (Opus 4.8 / 4.7)** — these models follow severity filters literally: the Reviewer stage must report every Defect and Issue found; filtering happens in the routing stages, never at review time.
+
 ## Instructions
 
 This command orchestrates the **Engineering Stage** of the agent workflow. It requires that `/agent-plan` has already been completed and the CEO has issued APPROVED or APPROVED WITH CONDITIONS.

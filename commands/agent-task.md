@@ -67,6 +67,14 @@ This command explicitly does NOT invoke [architect](../agents/architect.md), [ui
 
 If in doubt, run `/agent-plan` first. The planning gate exists because ad-hoc changes that turn out to need design work produce drift that is expensive to untangle later.
 
+## Model Compatibility
+
+Each stage runs on the model pinned in that agent's file (default: `claude-opus-4-8`; `claude-opus-4-7` and `claude-opus-4-6` are supported — full profiles and upgrade paths in `docs/MODEL_OPTIMIZATION.md`). Orchestration notes by executing model:
+
+- **Opus 4.8 / 4.7** — these models delegate conservatively; execute the pipeline stages exactly as written rather than folding them into direct work.
+- **Opus 4.6** — this model over-delegates; invoke only the agents this pipeline names, and honor the bail-out rule above instead of spawning planning agents ad hoc.
+- **Effort** — `high` reasoning effort is sufficient for one-off tasks; use `xhigh` for nontrivial fixes on Opus 4.7+ (Opus 4.6 caps at `high`).
+
 ## Arguments
 
 - `$ARGUMENTS`: Required. A free-form description of the task. May reference a specific file path, a bug ID (e.g., "Fix BUG-002: `done` silently succeeds on missing ID"), or a plain description ("Add a `--json` flag to the `list` command following the pattern in `add.ts`").

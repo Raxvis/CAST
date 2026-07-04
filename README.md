@@ -15,7 +15,7 @@
 
 > **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three slash commands, and a CEO-gated planning pipeline — shipped as plain Markdown, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v0.10.0-blue)
+![Template version](https://img.shields.io/badge/template-v0.11.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
 
@@ -60,7 +60,7 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 - **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v0.10.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v0.11.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
@@ -280,7 +280,7 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 
 ### Agents
 
-Each agent file has its model hard-coded in the YAML frontmatter — there is no `[AI_MODEL]` placeholder. The template pre-selects the right model per workload tier: planning agents on `claude-opus-4-6`, engineering agents on `claude-sonnet-4-6`, and utility agents on `claude-haiku-4-5-20251001`. Edit the `model:` line in an individual agent file if you need to override, but the defaults are intentional.
+Each agent file has its model hard-coded in the YAML frontmatter — there is no `[AI_MODEL]` placeholder. Every agent is pinned to `claude-opus-4-8` and optimized for the Claude Opus 4.x family (`claude-opus-4-7` and `claude-opus-4-6` are supported executing models); workload differentiation comes from the recommended reasoning effort stated in each agent's **Model Configuration** section rather than model tier. Edit the `model:` line in an individual agent file if you need to override, and see `docs/MODEL_OPTIMIZATION.md` for per-model behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists.
 
 | Placeholder | Description | Example value |
 |---|---|---|
@@ -296,7 +296,7 @@ Before installing, confirm the following:
 
 - **Claude Code CLI installed and authenticated.** This template is built for Claude Code specifically. The slash commands (`/agent-plan`, `/agent-code`) and subagent auto-discovery rely on Claude Code's `.claude/commands/` and `.claude/agents/` conventions. Other AI coding assistants do not read these files. Install and sign in to Claude Code before continuing.
 - **A target project directory.** Either a new empty git repo or an existing project where you want to introduce the agent workflow. The template does not create the project for you.
-- **An Anthropic account with API access** to the model tiers pinned in the agent files: Opus 4.6 for planning agents, Sonnet 4.6 for engineering agents, Haiku 4.5 for utility agents. You can override the `model:` line in an individual agent file if you need a different pin.
+- **An Anthropic account with access to the Claude Opus 4.x family.** All agents are pinned to `claude-opus-4-8` by default; `claude-opus-4-7` and `claude-opus-4-6` are supported alternatives (all three are priced identically). You can override the `model:` line in an individual agent file if you need a different pin — `docs/MODEL_OPTIMIZATION.md` covers the per-model behavior differences and upgrade paths.
 
 ## Known Limitations
 
@@ -472,7 +472,7 @@ If you do not want a CEO planning gate, **delete both `/agent-plan` and `/agent-
 | `commands/agent-code.md` | Defines the `/agent-code` slash command; orchestrates the Engineering Stage per task (Coder → Tester → Reviewer, with Defects through Debugger → Bug Gatherer → Product and Issues through Refactor → Reviewer) |
 | `commands/agent-task.md` | Defines the `/agent-task` slash command; runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone or CEO verdict |
 
-### docs/ (reference material, 19 files)
+### docs/ (reference material, 20 files)
 
 Reference documentation. Never holds work artifacts. Document templates live in `templates/` (below).
 
@@ -488,6 +488,7 @@ Reference documentation. Never holds work artifacts. Document templates live in 
 | `docs/FILE_CONVENTIONS.md` | File naming rules, directory layout expectations, and `docs/` vs `artifacts/` split |
 | `docs/ERROR_HANDLING.md` | Guidelines for handling errors across all categories; defines principles, patterns, and user-facing message standards |
 | `docs/TEST_FRAMEWORK.md` | Testing strategy, test runner setup, file conventions, and coverage requirements |
+| `docs/MODEL_OPTIMIZATION.md` | Model policy for the agent roster: the Claude Opus 4.x ladder, per-model behavior profiles, and the 4.6 → 4.7 → 4.8 upgrade checklists |
 | `docs/FIRST_RUN.md` | Interactive checklist to run in Claude Code after a fresh install; verifies that subagents load and slash commands register |
 | `docs/CLAUDE_CODE_SETTINGS.md` | Reference for `.claude/settings.json` — explains permission rules, environment variables, and hooks, with common extension patterns |
 | `docs/FRONTEND.md` | Topic-specific reference for frontend projects; delete if not applicable |

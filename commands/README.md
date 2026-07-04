@@ -43,6 +43,10 @@ Short version:
 
 Longer version with a decision table: see `TROUBLESHOOTING.md` → "Which command should I use?"
 
+## Model compatibility
+
+All three commands are optimized for the Claude Opus 4.x family (`claude-opus-4-8` default; `claude-opus-4-7` and `claude-opus-4-6` supported). Each command file carries a **Model Compatibility** section with orchestration notes for the model executing it — chiefly that Opus 4.8/4.7 delegate conservatively (the explicit stage invocations are load-bearing) while Opus 4.6 over-delegates (spawn only the agents each stage names). Behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`.
+
 ## How command files work
 
 A command file is plain Markdown read by Claude Code at session start. The `$ARGUMENTS` token in the file body is replaced with whatever the user typed after the command name. The rest of the file is instructions to Claude for how to orchestrate the work.

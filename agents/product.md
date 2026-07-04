@@ -1,7 +1,7 @@
 ---
 name: product
 description: "Product requirements agent. Use for defining features, acceptance criteria, and validating completed work."
-model: claude-opus-4-6
+model: claude-opus-4-8
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -24,7 +24,27 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Product Agent
 
-**Model**: `claude-opus-4-6`
+**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
+
+---
+
+## Model Configuration
+
+This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `high`.
+
+| Executing model | ID | Status |
+|---|---|---|
+| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
+| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
+| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
+
+Execution notes, depending on the model running this agent:
+
+- **Opus 4.8** — Narrates and summarizes on its own — the handoff formats in this file need no extra "summarize your work" scaffolding. It is more deliberate and may pause on minor judgment calls (wording, backlog ordering): decide those yourself and reserve questions for genuine scope changes.
+- **Opus 4.7** — Interprets acceptance criteria literally and will not generalize a requirement beyond what is written — make scope explicit in every criterion you author, and validate completed work against the letter of the criteria.
+- **Opus 4.6** — Follows role directives very closely — keep wording measured (never escalate to "CRITICAL"/"MUST") or it will overtrigger. Watch requirement scope creep: prefer the smallest requirement set that meets the goal.
+
+Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
 
 ---
 

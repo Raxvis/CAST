@@ -1,6 +1,6 @@
 # CAST Adoption Prompt
 
-**Template version targeted:** `v0.10.0` · **Canonical source:** [`https://github.com/Raxvis/CAST`](https://github.com/Raxvis/CAST)
+**Template version targeted:** `v0.11.0` · **Canonical source:** [`https://github.com/Raxvis/CAST`](https://github.com/Raxvis/CAST)
 
 ## How to use this prompt
 
@@ -119,6 +119,7 @@ For each matched file, read the first 20 lines and classify:
   - File layout / directory convention → `docs/FILE_CONVENTIONS.md`
   - Error handling guide → `docs/ERROR_HANDLING.md`
   - Testing strategy / test setup → `docs/TEST_FRAMEWORK.md`
+  - Model policy / AI model selection / model upgrade guide → `docs/MODEL_OPTIMIZATION.md`
   - CHANGELOG / release notes → `docs/CHANGELOG.md`
   - Asset registry / media inventory → `docs/ASSETS.md`
   - MVP launch checklist → `docs/MVP_LAUNCH.md`
@@ -290,31 +291,31 @@ CAST ships **fifteen** agents. An adoption must account for every one of them �
 
 **Final check before closing the plan:** enumerate all 15 agent names from the table below and verify every one has a corresponding Create / Rename+Update / Update-in-place / Preserve action in the plan. If any of the 15 is missing from the plan, add the corresponding Create action before presenting the plan to the user.
 
-### Canonical CAST agent roster (v0.10.0)
+### Canonical CAST agent roster (v0.11.0)
 
-Use this table as the authoritative reference when comparing an existing project's agents against CAST. The description column is pulled verbatim from each agent file's YAML frontmatter — match role against role, not name against name. The model column shows the pinned tier; override per-agent only when the user has a reason.
+Use this table as the authoritative reference when comparing an existing project's agents against CAST. The description column is pulled verbatim from each agent file's YAML frontmatter — match role against role, not name against name. Every agent is pinned to `claude-opus-4-8` (the Claude Opus 4.x family is the optimized target; `claude-opus-4-7` and `claude-opus-4-6` are supported alternatives — see `docs/MODEL_OPTIMIZATION.md`); the Effort column is the recommended reasoning effort from each agent's Model Configuration section. Override per-agent only when the user has a reason.
 
-| # | Agent | Tier | Model | Role (from agent frontmatter) |
-|---|---|---|---|---|
-| 1 | `product` | 1 | `claude-opus-4-6` | Product requirements agent. Use for defining features, acceptance criteria, and validating completed work. |
-| 2 | `architect` | 2 / 4 | `claude-opus-4-6` | System design agent. Use for architecture decisions, module design, data schemas, and technical planning. |
-| 3 | `ui` | 4 | `claude-opus-4-6` | UI design agent. Use for visual design, layout specs, style guides, and interaction patterns. |
-| 4 | `security` | 4 | `claude-opus-4-6` | Security audit agent. Use for identifying vulnerabilities and insecure patterns. |
-| 5 | `performance` | 4 | `claude-opus-4-6` | Performance agent. Use for profiling, identifying bottlenecks, and optimization. |
-| 6 | `ceo` | 4 | `claude-opus-4-6` | Planning sign-off agent. Use for final milestone review, CEO verdicts, and gating engineering on planning quality. |
-| 7 | `coder` | 1 | `claude-sonnet-4-6` | Implementation agent. Use for writing features, fixes, and production code. |
-| 8 | `tester` | 1 | `claude-sonnet-4-6` | Testing agent. Use for generating, maintaining, and executing automated tests. |
-| 9 | `reviewer` | 1 | `claude-sonnet-4-6` | Code review agent. Use for reviewing code quality, standards compliance, and architecture adherence. |
-| 10 | `debugger` | 2 / 3 | `claude-sonnet-4-6` | Bug investigation agent. Use for isolating defects, root cause analysis, and diagnosing failures. |
-| 11 | `refactor` | 3 | `claude-sonnet-4-6` | Refactoring agent. Use for improving code structure without changing behavior. |
-| 12 | `bug-gatherer` | 3 | `claude-haiku-4-5-20251001` | Bug reporting agent. Use for collecting, structuring, and submitting bug reports. |
-| 13 | `docs-writer` | 2 | `claude-haiku-4-5-20251001` | Documentation agent. Use for creating and maintaining developer-facing documentation. |
-| 14 | `release` | 5 | `claude-haiku-4-5-20251001` | Release preparation agent. Use for changelogs, versioning, and build verification. |
-| 15 | `validator` | 5 | `claude-haiku-4-5-20251001` | Process enforcement agent. Use for conflict resolution, milestone tracking, and workflow compliance. |
+| # | Agent | Tier | Model | Effort | Role (from agent frontmatter) |
+|---|---|---|---|---|---|
+| 1 | `product` | 1 | `claude-opus-4-8` | `high` | Product requirements agent. Use for defining features, acceptance criteria, and validating completed work. |
+| 2 | `architect` | 2 / 4 | `claude-opus-4-8` | `xhigh` | System design agent. Use for architecture decisions, module design, data schemas, and technical planning. |
+| 3 | `ui` | 4 | `claude-opus-4-8` | `high` | UI design agent. Use for visual design, layout specs, style guides, and interaction patterns. |
+| 4 | `security` | 4 | `claude-opus-4-8` | `high` | Security audit agent. Use for identifying vulnerabilities and insecure patterns. |
+| 5 | `performance` | 4 | `claude-opus-4-8` | `high` | Performance agent. Use for profiling, identifying bottlenecks, and optimization. |
+| 6 | `ceo` | 4 | `claude-opus-4-8` | `high` | Planning sign-off agent. Use for final milestone review, CEO verdicts, and gating engineering on planning quality. |
+| 7 | `coder` | 1 | `claude-opus-4-8` | `xhigh` | Implementation agent. Use for writing features, fixes, and production code. |
+| 8 | `tester` | 1 | `claude-opus-4-8` | `high` | Testing agent. Use for generating, maintaining, and executing automated tests. |
+| 9 | `reviewer` | 1 | `claude-opus-4-8` | `xhigh` | Code review agent. Use for reviewing code quality, standards compliance, and architecture adherence. |
+| 10 | `debugger` | 2 / 3 | `claude-opus-4-8` | `xhigh` | Bug investigation agent. Use for isolating defects, root cause analysis, and diagnosing failures. |
+| 11 | `refactor` | 3 | `claude-opus-4-8` | `high` | Refactoring agent. Use for improving code structure without changing behavior. |
+| 12 | `bug-gatherer` | 3 | `claude-opus-4-8` | `low` | Bug reporting agent. Use for collecting, structuring, and submitting bug reports. |
+| 13 | `docs-writer` | 2 | `claude-opus-4-8` | `low` | Documentation agent. Use for creating and maintaining developer-facing documentation. |
+| 14 | `release` | 5 | `claude-opus-4-8` | `low` | Release preparation agent. Use for changelogs, versioning, and build verification. |
+| 15 | `validator` | 5 | `claude-opus-4-8` | `low` | Process enforcement agent. Use for conflict resolution, milestone tracking, and workflow compliance. |
 
 **How to compare against existing project agents.** When the Phase 1 inventory finds an agent file in the project under any name, match it by **role**, not by filename. Read the Role column in the table above and ask: "Does this existing file do what that role describes?" An existing `planner.md` whose purpose is "defines features and acceptance criteria" maps to `product`. An existing `coordinator.md` whose purpose is "resolves conflicts between roles and tracks milestones" maps to `validator`. An existing `shipper.md` whose purpose is "runs the release cut and updates the changelog" maps to `release`. Use the Agent similar-name candidates table further down for alias hints, but the description column above is the tiebreaker — the role always wins over the filename.
 
-**One-line summary you can keep in context:** 15 agents = 6 planning-tier on Opus (product, architect, ui, security, performance, ceo) + 5 engineering-tier on Sonnet (coder, tester, reviewer, debugger, refactor) + 4 utility-tier on Haiku (bug-gatherer, docs-writer, release, validator). Every adoption must account for all 15, not just the 13 in Tiers 1–4.
+**One-line summary you can keep in context:** 15 agents, all on `claude-opus-4-8` = 6 planning-tier at effort high/xhigh (product, architect, ui, security, performance, ceo) + 5 engineering-tier at effort high/xhigh (coder, tester, reviewer, debugger, refactor) + 4 utility-tier at effort low (bug-gatherer, docs-writer, release, validator). Every adoption must account for all 15, not just the 13 in Tiers 1–4.
 
 ### Commands mapping
 
@@ -377,6 +378,7 @@ For each CAST reference doc and document template, determine the disposition fro
 | `docs/FILE_CONVENTIONS.md` | **Always install** — load-bearing for docs/artifacts split | Rename + merge with CAST's enforcement rules |
 | `docs/ERROR_HANDLING.md` | Skip (optional) | Rename |
 | `docs/TEST_FRAMEWORK.md` | Skip (optional) | Rename |
+| `docs/MODEL_OPTIMIZATION.md` | **Always install** — referenced by every agent's Model Configuration section | Install CAST version; preserve any user-added model pins as notes |
 | `docs/CHANGELOG.md` | Skip (optional) | Preserve — note Release agent will maintain going forward |
 | `docs/ASSETS.md` | Skip (optional) | Preserve |
 | `docs/MVP_LAUNCH.md` | Skip (optional) | Preserve |
@@ -627,7 +629,7 @@ After execution:
 5. **Verify YAML frontmatter on every agent file**:
    - Each agent has `name:`, `description:`, `model:` in the frontmatter
    - Description length ≤ 120 characters
-   - Model is one of `claude-opus-4-6`, `claude-sonnet-4-6`, or `claude-haiku-4-5-20251001` (or an override the user approved)
+   - Model is one of `claude-opus-4-8` (default), `claude-opus-4-7`, or `claude-opus-4-6` (or an override the user approved — e.g. `claude-haiku-4-5` on a utility agent)
 
 If any validation check fails, report it and ask the user how to proceed before writing the Phase 7 report. Do not silently mask failures.
 

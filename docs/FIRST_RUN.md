@@ -155,7 +155,7 @@ Each probe is a single prompt to launch the named agent explicitly. Each takes u
 
 ## What this checklist does NOT cover
 
-- **Per-agent model access.** If your Anthropic account does not have access to `claude-opus-4-6`, the planning agents will fail when invoked. The static smoke test cannot detect this — you find out when `/agent-plan` halts. Fix: override the `model:` line in each planning agent file to a model you have access to (e.g., `claude-sonnet-4-6`).
+- **Per-agent model access.** If your Anthropic account does not have access to `claude-opus-4-8`, the agents will fail when invoked. The static smoke test cannot detect this — you find out when `/agent-plan` halts. Fix: override the `model:` line in each agent file to a model you have access to (`claude-opus-4-7` and `claude-opus-4-6` are the supported alternatives — see `docs/MODEL_OPTIMIZATION.md` for the per-model notes).
 - **Project-specific conventions.** This checklist verifies the template is wired up; it does not verify that your `CLAUDE.md`, `PRD.md`, or code conventions are accurate for your project. That is the user's responsibility.
 - **Full end-to-end run of a real milestone.** For that, run `/agent-plan` with a real feature description and follow it through `/agent-code`.
 

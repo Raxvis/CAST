@@ -49,6 +49,7 @@ These documents describe how the project is built and the conventions that gover
 | `FILE_CONVENTIONS.md` | Rules governing where each type of file and document belongs in the repository. Read before creating any new file. |
 | `ERROR_HANDLING.md` | Guidelines for handling errors across all error categories. Defines principles, patterns, and user-facing message standards. |
 | `TEST_FRAMEWORK.md` | Testing strategy, test runner setup, file conventions, coverage requirements, and best practices. |
+| `MODEL_OPTIMIZATION.md` | Model policy for the agent roster: the Claude Opus 4.x ladder, per-model behavior profiles, and the 4.6 → 4.7 → 4.8 upgrade checklists. |
 
 ---
 

@@ -9,7 +9,7 @@
 ---
 
 **Reviewer**: Performance Agent
-**Model**: claude-sonnet-4-6
+**Model**: claude-opus-4-8
 **Date**: 2026-04-08
 **Stage**: `/agent-plan` Stage 3b
 **Inputs Reviewed**:
