@@ -67,11 +67,21 @@ Extract and record:
 - **Project name** — from manifest `name` field or top-level directory
 - **Language** — from manifest
 - **Framework** — best guess from dependencies (React, Next.js, Express, Django, Flask, Rails, SwiftUI, etc.)
+- **Framework version** — from the dependency pin, if a framework was detected
 - **Test command** — from manifest scripts or convention (`npm test`, `pytest`, `cargo test`, `go test ./...`, etc.)
+- **Test runner** — the tool behind the test command (Vitest, Jest, pytest, go test, etc.)
 - **Dev command** — if present
 - **Build command** — if present
 - **Type check command** — if applicable (`tsc --noEmit`, `mypy`, etc.)
 - **Package manager** — `npm`, `pnpm`, `yarn`, `pip`, `poetry`, `cargo`, `go`, `bundle`, etc.
+- **Package manifest** — the manifest file itself (`package.json`, `pyproject.toml`, `Cargo.toml`, …)
+- **Dependency add command** — from the package manager (`npm install`, `pnpm add`, `poetry add`, `cargo add`, …)
+- **Config files** — type-checker config (`tsconfig.json`, `mypy.ini`) and framework/bundler config (`next.config.js`, `vite.config.ts`, `metro.config.js`) if present
+- **Persistence layer** — best guess from dependencies (SQLite, Postgres, Mongo, Redis, localStorage, flat files) or "none detected"
+- **State / navigation libraries** — if the dependency list names one (Redux, Zustand, React Router, GoRouter, …)
+- **Target platforms** — from the project type and manifests: web, iOS, Android, desktop, server, CLI (e.g. a React Native app → "iOS, Android"; a CLI → "macOS / Linux / any [LANGUAGE] runtime")
+
+These feed the substitution pass directly: each maps to a placeholder (`[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[FRAMEWORK_VERSION]`, `[TEST_CMD]`, `[TEST_RUNNER]`, `[DEV_SERVER_CMD]`, `[BUILD_CMD]`, `[TYPE_CHECK_CMD]`, `[PKG_MANAGER]`, `[PKG_MANIFEST]`, `[PKG_ADD_CMD]`, `[TYPE_CONFIG]`, `[FRAMEWORK_CONFIG]`, `[BUNDLER_CONFIG]`, `[PERSISTENCE_LAYER]`, `[STATE_LIBRARY]`, `[NAVIGATION_LIBRARY]`, `[TARGET_PLATFORMS]`). Record "unknown" rather than guessing — unknowns become Phase 3 questions or report TODOs, never invented values.
 
 Detect project type:
 
@@ -88,10 +98,13 @@ Read the top of the existing `README.md` for the project's one-sentence pitch. I
 ## 1.5 — Source code structure
 
 - Glob top-level directories and identify where source lives (`src/`, `lib/`, `app/`, `cmd/`, `pkg/`, etc.)
-- Note naming conventions: camelCase vs snake_case vs PascalCase vs kebab-case for file names
+- Map source subdirectories to their roles where identifiable — screens/pages (`[SCREEN_DIR]`), business logic (`[LOGIC_DIR]`), state management (`[STORE_DIR]`), UI components (`[COMPONENTS_DIR]`), hooks/providers (`[HOOKS_DIR]`), constants/config (`[CONSTANTS_DIR]`), static assets (`[ASSETS_DIR]`). Record only mappings the directory names or contents make clear; leave the rest unknown.
+- Note naming conventions: camelCase vs snake_case vs PascalCase vs kebab-case for file names (`[LOWER_CASE_CONVENTION]`, `[PASCAL_CASE_CONVENTION]`, `[UPPER_SNAKE_CONVENTION]`)
 - Note any existing test directory pattern (`tests/`, `test/`, `spec/`, colocated `*.test.ts`, etc.)
-- If there's a dominant language, note the file extension for source files
+- If there's a dominant language, note the file extension for source files (`[EXT]`)
 - Note any CI config (`.github/workflows/`, `.gitlab-ci.yml`, `circle.yml`) — helps confirm test/build commands
+
+**Domain tokens are asked, not detected.** `[DOMAIN_ENTITY]`, `[RESOURCE_TYPE]`, `[CORE_MECHANIC]`, `[PROGRESSION_UNIT]`, `[SAVE_KEY]`, `[SAVE_VERSION]`, and `[ONE_SENTENCE_PITCH]` (when no README pitch exists) cannot be inferred from code. Batch them into the Phase 3 plan's Ask section when a file that carries them is being installed; if the user declines to answer, leave the token and list it in the Phase 7 report.
 
 ## 1.6 — Write the inventory
 
@@ -117,19 +130,25 @@ Generated: <ISO date>
 ## Project metadata
 - **Name**: <detected or "unknown — prompt user">
 - **Language**: <detected>
-- **Framework**: <detected or "none">
+- **Framework**: <detected or "none"> (version: <detected or "—">)
 - **Project type**: <frontend / backend / CLI / library / mobile / data / mixed / unknown>
-- **Test command**: <detected>
+- **Test command**: <detected> (runner: <detected or "—">)
 - **Dev command**: <detected>
 - **Build command**: <detected>
 - **Type check command**: <detected>
-- **Package manager**: <detected>
+- **Package manager**: <detected> (manifest: <file>, add command: <cmd>)
+- **Config files**: <type-checker / framework / bundler configs or "—">
+- **Persistence layer**: <detected or "none detected">
+- **State / navigation libraries**: <detected or "—">
+- **Target platforms**: <detected>
 
 ## Source structure
 - Top-level directories: <list>
 - Source directory: <best guess>
+- Directory role mapping: <screens / logic / store / components / hooks / constants / assets, where identifiable>
 - Test directory: <best guess>
 - File naming convention: <best guess>
+- Source file extension: <best guess>
 
 ## Detected customizations to preserve
 - <description of any non-standard agent, pipeline, or doc the user has built>

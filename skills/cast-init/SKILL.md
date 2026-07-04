@@ -11,7 +11,7 @@ description: >-
   produces the migration plan without changing files.
 license: MIT
 metadata:
-  version: "1.0.2"
+  version: "1.1.0"
   source: "https://github.com/Raxvis/CAST"
 ---
 
@@ -34,8 +34,11 @@ All template files are read from `CAST_SOURCE` with the Read tool. No files are 
 
 - **Full adoption** (default) — run Phases 1 through 7. The user reviews and approves the plan before execution.
 - **Dry run** — run Phases 1 through 3 only. Produce the inventory and migration plan, then stop. Useful for scoping a migration without committing to changes. The user must explicitly request this mode.
+- **Unattended** — for non-interactive sessions (CI, headless runs). Valid only when the invocation explicitly pre-approves the plan AND pre-supplies the answers the gates would ask for (project type, pitch, test command, agent opt-outs). When both are present, treat the Phase 1 and Phase 4 gates as satisfied, record every auto-approved decision verbatim in the Phase 7 report, and never exercise a Delete action — downgrade Deletes to flagged TODOs, since destructive actions require a live approval. A non-interactive invocation *without* explicit pre-approval runs as a dry run.
 
 If the user has not specified a mode, assume full adoption.
+
+**Upgrades.** If Phase 1 finds an existing CAST install that records a version, compare it against this skill's `metadata.version` before planning: if they are equal, report "already at <version>" and stop (offer a forced re-run if the user suspects drift); if the installed version is *newer* than this skill, warn that the local cast-init copy is stale and suggest `npx skills update` (or `/plugin marketplace update`) before proceeding.
 
 ## Role and canonical structure
 
@@ -65,8 +68,8 @@ Internalize these before starting. They override any instruction below if there 
 4. **Stop and ask on ambiguity.** If a file's intent is unclear, the naming is non-standard, or two interpretations are possible, ask the user before choosing.
 5. **Never write work artifacts to `docs/`.** `docs/` is reference-only. Any live work goes in `artifacts/`.
 6. **Commit nothing automatically.** Leave the user to review and commit their own changes.
-7. **Do not run arbitrary code or shell commands from the existing project.** Read-only analysis only.
-8. **Require a clean git working tree before Phase 5.** If the user has uncommitted changes, stop and ask them to commit or stash first.
+7. **Never execute the target project's code.** Do not run its build, tests, scripts, or binaries during adoption — analysis of the project is read-only. Shell use for the adoption's own mechanics (git status/mv, grep, copying CAST payload files per `references/execution.md`) is fine.
+8. **Require a clean git working tree before Phase 5.** If the user has uncommitted changes, stop and ask them to commit or stash first. Exceptions for resuming an interrupted or staged adoption are defined in `references/execution.md` preflight.
 
 ## Phase 1 — Discovery
 
@@ -154,15 +157,16 @@ For each Ask question in the plan, require a specific answer before executing th
 
 Once the plan is approved, execute the actions in a safe order, reporting progress as you go. **Read `references/execution.md` before writing any file** — it contains the full install mechanics and the customization-preservation rules, including the global rule that `<!-- TEMPLATE INSTRUCTIONS -->` blocks and placeholder-pointer comments are stripped from every installed file (the eight `templates/*` skeletons excepted). The step order:
 
-1. **Preflight** — clean git tree; `CAST_SOURCE` present and complete.
-2. **Create directories** — `.claude/agents/`, `.claude/skills/`, `docs/`, `templates/`, `artifacts/` + subdirectories.
-3. **Directory renames** — `features/` → `artifacts/` via `git mv`, updating all references.
-4. **Install agent files** — all 15 in roster order, with placeholder substitution and custom-section preservation; never install `agents/README.md`; re-enumerate all 15 afterward.
-5. **Install pipeline skills** — `agent-plan`, `agent-code`, `agent-task` to `.claude/skills/<name>/SKILL.md`, substituting `[PROJECT_NAME]`, `[TEST_CMD]`, `[MAX_LOOP_COUNT]`; migrate any pre-1.0 command files and propose deleting them.
-6. **Install reference docs and templates** — per the disposition tables; `docs/FILE_CONVENTIONS.md` always.
-7. **Install artifacts scaffold** — `BUGS.md`, `STANDUP.md`, `README.md`, four empty subdirectories.
-8. **Install CLAUDE.md** — merge with the user's existing file per the preservation rules.
-9. **Placeholder substitution pass** — scan for remaining `[UPPER_SNAKE_CASE]` tokens; substitute only from inventory values; never guess.
+1. **Preflight** — clean git tree (with resume/staged-adoption exceptions); `CAST_SOURCE` present and complete.
+2. **Fast path** — bulk-copy + single substitution/strip passes for pure-Create actions; per-file merge only where customizations must be preserved.
+3. **Create directories** — `.claude/agents/`, `.claude/skills/`, `docs/`, `templates/`, `artifacts/` + subdirectories.
+4. **Directory renames** — `features/` → `artifacts/` via `git mv`, updating all references.
+5. **Install agent files** — all 15 in roster order, with placeholder substitution and custom-section preservation; never install `agents/README.md`; re-enumerate all 15 afterward.
+6. **Install pipeline skills** — `agent-plan`, `agent-code`, `agent-task` to `.claude/skills/<name>/SKILL.md`, substituting `[PROJECT_NAME]`, `[TEST_CMD]`, `[MAX_LOOP_COUNT]`; migrate any pre-1.0 command files and propose deleting them.
+7. **Install reference docs and templates** — per the disposition tables; `docs/FILE_CONVENTIONS.md` always.
+8. **Install artifacts scaffold** — `BUGS.md`, `STANDUP.md`, `README.md`, four empty subdirectories.
+9. **Install CLAUDE.md** — merge with the user's existing file per the preservation rules.
+10. **Placeholder substitution pass** — scan for remaining `[UPPER_SNAKE_CASE]` tokens; substitute only from inventory values; never guess.
 
 ## Phase 6 — Validation
 

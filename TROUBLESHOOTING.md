@@ -54,6 +54,25 @@ Common problems adopting or running this template, with the most likely cause an
 
 ---
 
+## My installed files still contain `[PLACEHOLDER]` tokens
+
+**Cause.** `/cast-init` substitutes every placeholder it can detect (tech stack, commands, platforms, directory roles) or that you answered during planning, but some tokens are undetectable domain values (`[DOMAIN_ENTITY]`, `[SAVE_KEY]`, …) and some are deliberate: per-use sub-template tokens (`[DATE]`, `[REPRODUCTION_STEPS]`, `[MILESTONE_NAME]`) are filled by agents each time a form or template is used and are supposed to remain.
+
+**Fix.**
+1. Open `artifacts/adoption-report.md` — the "Remaining TODOs" section lists every real unfilled placeholder from your install; per-use tokens are not defects.
+2. Fill the listed tokens by hand (they're stable project facts: domain entity, save key, budgets, etc.), or re-run `/cast-init` and answer the questions you skipped.
+3. If a token you expected to be auto-filled wasn't (e.g. `[TEST_CMD]` in a project with a test script), that's a discovery miss — file an issue on `Raxvis/CAST` with your project's manifest shape.
+
+---
+
+## Re-running `/cast-init` stops because the git tree is dirty after an interrupted run
+
+**Cause.** Adoption requires a clean git tree before Phase 5 (safety rule). A run that was interrupted mid-execution leaves its own half-written files uncommitted, which would block a naive re-run against its own output.
+
+**Fix.** Re-run `/cast-init` and say you want to resume. Preflight recognizes two resume cases: dirty files that match the prior run's `artifacts/adoption-plan.md` actions (it re-verifies each against the plan instead of demanding a stash), and a leftover `.cast-stage/` directory from a permission-blocked run (it offers to complete the move). Only files the plan does not account for still require a commit or stash — that's your work, not the adoption's.
+
+---
+
 ## `/agent-plan` or `/agent-code` is not recognized
 
 **Cause.** Claude Code registers skills from `.claude/skills/` at session start. If the directory did not exist when you started the session, or if the pipeline skills are not there yet, they will not appear. (Before CAST v1.0.0 the pipelines were slash commands in `.claude/commands/` — if you upgraded, the old files should have been migrated and removed by `/cast-init`.)

@@ -223,8 +223,7 @@ _Copy this block for each task review. Fill in every field. Do not skip sections
 
 ### Testing
 
-- [ ] Manually tested on [PLATFORM_1]
-- [ ] Manually tested on [PLATFORM_2]
+- [ ] Manually tested on each target platform ([TARGET_PLATFORMS])
 - [ ] Edge cases were tested, not just the happy path
 
 **Notes**:

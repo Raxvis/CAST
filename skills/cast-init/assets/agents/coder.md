@@ -13,7 +13,7 @@ HOW TO CUSTOMIZE:
 2. Replace [MILESTONE_*] with your actual milestone names.
 3. Replace [EXAMPLE_TASK] in the Pre-Handoff Example with a real or representative task name.
 4. Replace [EXAMPLE_FILE_*] and [EXAMPLE_MODULE_*] in the example with realistic names.
-5. Replace [PLATFORM_1], [PLATFORM_2] with the actual platforms your project targets.
+5. [TARGET_PLATFORMS] is substituted by /cast-init from the detected target platforms.
 6. The Pre-Handoff Checklist is the core quality gate — keep it intact. Copy it for each task.
 7. Update the Work Selection Strategy to match your project's actual priority rules.
 -->
@@ -140,8 +140,7 @@ _Copy this block for every task before submitting for Product review. Every item
 
 ### Functional Testing
 
-- [ ] Tested the happy path manually on [PLATFORM_1]
-- [ ] Tested the happy path manually on [PLATFORM_2]
+- [ ] Tested the happy path manually on each target platform ([TARGET_PLATFORMS])
 - [ ] Tested edge cases: empty / zero / null inputs
 - [ ] Tested edge cases: maximum / boundary values
 - [ ] Tested error states and failure scenarios
@@ -172,7 +171,7 @@ _Copy this block for every task before submitting for Product review. Every item
 - [ ] New logic is structured to be testable (pure functions, no hidden dependencies)
 - [ ] Existing tests (if any) still pass
 - [ ] New tests added for: [LIST_KEY_BEHAVIORS_TESTED]
-- [ ] Test coverage meets or exceeds [COVERAGE_TARGET]% for new code
+- [ ] Test coverage meets or exceeds the project coverage target for new code (80% default — thresholds live in tester.md)
 
 ### Performance
 
@@ -224,8 +223,7 @@ _This example shows a completed checklist. Replace [EXAMPLE_TASK] and all placeh
 
 ### Functional Testing
 
-- [x] Happy path tested on [PLATFORM_1]
-- [x] Happy path tested on [PLATFORM_2]
+- [x] Happy path tested on each target platform
 - [x] Edge case: [EDGE_CASE_1] — behaves correctly
 - [x] Edge case: [EDGE_CASE_2] — behaves correctly
 - [x] Error state: [ERROR_STATE_1] — surfaces appropriate feedback

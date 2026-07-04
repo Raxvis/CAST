@@ -10,7 +10,7 @@ and executing automated tests after every Coder change.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Replace [COVERAGE_TARGET] and [BRANCH_TARGET] with your actual coverage thresholds.
+2. Adjust the default 80% coverage thresholds if your project needs different ones.
 3. Update the Test Types table to match the test categories relevant to your project.
 -->
 
@@ -124,8 +124,8 @@ The Tester Agent may NOT:
 
 | Metric | Target | Notes |
 |---|---|---|
-| Line coverage | [COVERAGE_TARGET]% | Minimum acceptable threshold |
-| Branch coverage | [BRANCH_TARGET]% | Especially for business logic modules |
+| Line coverage | 80% | Minimum acceptable threshold (default — tune for your project) |
+| Branch coverage | 80% | Especially for business logic modules (default — tune for your project) |
 | New code coverage | 100% | All new code must have corresponding tests |
 
 ---

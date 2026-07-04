@@ -555,11 +555,11 @@ _Fill in with real metrics for your platform and workload._
 
 | Metric | Target | Notes |
 |---|---|---|
-| [STARTUP_METRIC] | [TARGET] | |
-| [TICK_METRIC] | [TARGET] | |
-| [RENDER_METRIC] | [TARGET] | |
-| [MEMORY_METRIC] | [TARGET] | |
-| [STORAGE_METRIC] | [TARGET] | |
+| Startup time | < 2s | Default — tune per platform |
+| Update/tick duration | < 16ms | Default — only for projects with a hot loop |
+| Frame render time | < 16ms | Default — only for projects that render UI |
+| Memory footprint | < 200MB | Default — tune per platform |
+| Local storage use | < 50MB | Default — tune per platform |
 
 _For current values and status, see `performance.md` → Performance Budget Tracking._
 

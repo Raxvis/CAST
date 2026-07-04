@@ -11,8 +11,8 @@ provides feedback directly to Architecture.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. Replace [STARTUP_METRIC], [TICK_METRIC], [RENDER_METRIC], [MEMORY_METRIC], [STORAGE_METRIC]
-   and their [TARGET] values with your actual performance metrics.
+2. The Performance Budget Tracking table ships with default targets — replace them
+   with your actual performance metrics and budgets.
 3. The Performance Budget Tracking table mirrors targets defined in architect.md — keep them
    in sync.
 -->
@@ -140,11 +140,11 @@ _This is the canonical live tracking table. Targets are defined by Architecture 
 
 | Metric | Target | Current | Status | Notes |
 |---|---|---|---|---|
-| [STARTUP_METRIC] | [TARGET] | — | — | |
-| [TICK_METRIC] | [TARGET] | — | — | |
-| [RENDER_METRIC] | [TARGET] | — | — | |
-| [MEMORY_METRIC] | [TARGET] | — | — | |
-| [STORAGE_METRIC] | [TARGET] | — | — | |
+| Startup time | < 2s | — | — | Default — tune per platform |
+| Update/tick duration | < 16ms | — | — | Default — only for projects with a hot loop |
+| Frame render time | < 16ms | — | — | Default — only for projects that render UI |
+| Memory footprint | < 200MB | — | — | Default — tune per platform |
+| Local storage use | < 50MB | — | — | Default — tune per platform |
 
 ---
 

@@ -28,8 +28,22 @@ Files that were written directly (typically `docs/`, `templates/`, `artifacts/`,
 
 Verify:
 
-1. Git working tree is clean (`git status` returns nothing modified or staged). If not, stop and ask the user to commit or stash.
+1. Git working tree is clean (`git status` returns nothing modified or staged). Two exceptions, both requiring user confirmation before proceeding:
+   - **Resuming an interrupted adoption**: if the only dirty files are ones the prior CAST run wrote (cross-check against the existing `artifacts/adoption-plan.md`), offer to resume — re-verify each already-written file against its planned action instead of demanding a stash. Anything dirty that the plan does not account for still blocks.
+   - **Completing a staged adoption**: if `.cast-stage/` exists from a prior permission-blocked run, offer to complete the move per the staging rule below instead of starting over.
+   Otherwise, stop and ask the user to commit or stash.
 2. `CAST_SOURCE` (resolved in SKILL.md as `<CAST_SKILL_DIR>/assets`) exists and contains `agents/`, `skills/`, `docs/`, `templates/`, `artifacts/`, and `root/`. If missing, stop — the cast-init install is incomplete; ask the user to re-install with `npx skills add Raxvis/CAST` or `/plugin install cast@cast`.
+
+## 5.1a — Fast path for pure-Create actions
+
+Most greenfield adoptions are dominated by **Create** actions with no merge work. Do not read-and-retype those files one at a time. Instead:
+
+1. Copy the payload subtrees mechanically with shell (`cp -R "<CAST_SOURCE>/docs/." docs/` etc., or per-file `cp` driven by the plan's Create list). This is permitted: the safety rule forbids executing the *target project's* code, not using the shell to copy CAST's own payload files.
+2. Run **one substitution pass** over the copied files, replacing every token listed in 5.4.2 with its inventory value (e.g. a scripted find-and-replace per token).
+3. Run **one scaffolding-strip pass** over the copied files per the global strip rule (skip the eight `templates/*` skeletons).
+4. Spot-check one file per class (an agent, a pipeline skill, a doc) to confirm substitution and strip landed, then rely on Phase 6 validation for full coverage.
+
+The per-file read-merge-write procedure in 5.4–5.8 remains **required** for every Rename+Update and Update-in-place action — customization preservation cannot be done mechanically. Never bulk-copy over an existing file.
 
 ## 5.2 — Create directories
 
@@ -46,7 +60,7 @@ Walk the canonical 15-agent list in the order given by the roster table in `rost
 For each agent:
 
 1. Read the CAST agent file from `<CAST_SOURCE>/agents/<name>.md`. **Never install `<CAST_SOURCE>/agents/README.md`** — it is payload documentation, and a `.claude/agents/README.md` would be registered as a bogus subagent.
-2. Substitute detected project values: `[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[TEST_CMD]`, `[DEV_SERVER_CMD]`, `[BUILD_CMD]`, and any others from the inventory.
+2. Substitute every placeholder that has a collected inventory value — identity (`[PROJECT_NAME]`, `[PROJECT_TYPE]`, `[ONE_SENTENCE_PITCH]`), tech (`[LANGUAGE]`, `[FRAMEWORK]`, `[FRAMEWORK_VERSION]`, `[EXT]`, `[STATE_LIBRARY]`, `[NAVIGATION_LIBRARY]`, `[PERSISTENCE_LAYER]`, `[TEST_RUNNER]`), commands (`[TEST_CMD]`, `[DEV_SERVER_CMD]`, `[BUILD_CMD]`, `[TYPE_CHECK_CMD]`), packaging (`[PKG_MANAGER]`, `[PKG_MANIFEST]`, `[PKG_ADD_CMD]`, `[TYPE_CONFIG]`, `[FRAMEWORK_CONFIG]`, `[BUNDLER_CONFIG]`), platforms (`[TARGET_PLATFORMS]`), structure (`[SCREEN_DIR]`, `[LOGIC_DIR]`, `[STORE_DIR]`, `[COMPONENTS_DIR]`, `[HOOKS_DIR]`, `[CONSTANTS_DIR]`, `[ASSETS_DIR]`), and conventions (`[LOWER_CASE_CONVENTION]`, `[PASCAL_CASE_CONVENTION]`, `[UPPER_SNAKE_CONVENTION]`). Domain tokens the user answered in Phase 3 substitute too; unanswered ones stay and go in the report.
 3. If the action is **Create**: write to `.claude/agents/<name>.md` directly.
 4. If the action is **Rename + Update**: read the existing file first, identify custom sections (anything not in CAST's standard section list), write the CAST template as the base, insert custom sections as an appendix after the standard sections, then move the old file to the new canonical name.
 5. If the action is **Update in place**: read the existing file, identify custom sections, replace CAST-owned sections with CAST's current versions, leave custom sections untouched.

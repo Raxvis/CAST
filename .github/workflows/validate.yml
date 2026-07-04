@@ -1,0 +1,72 @@
+name: Validate template
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version fields are synchronized (README, CHANGELOG, plugin.json, SKILL.md)
+        run: |
+          readme_badge=$(grep -oE 'template-v[0-9]+\.[0-9]+\.[0-9]+' README.md | head -1 | sed 's/template-v//')
+          readme_hero=$(grep -oE 'Current template version: `v[0-9]+\.[0-9]+\.[0-9]+`' README.md | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          changelog=$(grep -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          plugin=$(grep -oE '"version": "[0-9]+\.[0-9]+\.[0-9]+"' .claude-plugin/plugin.json | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          skill=$(grep -oE 'version: "[0-9]+\.[0-9]+\.[0-9]+"' skills/cast-init/SKILL.md | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "README badge=$readme_badge hero=$readme_hero CHANGELOG=$changelog plugin.json=$plugin SKILL.md=$skill"
+          test -n "$readme_badge"
+          test "$readme_badge" = "$readme_hero"
+          test "$readme_badge" = "$changelog"
+          test "$readme_badge" = "$plugin"
+          test "$readme_badge" = "$skill"
+
+      - name: SKILL.md stays under 500 lines
+        run: |
+          lines=$(wc -l < skills/cast-init/SKILL.md)
+          echo "skills/cast-init/SKILL.md: $lines lines"
+          test "$lines" -lt 500
+
+      - name: Skill frontmatter name matches directory name
+        run: |
+          fail=0
+          for f in skills/cast-init/SKILL.md skills/cast-init/assets/skills/*/SKILL.md; do
+            dir=$(basename "$(dirname "$f")")
+            name=$(awk '/^name:/{print $2; exit}' "$f")
+            echo "$f: name=$name dir=$dir"
+            [ "$name" = "$dir" ] || { echo "MISMATCH in $f"; fail=1; }
+          done
+          exit $fail
+
+      - name: Agent frontmatter matches the canonical roster
+        run: |
+          fail=0
+          for f in skills/cast-init/assets/agents/*.md; do
+            [ "$(basename "$f")" = "README.md" ] && continue
+            name=$(awk '/^name:/{print $2; exit}' "$f")
+            desc=$(awk -F'description: ' '/^description:/{print $2; exit}' "$f" | tr -d '"')
+            grep -qF "| \`$name\` |" skills/cast-init/references/roster.md || { echo "$name missing from roster.md"; fail=1; }
+            grep -qF "$desc" skills/cast-init/references/roster.md || { echo "$name description drifted from roster.md"; fail=1; }
+          done
+          count=$(ls skills/cast-init/assets/agents/*.md | grep -cv README.md)
+          echo "agent files: $count"
+          [ "$count" -eq 15 ] || { echo "expected 15 agents, found $count"; fail=1; }
+          exit $fail
+
+      - name: Payload and example contain no pre-1.0 references
+        run: |
+          hits=$(grep -rln 'PROMPT\.md\|\.claude/commands\|slash command' \
+            skills/cast-init/assets/ example/ || true)
+          if [ -n "$hits" ]; then
+            echo "Stale pre-1.0 references found in:"; echo "$hits"; exit 1
+          fi
+          echo "clean"
+
+      - name: Plugin manifests are valid JSON
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('.claude-plugin/plugin.json','utf8')); console.log('plugin.json ok')"
+          node -e "JSON.parse(require('fs').readFileSync('.claude-plugin/marketplace.json','utf8')); console.log('marketplace.json ok')"

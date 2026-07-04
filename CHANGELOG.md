@@ -8,6 +8,30 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [1.1.0] — 2026-07-03
+
+The adoption-workflow batch from the post-1.0 review: fewer surviving placeholders, a much faster Phase 5, and specified behavior for unattended runs, interrupted runs, and repeat runs.
+
+### Added
+
+- **Expanded discovery** (`references/discovery.md`): Phase 1 now also collects framework version, test runner, package manifest, dependency-add command, type-checker/framework/bundler config files, persistence layer, state/navigation libraries, target platforms, source-directory role mapping (screens/logic/store/components/hooks/constants/assets), naming conventions, and source-file extension — each mapped to its placeholder. Domain tokens (`[DOMAIN_ENTITY]`, `[SAVE_KEY]`, …) are explicitly asked in the Phase 3 plan, never guessed. The Phase 5 substitution list covers all of it.
+- **Phase 5 fast path** (`references/execution.md` §5.1a): pure-Create actions are bulk-copied with shell, then one substitution pass + one scaffolding-strip pass — the per-file read-merge-write loop is reserved for actions that preserve customizations. Safety rule 7 reworded to its actual intent: never *execute* the target project's code (shell for the adoption's own mechanics is fine).
+- **Unattended mode** (SKILL.md): non-interactive runs are valid only with explicit pre-approval plus pre-supplied answers; auto-approved decisions are recorded in the report; Delete actions are never exercised unattended. Without pre-approval, non-interactive runs behave as dry runs.
+- **Resume support**: preflight recognizes an interrupted adoption (dirty files matching the prior `adoption-plan.md`) and a leftover `.cast-stage/` from a permission-blocked run, and offers to resume/complete instead of demanding a stash.
+- **Version-aware re-runs** (SKILL.md): if the installed CAST version equals the skill's `metadata.version`, report and stop; if the install is newer than the skill, warn that the local cast-init copy is stale.
+- **Per-use placeholder whitelist** (`references/validation.md`): the Phase 6 placeholder scan now has a definitive list of deliberate sub-template tokens instead of judgment calls.
+- **CI enforcement** (`.github/workflows/validate.yml`): version sync across the four locations, SKILL.md <500-line cap, skill frontmatter name==directory, agent-frontmatter-vs-roster drift, payload/example pre-1.0-reference scan, and manifest JSON validity.
+- **"Keeping CAST up to date"** section in the README and a FIRST_RUN note covering `skills-lock.json` (commit it) and the default symlink install (`--copy` to avoid).
+- **TROUBLESHOOTING entries**: "installed files still contain `[PLACEHOLDER]` tokens" and "re-run stops on a dirty tree after an interruption."
+
+### Changed
+
+- **Payload defaults instead of dead tokens**: `tester.md` ships 80% line/branch coverage defaults; `performance.md` and `architect.md` performance-budget tables ship concrete default targets (2s startup, 16ms tick/render, 200MB memory, 50MB storage) marked "tune per project"; `coder.md`/`product.md` checklists say "each target platform (`[TARGET_PLATFORMS]`)" instead of `[PLATFORM_1]`/`[PLATFORM_2]`; `bug-gatherer.md`'s platform example uses `[TARGET_PLATFORMS]`. All of these previously survived installs as bare tokens whose only explanation was in the stripped comment block.
+
+### Migration
+
+- Existing installs: optional. Re-running `/cast-init` picks up the improved substitutions and the defaulted checklists/tables; your customized values are preserved by the merge rules. No paths change.
+
 ## [1.0.2] — 2026-07-03
 
 Consistency batch from the post-1.0 review sweep. No pipeline or agent behavior changes — this release corrects stale wording that predated the v0.10.0 `templates/` split and the v1.0.0 commands→skills conversion, closes two specification gaps, and adds two Phase 6 validation checks.

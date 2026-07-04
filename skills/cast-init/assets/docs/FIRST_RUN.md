@@ -153,6 +153,12 @@ Each probe is a single prompt to launch the named agent explicitly. Each takes u
 
 ---
 
+## A note on the cast-init skill itself
+
+Keep `.claude/skills/cast-init` installed — it is the upgrade mechanism (`npx skills update` or `/plugin marketplace update`, then re-run `/cast-init`). If it was installed via `npx skills`, two artifacts are normal: a `skills-lock.json` at the project root (commit it — it pins the skill revision for teammates) and the skill directory being a symlink into `.agents/skills/` (harmless; use `npx skills add --copy` if your tooling doesn't follow symlinks).
+
+---
+
 ## What this checklist does NOT cover
 
 - **Per-agent model access.** If your Anthropic account does not have access to `claude-opus-4-8`, the agents will fail when invoked. The static smoke test cannot detect this — you find out when `/agent-plan` halts. Fix: override the `model:` line in each agent file to a model you have access to (`claude-opus-4-7` and `claude-opus-4-6` are the supported alternatives — see `docs/MODEL_OPTIMIZATION.md` for the per-model notes).

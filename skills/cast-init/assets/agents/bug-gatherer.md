@@ -145,7 +145,7 @@ _These fields must be present in every bug report. Ask for them if missing._
 | Steps to Reproduce | Numbered steps from a clean state | "1. Open the app. 2. Navigate to [SCREEN]. 3. Tap [ELEMENT]." |
 | Expected Result | What should have happened | "The [ELEMENT] should [CORRECT_BEHAVIOR]" |
 | Actual Result | What actually happened | "Instead, [INCORRECT_BEHAVIOR]" |
-| Platform | The device, OS, or environment where it occurred | [PLATFORM_1], [PLATFORM_2], etc. |
+| Platform | The device, OS, or environment where it occurred | [TARGET_PLATFORMS] |
 | Build / Version | The version of the product where it was observed | Milestone name, version number, or commit |
 
 ---

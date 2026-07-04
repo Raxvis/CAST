@@ -10,7 +10,7 @@
 
 > **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three pipeline skills, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v1.0.2-blue)
+![Template version](https://img.shields.io/badge/template-v1.1.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
 
@@ -55,7 +55,7 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 - **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v1.0.2` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v1.1.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
@@ -99,7 +99,18 @@ This works for greenfield projects, existing projects with no agentic workflow, 
 
 1. Walk through [`docs/FIRST_RUN.md`](skills/cast-init/assets/docs/FIRST_RUN.md) (installed to your project's `docs/`) for the interactive checklist (`/agents`, `/agent-plan` dry run, optional per-agent smoke probes).
 2. Commit the populated template as your first commit.
-3. Keep the cast-init skill installed — `npx skills update` (or `/plugin marketplace update`) followed by re-running `/cast-init` is the upgrade path for future CAST releases.
+
+### Keeping CAST up to date
+
+Keep the cast-init skill installed after adoption — it is also the upgrade mechanism:
+
+1. `npx skills update` refreshes the skill to the latest content of this repo (updates are content-hash based, not semver). Plugin installs use `/plugin marketplace update` instead.
+2. Re-run `/cast-init`. It detects your installed CAST version, short-circuits if you're already current, and otherwise proposes a migration plan that preserves your customizations.
+
+Two operational notes about the `npx skills` route:
+
+- It writes a **`skills-lock.json`** at your project root recording the skill's source and content hash. Commit it — it is designed for deterministic team installs (a teammate runs `npx skills add` and gets the same revision).
+- By default the skill is installed as a **symlink**: the real copy lives in `.agents/skills/cast-init` and `.claude/skills/cast-init` points at it. Pass `--copy` to `npx skills add` if you prefer a real copy (e.g. your tooling doesn't follow symlinks).
 
 ---
 
