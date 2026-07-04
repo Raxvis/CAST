@@ -1,0 +1,14 @@
+{
+  "name": "cast",
+  "version": "1.0.0",
+  "description": "CAST — Claude Agent Staged Team. Installs a staged multi-agent development workflow into your project via the /cast-init skill: 15 specialist subagents, /agent-plan, /agent-code, /agent-task, and a docs/templates/artifacts scaffold.",
+  "author": {
+    "name": "Raxvis",
+    "url": "https://github.com/Raxvis"
+  },
+  "homepage": "https://github.com/Raxvis/CAST",
+  "repository": "https://github.com/Raxvis/CAST",
+  "license": "MIT",
+  "keywords": ["agents", "workflow", "multi-agent", "planning", "claude-code"],
+  "skills": ["./skills/cast-init"]
+}
