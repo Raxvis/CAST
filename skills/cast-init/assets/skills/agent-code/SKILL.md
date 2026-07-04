@@ -90,10 +90,10 @@ Before any task begins:
 
 For each task, execute the engineering loop defined in `docs/PIPELINE_LOOP.md` — Coder → Tester → Reviewer (with the Defect and Issue routing) → Product validation — including its loop-counter rules, test-gate rule, and Environment Issue rule. The loop doc is the single canonical statement of that sequence; do not improvise routing.
 
-Inputs specific to this skill, passed into the loop:
+Inputs specific to this skill, passed into the loop per the loop doc's pass-forward rule (read once in Pre-Flight/Task Selection, supply the content to each stage — don't have each agent re-open the same files):
 
-- **Coder (Step 1)** reads the task definition from the task breakdown, the architecture document (`artifacts/architecture/arch-milestone-{N}.md`), the UI specification (`artifacts/ui-specs/ui-milestone-{N}.md`), and any Approval Conditions extracted in Pre-Flight, and follows the conventions in `CLAUDE.md`, `docs/CODE_PATTERNS.md`, and `docs/FILE_CONVENTIONS.md`.
-- **Reviewer (Step 3)** reviews against the architecture document, the UI specification, project conventions, and the CEO's Approval Conditions.
+- **Coder (Step 1)** receives the task definition from the task breakdown, the architecture document (`artifacts/architecture/arch-milestone-{N}.md`), the UI specification (`artifacts/ui-specs/ui-milestone-{N}.md`), and any Approval Conditions extracted in Pre-Flight, and follows the conventions in `CLAUDE.md`, `docs/CODE_PATTERNS.md`, and `docs/FILE_CONVENTIONS.md`.
+- **Reviewer (Step 3)** receives the same architecture document, UI specification, and Approval Conditions, and reviews against them plus project conventions.
 - **Product validation (Step 4)** validates against the task's acceptance criteria using the Task Validation Checklist in `templates/MILESTONE_VALIDATION.md`.
 
 ### Completion

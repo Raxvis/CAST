@@ -164,16 +164,13 @@ When in doubt, read `docs/FILE_CONVENTIONS.md` and `artifacts/README.md`.
 ## Memory Imports
 
 These documents are loaded into Claude Code's context at every session start. They
-provide the baseline context all agents need. Customize based on your project's needs —
-add docs your agents frequently reference, remove any that don't apply.
+provide the baseline context all agents need. Keep this list lean — every import is
+paid in every session. The Directory Conventions section above already covers where
+files live; agents read the detailed reference docs on demand by path.
 
-<!-- Core context — keep all of these -->
-@import docs/README.md
+<!-- Core context — keep these -->
 @import docs/PRD.md
 @import docs/CODE_PATTERNS.md
-@import docs/FILE_CONVENTIONS.md
-@import docs/ERROR_HANDLING.md
-@import artifacts/README.md
 
 <!-- Topic-specific context — keep the one(s) that match your project type, delete the rest.
      These files ship with the template and can be edited freely.
@@ -181,6 +178,14 @@ add docs your agents frequently reference, remove any that don't apply.
 @import docs/BACKEND.md
 @import docs/CLI.md
 @import docs/MOBILE.md
+-->
+
+<!-- On-demand reference — agents read these by path when a task calls for them
+     (coder/docs-writer: FILE_CONVENTIONS; coder/reviewer: ERROR_HANDLING; tester:
+     TEST_FRAMEWORK; navigation: docs/README.md, artifacts/README.md). Uncomment an
+     import only if your sessions repeatedly need one unprompted:
+@import docs/FILE_CONVENTIONS.md
+@import docs/ERROR_HANDLING.md
 -->
 
 <!-- Add once they contain real project content:

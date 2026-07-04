@@ -45,7 +45,7 @@ The **Tier** column indicates which Minimum Viable Agent Set tier each agent bel
 | Debugger | `debugger.md` | T2 | Investigates defects Product triages as fix-now. Updates the bug record with root-cause analysis for Coder. |
 | Refactor | `refactor.md` | T3 | Improves code structure without changing behaviour. Triggered by Reviewer issues. Flows back to Reviewer on completion. |
 | Bug Gatherer | `bug-gatherer.md` | T3 | Collects and structures bug reports from Debugger and other sources. Produces standardized reports that Product triages. |
-| Docs Writer | `docs-writer.md` | T2 | Produces and maintains developer-facing documentation. Runs after any other agent completes work. Accepts direct user input. |
+| Docs Writer | `docs-writer.md` | T2 | Produces and maintains developer-facing documentation. Runs at task- and milestone-completion checkpoints. Accepts direct user input. |
 | Release | `release.md` | T5 | Owns release preparation: changelogs, versioning, and build verification. Installed by default; drop only for scratch projects that never cut a release. |
 | Validator | `validator.md` | T5 | Owns the process. Enforces agent protocols, resolves conflicts between agents, tracks milestone progress, and runs retrospectives. Installed by default; drop only for strict single-developer workflows with no agent-vs-agent escalation. |
 
@@ -238,7 +238,7 @@ Run per task within the approved milestone:
    - **Defects** — route to **Bug Gatherer** (files the report, status New) → **Product** (triages, sets final severity, status Triaged) → if fix-now, **Debugger** (investigates root cause, status In Progress). The defect then returns to Coder with the root-cause analysis.
    - **Issues** — route to **Refactor**. Refactor hands off back to **Tester** and **Reviewer** until the issue is resolved.
 4. **Product** validates the finished task against its acceptance criteria. On rejection, work returns to Coder.
-5. **Docs Writer** updates documentation after each agent completes work.
+5. **Docs Writer** updates documentation at the task- and milestone-completion checkpoints, draining the `docs:` queue in `artifacts/STANDUP.md`.
 6. **Validator** records the outcome in the process log.
 7. After every task in the milestone is complete, **Release** prepares changelog, versioning, and build verification, and **Validator** runs the milestone retrospective.
 

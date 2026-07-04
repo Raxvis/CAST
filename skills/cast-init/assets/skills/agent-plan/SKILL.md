@@ -59,6 +59,8 @@ The argument text the user provided when invoking this skill (e.g. `/agent-plan 
 
 This skill orchestrates the **Planning Stage** of the agent workflow. It runs the agents in the order below, each building on the previous agent's output. All outputs are planning documents under `artifacts/` — no production code is modified and nothing is written to `docs/`.
 
+**Pass inputs forward.** Each stage's "Input to pass" means include the content in the agent's invocation — read each artifact once as it is produced and hand it to the consuming stages. Do not make every agent independently re-open files the orchestrator has already read; an agent re-reads a file itself only when it needs sections that were not supplied.
+
 ### Stage 1 — Product
 
 Launch the **product** agent to:
@@ -70,7 +72,7 @@ Launch the **product** agent to:
 
 The two files are deliberately separate: the definition is the CEO's primary read during planning review, the breakdown is the Coder's primary read during engineering. Keeping them in separate files means each audience can find what they need without scrolling past the other.
 
-Input to pass:
+Input to pass ("pass" means include the content in the agent's invocation — do not make each stage re-open files the orchestrator already read):
 - Feature request: the invocation input
 - Output directory: `artifacts/milestones/`
 - Templates: `templates/MILESTONE_DEFINITION.md` (for the definition file) and `templates/MILESTONE_TASKS.md` (for the task breakdown)

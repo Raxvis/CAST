@@ -34,6 +34,12 @@ The loop may cycle. One full cycle is any return to Step 1 (Coder) or any Refact
 
 Tester must pass before Reviewer runs. No exceptions. This gate also applies inside the Issue subloop: after Refactor hands off, Tester re-runs before Reviewer re-reviews.
 
+**Targeted re-runs inside the loop.** Within Defect/Issue cycles, Tester runs the targeted test set for the affected modules (Refactor's handoff names the tests to re-run; for Defect fixes, the tests covering the changed code). The **full `[TEST_CMD]` suite** still gates Step 4 (Product validation) and the orchestrating skill's completion step — k loop iterations must not cost k full-suite runs.
+
+## Pass-forward rule
+
+The orchestrating skill reads the task's input artifacts (task definition, architecture document, UI spec, Approval Conditions, convention docs) **once**, at task start, and passes the relevant content into each stage's invocation. Do not instruct Coder, Tester, and Reviewer to each independently re-open the same files — that pays the same read three times per cycle. An agent re-reads a file itself only when it needs sections the orchestrator did not supply.
+
 ## Environment Issue rule
 
 If tests fail due to environment rather than code, Tester flags the failure as "Environment Issue" instead of failing the gate on the code. In `/agent-code`, the Validator escalation protocol applies (Validator pauses the test gate until infrastructure is resolved) and Coder is not blocked from continuing other work. In `/agent-task`, there is no Validator in the loop — the user decides whether to continue.
@@ -53,7 +59,7 @@ Launch the **coder** agent to:
 After Coder hands off, launch the **tester** agent to:
 
 - Write or update unit tests covering the changed code.
-- Run `[TEST_CMD]` to verify all tests pass.
+- Run `[TEST_CMD]` to verify all tests pass (first cycle); on subsequent cycles within the loop, run the targeted set per the test gate rule.
 - If tests fail, return findings to Coder (loop back to Step 1).
 
 ## Step 3 — Reviewer
@@ -77,8 +83,8 @@ For every Reviewer finding classified as a **Defect**:
 
 For every Reviewer finding classified as an **Issue**:
 
-1. Launch the **refactor** agent to restructure the code without changing behaviour, citing the architectural principle or quality standard that justifies the change.
-2. After Refactor hands off, **Tester re-runs first** (test gate rule), then return to **Reviewer** (loop back to Step 3) to confirm the issue is resolved.
+1. Launch the **refactor** agent to restructure the code without changing behaviour, citing the architectural principle or quality standard that justifies the change. Refactor's handoff names the tests to re-run for the affected modules.
+2. After Refactor hands off, **Tester re-runs first** (targeted set, per the test gate rule), then return to **Reviewer** (loop back to Step 3) to confirm the issue is resolved.
 
 Step 3a and Step 3b may run in parallel when the findings are independent. A task does not advance to Step 4 until the Reviewer has approved a clean version.
 
