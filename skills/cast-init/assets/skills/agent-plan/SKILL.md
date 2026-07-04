@@ -1,38 +1,48 @@
+---
+name: agent-plan
+description: >-
+  Run the CAST Planning Stage end-to-end for a feature or milestone: Product →
+  Architecture + UI → Security + Performance → CEO verdict. Use when the user asks to
+  plan a feature or milestone, or invokes /agent-plan. Produces planning documents
+  under artifacts/ and a CEO sign-off; writes no code.
+---
+
 <!-- TEMPLATE INSTRUCTIONS
-PURPOSE: This file defines the /agent-plan slash command. It runs the Planning Stage of the
+PURPOSE: This file defines the /agent-plan pipeline skill. It runs the Planning Stage of the
 multi-agent workflow end-to-end: Product → (Architecture + UI) → (Security + Performance) →
 CEO. No code is written — the stage produces planning documents only.
 
-All work artifacts are written to `artifacts/`. Templates are read from `docs/`. Never mix
-the two: `docs/` is reference-only, `artifacts/` is where live work lives.
+All work artifacts are written to `artifacts/`. Templates are read from `templates/`;
+guidelines are read from `docs/`. Never mix them: `docs/` and `templates/` are
+reference-only, `artifacts/` is where live work lives.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
 2. If your project uses milestone identifiers other than `{N}` (numeric), update the
    filename patterns below (e.g., swap `milestone-{N}-{slug}` for `M{N}-{slug}`).
-3. Delete this comment block once the command is customized for your project.
+3. Delete this comment block once the skill is customized for your project.
 
-INSTALLATION: Copy this file to `.claude/commands/agent-plan.md` in your target project.
-Claude Code registers any file in `.claude/commands/` as a slash command named after the
-file. Invoke it with `/agent-plan <feature description or milestone>`.
+INSTALLATION: This skill installs to `.claude/skills/agent-plan/SKILL.md` in your target
+project (done automatically by /cast-init). Claude Code registers it as the /agent-plan
+skill. Invoke it with `/agent-plan <feature description or milestone>`.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # /agent-plan — Feature Planning Pipeline
 
-Run the planning stage for a new feature or milestone. Produces milestone definitions, architecture documents, UI specifications, security and performance findings, and a CEO sign-off. No code is written. Every artifact produced by this command is written to `artifacts/`; templates are read from `docs/`.
+Run the planning stage for a new feature or milestone. Produces milestone definitions, architecture documents, UI specifications, security and performance findings, and a CEO sign-off. No code is written. Every artifact produced by this skill is written to `artifacts/`; templates are read from `templates/`.
 
 ## Related agent files
 
-This command invokes the following agents. Open any of them for the full role definition, authority boundaries, and output format:
+This skill invokes the following agents. Open any of them for the full role definition, authority boundaries, and output format:
 
-- [product](../agents/product.md) — defines milestone scope, goals, and acceptance criteria; writes the milestone definition and task breakdown
-- [architect](../agents/architect.md) — produces the milestone architecture document, data schemas, and module boundaries
-- [ui](../agents/ui.md) — produces the milestone UI specification and interaction states
-- [security](../agents/security.md) — reviews the architecture for vulnerabilities and files findings
-- [performance](../agents/performance.md) — reviews the architecture for performance budget violations and files findings
-- [ceo](../agents/ceo.md) — reads every prior artifact and issues the APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED verdict
+- [product](../../agents/product.md) — defines milestone scope, goals, and acceptance criteria; writes the milestone definition and task breakdown
+- [architect](../../agents/architect.md) — produces the milestone architecture document, data schemas, and module boundaries
+- [ui](../../agents/ui.md) — produces the milestone UI specification and interaction states
+- [security](../../agents/security.md) — reviews the architecture for vulnerabilities and files findings
+- [performance](../../agents/performance.md) — reviews the architecture for performance budget violations and files findings
+- [ceo](../../agents/ceo.md) — reads every prior artifact and issues the APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED verdict
 
 ## Model Compatibility
 
@@ -42,13 +52,13 @@ Each stage runs on the model pinned in that agent's file (default: `claude-opus-
 - **Opus 4.6** — this model over-delegates; invoke only the agents named in the stages below and spawn no ad-hoc subagents beyond them.
 - **Effort** — run planning stages at `high` reasoning effort, and the Architecture stage at `xhigh` on Opus 4.7+ (Opus 4.6 caps at `high`).
 
-## Arguments
+## Input
 
-- `$ARGUMENTS`: Required. Description of the feature to plan, or an existing milestone identifier to re-plan.
+The argument text the user provided when invoking this skill (e.g. `/agent-plan add dark mode`) — a description of the feature to plan, or an existing milestone identifier to re-plan. If none was provided, ask for one before Stage 1.
 
 ## Instructions
 
-This command orchestrates the **Planning Stage** of the agent workflow. It runs the agents in the order below, each building on the previous agent's output. All outputs are planning documents under `artifacts/` — no production code is modified and nothing is written to `docs/`.
+This skill orchestrates the **Planning Stage** of the agent workflow. It runs the agents in the order below, each building on the previous agent's output. All outputs are planning documents under `artifacts/` — no production code is modified and nothing is written to `docs/`.
 
 ### Stage 1 — Product
 
@@ -62,7 +72,7 @@ Launch the **product** agent to:
 The two files are deliberately separate: the definition is the CEO's primary read during planning review, the breakdown is the Coder's primary read during engineering. Keeping them in separate files means each audience can find what they need without scrolling past the other.
 
 Input to pass:
-- Feature request: `$ARGUMENTS`
+- Feature request: the invocation input
 - Output directory: `artifacts/milestones/`
 - Templates: `templates/MILESTONE_DEFINITION.md` (for the definition file) and `templates/MILESTONE_TASKS.md` (for the task breakdown)
 
@@ -119,7 +129,7 @@ Both Security and Performance must complete before Stage 4 begins. If either req
 After Security, Performance, and UI have all completed, launch the **ceo** agent to:
 
 1. Read every Stage 1–3 artifact: milestone definition, architecture document, UI specification, security findings, and performance findings.
-2. Apply the CEO Review Checklist from `agents/ceo.md`.
+2. Apply the CEO Review Checklist from `.claude/agents/ceo.md`.
 3. Save the review to `artifacts/reviews/ceo-review-milestone-{N}.md`.
 4. Produce a verdict: **APPROVED**, **APPROVED WITH CONDITIONS**, or **REVISION REQUIRED**.
 

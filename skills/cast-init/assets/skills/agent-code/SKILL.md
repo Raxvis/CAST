@@ -1,47 +1,58 @@
+---
+name: agent-code
+description: >-
+  Run the CAST Engineering Stage for a CEO-approved milestone: Coder → Tester →
+  Reviewer, with Defects routed through Debugger → Bug Gatherer → Product and Issues
+  through Refactor → Reviewer, then Product validation. Use when the user asks to
+  implement an approved milestone or invokes /agent-code. Requires an existing CEO
+  verdict in artifacts/reviews/.
+---
+
 <!-- TEMPLATE INSTRUCTIONS
-PURPOSE: This file defines the /agent-code slash command. It runs the Engineering Stage of
+PURPOSE: This file defines the /agent-code pipeline skill. It runs the Engineering Stage of
 the multi-agent workflow for an approved milestone: Coder → Tester → Reviewer, with defects
 routed to Debugger → Bug Gatherer → Product, and quality issues routed to Refactor → Reviewer.
 
 All work artifacts (bug reports, progress log entries, milestone completion records) are
-written to `artifacts/`. Templates and guidelines are read from `docs/`. Never mix the two:
-`docs/` is reference-only, `artifacts/` is where live work lives.
+written to `artifacts/`. Templates are read from `templates/`; guidelines are read from
+`docs/`. Never mix them: `docs/` and `templates/` are reference-only, `artifacts/` is
+where live work lives.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
 2. Replace [TEST_CMD] with your project's test command.
 3. Replace [MAX_LOOP_COUNT] with the number of Coder-Tester-Reviewer cycles allowed before
    escalation (default: 3).
-4. Delete this comment block once the command is customized for your project.
+4. Delete this comment block once the skill is customized for your project.
 
-INSTALLATION: Copy this file to `.claude/commands/agent-code.md` in your target project.
-Claude Code registers any file in `.claude/commands/` as a slash command named after the
-file. Invoke it with `/agent-code <milestone or task id>`.
+INSTALLATION: This skill installs to `.claude/skills/agent-code/SKILL.md` in your target
+project (done automatically by /cast-init). Claude Code registers it as the /agent-code
+skill. Invoke it with `/agent-code <milestone or task id>`.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # /agent-code — Engineering Pipeline
 
-Run the engineering stage for a milestone that has already been approved by the CEO during `/agent-plan`. Implements code, runs tests, reviews for defects and quality issues, and validates against the task's acceptance criteria. Work artifacts produced by this command (bug reports, completion records, progress log) are written to `artifacts/`.
+Run the engineering stage for a milestone that has already been approved by the CEO during `/agent-plan`. Implements code, runs tests, reviews for defects and quality issues, and validates against the task's acceptance criteria. Work artifacts produced by this skill (bug reports, completion records, progress log) are written to `artifacts/`.
 
 ## Related agent files
 
-This command invokes the following agents. Open any of them for the full role definition and interaction rules:
+This skill invokes the following agents. Open any of them for the full role definition and interaction rules:
 
-- [coder](../agents/coder.md) — implements each task and completes the Pre-Handoff Checklist
-- [tester](../agents/tester.md) — writes and runs tests; gates Reviewer behind a green test suite
-- [reviewer](../agents/reviewer.md) — reviews the code and classifies findings as Defects or Issues
-- [debugger](../agents/debugger.md) — investigates Defect findings and produces root-cause analysis
-- [bug-gatherer](../agents/bug-gatherer.md) — files investigated defects as structured bug reports
-- [refactor](../agents/refactor.md) — addresses Issue findings without changing behaviour and loops back to Reviewer
-- [product](../agents/product.md) — triages bug reports and validates completed tasks against acceptance criteria
+- [coder](../../agents/coder.md) — implements each task and completes the Pre-Handoff Checklist
+- [tester](../../agents/tester.md) — writes and runs tests; gates Reviewer behind a green test suite
+- [reviewer](../../agents/reviewer.md) — reviews the code and classifies findings as Defects or Issues
+- [debugger](../../agents/debugger.md) — investigates Defect findings and produces root-cause analysis
+- [bug-gatherer](../../agents/bug-gatherer.md) — files investigated defects as structured bug reports
+- [refactor](../../agents/refactor.md) — addresses Issue findings without changing behaviour and loops back to Reviewer
+- [product](../../agents/product.md) — triages bug reports and validates completed tasks against acceptance criteria
 
-The planning-stage outputs this command reads were produced earlier by [architect](../agents/architect.md), [ui](../agents/ui.md), [security](../agents/security.md), [performance](../agents/performance.md), and signed off by [ceo](../agents/ceo.md). This command does not re-invoke them.
+The planning-stage outputs this skill reads were produced earlier by [architect](../../agents/architect.md), [ui](../../agents/ui.md), [security](../../agents/security.md), [performance](../../agents/performance.md), and signed off by [ceo](../../agents/ceo.md). This skill does not re-invoke them.
 
-## Arguments
+## Input
 
-- `$ARGUMENTS`: Required. The milestone to implement, or a specific task identifier within that milestone.
+The argument text the user provided when invoking this skill (e.g. `/agent-code milestone-1`) — the milestone to implement, or a specific task identifier within that milestone. If none was provided, ask for one before the Pre-Flight Check.
 
 ## Model Compatibility
 
@@ -54,7 +65,7 @@ Each stage runs on the model pinned in that agent's file (default: `claude-opus-
 
 ## Instructions
 
-This command orchestrates the **Engineering Stage** of the agent workflow. It requires that `/agent-plan` has already been completed and the CEO has issued APPROVED or APPROVED WITH CONDITIONS.
+This skill orchestrates the **Engineering Stage** of the agent workflow. It requires that `/agent-plan` has already been completed and the CEO has issued APPROVED or APPROVED WITH CONDITIONS.
 
 ### Pre-Flight Check
 
@@ -72,7 +83,7 @@ Before any task begins:
 ### Task Selection
 
 1. Read the task breakdown in `artifacts/milestones/milestone-{N}-{slug}-tasks.md`.
-2. If `$ARGUMENTS` specifies a single task, work on only that task.
+2. If the invocation input specifies a single task, work on only that task.
 3. Otherwise, work through tasks in dependency order, respecting any `blockedBy` relationships.
 
 ### Per-Task Loop

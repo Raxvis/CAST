@@ -1,39 +1,39 @@
 <!-- TEMPLATE INSTRUCTIONS
-PURPOSE: This file is the in-directory index for the commands/ directory. It is
-reference material for readers browsing the template repo — it should NOT be
-copied to target projects during adoption, because Claude Code would otherwise
-try to register it as a slash command named /README.
+PURPOSE: This file is the in-directory index for the pipeline skills payload. It is
+reference material for readers browsing the template repo — it must NOT be copied to
+target projects during adoption. /cast-init installs only the three skill directories
+below.
 
 HOW TO CUSTOMIZE: no customization needed. This file is metadata about the directory.
 -->
 
-# `commands/` — Slash Command Definitions
+# `skills/` — Pipeline Skill Definitions
 
-Each `.md` file in this directory (except this README) defines one Claude Code slash command. The filename becomes the command name: `commands/agent-plan.md` is the `/agent-plan` command, `commands/agent-code.md` is `/agent-code`, and so on.
+Each subdirectory here (except this README) contains one Claude Code skill. The directory name becomes the skill name: `agent-plan/SKILL.md` is the `/agent-plan` skill, `agent-code/SKILL.md` is `/agent-code`, and so on.
 
 ## Install destination
 
-When the template is installed into a target project, files in this directory are copied to `.claude/commands/` at the target's project root:
+When `/cast-init` installs the template into a target project, each skill directory is copied to `.claude/skills/` at the target's project root, with placeholders substituted:
 
 ```
-commands/agent-plan.md  →  <target>/.claude/commands/agent-plan.md
-commands/agent-code.md  →  <target>/.claude/commands/agent-code.md
-commands/agent-task.md  →  <target>/.claude/commands/agent-task.md
+skills/agent-plan/SKILL.md  →  <target>/.claude/skills/agent-plan/SKILL.md
+skills/agent-code/SKILL.md  →  <target>/.claude/skills/agent-code/SKILL.md
+skills/agent-task/SKILL.md  →  <target>/.claude/skills/agent-task/SKILL.md
 ```
 
-Claude Code auto-discovers any `.md` file in `.claude/commands/` at session start and registers it as a slash command named after the file (without the `.md` extension). No configuration is required beyond putting the files in the right place.
+Claude Code auto-discovers any `<name>/SKILL.md` under `.claude/skills/` at session start and registers it as a skill invocable as `/<name>`. The SKILL.md frontmatter `name` field must match its directory name.
 
-**This README file should NOT be copied to the target project.** A `.claude/commands/README.md` would be registered as a `/README` slash command, which is not intended.
+**This README file is NOT copied to the target project.** It documents the payload directory, not the installed workflow.
 
-## The three commands in this directory
+## The three pipeline skills in this directory
 
-| File | Slash command | Purpose |
+| Directory | Skill | Purpose |
 |---|---|---|
-| `agent-plan.md` | `/agent-plan <feature description>` | Runs the full Planning Stage: Product → Architecture + UI → Security + Performance → CEO. Produces milestone plans, architecture documents, UI specs, reviews, and a CEO verdict in `artifacts/`. No code is written. |
-| `agent-code.md` | `/agent-code <milestone or task>` | Runs the Engineering Stage for a CEO-approved milestone: Coder → Tester → Reviewer → Product validation. Defect findings route through Debugger → Bug Gatherer → Product for triage. Issue findings route through Refactor → Reviewer loop. |
-| `agent-task.md` | `/agent-task <task description>` | Runs a mini engineering pipeline for a single one-off task without requiring a milestone, planning artifacts, or CEO verdict. Same Defect/Issue routing as `/agent-code` but no planning stage. Bails out and recommends `/agent-plan` if the task turns out to need architectural work. |
+| `agent-plan/` | `/agent-plan <feature description>` | Runs the full Planning Stage: Product → Architecture + UI → Security + Performance → CEO. Produces milestone plans, architecture documents, UI specs, reviews, and a CEO verdict in `artifacts/`. No code is written. |
+| `agent-code/` | `/agent-code <milestone or task>` | Runs the Engineering Stage for a CEO-approved milestone: Coder → Tester → Reviewer → Product validation. Defect findings route through Debugger → Bug Gatherer → Product for triage. Issue findings route through Refactor → Reviewer loop. |
+| `agent-task/` | `/agent-task <task description>` | Runs a mini engineering pipeline for a single one-off task without requiring a milestone, planning artifacts, or CEO verdict. Same Defect/Issue routing as `/agent-code` but no planning stage. Bails out and recommends `/agent-plan` if the task turns out to need architectural work. |
 
-## When to use each command
+## When to use each skill
 
 Short version:
 
@@ -41,29 +41,29 @@ Short version:
 - **Bug fix, typo, small refactor, dependency bump?** → `/agent-task`
 - **Unsure?** → `/agent-plan` first. It is strictly safer to plan and not need it than to skip planning and discover you needed it mid-implementation.
 
-Longer version with a decision table: see `TROUBLESHOOTING.md` → "Which command should I use?"
+Longer version with a decision table: see the repo's `TROUBLESHOOTING.md` → "Which command should I use?"
 
 ## Model compatibility
 
-All three commands are optimized for the Claude Opus 4.x family (`claude-opus-4-8` default; `claude-opus-4-7` and `claude-opus-4-6` supported). Each command file carries a **Model Compatibility** section with orchestration notes for the model executing it — chiefly that Opus 4.8/4.7 delegate conservatively (the explicit stage invocations are load-bearing) while Opus 4.6 over-delegates (spawn only the agents each stage names). Behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`.
+All three skills are optimized for the Claude Opus 4.x family (`claude-opus-4-8` default; `claude-opus-4-7` and `claude-opus-4-6` supported). Each SKILL.md carries a **Model Compatibility** section with orchestration notes for the model executing it — chiefly that Opus 4.8/4.7 delegate conservatively (the explicit stage invocations are load-bearing) while Opus 4.6 over-delegates (spawn only the agents each stage names). Behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`.
 
-## How command files work
+## How pipeline skills work
 
-A command file is plain Markdown read by Claude Code at session start. The `$ARGUMENTS` token in the file body is replaced with whatever the user typed after the command name. The rest of the file is instructions to Claude for how to orchestrate the work.
+A SKILL.md is Markdown with YAML frontmatter (`name`, `description`) that Claude Code discovers at session start. When the user invokes the skill (e.g. `/agent-plan add dark mode`), Claude loads the file body and follows it, treating the text the user typed after the skill name as the invocation input. The rest of the file is instructions to Claude for how to orchestrate the work.
 
-Open any of the three command files to see the full orchestration: which agents get launched, in what order, with what inputs, and how findings are routed. The files are self-documenting and deliberately verbose — they are the contract between the user's intent and the agent pipeline.
+Open any of the three SKILL.md files to see the full orchestration: which agents get launched, in what order, with what inputs, and how findings are routed. The files are self-documenting and deliberately verbose — they are the contract between the user's intent and the agent pipeline.
 
 ## Customization
 
-You can edit any command file freely. Common edits:
+You can edit any installed SKILL.md freely. Common edits:
 
 - Tighten the pre-flight check to read additional project-specific files.
 - Add steps for project-specific gates (e.g., run a linter before Reviewer).
 - Remove agents from the pipeline if you have deleted them from `.claude/agents/`.
-- Change the `[MAX_LOOP_COUNT]` placeholder in `agent-code.md` and `agent-task.md` to match your project's tolerance for Coder/Tester/Reviewer retry cycles.
+- Change the `[MAX_LOOP_COUNT]` placeholder in `agent-code/SKILL.md` and `agent-task/SKILL.md` to match your project's tolerance for Coder/Tester/Reviewer retry cycles.
 
-If you delete `agent-plan.md` or `agent-code.md`, you must also delete `agents/ceo.md` — the CEO agent exists to serve those commands. See `README.md` → Minimum Viable Agent Set for the full coupling rules.
+If you delete `agent-plan/` or `agent-code/`, you must also delete `agents/ceo.md` — the CEO agent exists to serve those pipelines. See `README.md` → Minimum Viable Agent Set for the full coupling rules.
 
 ---
 
-_See also: `../agents/README.md` for the agent roster and how each slash command invokes its agents. `../docs/FILE_CONVENTIONS.md` for where each command writes its outputs (`artifacts/`, never `docs/`)._
+_See also: `../agents/README.md` for the agent roster and how each pipeline skill invokes its agents. `../docs/FILE_CONVENTIONS.md` for where each pipeline writes its outputs (`artifacts/`, never `docs/`)._

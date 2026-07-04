@@ -1,5 +1,15 @@
+---
+name: agent-task
+description: >-
+  Run the CAST mini engineering pipeline (Coder → Tester → Reviewer → Product) for a
+  single self-contained task — bug fixes, typos, single-function refactors, dependency
+  bumps — with no milestone, planning artifacts, or CEO verdict. Use when the user asks
+  for a small one-off change or invokes /agent-task. Bails out to /agent-plan for
+  architectural or cross-cutting work.
+---
+
 <!-- TEMPLATE INSTRUCTIONS
-PURPOSE: This file defines the /agent-task slash command. It runs a mini engineering
+PURPOSE: This file defines the /agent-task pipeline skill. It runs a mini engineering
 pipeline for a single one-off task without requiring a milestone, planning artifacts,
 or CEO verdict.
 
@@ -9,42 +19,43 @@ modules, new data schemas, or cross-cutting changes — those belong in /agent-p
 followed by /agent-code.
 
 All work artifacts (bug updates, progress log entries) are written to `artifacts/`.
-Templates and guidelines are read from `docs/`. Never mix the two: `docs/` is
-reference-only, `artifacts/` is where live work lives.
+Templates are read from `templates/`; guidelines are read from `docs/`. Never mix
+them: `docs/` and `templates/` are reference-only, `artifacts/` is where live work
+lives.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
 2. Replace [TEST_CMD] with your project's test command.
 3. Replace [MAX_LOOP_COUNT] with the number of Coder-Tester-Reviewer cycles allowed
    before escalation (default: 3).
-4. Delete this comment block once the command is customized for your project.
+4. Delete this comment block once the skill is customized for your project.
 
-INSTALLATION: Copy this file to `.claude/commands/agent-task.md` in your target project.
-Claude Code registers any file in `.claude/commands/` as a slash command named after
-the file. Invoke it with `/agent-task <task description>`.
+INSTALLATION: This skill installs to `.claude/skills/agent-task/SKILL.md` in your target
+project (done automatically by /cast-init). Claude Code registers it as the /agent-task
+skill. Invoke it with `/agent-task <task description>`.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # /agent-task — One-Off Task Pipeline
 
-Run a mini engineering pipeline for a single, self-contained task. Unlike `/agent-code`, this command does not require a milestone, planning artifacts, or a CEO verdict. It is designed for small, focused work that does not justify a full planning stage.
+Run a mini engineering pipeline for a single, self-contained task. Unlike `/agent-code`, this skill does not require a milestone, planning artifacts, or a CEO verdict. It is designed for small, focused work that does not justify a full planning stage.
 
 ## Related agent files
 
-This command invokes the following agents. Open any of them for the full role definition and interaction rules:
+This skill invokes the following agents. Open any of them for the full role definition and interaction rules:
 
-- [coder](../agents/coder.md) — implements the task
-- [tester](../agents/tester.md) — writes and runs tests; gates Reviewer behind a green test suite
-- [reviewer](../agents/reviewer.md) — reviews the code and classifies findings as Defects or Issues
-- [debugger](../agents/debugger.md) — investigates Defect findings when raised
-- [bug-gatherer](../agents/bug-gatherer.md) — files investigated defects as structured bug reports
-- [refactor](../agents/refactor.md) — addresses Issue findings and loops back to Reviewer
-- [product](../agents/product.md) — validates the finished task against the original task description
+- [coder](../../agents/coder.md) — implements the task
+- [tester](../../agents/tester.md) — writes and runs tests; gates Reviewer behind a green test suite
+- [reviewer](../../agents/reviewer.md) — reviews the code and classifies findings as Defects or Issues
+- [debugger](../../agents/debugger.md) — investigates Defect findings when raised
+- [bug-gatherer](../../agents/bug-gatherer.md) — files investigated defects as structured bug reports
+- [refactor](../../agents/refactor.md) — addresses Issue findings and loops back to Reviewer
+- [product](../../agents/product.md) — validates the finished task against the original task description
 
-This command explicitly does NOT invoke [architect](../agents/architect.md), [ui](../agents/ui.md), [security](../agents/security.md), [performance](../agents/performance.md), or [ceo](../agents/ceo.md). If the task turns out to need any of those, Pre-Flight or Reviewer will halt and tell you to run `/agent-plan` instead.
+This skill explicitly does NOT invoke [architect](../../agents/architect.md), [ui](../../agents/ui.md), [security](../../agents/security.md), [performance](../../agents/performance.md), or [ceo](../../agents/ceo.md). If the task turns out to need any of those, Pre-Flight or Reviewer will halt and tell you to run `/agent-plan` instead.
 
-## When to use this command
+## When to use this skill
 
 **Good fits:**
 - Fixing a bug already filed in `artifacts/BUGS.md`
@@ -75,13 +86,13 @@ Each stage runs on the model pinned in that agent's file (default: `claude-opus-
 - **Opus 4.6** — this model over-delegates; invoke only the agents this pipeline names, and honor the bail-out rule above instead of spawning planning agents ad hoc.
 - **Effort** — `high` reasoning effort is sufficient for one-off tasks; use `xhigh` for nontrivial fixes on Opus 4.7+ (Opus 4.6 caps at `high`).
 
-## Arguments
+## Input
 
-- `$ARGUMENTS`: Required. A free-form description of the task. May reference a specific file path, a bug ID (e.g., "Fix BUG-002: `done` silently succeeds on missing ID"), or a plain description ("Add a `--json` flag to the `list` command following the pattern in `add.ts`").
+The argument text the user provided when invoking this skill — a free-form description of the task. May reference a specific file path, a bug ID (e.g., "Fix BUG-002: `done` silently succeeds on missing ID"), or a plain description ("Add a `--json` flag to the `list` command following the pattern in `add.ts`"). If none was provided, ask for one before the Pre-Flight Check.
 
 ## Instructions
 
-This command orchestrates a mini engineering pipeline: Coder → Tester → Reviewer → Product. It reuses the same Defect / Issue routing as `/agent-code` but skips the planning stage entirely.
+This skill orchestrates a mini engineering pipeline: Coder → Tester → Reviewer → Product. It reuses the same Defect / Issue routing as `/agent-code` but skips the planning stage entirely.
 
 ### Pre-Flight Check
 
