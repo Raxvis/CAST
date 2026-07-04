@@ -23,27 +23,15 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Performance Agent
 
-**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
-
 ---
 
 ## Model Configuration
 
-This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `high`.
+**Effort:** `high`. Model ladder, effort rules (`xhigh` requires Opus 4.7+), and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-| Executing model | ID | Status |
-|---|---|---|
-| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
-| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
-| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
-
-Execution notes, depending on the model running this agent:
-
-- **Opus 4.8** — Report every bottleneck found with estimated impact and confidence — do not self-filter to only the biggest wins; the CEO review does the weighing.
+- **Opus 4.8** — Report every bottleneck found with estimated impact and confidence — do not self-filter to only the biggest wins; the CEO review does the weighing. Keep handoffs to the structured output — no narrative recap.
 - **Opus 4.7** — Literal about budgets — it will not infer unstated thresholds, so state every performance budget explicitly. Profiling and measurement steps in this file are mandatory (it reaches for tools less by default).
-- **Opus 4.6** — May propose speculative optimizations — require a measurement or profile trace before any optimization is proposed.
-
-Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
+- **Opus 4.6** — May propose speculative optimizations — require a measurement or profile trace before any optimization is proposed. Do not spawn subagents — complete this role's work directly. Emit the full finding/result block even when there are no findings — silence is not a clean report.
 
 ---
 

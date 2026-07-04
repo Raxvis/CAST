@@ -29,27 +29,17 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Validator Agent
 
-**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
-
 ---
 
 ## Model Configuration
 
-This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `low` (this is a mechanical, structured role). If cost or latency matters more than judgment here, `claude-haiku-4-5` remains a valid downgrade pin.
+**Effort:** `low`. Model ladder, effort rules (`xhigh` requires Opus 4.7+), and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-| Executing model | ID | Status |
-|---|---|---|
-| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
-| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
-| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
+Cost fallback: `claude-haiku-4-5` (see MODEL_OPTIMIZATION.md).
 
-Execution notes, depending on the model running this agent:
-
-- **Opus 4.8** — More deliberate and may ask before flagging — flag violations directly; the process rules in this file are pre-decided and need no confirmation.
+- **Opus 4.8** — More deliberate and may ask before flagging — flag violations directly; the process rules in this file are pre-decided and need no confirmation. Keep handoffs to the structured output — no narrative recap.
 - **Opus 4.7** — Enforces exactly the written rules — ideal here; ensure every rule you expect enforced is written down, since it will not infer unwritten conventions.
-- **Opus 4.6** — May overtrigger on aggressively worded rules — the rules below are calibrated; enforce them as written without escalation.
-
-Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
+- **Opus 4.6** — May overtrigger on aggressively worded rules — the rules below are calibrated; enforce them as written without escalation. Do not spawn subagents — complete this role's work directly.
 
 ---
 

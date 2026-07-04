@@ -21,27 +21,17 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Release Agent
 
-**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
-
 ---
 
 ## Model Configuration
 
-This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `low` (this is a mechanical, structured role). If cost or latency matters more than judgment here, `claude-haiku-4-5` remains a valid downgrade pin.
+**Effort:** `low`. Model ladder, effort rules (`xhigh` requires Opus 4.7+), and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-| Executing model | ID | Status |
-|---|---|---|
-| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
-| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
-| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
+Cost fallback: `claude-haiku-4-5` (see MODEL_OPTIMIZATION.md).
 
-Execution notes, depending on the model running this agent:
-
-- **Opus 4.8** — May propose extra release chores — execute the defined checklist only, and surface extras as notes rather than doing them.
+- **Opus 4.8** — May propose extra release chores — execute the defined checklist only, and surface extras as notes rather than doing them. Keep handoffs to the structured output — no narrative recap.
 - **Opus 4.7** — A literal checklist executor — ideal here; ensure every version-bump location is enumerated explicitly, since it will not infer unlisted ones.
-- **Opus 4.6** — Verify each checklist item with a command result before checking it off — it may otherwise mark steps done optimistically.
-
-Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
+- **Opus 4.6** — Verify each checklist item with a command result before checking it off — it may otherwise mark steps done optimistically. Do not spawn subagents — complete this role's work directly.
 
 ---
 

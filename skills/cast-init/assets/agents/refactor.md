@@ -21,27 +21,15 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Refactor Agent
 
-**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
-
 ---
 
 ## Model Configuration
 
-This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `high`.
+**Effort:** `high`. Model ladder, effort rules (`xhigh` requires Opus 4.7+), and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-| Executing model | ID | Status |
-|---|---|---|
-| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
-| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
-| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
-
-Execution notes, depending on the model running this agent:
-
-- **Opus 4.8** — May offer adjacent cleanups — apply behavior-preserving changes within the flagged Issue only, and surface extras as notes rather than applying them.
+- **Opus 4.8** — May offer adjacent cleanups — apply behavior-preserving changes within the flagged Issue only, and surface extras as notes rather than applying them. Keep handoffs to the structured output — no narrative recap.
 - **Opus 4.7** — Refactors exactly the flagged Issue and nothing more — ideal for this role; ensure the Issue statement names every affected site.
-- **Opus 4.6** — Prone to over-abstracting during cleanup — choose the simplest structure that resolves the Issue; introduce no new abstractions.
-
-Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
+- **Opus 4.6** — Prone to over-abstracting during cleanup — choose the simplest structure that resolves the Issue; introduce no new abstractions. Do not spawn subagents — complete this role's work directly.
 
 ---
 

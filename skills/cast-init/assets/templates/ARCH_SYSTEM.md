@@ -12,13 +12,15 @@
   - Fill in the Component Diagram and Data Flow with real details for your system.
   - The Acceptance Checklist is the contract — keep it accurate and up to date.
   - Status values: Draft / In Review / Approved / Implemented
+  - Sections marked (required) must be present and non-empty in every instance;
+    (optional) sections may be omitted. The CEO gate checks required sections.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # [PROJECT_NAME] — Architecture Spec: [SYSTEM_NAME]
 
-## Revision History
+## Revision History (required)
 
 | # | Date | Agent | Reason |
 |---|---|---|---|
@@ -35,13 +37,13 @@
 
 ---
 
-## Overview
+## Overview (required)
 
-### Purpose
+### Purpose (required)
 
 [Describe what this system does and why it exists as a multi-module system rather than a single module. 2–4 sentences.]
 
-### Scope
+### Scope (required)
 
 **In scope**:
 - [What this system is collectively responsible for]
@@ -51,7 +53,7 @@
 - [What this system does NOT cover]
 - [Adjacent systems that interact but are not part of this spec]
 
-### Key Components
+### Key Components (required)
 
 | Component | Role |
 |-----------|------|
@@ -63,9 +65,9 @@
 
 ---
 
-## System Architecture
+## System Architecture (required)
 
-### Component Diagram
+### Component Diagram (required)
 
 ```
 [Describe the relationship between components using ASCII or a text-based diagram.]
@@ -83,7 +85,7 @@
   └─────────────────────────────────────────────────────────┘
 ```
 
-### Data Flow
+### Data Flow (required)
 
 [Describe how data moves through the system end-to-end.]
 
@@ -95,7 +97,7 @@
 
 ---
 
-## Module Specifications
+## Module Specifications (required)
 
 ### [MODULE_A]
 
@@ -154,7 +156,7 @@
 
 ---
 
-## Message Flow
+## Message Flow (required)
 
 [Describe the sequence of events for the primary use case of this system.]
 
@@ -170,9 +172,9 @@ Actor / Source          Action                         Result
 
 ---
 
-## State Management
+## State Management (required)
 
-### State Diagram
+### State Diagram (optional)
 
 [Describe the states the system can be in and the transitions between them.]
 
@@ -189,7 +191,7 @@ Actor / Source          Action                         Result
 [FINAL_STATE]
 ```
 
-### State Storage
+### State Storage (required)
 
 | State Field | Type | Persisted | Owner Module |
 |-------------|------|-----------|-------------|
@@ -199,7 +201,7 @@ Actor / Source          Action                         Result
 
 ---
 
-## Integration Points
+## Integration Points (required)
 
 | External System | Relationship | Data Exchanged | Direction |
 |----------------|-------------|---------------|----------|
@@ -209,7 +211,7 @@ Actor / Source          Action                         Result
 
 ---
 
-## Performance Budget
+## Performance Budget (required)
 
 | Metric | Target | Notes |
 |--------|--------|-------|
@@ -220,9 +222,9 @@ Actor / Source          Action                         Result
 
 ---
 
-## Testing Strategy
+## Testing Strategy (required)
 
-### Integration Tests
+### Integration Tests (required)
 
 | # | Test Scenario | Modules Involved | Expected Outcome |
 |---|--------------|-----------------|-----------------|
@@ -230,7 +232,7 @@ Actor / Source          Action                         Result
 | 2 | [Scenario] | [MODULE_B], [MODULE_C] | [Outcome] |
 | 3 | Edge: [Scenario] | [All] | [Outcome] |
 
-### Manual Testing Checklist
+### Manual Testing Checklist (required)
 
 - [ ] [End-to-end scenario covering happy path]
 - [ ] [Edge case scenario]
@@ -240,7 +242,7 @@ Actor / Source          Action                         Result
 
 ---
 
-## Acceptance Checklist
+## Acceptance Checklist (required)
 
 - [ ] All modules implemented per their specifications
 - [ ] Data flow matches the described sequence end-to-end
@@ -254,7 +256,7 @@ Actor / Source          Action                         Result
 
 ---
 
-## CEO Verdict
+## CEO Verdict (required)
 
 Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-{N}.md`. Do not sign off here.
 

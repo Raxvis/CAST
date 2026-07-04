@@ -21,27 +21,15 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Reviewer Agent
 
-**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
-
 ---
 
 ## Model Configuration
 
-This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `xhigh`.
+**Effort:** `xhigh`. Model ladder, effort rules (`xhigh` requires Opus 4.7+), and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-| Executing model | ID | Status |
-|---|---|---|
-| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
-| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
-| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
-
-Execution notes, depending on the model running this agent:
-
-- **Opus 4.8** — Meaningfully better at finding real defects, but follows conservative-reporting instructions literally — report **every** Defect and Issue found, with severity and confidence; classification and filtering happen downstream (Debugger, Refactor, Product), never here.
+- **Opus 4.8** — Meaningfully better at finding real defects, but follows conservative-reporting instructions literally — report **every** Defect and Issue found, with severity and confidence; classification and filtering happen downstream (Debugger, Refactor, Product), never here. Keep handoffs to the structured output — no narrative recap.
 - **Opus 4.7** — Same coverage-first rule — self-filtering to "high-severity only" measurably depresses recall even though its bug-finding improved. It investigates thoroughly but reports tersely, so the Defect/Issue output format in this file is mandatory.
-- **Opus 4.6** — Keep review directives measured — it may over-flag stylistic nits as Issues; anchor every Issue to a named convention in `docs/CODE_PATTERNS.md`. Use effort `high` (`xhigh` requires Opus 4.7+).
-
-Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
+- **Opus 4.6** — Keep review directives measured — it may over-flag stylistic nits as Issues; anchor every Issue to a named convention in `docs/CODE_PATTERNS.md`. Use effort `high`. Do not spawn subagents — complete this role's work directly. Emit the full finding/result block even when there are no findings — silence is not a clean report.
 
 ---
 

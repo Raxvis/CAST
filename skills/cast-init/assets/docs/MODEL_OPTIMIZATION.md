@@ -17,7 +17,7 @@
 
 # [PROJECT_NAME] — Agent Model Optimization Guide
 
-This document is the single source of truth for which Claude model each CAST agent runs on, how the supported models differ in behavior, and how to move the roster between them. Every agent file contains a compact **Model Configuration** section; this file holds the full detail.
+This document is the single source of truth for which Claude model each CAST agent runs on, how the supported models differ in behavior, and how to move the roster between them. Each agent file carries only a compact **Model Configuration** section — the frontmatter `model:` pin, a one-line recommended effort, and three role-specific per-model bullets. The model ladder table, effort rules (`xhigh` requires Opus 4.7+), behavior profiles, and upgrade checklists live only in this file — a model change never requires editing per-agent tables, just the frontmatter pin (and effort substitution when pinning 4.6).
 
 ---
 

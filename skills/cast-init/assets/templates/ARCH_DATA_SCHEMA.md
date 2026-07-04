@@ -13,13 +13,15 @@
   - Update the Example Data section with realistic placeholder values.
   - The Acceptance Checklist is the contract for implementation — keep it accurate.
   - Status values: Draft / In Review / Approved / Implemented
+  - Sections marked (required) must be present and non-empty in every instance;
+    (optional) sections may be omitted. The CEO gate checks required sections.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # [PROJECT_NAME] — Architecture Spec: [SCHEMA_NAME] Data Schema
 
-## Revision History
+## Revision History (required)
 
 | # | Date | Agent | Reason |
 |---|---|---|---|
@@ -36,19 +38,19 @@
 
 ---
 
-## Overview
+## Overview (required)
 
-### Purpose
+### Purpose (required)
 
 [Describe what data this schema represents, what it is used for, and why it is structured this way. 2–4 sentences.]
 
 **Related documents:** See `ARCH_MODULE.md` for the module that owns this schema. If this data is displayed in a UI, see the related `UI_SPEC.md` document.
 
-### Format
+### Format (required)
 
 [Describe the serialization format — e.g., structured text, binary, key-value pairs — and why it was chosen.]
 
-### Location
+### Location (required)
 
 [Describe where this data is stored, accessed, and managed.]
 
@@ -58,9 +60,9 @@
 
 ---
 
-## Schema Definition
+## Schema Definition (required)
 
-### Structure
+### Structure (required)
 
 ```
 // Top-level structure
@@ -86,7 +88,7 @@
 }
 ```
 
-### Field Definitions
+### Field Definitions (required)
 
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
@@ -98,7 +100,7 @@
 
 ---
 
-## Example Data
+## Example Data (required)
 
 A representative example of a populated schema instance:
 
@@ -122,7 +124,7 @@ A representative example of a populated schema instance:
 
 ---
 
-## Validation Rules
+## Validation Rules (required)
 
 Rules that must be enforced when reading or writing this schema.
 
@@ -140,9 +142,9 @@ Rules that must be enforced when reading or writing this schema.
 
 ---
 
-## Serialization
+## Serialization (required)
 
-### Save Format
+### Save Format (required)
 
 [Describe the exact serialization process — how the in-memory structure is written to the persistence layer.]
 
@@ -157,7 +159,7 @@ function save(data: [SCHEMA_NAME]): void {
 }
 ```
 
-### Load Format
+### Load Format (required)
 
 [Describe the deserialization process — how data is read back and validated.]
 
@@ -174,7 +176,7 @@ function load(): [SCHEMA_NAME] {
 }
 ```
 
-### Migration Strategy
+### Migration Strategy (required)
 
 Each schema version must have a corresponding migration path. Migrations are applied sequentially.
 
@@ -197,9 +199,9 @@ function migrate(data: any): [SCHEMA_NAME] {
 
 ---
 
-## Usage
+## Usage (optional)
 
-### How to Access
+### How to Access (optional)
 
 [Describe how other parts of the system read this data.]
 
@@ -212,7 +214,7 @@ const data = await load();
 const value = data.[DOMAIN_ENTITY].[field];
 ```
 
-### How to Modify
+### How to Modify (optional)
 
 [Describe how other parts of the system write or update this data.]
 
@@ -231,7 +233,7 @@ const value = data.[DOMAIN_ENTITY].[field];
 
 ---
 
-## Acceptance Checklist
+## Acceptance Checklist (required)
 
 - [ ] All fields defined in the Field Definitions table are implemented
 - [ ] Default schema function returns a valid, complete structure
@@ -246,7 +248,7 @@ const value = data.[DOMAIN_ENTITY].[field];
 
 ---
 
-## CEO Verdict
+## CEO Verdict (required)
 
 Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-{N}.md`. Do not sign off here.
 

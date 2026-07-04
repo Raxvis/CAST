@@ -22,27 +22,15 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Security Agent
 
-**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
-
 ---
 
 ## Model Configuration
 
-This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `high`.
+**Effort:** `high`. Model ladder, effort rules (`xhigh` requires Opus 4.7+), and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-| Executing model | ID | Status |
-|---|---|---|
-| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
-| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
-| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
-
-Execution notes, depending on the model running this agent:
-
-- **Opus 4.8** — Better at finding real vulnerabilities, but follows severity filters literally — report **every** finding with severity and confidence; the CEO review weighs them, so never self-filter to high-severity only.
+- **Opus 4.8** — Better at finding real vulnerabilities, but follows severity filters literally — report **every** finding with severity and confidence; the CEO review weighs them, so never self-filter to high-severity only. Keep handoffs to the structured output — no narrative recap.
 - **Opus 4.7** — Same coverage-first rule applies. It also reaches for scanning and search tools less by default — the review checklist steps in this file are mandatory, not suggestions. Frame findings as defensive remediation; requests for offensive exploitation detail may be refused.
-- **Opus 4.6** — Keep trigger wording measured, and require a concrete attack scenario per finding — it can over-flag theoretical issues.
-
-Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
+- **Opus 4.6** — Keep trigger wording measured, and require a concrete attack scenario per finding — it can over-flag theoretical issues. Do not spawn subagents — complete this role's work directly. Emit the full finding/result block even when there are no findings — silence is not a clean report.
 
 ---
 

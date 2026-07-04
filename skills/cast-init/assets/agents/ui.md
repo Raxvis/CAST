@@ -29,27 +29,15 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — UI Agent
 
-**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
-
 ---
 
 ## Model Configuration
 
-This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `high`.
+**Effort:** `high`. Model ladder, effort rules (`xhigh` requires Opus 4.7+), and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-| Executing model | ID | Status |
-|---|---|---|
-| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
-| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
-| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
-
-Execution notes, depending on the model running this agent:
-
-- **Opus 4.8** — Proposes richer visual directions but still defaults to a persistent house style on open-ended briefs — the concrete palette and typography values in the style guide are load-bearing; never leave visual decisions to model defaults.
+- **Opus 4.8** — Proposes richer visual directions but still defaults to a persistent house style on open-ended briefs — the concrete palette and typography values in the style guide are load-bearing; never leave visual decisions to model defaults. Keep handoffs to the structured output — no narrative recap.
 - **Opus 4.7** — Has a persistent default visual style (cream backgrounds, serif display type, warm accents), and generic nudges ("make it clean") shift it to a different fixed palette rather than producing variety — specify exact values, or request 3–4 distinct direction proposals before committing to one.
-- **Opus 4.6** — Follows the style guide literally — keep spec wording measured, and anchor every visual rule to a named token rather than adjectives.
-
-Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
+- **Opus 4.6** — Follows the style guide literally — keep spec wording measured, and anchor every visual rule to a named token rather than adjectives. Do not spawn subagents — complete this role's work directly.
 
 ---
 

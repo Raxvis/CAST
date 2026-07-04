@@ -12,6 +12,8 @@
   - List deferred items that were originally planned but moved to a future milestone.
   - Capture lessons learned to improve future milestone planning and execution.
   - Copy this template to `artifacts/milestones/milestone-{N}-{slug}-completion.md` for each milestone.
+  - Sections marked (required) must be present and non-empty in every instance;
+    (optional) sections may be omitted. Reviewer and Product check required sections.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
@@ -20,7 +22,7 @@
 
 ---
 
-## Header
+## Header (required)
 
 | Field | Value |
 |-------|-------|
@@ -31,14 +33,14 @@
 
 ---
 
-## Summary
+## Summary (required)
 
 [2–4 sentences summarizing what this milestone achieved. State the goal, whether it was
 fully met, and any notable outcomes or surprises.]
 
 ---
 
-## Delivered
+## Delivered (required)
 
 Features and changes completed in this milestone.
 
@@ -50,7 +52,7 @@ Features and changes completed in this milestone.
 
 ---
 
-## Deferred
+## Deferred (required)
 
 Items originally planned for this milestone that were moved to a future milestone.
 
@@ -62,7 +64,7 @@ _If nothing was deferred, replace this table with "Nothing deferred."_
 
 ---
 
-## Known Issues
+## Known Issues (required)
 
 Issues discovered during this milestone that remain open.
 
@@ -74,19 +76,19 @@ _If no known issues, replace this table with "No known issues."_
 
 ---
 
-## Lessons Learned
+## Lessons Learned (optional)
 
-### What Went Well
-
-- [Item]
-- [Item]
-
-### What Could Be Improved
+### What Went Well (optional)
 
 - [Item]
 - [Item]
 
-### Action Items for Next Milestone
+### What Could Be Improved (optional)
+
+- [Item]
+- [Item]
+
+### Action Items for Next Milestone (optional)
 
 | # | Action | Owner |
 |---|--------|-------|
@@ -94,7 +96,7 @@ _If no known issues, replace this table with "No known issues."_
 
 ---
 
-## References
+## References (required)
 
 - **Task Breakdown**: `artifacts/milestones/milestone-{N}-{slug}-tasks.md`
 - **Validation Report**: `artifacts/milestones/milestone-{N}-{slug}-validation.md`

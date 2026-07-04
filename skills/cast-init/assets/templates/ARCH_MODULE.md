@@ -14,13 +14,15 @@
   - Keep the Acceptance Checklist updated — it is the contract between the engineer and
     the product owner.
   - Status values: Draft / In Review / Approved / Implemented
+  - Sections marked (required) must be present and non-empty in every instance;
+    (optional) sections may be omitted. The CEO gate checks required sections.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # [PROJECT_NAME] — Architecture Spec: [MODULE_NAME]
 
-## Revision History
+## Revision History (required)
 
 | # | Date | Agent | Reason |
 |---|---|---|---|
@@ -37,15 +39,15 @@
 
 ---
 
-## Overview
+## Overview (required)
 
-### Purpose
+### Purpose (required)
 
 [Describe what this module does, why it exists, and what problem it solves. 2–4 sentences.]
 
 **Related documents:** If this module has a UI, see the related `UI_SPEC.md` document. If this module defines a data schema, see the related `ARCH_DATA_SCHEMA.md` document.
 
-### Scope
+### Scope (required)
 
 **In scope**:
 - [What this module is responsible for]
@@ -55,7 +57,7 @@
 - [What this module intentionally does NOT do]
 - [Concerns handled by a different module]
 
-### Dependencies
+### Dependencies (required)
 
 | Dependency | Type | Purpose |
 |------------|------|---------|
@@ -64,9 +66,9 @@
 
 ---
 
-## Data Model
+## Data Model (required)
 
-### Interfaces & Types
+### Interfaces & Types (required)
 
 ```
 // Primary data structure
@@ -86,7 +88,7 @@ interface [SUPPORTING_TYPE] {
 type [STATUS_TYPE] = '[VALUE_A]' | '[VALUE_B]' | '[VALUE_C]';
 ```
 
-### Serialization
+### Serialization (optional)
 
 [Describe how this module's data is serialized for persistence or transmission. Note any fields that require special handling, transformation, or versioning.]
 
@@ -96,9 +98,9 @@ type [STATUS_TYPE] = '[VALUE_A]' | '[VALUE_B]' | '[VALUE_C]';
 
 ---
 
-## API Contract
+## API Contract (required)
 
-### Public Functions
+### Public Functions (required)
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
@@ -106,7 +108,7 @@ type [STATUS_TYPE] = '[VALUE_A]' | '[VALUE_B]' | '[VALUE_C]';
 | `[functionName]` | `([param]: [type], [param]: [type]) => [ReturnType]` | `[ReturnType]` | [What it does] |
 | `[functionName]` | `([param]: [type]) => [ReturnType]` | `[ReturnType]` | [What it does] |
 
-### Function Details
+### Function Details (required)
 
 #### `[functionName]`
 
@@ -127,7 +129,7 @@ function [functionName]([param]: [type]): [ReturnType]
 
 ---
 
-## State / Integration Boundary (if applicable)
+## State / Integration Boundary (optional)
 
 [Describe how this module's state is exposed to and consumed by the rest of the application, if it holds state. Name the mechanism (state layer, service interface, event bus, plain function calls) and the direction of each interaction.]
 
@@ -139,7 +141,7 @@ State fields owned or updated by this module's outputs:
 
 ---
 
-## File Structure
+## File Structure (required)
 
 ```
 [source-directory]/
@@ -149,22 +151,22 @@ State fields owned or updated by this module's outputs:
 
 ---
 
-## Implementation Notes
+## Implementation Notes (required)
 
-### Performance
+### Performance (optional)
 
 - [Any performance constraints or targets for this module]
 - [Caching strategy, if applicable]
 - [Computation complexity notes]
 
-### Edge Cases
+### Edge Cases (required)
 
 | Case | Expected Behavior |
 |------|------------------|
 | [Edge case description] | [How the module handles it] |
 | [Edge case description] | [How the module handles it] |
 
-### [FRAMEWORK]-Specific Patterns
+### [FRAMEWORK]-Specific Patterns (optional)
 
 [Note any conventions, idioms, or constraints specific to your framework or runtime that apply to this module.]
 
@@ -173,9 +175,9 @@ State fields owned or updated by this module's outputs:
 
 ---
 
-## Integration Points
+## Integration Points (required)
 
-### With UI
+### With UI (optional)
 
 [Describe how UI components consume this module's output.]
 
@@ -183,7 +185,7 @@ State fields owned or updated by this module's outputs:
 |-------------|--------------|-----|
 | `[ComponentName]` | `[data or computed value]` | [via store selector / direct call] |
 
-### With Other Systems
+### With Other Systems (required)
 
 | System | Relationship | Direction |
 |--------|-------------|----------|
@@ -191,9 +193,9 @@ State fields owned or updated by this module's outputs:
 
 ---
 
-## Testing Strategy
+## Testing Strategy (required)
 
-### Test Cases
+### Test Cases (required)
 
 | # | Test | Input | Expected Output |
 |---|------|-------|----------------|
@@ -201,7 +203,7 @@ State fields owned or updated by this module's outputs:
 | 2 | [Description] | [Input values] | [Expected result] |
 | 3 | Edge: [Description] | [Input values] | [Expected result] |
 
-### Manual Testing
+### Manual Testing (required)
 
 - [ ] [Manual test step or scenario]
 - [ ] [Manual test step or scenario]
@@ -209,13 +211,13 @@ State fields owned or updated by this module's outputs:
 
 ---
 
-## Performance Budget
+## Performance Budget (required)
 
 Budgets: see the system-level table in the `ARCH_SYSTEM.md` instance and live tracking in `.claude/agents/performance.md`.
 
 ---
 
-## Acceptance Checklist
+## Acceptance Checklist (required)
 
 - [ ] All public functions implemented and match the API Contract table
 - [ ] All edge cases handled per the Edge Cases table
@@ -228,7 +230,7 @@ Budgets: see the system-level table in the `ARCH_SYSTEM.md` instance and live tr
 
 ---
 
-## CEO Verdict
+## CEO Verdict (required)
 
 Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-{N}.md`. Do not sign off here.
 

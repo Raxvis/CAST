@@ -26,27 +26,15 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Architecture Agent
 
-**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
-
 ---
 
 ## Model Configuration
 
-This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `xhigh`.
+**Effort:** `xhigh`. Model ladder, effort rules (`xhigh` requires Opus 4.7+), and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-| Executing model | ID | Status |
-|---|---|---|
-| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
-| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
-| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
-
-Execution notes, depending on the model running this agent:
-
-- **Opus 4.8** — Strongest long-horizon design reasoning — give it the full milestone context in one turn. It may pause on minor structural choices: pick a reasonable default and record it in the decision log instead of asking.
+- **Opus 4.8** — Strongest long-horizon design reasoning — give it the full milestone context in one turn. It may pause on minor structural choices: pick a reasonable default and record it in the decision log instead of asking. Keep handoffs to the structured output — no narrative recap.
 - **Opus 4.7** — Designs exactly what the requirements state, nothing more — if a cross-cutting concern should generalize across modules, say so explicitly. It reaches for research tools less by default, so the document-reading steps in this file are mandatory.
-- **Opus 4.6** — Prone to overengineering — produce the simplest architecture that meets requirements; no speculative abstractions or future-proofing. Use effort `high` (`xhigh` requires Opus 4.7+).
-
-Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
+- **Opus 4.6** — Prone to overengineering — produce the simplest architecture that meets requirements; no speculative abstractions or future-proofing. Use effort `high`. Do not spawn subagents — complete this role's work directly.
 
 ---
 

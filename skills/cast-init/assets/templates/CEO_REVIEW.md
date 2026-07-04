@@ -17,13 +17,15 @@
     these strings.
   - Instance destination: artifacts/reviews/ceo-review-milestone-{N}.md. Never fill
     this template in place.
+  - Sections marked (required) must be present and non-empty in every instance;
+    (optional) sections may be omitted. The CEO gate checks required sections.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # CEO Review: [MILESTONE_NAME]
 
-## Revision History
+## Revision History (required)
 
 | # | Date | Agent | Reason |
 |---|---|---|---|
@@ -31,7 +33,7 @@
 
 ---
 
-## Header
+## Header (required)
 
 **Date**: [DATE]
 **Reviewer**: CEO Agent
@@ -49,7 +51,7 @@ On any re-review, read the `## Revision History` table at the top of every input
 
 ---
 
-## 1. Scope & Business Intent
+## 1. Scope & Business Intent (required)
 
 - [ ] Milestone goals are clear and measurable.
 - [ ] Acceptance criteria are testable.
@@ -60,7 +62,7 @@ On any re-review, read the `## Revision History` table at the top of every input
 
 ---
 
-## 2. Architectural Soundness
+## 2. Architectural Soundness (required)
 
 - [ ] Architecture document covers every module touched by the milestone.
 - [ ] Data schemas are versioned and migration-safe.
@@ -71,7 +73,7 @@ On any re-review, read the `## Revision History` table at the top of every input
 
 ---
 
-## 3. UI & User Experience
+## 3. UI & User Experience (required)
 
 - [ ] UI spec covers every screen or component the milestone introduces.
 - [ ] Interaction states (default, pressed, disabled, loading, error, empty) are specified.
@@ -82,7 +84,7 @@ On any re-review, read the `## Revision History` table at the top of every input
 
 ---
 
-## 4. Security Posture
+## 4. Security Posture (required)
 
 - [ ] All Critical and High findings have a remediation plan inside this milestone.
 - [ ] No Critical finding is deferred to "future work" without explicit Product acceptance.
@@ -92,7 +94,7 @@ On any re-review, read the `## Revision History` table at the top of every input
 
 ---
 
-## 5. Performance Budget
+## 5. Performance Budget (required)
 
 - [ ] The milestone respects the project's performance budgets.
 - [ ] Hot paths are identified and have a measurement plan.
@@ -102,7 +104,7 @@ On any re-review, read the `## Revision History` table at the top of every input
 
 ---
 
-## 6. Cross-Cutting Risks
+## 6. Cross-Cutting Risks (required)
 
 - [ ] No UI requirement contradicts the architecture.
 - [ ] No architecture decision contradicts a Product acceptance criterion.
@@ -113,7 +115,7 @@ On any re-review, read the `## Revision History` table at the top of every input
 
 ---
 
-## Revision Requests
+## Revision Requests (optional)
 
 | # | Addressed To | Section | Required Change |
 |---|---|---|---|
@@ -121,7 +123,7 @@ On any re-review, read the `## Revision History` table at the top of every input
 
 ---
 
-## Approval Conditions (for APPROVED WITH CONDITIONS)
+## Approval Conditions (for APPROVED WITH CONDITIONS) (optional)
 
 | # | Condition | Verified By | Verified At |
 |---|---|---|---|
@@ -129,7 +131,7 @@ On any re-review, read the `## Revision History` table at the top of every input
 
 ---
 
-## Verdict
+## Verdict (required)
 
 - [ ] **APPROVED** — Milestone may proceed to the engineering stage. No outstanding revisions.
 - [ ] **APPROVED WITH CONDITIONS** — Milestone may proceed. Coder must satisfy the Approval Conditions above; Reviewer and Product verify on completion.

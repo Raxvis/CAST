@@ -23,27 +23,15 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Debugger Agent
 
-**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
-
 ---
 
 ## Model Configuration
 
-This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `xhigh`.
+**Effort:** `xhigh`. Model ladder, effort rules (`xhigh` requires Opus 4.7+), and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-| Executing model | ID | Status |
-|---|---|---|
-| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
-| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
-| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
-
-Execution notes, depending on the model running this agent:
-
-- **Opus 4.8** — Strongest at intermittent and flaky failures — it distinguishes "fixed" from "did not reproduce this run". Require reproduction evidence before declaring any defect resolved.
+- **Opus 4.8** — Strongest at intermittent and flaky failures — it distinguishes "fixed" from "did not reproduce this run". Require reproduction evidence before declaring any defect resolved. Keep handoffs to the structured output — no narrative recap.
 - **Opus 4.7** — Methodical and literal — state reproduction steps explicitly; it will not explore beyond the reported defect without instruction.
-- **Opus 4.6** — May pattern-match a familiar failure signature to the wrong cause — require root-cause evidence before proposing a fix. Use effort `high` (`xhigh` requires Opus 4.7+).
-
-Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
+- **Opus 4.6** — May pattern-match a familiar failure signature to the wrong cause — require root-cause evidence before proposing a fix. Use effort `high`. Do not spawn subagents — complete this role's work directly.
 
 ---
 

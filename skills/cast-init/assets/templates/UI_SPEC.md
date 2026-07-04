@@ -14,13 +14,15 @@
   - Replace [THEME_KEY] with the keys from your design system or theme file.
   - The Acceptance Checklist at the end of each section is the contract — keep it accurate.
   - Status values: Draft / In Review / Approved / Implemented
+  - Sections marked (required) must be present and non-empty in every instance;
+    (optional) sections may be omitted. The CEO gate checks required sections.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # [PROJECT_NAME] — UI Spec: [COMPONENT_OR_SCREEN_NAME]
 
-## Revision History
+## Revision History (required)
 
 | # | Date | Agent | Reason |
 |---|---|---|---|
@@ -38,7 +40,7 @@
 
 ---
 
-## Overview
+## Overview (required)
 
 [Describe what this component or screen does, when it is shown, and why it exists. 2–4 sentences.]
 
@@ -46,7 +48,7 @@
 
 ---
 
-## Position
+## Position (optional)
 
 [Describe where this component appears in the overall screen layout. Replace the ASCII diagram below with an accurate representation.]
 
@@ -64,7 +66,7 @@
 
 ---
 
-## Layout Diagram
+## Layout Diagram (required)
 
 [Provide a detailed ASCII layout of the component's internal structure. Label all sub-elements.]
 
@@ -88,7 +90,7 @@
 
 ---
 
-## Visual Style
+## Visual Style (required)
 
 | Property | Value | Theme Key |
 |----------|-------|-----------|
@@ -106,7 +108,7 @@
 
 ---
 
-## States
+## States (required)
 
 | State | Description | Visual Change |
 |-------|-------------|---------------|
@@ -120,7 +122,7 @@
 
 ---
 
-## Animation
+## Animation (optional)
 
 | Property | Value | Notes |
 |----------|-------|-------|
@@ -131,16 +133,16 @@
 
 ---
 
-## Data Requirements
+## Data Requirements (required)
 
-### Reads
+### Reads (required)
 
 | Data | Source | Format | Notes |
 |------|--------|--------|-------|
 | `[fieldName]` | [Store / API / Props] | [type] | [Any transformation needed] |
 | `[fieldName]` | [Store / API / Props] | [type] | [Any transformation needed] |
 
-### Writes / Actions
+### Writes / Actions (required)
 
 | Action | Trigger | Effect |
 |--------|---------|--------|
@@ -149,7 +151,7 @@
 
 ---
 
-## Accessibility
+## Accessibility (required)
 
 | Property | Requirement |
 |----------|------------|
@@ -163,7 +165,7 @@
 
 ---
 
-## Component Structure
+## Component Structure (optional)
 
 [Describe the component hierarchy in pseudocode or outline form.]
 
@@ -181,7 +183,7 @@
 
 ---
 
-## Edge Cases
+## Edge Cases (required)
 
 | Case | Expected Behavior |
 |------|------------------|
@@ -193,7 +195,7 @@
 
 ---
 
-## Acceptance Checklist
+## Acceptance Checklist (required)
 
 - [ ] Layout matches the diagram above
 - [ ] All states (default, pressed, disabled, loading, empty, error) implemented
@@ -205,7 +207,7 @@
 
 ---
 
-## CEO Verdict
+## CEO Verdict (required)
 
 Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-{N}.md`. Do not sign off here.
 

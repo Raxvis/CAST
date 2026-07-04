@@ -22,13 +22,15 @@
   - Reference any linked milestone task documents in the Completion Reports section.
   - Instance destination: artifacts/milestones/milestone-{N}-{slug}-validation.md.
     Never fill this template in place.
+  - Sections marked (required) must be present and non-empty in every instance;
+    (optional) sections may be omitted. Reviewer and Product check required sections.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # [PROJECT_NAME] — Milestone Validation Report
 
-## Revision History
+## Revision History (required)
 
 | # | Date | Agent | Reason |
 |---|---|---|---|
@@ -36,7 +38,7 @@
 
 ---
 
-## Header
+## Header (required)
 
 | Field | Value |
 |-------|-------|
@@ -47,13 +49,13 @@
 
 ---
 
-## Executive Summary
+## Executive Summary (required)
 
 [2–4 sentences summarizing the outcome of this validation. State what was tested, what passed, what failed, and whether the milestone is approved for completion.]
 
 ---
 
-## Task Validation Checklist
+## Task Validation Checklist (required)
 
 _Duplicate this section for each task validated by the Product Agent. Fill in every field. Do not skip sections._
 
@@ -128,9 +130,9 @@ _Duplicate this section for each task validated by the Product Agent. Fill in ev
 
 ---
 
-## Milestone Validation Checklist
+## Milestone Validation Checklist (required)
 
-### Functionality
+### Functionality (required)
 
 | # | Requirement | Acceptance Criteria | Status | Notes |
 |---|-------------|--------------------|----|-------|
@@ -138,7 +140,7 @@ _Duplicate this section for each task validated by the Product Agent. Fill in ev
 | F2 | [Requirement] | [Specific, testable criteria] | Pass / Fail / N/A | |
 | F3 | [Requirement] | [Specific, testable criteria] | Pass / Fail / N/A | |
 
-### Quality
+### Quality (required)
 
 | # | Criterion | Acceptance Criteria | Status | Notes |
 |---|-----------|--------------------|----|-------|
@@ -146,7 +148,7 @@ _Duplicate this section for each task validated by the Product Agent. Fill in ev
 | Q2 | Performance | [e.g., Meets performance budget targets] | Pass / Fail / N/A | |
 | Q3 | Accessibility | [e.g., All interactive elements are reachable] | Pass / Fail / N/A | |
 
-### Critical Path Testing
+### Critical Path Testing (required)
 
 | # | Scenario | Steps | Expected | Actual | Status |
 |---|----------|-------|----------|--------|--------|
@@ -155,7 +157,7 @@ _Duplicate this section for each task validated by the Product Agent. Fill in ev
 
 ---
 
-## User Validation Feedback Log
+## User Validation Feedback Log (optional)
 
 _Rename this section to match your review process (e.g., "User Testing", "QA Session", "Demo Review"). Duplicate the session block per session._
 
@@ -182,7 +184,7 @@ _Rename this section to match your review process (e.g., "User Testing", "QA Ses
 
 ---
 
-## Regression Testing
+## Regression Testing (required)
 
 _Duplicate a checklist block for each major feature area._
 
@@ -200,15 +202,15 @@ _Duplicate a checklist block for each major feature area._
 
 ---
 
-## Known Issues
+## Known Issues (required)
 
-### Resolved During Validation
+### Resolved During Validation (required)
 
 | ID | Description | Resolution |
 |----|-------------|------------|
 | | | |
 
-### Open (Must Resolve Before Milestone Closes)
+### Open (Must Resolve Before Milestone Closes) (required)
 
 | ID | Description | Severity | Owner | Target Date |
 |----|-------------|----------|-------|------------|
@@ -216,7 +218,7 @@ _Duplicate a checklist block for each major feature area._
 
 ---
 
-## Blockers for Remaining Tasks
+## Blockers for Remaining Tasks (optional)
 
 _Issues that will prevent subsequent milestones from starting or proceeding._
 
@@ -226,19 +228,19 @@ _Issues that will prevent subsequent milestones from starting or proceeding._
 
 ---
 
-## Recommendations
+## Recommendations (optional)
 
-### Immediate (Before Milestone Closes)
+### Immediate (Before Milestone Closes) (optional)
 
 1. [Recommendation]
 
-### For Next Milestone
+### For Next Milestone (optional)
 
 1. [Recommendation]
 
 ---
 
-## Completion Reports
+## Completion Reports (required)
 
 Links or references to related task breakdown documents for this milestone:
 
@@ -246,7 +248,7 @@ Links or references to related task breakdown documents for this milestone:
 
 ---
 
-## Validation Status
+## Validation Status (required)
 
 **Status**: Approved / Approved with Notes / Changes Requested
 

@@ -11,11 +11,9 @@ code and completing implementation tasks as directed by Product, Architecture, a
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
 2. Replace [MILESTONE_*] with your actual milestone names.
-3. Replace [EXAMPLE_TASK] in the Pre-Handoff Example with a real or representative task name.
-4. Replace [EXAMPLE_FILE_*] and [EXAMPLE_MODULE_*] in the example with realistic names.
-5. [TARGET_PLATFORMS] is substituted by /cast-init from the detected target platforms.
-6. The Pre-Handoff Checklist is the core quality gate — keep it intact. Copy it for each task.
-7. Update the Work Selection Strategy to match your project's actual priority rules.
+3. [TARGET_PLATFORMS] is substituted by /cast-init from the detected target platforms.
+4. The Pre-Handoff Checklist is the core quality gate — keep it intact. Copy it for each task.
+5. Update the Work Selection Strategy to match your project's actual priority rules.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
@@ -24,27 +22,15 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Coder Agent
 
-**Model**: `claude-opus-4-8` — pinned in the YAML frontmatter above; tuned for the Claude Opus 4.x family (see Model Configuration below).
-
 ---
 
 ## Model Configuration
 
-This agent targets the Claude Opus 4.x family — all three supported models are priced identically, so prefer the newest your platform serves. Recommended reasoning effort: `xhigh`.
+**Effort:** `xhigh`. Model ladder, effort rules (`xhigh` requires Opus 4.7+), and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-| Executing model | ID | Status |
-|---|---|---|
-| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** |
-| Claude Opus 4.7 | `claude-opus-4-7` | Supported |
-| Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported |
-
-Execution notes, depending on the model running this agent:
-
-- **Opus 4.8** — Strongest long-horizon implementation — hand it the complete task spec in one turn. It may pause on minor choices (naming, defaults): pick a reasonable option and note it in the handoff instead of asking.
+- **Opus 4.8** — Strongest long-horizon implementation — hand it the complete task spec in one turn. It may pause on minor choices (naming, defaults): pick a reasonable option and note it in the handoff instead of asking. Keep handoffs to the structured output — no narrative recap.
 - **Opus 4.7** — The most literal implementer — it builds exactly what the spec says and nothing more, and ambiguity becomes a question rather than an assumption. Keep the run-tests / run-linter instructions explicit; it reaches for tools less by default.
-- **Opus 4.6** — Add scope discipline — make only the changes the task directly requests; no extra helpers, abstractions, or defensive error handling for scenarios that cannot happen. Use effort `high` (`xhigh` requires Opus 4.7+).
-
-Full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`. To run this agent on a different model, edit the `model:` line in the frontmatter — the notes above keep the role functional on any Opus 4.x pin.
+- **Opus 4.6** — Add scope discipline — make only the changes the task directly requests; no extra helpers, abstractions, or defensive error handling for scenarios that cannot happen. Use effort `high`. Do not spawn subagents — complete this role's work directly.
 
 ---
 
@@ -202,75 +188,11 @@ _Copy this block for every task before submitting for Product review. Every item
 
 ## Pre-Handoff Example
 
-_This example shows a completed checklist. Replace [EXAMPLE_TASK] and all placeholders with real values when using this as a reference._
+Example entries for the non-obvious fields:
 
 ```
-## Pre-Handoff: [EXAMPLE_TASK]
-**Date**: [DATE]
-**Milestone**: [MILESTONE_NAME]
-**Submitted By**: Coder Agent
-
----
-
-### Code Quality
-
-- [x] Code follows naming conventions
-- [x] No untyped values
-- [x] No unused imports
-- [x] No hardcoded values — all thresholds are constants in [EXAMPLE_MODULE_CONSTANTS]
-- [x] No commented-out code
-- [x] No debug output
-
-### Functional Testing
-
-- [x] Happy path tested on each target platform
-- [x] Edge case: [EDGE_CASE_1] — behaves correctly
-- [x] Edge case: [EDGE_CASE_2] — behaves correctly
-- [x] Error state: [ERROR_STATE_1] — surfaces appropriate feedback
-
-### File Checklist
-
-| File | Action | Notes |
-|---|---|---|
-| [EXAMPLE_FILE_1] | Created | New module per Architecture Doc: [DOC_REFERENCE] |
-| [EXAMPLE_FILE_2] | Modified | Added [FUNCTION_NAME] to support [FEATURE_NAME] |
-| [EXAMPLE_FILE_3] | Modified | UI integration per UI Spec: [SPEC_REFERENCE] |
-
-### Integration
-
-- [x] Public interface documented in [EXAMPLE_FILE_1]
-- [x] Cross-module calls match Architecture contracts
-- [x] State updates consistent with existing store patterns
-- N/A — No persistence changes
-
-### Documentation
-
-- [x] Architecture doc referenced: [DOC_REFERENCE]
-- [x] UI spec referenced: [SPEC_REFERENCE]
-- [x] No deviations from specification
-
-### Performance
-
-- [x] No new recomputation in hot paths
-- [x] No blocking operations added
-- [x] Memory footprint unchanged
-
-### Known Issues
-
-| # | Description | Severity | Plan |
-|---|---|---|---|
-| 1 | [MINOR_ISSUE_DESCRIPTION] | Minor | Noted for follow-up in future milestone |
-
-### Self-Assessment
-
-- [x] Confident this matches the specification
-- [x] Read the full architecture document
-- [x] Read the full UI spec
-- [x] Comfortable with a team review
-
-### Ready for Review
-
-- [x] YES — Submitting to Product for validation.
+- [x] New tests added for: [KEY_BEHAVIOR] — evidence: `[TEST_CMD]` output "14 passed, 0 failed" pasted below the checklist (for bug fixes, include the failing-then-passing run)
+- [x] Any deviations from specification are explained — Deviation: [SPEC_SECTION] specifies [SPECIFIED_APPROACH]; implemented [ACTUAL_APPROACH] because [REASON]. Flagged for Product/Architecture review.
 ```
 
 ---

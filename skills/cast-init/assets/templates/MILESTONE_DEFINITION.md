@@ -14,13 +14,15 @@
     the CEO that planning is incomplete.
   - Keep this template-instruction block when copying the file; fill in the body,
     then delete this block from the instance file.
+  - Sections marked (required) must be present and non-empty in every instance;
+    (optional) sections may be omitted. The CEO gate checks required sections.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # [PROJECT_NAME] — [MILESTONE_NAME]
 
-## Revision History
+## Revision History (required)
 
 | # | Date | Agent | Reason |
 |---|---|---|---|
@@ -28,7 +30,7 @@
 
 ---
 
-## Header
+## Header (required)
 
 | Field | Value |
 |-------|-------|
@@ -43,7 +45,7 @@
 
 ---
 
-## Goal
+## Goal (required)
 
 _One clear sentence describing what completing this milestone achieves for the user or the product. Not a list of tasks — a single outcome statement. Example: "Users can create, complete, and delete tasks from the command line with their data persisted across runs."_
 
@@ -51,7 +53,7 @@ _One clear sentence describing what completing this milestone achieves for the u
 
 ---
 
-## Why This Matters
+## Why This Matters (required)
 
 _2-4 sentences explaining why this milestone is on the roadmap at all. What user pain does it relieve? What future work does it unblock? What will the product not be able to do without it? This is the paragraph the CEO reads first during planning review._
 
@@ -59,7 +61,7 @@ _2-4 sentences explaining why this milestone is on the roadmap at all. What user
 
 ---
 
-## Success Metrics
+## Success Metrics (required)
 
 _Concrete, measurable outcomes that indicate the milestone is successful. Prefer observable behaviors and thresholds over feelings. At least 2, at most 6._
 
@@ -69,7 +71,7 @@ _Concrete, measurable outcomes that indicate the milestone is successful. Prefer
 
 ---
 
-## In Scope
+## In Scope (required)
 
 _Bulleted list of features, modules, or behaviors that belong in this milestone. Be specific. The tasks file will break each of these down into implementable work items._
 
@@ -79,7 +81,7 @@ _Bulleted list of features, modules, or behaviors that belong in this milestone.
 
 ---
 
-## Out of Scope
+## Out of Scope (required)
 
 _Explicit list of closely-related things that are NOT in this milestone. Every item here is a future-work candidate or an explicit rejection. Use this section to prevent scope creep — if something shows up in the task breakdown that is not also listed in In Scope, it should either be moved here or added above._
 
@@ -89,7 +91,7 @@ _Explicit list of closely-related things that are NOT in this milestone. Every i
 
 ---
 
-## Top-Level Acceptance Criteria
+## Top-Level Acceptance Criteria (required)
 
 _The criteria the CEO uses to decide whether the completed milestone is done. These are broader than per-task acceptance criteria (which live in the task breakdown file) — they are milestone-level outcomes that cut across tasks._
 
@@ -100,7 +102,7 @@ _The criteria the CEO uses to decide whether the completed milestone is done. Th
 
 ---
 
-## Dependencies and Risks
+## Dependencies and Risks (required)
 
 _List any external dependencies (libraries, services, prior milestones, team decisions) and any risks that could delay or invalidate the milestone. Each risk should have a proposed mitigation or a note saying "accepted"._
 
@@ -111,7 +113,7 @@ _List any external dependencies (libraries, services, prior milestones, team dec
 
 ---
 
-## Cross-Cutting Concerns
+## Cross-Cutting Concerns (optional)
 
 _Anything that touches multiple tasks in this milestone and needs to be specified once at the milestone level rather than repeated per-task. Examples: error-handling conventions, logging requirements, shared naming rules, the set of platforms that must be tested._
 
@@ -120,7 +122,7 @@ _Anything that touches multiple tasks in this milestone and needs to be specifie
 
 ---
 
-## References
+## References (required)
 
 - **PRD section(s):** [PRD link or section anchor]
 - **Architecture document:** `artifacts/architecture/arch-milestone-[M#].md`

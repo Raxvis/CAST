@@ -19,13 +19,15 @@
   - The milestone Goal lives in the milestone definition file (MILESTONE_DEFINITION.md
     instance) — do not restate it here.
   - The CEO Approval Conditions section is filled after the CEO verdict; keep it.
+  - Sections marked (required) must be present and non-empty in every instance;
+    (optional) sections may be omitted. The CEO gate checks required sections.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # [PROJECT_NAME] — [MILESTONE_NAME] Task Breakdown
 
-## Revision History
+## Revision History (required)
 
 | # | Date | Agent | Reason |
 |---|---|---|---|
@@ -33,7 +35,7 @@
 
 ---
 
-## Header
+## Header (required)
 
 | Field | Value |
 |-------|-------|
@@ -43,7 +45,7 @@
 
 ---
 
-## Summary
+## Summary (required)
 
 | Task ID | Task Name | Status | Dependencies |
 |---------|-----------|--------|-------------|
@@ -54,7 +56,7 @@
 
 ---
 
-## CEO Approval Conditions
+## CEO Approval Conditions (required)
 
 _Filled after the CEO verdict. Coder tracks each condition during engineering; Reviewer and Product verify at completion._
 
@@ -64,7 +66,7 @@ _Filled after the CEO verdict. Coder tracks each condition during engineering; R
 
 ---
 
-## Tasks
+## Tasks (required)
 
 ---
 
