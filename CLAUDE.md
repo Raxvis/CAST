@@ -77,15 +77,17 @@ All three of these must land in the same commit. A commit that bumps one without
    git push origin v<NEW>
    ```
    The tag name is `v` followed by the semver string. Use an annotated tag (`-a`), never a lightweight tag — annotated tags carry the tagger, date, and message and are what GitHub Releases consume.
-6. **Immediately after pushing the tag**, create a GitHub Release at that tag with the release notes pulled from the corresponding `CHANGELOG.md` entry. Extract the section between the new version heading and the next one, then pass it to `gh release create`:
+6. **Immediately after pushing the tag**, create a GitHub Release at that tag with the release notes pulled from the corresponding `CHANGELOG.md` entry. The new entry is always the topmost version section, so extract everything from the first `## [` heading up to (but not including) the second, drop the heading line itself, and pass the result to `gh release create`:
    ```bash
-   awk '/^## \[<NEW>\]/,/^## \[/' CHANGELOG.md | sed '$d' > /tmp/notes.md
+   awk '/^## \[/{n++} n==1' CHANGELOG.md | sed '1d' > /tmp/notes.md
+   cat /tmp/notes.md   # MUST be non-empty and match the <NEW> entry — do not publish blank notes
    gh release create v<NEW> \
      --title "CAST v<NEW>" \
      --notes-file /tmp/notes.md \
      --latest
    rm /tmp/notes.md
    ```
+   Do not use a single awk range pattern like `awk '/^## \[<NEW>\]/,/^## \[/'` — the heading line matches both the start and end expressions, so awk emits only that one line and the pipeline produces an empty notes file.
    The `--latest` flag marks this as the repo's latest release (what `https://github.com/Raxvis/CAST/releases/latest` redirects to). Omit `--latest` only for patch releases of a non-current minor version. Do NOT pass `--target <sha>` — `gh` expects a branch name there, and the tag already points at the right commit.
 7. Verify: `gh release view v<NEW>` should show the release notes, and `git tag -l` should list the new tag. If either is missing, finish the release before moving on.
 
