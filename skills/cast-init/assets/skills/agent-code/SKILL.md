@@ -23,7 +23,6 @@ HOW TO CUSTOMIZE:
 2. Replace [TEST_CMD] with your project's test command.
 3. Replace [MAX_LOOP_COUNT] with the number of Coder-Tester-Reviewer cycles allowed before
    escalation (default: 3).
-4. Delete this comment block once the skill is customized for your project.
 
 INSTALLATION: This skill installs to `.claude/skills/agent-code/SKILL.md` in your target
 project (done automatically by /cast-init). Claude Code registers it as the /agent-code

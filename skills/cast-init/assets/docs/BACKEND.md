@@ -18,7 +18,7 @@
   - Delete sections that do not apply (e.g., Background Work for a pure
     request/response service with no async jobs).
   - Add your own backend patterns under the relevant section as they emerge.
-  - Delete this comment block before committing.
+  - This comment block is stripped automatically by /cast-init at install.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->

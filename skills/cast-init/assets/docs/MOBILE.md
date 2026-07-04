@@ -24,7 +24,7 @@
   - Delete sections that do not apply (e.g., push notifications on an app that
     does not push).
   - Update the footer date whenever this file changes.
-  - Delete this comment block before committing.
+  - This comment block is stripped automatically by /cast-init at install.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->

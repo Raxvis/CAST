@@ -152,7 +152,7 @@ For each Ask question in the plan, require a specific answer before executing th
 
 ## Phase 5 — Execution
 
-Once the plan is approved, execute the actions in a safe order, reporting progress as you go. **Read `references/execution.md` before writing any file** — it contains the full install mechanics and the customization-preservation rules. The step order:
+Once the plan is approved, execute the actions in a safe order, reporting progress as you go. **Read `references/execution.md` before writing any file** — it contains the full install mechanics and the customization-preservation rules, including the global rule that `<!-- TEMPLATE INSTRUCTIONS -->` blocks and placeholder-pointer comments are stripped from every installed file (the eight `templates/*` skeletons excepted). The step order:
 
 1. **Preflight** — clean git tree; `CAST_SOURCE` present and complete.
 2. **Create directories** — `.claude/agents/`, `.claude/skills/`, `docs/`, `templates/`, `artifacts/` + subdirectories.
@@ -173,6 +173,7 @@ Run every check in `references/validation.md`:
 3. The pipeline skills exist at `.claude/skills/<name>/SKILL.md` with valid frontmatter, and no superseded pre-1.0 command files remain.
 4. The docs/artifacts split is clean in both directions.
 5. Every agent file has valid `name`/`description`/`model` frontmatter.
+6. No installed file outside `templates/` carries a `<!-- TEMPLATE INSTRUCTIONS -->` block.
 
 If any validation check fails, report it and ask the user how to proceed before writing the Phase 7 report. Do not silently mask failures.
 

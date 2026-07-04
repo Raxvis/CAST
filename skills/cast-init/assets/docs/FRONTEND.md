@@ -18,7 +18,7 @@
     bracketed example identifiers so it is clear the code is a pattern, not literal.
   - Delete sections that do not apply (e.g., platform differences on a web-only app).
   - Update the footer date whenever this file changes.
-  - Delete this comment block before committing.
+  - This comment block is stripped automatically by /cast-init at install.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->

@@ -4,13 +4,13 @@ Common problems adopting or running this template, with the most likely cause an
 
 ---
 
-## Which command should I use — `/agent-plan`, `/agent-code`, or `/agent-task`?
+## Which pipeline should I use — `/agent-plan`, `/agent-code`, or `/agent-task`?
 
-**Cause.** This is a decision problem rather than an error. The template ships three slash commands with three different scopes, and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → Security + Performance → CEO). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Tester → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
+**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes, and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → Security + Performance → CEO). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Tester → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
 
-**Fix.** Use the table below to pick a command, then read the narrative note after it.
+**Fix.** Use the table below to pick a pipeline, then read the narrative note after it.
 
-| Task | Command | Why |
+| Task | Pipeline | Why |
 |---|---|---|
 | "Add a new feature / milestone" | `/agent-plan` then `/agent-code` | New features need a planning stage with CEO sign-off before engineering. |
 | "Fix a typo in the README" | `/agent-task` | Self-contained text change, no design work needed. |
@@ -26,17 +26,28 @@ Common problems adopting or running this template, with the most likely cause an
 
 ---
 
-## `/agent-plan` or `/agent-code` is not recognized as a slash command
+## `/cast-init` is not recognized
 
-**Cause.** Claude Code registers slash commands from `.claude/commands/` at session start. If the directory did not exist when you started the session, or if the command files are not there yet, the commands will not appear.
+**Cause.** The cast-init skill is not installed, or the session started before it was installed. Claude Code discovers skills at session start.
+
+**Fix.**
+1. Confirm the skill is installed: `ls .claude/skills/cast-init/SKILL.md` (project install) or `ls ~/.claude/skills/cast-init/SKILL.md` (global install). If missing, install it: `npx skills add Raxvis/CAST`, or `/plugin marketplace add Raxvis/CAST` followed by `/plugin install cast@cast`.
+2. Restart your Claude Code session (exit and re-open). Skill discovery runs at session start, not continuously.
+3. If the file exists but the skill still doesn't register, verify `.claude/skills/cast-init` is not a broken symlink (`npx skills` installs symlinks into `.agents/skills/` by default): `ls -L .claude/skills/cast-init/`.
+
+---
+
+## `/agent-plan` or `/agent-code` is not recognized
+
+**Cause.** Claude Code registers skills from `.claude/skills/` at session start. If the directory did not exist when you started the session, or if the pipeline skills are not there yet, they will not appear. (Before CAST v1.0.0 the pipelines were slash commands in `.claude/commands/` — if you upgraded, the old files should have been migrated and removed by `/cast-init`.)
 
 **Fix.**
 1. Confirm the files exist at the right path:
    ```
-   ls .claude/commands/agent-plan.md .claude/commands/agent-code.md
+   ls .claude/skills/agent-plan/SKILL.md .claude/skills/agent-code/SKILL.md
    ```
 2. Restart your Claude Code session (exit and re-open). Auto-discovery runs at session start, not continuously.
-3. If you copied the template manually without the install script, re-check you ran the `commands/*.md` copy step from Quick Start.
+3. If the files are missing, re-run `/cast-init` — it installs the pipeline skills as part of the adoption.
 4. Run `/agents` to confirm Claude Code sees the template's subagents. If `/agents` lists the 15 agents, the session is reading `.claude/`; if it doesn't, you are in the wrong directory.
 
 ---
@@ -67,7 +78,7 @@ Common problems adopting or running this template, with the most likely cause an
 **Fix.**
 1. Run `/agent-plan <milestone>` first. The planning stage ends with a CEO verdict written to that path.
 2. If the CEO issued **REVISION REQUIRED**, the planning stage is not complete. Address the Revision Requests (named by agent in the review document), re-run the affected stage, and re-run the CEO review.
-3. If you are trying to run engineering for a milestone that was planned manually (not via `/agent-plan`), you have two options: either run `/agent-plan` to produce the CEO review file retroactively, or hand-create `artifacts/reviews/ceo-review-milestone-{N}.md` with an APPROVED verdict. The command only checks that the file exists and the verdict string is present.
+3. If you are trying to run engineering for a milestone that was planned manually (not via `/agent-plan`), you have two options: either run `/agent-plan` to produce the CEO review file retroactively, or hand-create `artifacts/reviews/ceo-review-milestone-{N}.md` with an APPROVED verdict. The pipeline only checks that the file exists and the verdict string is present.
 
 ---
 
@@ -108,7 +119,7 @@ Common problems adopting or running this template, with the most likely cause an
 **Fix.**
 1. Use `/agent-plan` and `/agent-code` as the canonical entry points. They exist specifically to sequence the agents correctly.
 2. If you must invoke an agent directly, give it the prior agent's output as input ("Here is the architecture document at `artifacts/architecture/arch-milestone-3.md`; implement task T-4.").
-3. Escalate conflicts per `agents/README.md` → Conflict Resolution Priority: Product > Architecture > UI > Validator. The Validator agent arbitrates process conflicts; Product has final say on scope.
+3. Escalate conflicts per the repo's `skills/cast-init/assets/agents/README.md` → Conflict Resolution Priority: Product > Architecture > UI > Validator. The Validator agent arbitrates process conflicts; Product has final say on scope.
 
 ---
 
@@ -138,11 +149,11 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## An agent wrote a work artifact to `docs/` instead of `artifacts/`
 
-**Cause.** The agent was invoked ad-hoc without the slash commands, or its input pointed at a `docs/` path, or its prompt did not make the `docs/` vs `artifacts/` split explicit.
+**Cause.** The agent was invoked ad-hoc without the pipeline skills, or its input pointed at a `docs/` path, or its prompt did not make the `docs/` vs `artifacts/` split explicit.
 
 **Fix.**
 1. Move the file: `git mv docs/<file>.md artifacts/<appropriate-subdir>/<file>.md`.
 2. Grep for any references to the old path and update them.
 3. Update `agents/docs-writer.md` and the responsible agent's file if the source of the error is a stale path reference there.
-4. Re-read `docs/FILE_CONVENTIONS.md` → The Core Rule. If you are writing a template document or coding convention, it belongs in `docs/`. If you are writing a milestone plan, bug report, review, or session log, it belongs in `artifacts/`. The slash commands enforce this; direct agent invocation does not.
+4. Re-read `docs/FILE_CONVENTIONS.md` → The Core Rule. If you are writing a template document or coding convention, it belongs in `docs/`. If you are writing a milestone plan, bug report, review, or session log, it belongs in `artifacts/`. The pipeline skills enforce this; direct agent invocation does not.
 

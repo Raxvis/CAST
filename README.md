@@ -1,21 +1,16 @@
 <!-- TEMPLATE INSTRUCTIONS
-  This file is the master index for the reusable project template system.
-  It describes the purpose, structure, placeholder conventions, and file inventory
-  for every template file in this directory tree.
-
-  When adapting this template to a new project:
-    1. Read this file in full before touching anything else.
-    2. Follow the Quick Start section below.
-    3. Replace every [PLACEHOLDER_NAME] token with a project-specific value.
-    4. Delete agent files that are not relevant to your project type.
-    5. Remove this comment block from the final project's copy of the file.
+  This file is the master index for the CAST repo. It describes the purpose,
+  structure, placeholder conventions, and file inventory for every template file
+  in this repository. It is never installed into target projects — adoption is
+  performed by the /cast-init skill, which substitutes [PLACEHOLDER_NAME] tokens
+  and strips TEMPLATE INSTRUCTIONS blocks from the files it installs.
 -->
 
 # CAST — Claude Agent Staged Team
 
-> **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three slash commands, and a CEO-gated planning pipeline — shipped as plain Markdown, no framework to install, no runtime to maintain.
+> **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three pipeline skills, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v0.11.0-blue)
+![Template version](https://img.shields.io/badge/template-v1.0.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
 
@@ -54,48 +49,57 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 
 **What you get out of the box:**
 
-- **15 specialist subagents** pinned to the right Claude model tier per workload (Opus for planning, Sonnet for engineering, Haiku for utility).
-- **Three slash commands** — `/agent-plan`, `/agent-code`, `/agent-task` — as plain Markdown orchestration scripts Claude Code reads at session start.
+- **15 specialist subagents** pinned to `claude-opus-4-8`, with per-agent recommended reasoning effort matched to the workload (planning and engineering at high/xhigh, utility at low).
+- **Three pipeline skills** — `/agent-plan`, `/agent-code`, `/agent-task` — as plain Markdown orchestration scripts Claude Code discovers at session start.
 - **A hard `docs/` / `templates/` / `artifacts/` split** — `docs/` holds reference material (requirements, conventions), `templates/` holds reusable document skeletons, and `artifacts/` holds live work (plans, reviews, bugs, session logs). The CEO gate, placeholder check, and smoke test all enforce the split.
 - **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v0.11.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v1.0.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
 ## Install
 
-1. Get a local copy of CAST:
-   ```bash
-   # Shallow clone (fastest)
-   git clone --depth 1 https://github.com/Raxvis/CAST.git /path/to/CAST
+CAST is distributed as a single skill, `cast-init`, installable two ways. Both routes deliver the same `/cast-init` skill; pick whichever fits your tooling.
 
-   # Or download and extract the zip from:
-   # https://github.com/Raxvis/CAST/archive/refs/heads/main.zip
-   ```
+**Route A — the `skills` CLI:**
 
-2. Open Claude Code inside your project and point it at the prompt:
-   ```
-   cd /path/to/your-project
-   claude
-   > follow the instructions in /path/to/CAST/PROMPT.md
-   ```
+```bash
+cd /path/to/your-project
+npx skills add Raxvis/CAST        # installs the cast-init skill into .claude/skills/
+```
 
-Claude reads all template files from your local copy — no network access to GitHub is required during execution. It will:
+(Add `-g` to install globally for all projects instead.)
+
+**Route B — the Claude Code plugin marketplace:**
+
+```
+/plugin marketplace add Raxvis/CAST
+/plugin install cast@cast
+```
+
+**Then run the adoption.** Open Claude Code inside your project (restart the session if it was already open so the skill is discovered) and invoke:
+
+```
+/cast-init
+```
+
+The skill reads all template files from its bundled payload — no network access to GitHub is required during execution. It will:
 
 1. **Crawl your project** — detect tech stack, existing agents, docs, and customizations.
 2. **Propose a migration plan** — numbered list of every file it will create, rename, update, or skip.
 3. **Wait for your approval** — nothing is touched until you explicitly approve.
-4. **Execute the plan** — install agents, commands, docs, and artifacts, substituting detected project values.
+4. **Execute the plan** — install agents, pipeline skills, docs, and artifacts, substituting detected project values.
 5. **Validate** — verify all 15 agents exist, the docs/artifacts split is clean, and YAML frontmatter is valid.
 
 This works for greenfield projects, existing projects with no agentic workflow, and existing projects with a mature agentic workflow you want to migrate to CAST.
 
-**Next steps after install:**
+**Next steps after adoption:**
 
-1. Walk through [`docs/FIRST_RUN.md`](docs/FIRST_RUN.md) for the interactive checklist (`/agents`, `/agent-plan` dry run, optional per-agent smoke probes).
+1. Walk through [`docs/FIRST_RUN.md`](skills/cast-init/assets/docs/FIRST_RUN.md) (installed to your project's `docs/`) for the interactive checklist (`/agents`, `/agent-plan` dry run, optional per-agent smoke probes).
 2. Commit the populated template as your first commit.
+3. Keep the cast-init skill installed — `npx skills update` (or `/plugin marketplace update`) followed by re-running `/cast-init` is the upgrade path for future CAST releases.
 
 ---
 
@@ -104,13 +108,18 @@ This works for greenfield projects, existing projects with no agentic workflow, 
 ```
 CAST/
   README.md              # This file — master index and usage guide
-  PROMPT.md              # Adoption prompt — Claude reads this to install CAST
-  root/                  # Files intended for the project root
-  agents/                # Agent role definitions (copied to .claude/agents/)
-  commands/              # Slash commands (copied to .claude/commands/)
-  docs/                  # Reference material: requirements, conventions, rationale
-  templates/             # Document templates instantiated into artifacts/
-  artifacts/             # Work artifacts: plans, reviews, bugs, session logs
+  .claude-plugin/        # Plugin + marketplace manifests (the /plugin install route)
+  skills/
+    cast-init/
+      SKILL.md           # The /cast-init adoption workflow — replaces the old PROMPT.md
+      references/        # Detailed phase docs (discovery, roster, dispositions, execution, validation)
+      assets/            # The installable payload:
+        root/            #   Files intended for the project root (CLAUDE.md template)
+        agents/          #   Agent role definitions (installed to .claude/agents/)
+        skills/          #   Pipeline skills (installed to .claude/skills/)
+        docs/            #   Reference material: requirements, conventions, rationale
+        templates/       #   Document templates instantiated into artifacts/
+        artifacts/       #   Work artifact scaffold: bug tracker, session log
   example/               # Populated fixture: a full "Acme Todo" project walkthrough
 ```
 
@@ -122,7 +131,13 @@ This template enforces a strict separation between **reference material**, **doc
 - **`templates/` is document templates only.** It holds the reusable skeletons for architecture docs, UI specs, and milestone files. Agents copy them — never fill them in place — to produce instances under `artifacts/`.
 - **`artifacts/` is work artifacts only.** It holds instances of work: milestone definitions produced by the Product agent, architecture documents produced by the Architect agent for a specific milestone, UI specs produced by the UI agent, security and performance reviews, CEO planning verdicts, bug reports, and the rolling session log.
 
-If you are unsure where a file belongs, ask: _"Is this a reusable template, other reference material, or a specific piece of work?"_ Template → `templates/`. Other reference → `docs/`. Work → `artifacts/`. Both `/agent-plan` and `/agent-code` write exclusively to `artifacts/`; neither command should ever modify `docs/` or `templates/`.
+If you are unsure where a file belongs, ask: _"Is this a reusable template, other reference material, or a specific piece of work?"_ Template → `templates/`. Other reference → `docs/`. Work → `artifacts/`. Both `/agent-plan` and `/agent-code` write exclusively to `artifacts/`; neither pipeline should ever modify `docs/` or `templates/`.
+
+All the payload directories described below live under `skills/cast-init/assets/` in this repo; the headings use their short names because that is where they land in a target project.
+
+### skills/cast-init/
+
+The `/cast-init` skill itself: `SKILL.md` carries the seven-phase adoption workflow (discovery → classification → migration plan → approval gate → execution → validation → report), `references/` holds the detailed phase documentation it loads on demand, and `assets/` holds the entire installable payload described below.
 
 ### root/
 
@@ -130,11 +145,11 @@ Contains the `CLAUDE.md` template that is copied to the root of the target proje
 
 ### agents/
 
-Each file defines one agent role with YAML frontmatter for Claude Code auto-discovery. When copied to `.claude/agents/` in the target project, Claude Code automatically registers them as subagents that can be invoked by name or delegated to automatically based on task type. Files that do not apply to your project type can be deleted without affecting the others.
+Each file defines one agent role with YAML frontmatter for Claude Code auto-discovery. When installed to `.claude/agents/` in the target project, Claude Code automatically registers them as subagents that can be invoked by name or delegated to automatically based on task type. Files that do not apply to your project type can be deleted without affecting the others.
 
-### commands/
+### skills/ (pipeline skills)
 
-Each file defines one slash command that orchestrates a multi-agent workflow stage end-to-end. When copied to `.claude/commands/` in the target project, Claude Code registers them as slash commands named after the file (e.g. `commands/agent-plan.md` becomes `/agent-plan`). Three commands ship with this template: `/agent-plan` runs the Planning Stage (Product → Architecture + UI → Security + Performance → CEO), `/agent-code` runs the Engineering Stage (Coder → Tester → Reviewer, with defects to Debugger → Bug Gatherer → Product and issues to Refactor → Reviewer), and `/agent-task` runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone, planning artifacts, or a CEO verdict — use it for bug fixes, typos, small refactors, and dependency bumps, not for new modules or cross-cutting changes.
+Each subdirectory defines one pipeline skill that orchestrates a multi-agent workflow stage end-to-end. When installed to `.claude/skills/` in the target project, Claude Code registers them as skills named after the directory (e.g. `agent-plan/SKILL.md` becomes `/agent-plan`). Three pipelines ship with this template: `/agent-plan` runs the Planning Stage (Product → Architecture + UI → Security + Performance → CEO), `/agent-code` runs the Engineering Stage (Coder → Tester → Reviewer, with defects to Debugger → Bug Gatherer → Product and issues to Refactor → Reviewer), and `/agent-task` runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone, planning artifacts, or a CEO verdict — use it for bug fixes, typos, small refactors, and dependency bumps, not for new modules or cross-cutting changes.
 
 ### docs/
 
@@ -157,7 +172,7 @@ Work artifacts produced by the agents during `/agent-plan` and `/agent-code`: mi
 
 ## Placeholders
 
-Project-specific content in every template file is marked with `[UPPER_SNAKE_CASE]` tokens — things like `[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[TEST_CMD]`. The adoption prompt (`PROMPT.md`) detects project values and substitutes them during install; any remaining unfilled tokens are reported in the adoption report for you to fill in by hand.
+Project-specific content in every template file is marked with `[UPPER_SNAKE_CASE]` tokens — things like `[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[TEST_CMD]`. The `/cast-init` skill detects project values and substitutes them during install; any remaining unfilled tokens are reported in the adoption report for you to fill in by hand. The skill also strips the `<!-- TEMPLATE INSTRUCTIONS -->` comment blocks (repo documentation) from every file it installs — only the `templates/` skeletons keep theirs, since those blocks instruct the agents that instantiate them.
 
 <details>
 <summary><strong>Full placeholder reference</strong> (12 categories, ~60 tokens) — expand if you're populating files manually or writing a values file</summary>
@@ -294,7 +309,7 @@ Each agent file has its model hard-coded in the YAML frontmatter — there is no
 
 Before installing, confirm the following:
 
-- **Claude Code CLI installed and authenticated.** This template is built for Claude Code specifically. The slash commands (`/agent-plan`, `/agent-code`) and subagent auto-discovery rely on Claude Code's `.claude/commands/` and `.claude/agents/` conventions. Other AI coding assistants do not read these files. Install and sign in to Claude Code before continuing.
+- **Claude Code CLI installed and authenticated.** This template is built for Claude Code specifically. The pipeline skills (`/agent-plan`, `/agent-code`) and subagent auto-discovery rely on Claude Code's `.claude/skills/` and `.claude/agents/` conventions. Other AI coding assistants do not read these files. Install and sign in to Claude Code before continuing.
 - **A target project directory.** Either a new empty git repo or an existing project where you want to introduce the agent workflow. The template does not create the project for you.
 - **An Anthropic account with access to the Claude Opus 4.x family.** All agents are pinned to `claude-opus-4-8` by default; `claude-opus-4-7` and `claude-opus-4-6` are supported alternatives (all three are priced identically). You can override the `model:` line in an individual agent file if you need a different pin — `docs/MODEL_OPTIMIZATION.md` covers the per-model behavior differences and upgrade paths.
 
@@ -303,12 +318,12 @@ Before installing, confirm the following:
 A common source of confusion: this repo is a **template**, not a framework. Setting expectations clearly up front:
 
 - **Agents are role definitions, not running processes.** The files in `agents/` describe what each agent is responsible for, what it accepts as input, and what it produces as output. Claude Code reads them as subagent definitions. There is no background daemon, no queue, and no automatic dispatching beyond what Claude Code itself does.
-- **The slash commands are orchestration scripts written in Markdown.** `/agent-plan` and `/agent-code` tell Claude Code to invoke a specific sequence of subagents. They are not compiled, not executable, and not testable outside Claude Code. Reading them is reading their full behavior.
-- **The workflow is Claude Code-specific.** Copilot CLI, Gemini CLI, Cursor, and other AI tools do not honor `.claude/agents/` or `.claude/commands/`. Porting the template to another tool requires manual adaptation — read each agent file as a prompt and invoke it however that tool supports role prompts.
-- **No code is written by copying this template.** You get a directory layout, agent role files, slash command definitions, document templates, and empty work-artifact scaffolding. Your first real output appears after you run `/agent-plan` on a feature.
+- **The pipeline skills are orchestration scripts written in Markdown.** `/agent-plan` and `/agent-code` tell Claude Code to invoke a specific sequence of subagents. They are not compiled, not executable, and not testable outside Claude Code. Reading them is reading their full behavior.
+- **The workflow is Claude Code-specific.** Copilot CLI, Gemini CLI, Cursor, and other AI tools do not honor `.claude/agents/`. Porting the template to another tool requires manual adaptation — read each agent file as a prompt and invoke it however that tool supports role prompts. (The `SKILL.md` format itself is portable across a growing set of agents, but the subagent roster and orchestration are Claude Code conventions.)
+- **No code is written by installing this template.** You get a directory layout, agent role files, pipeline skill definitions, document templates, and empty work-artifact scaffolding. Your first real output appears after you run `/agent-plan` on a feature.
 - **Templates contain nested placeholders.** Some files (bug report forms, milestone validation records) include their own fill-in-per-use placeholders like `[DATE]`, `[REPRODUCTION_STEPS]`, `[TASK_NAME]`. These are not bugs in your customization — they are deliberate sub-templates filled in each time the form is used.
 
-Common problems you may hit during adoption or first use — slash command not recognized, subagent not delegating, `features/` references after upgrade, CEO returning REVISION REQUIRED — are covered in [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md). Skim it before filing a new issue.
+Common problems you may hit during adoption or first use — a pipeline skill not recognized, subagent not delegating, `features/` references after upgrade, CEO returning REVISION REQUIRED — are covered in [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md). Skim it before filing a new issue.
 
 ## What a populated project looks like
 
@@ -319,18 +334,18 @@ Before installing, browse [`example/`](example/) to see exactly what a real popu
 - A complete planning run for Milestone 1: milestone definition, task breakdown, architecture document, UI spec, security review, performance review, and CEO verdict ([`example/artifacts/`](example/artifacts/))
 - A milestone completion report, an active bug tracker with one fixed bug and one open deferred bug, and a three-day session log
 
-The example deliberately omits `.claude/` (those files are unchanged copies of the template agents/commands) and `src/` (this is a planning fixture, not a real build). The start-here file is [`example/README.md`](example/README.md).
+The example deliberately omits `.claude/` (those files are unchanged copies of the template agents and pipeline skills) and `src/` (this is a planning fixture, not a real build). The start-here file is [`example/README.md`](example/README.md).
 
 ---
 
 ## Quick Start
 
-1. Get a local copy of CAST (shallow clone or zip download — see Install above).
-2. Open Claude Code inside your target project directory.
-3. Say: `follow the instructions in /path/to/CAST/PROMPT.md`
+1. In your target project: `npx skills add Raxvis/CAST` (or `/plugin marketplace add Raxvis/CAST` + `/plugin install cast@cast`).
+2. Open (or restart) Claude Code inside the project directory.
+3. Run: `/cast-init`
 4. Claude crawls your project, proposes a migration plan, and waits for your approval.
-5. After approval, Claude installs agents, commands, docs, artifacts, and `CLAUDE.md` — substituting detected project values.
-6. Walk through [`docs/FIRST_RUN.md`](docs/FIRST_RUN.md) to verify everything loaded correctly.
+5. After approval, Claude installs agents, pipeline skills, docs, artifacts, and `CLAUDE.md` — substituting detected project values.
+6. Restart the session, then walk through your project's `docs/FIRST_RUN.md` to verify everything loaded correctly.
 7. Commit the populated template as your first commit.
 
 ---
@@ -369,9 +384,9 @@ With agent files in `.claude/agents/`, Claude Code can invoke them in three ways
 | Prepare a release | `release` |
 | Enforce process and resolve conflicts | `validator` |
 
-### Slash Commands
+### Pipeline Skills
 
-| Command | Purpose |
+| Skill | Purpose |
 |---|---|
 | `/agent-plan <feature>` | Run the Planning Stage end-to-end. Product → Architecture + UI → Security + Performance → CEO. Produces planning documents and a CEO verdict. No code is written. |
 | `/agent-code <milestone-or-task>` | Run the Engineering Stage for a CEO-approved milestone. Coder → Tester → Reviewer, with Defects routed through Debugger → Bug Gatherer → Product and Issues routed through Refactor → Reviewer. |
@@ -389,7 +404,7 @@ Agents communicate through shared documents. When one agent completes work, the 
 
 ### Minimum Viable Agent Set
 
-The required agent roster depends on which shipped slash commands you want to keep. The three commands form a gradient: `/agent-task` has the smallest minimum, then `/agent-plan` + `/agent-code` add the full planning pipeline on top. Prune from the bottom up.
+The required agent roster depends on which shipped pipeline skills you want to keep. The three pipelines form a gradient: `/agent-task` has the smallest minimum, then `/agent-plan` + `/agent-code` add the full planning pipeline on top. Prune from the bottom up.
 
 **Tier 1 — Always required (core development loop):**
 - **Product** — Requirements, acceptance criteria, and task validation
@@ -409,17 +424,17 @@ The required agent roster depends on which shipped slash commands you want to ke
 - **Refactor** — receives Issues from Reviewer and loops back
 - **Bug Gatherer** — files Defect reports and routes them to Product for triage
 
-A project that wants `/agent-task` but not the planning stage can delete `commands/agent-plan.md`, `commands/agent-code.md`, `agents/ceo.md`, and optionally `agents/ui.md`, `agents/security.md`, `agents/performance.md`, and still have a functional engineering loop via `/agent-task`.
+A project that wants `/agent-task` but not the planning stage can delete `.claude/skills/agent-plan/`, `.claude/skills/agent-code/`, `.claude/agents/ceo.md`, and optionally `.claude/agents/ui.md`, `.claude/agents/security.md`, `.claude/agents/performance.md`, and still have a functional engineering loop via `/agent-task`.
 
 **Tier 4 — Required for `/agent-plan` and `/agent-code`:**
 
-The planning commands hard-wire a pipeline that ends at a CEO sign-off. If you keep `/agent-plan` or `/agent-code`, you must keep all of these agents on top of Tiers 1–3:
+The planning pipelines hard-wire a flow that ends at a CEO sign-off. If you keep `/agent-plan` or `/agent-code`, you must keep all of these agents on top of Tiers 1–3:
 - **UI** — produces UI specifications during planning
 - **Security** — reviews architecture, feeds findings to CEO
 - **Performance** — reviews architecture, feeds findings to CEO
 - **CEO** — the final planning gate. `/agent-plan` has no meaning without it; `/agent-code` pre-flight reads the CEO verdict file before any task runs.
 
-If you do not want a CEO planning gate, **delete both `/agent-plan` and `/agent-code` together with `ceo.md`** — the two commands and the CEO agent are a unit. `/agent-task` remains functional on its own and does not read any CEO verdict. Do not attempt to keep `/agent-plan` or `/agent-code` while deleting the CEO agent; the result is a broken pipeline.
+If you do not want a CEO planning gate, **delete both `/agent-plan` and `/agent-code` together with `ceo.md`** — the two pipelines and the CEO agent are a unit. `/agent-task` remains functional on its own and does not read any CEO verdict. Do not attempt to keep `/agent-plan` or `/agent-code` while deleting the CEO agent; the result is a broken pipeline.
 
 ### Optional based on project type
 
@@ -434,6 +449,21 @@ If you do not want a CEO planning gate, **delete both `/agent-plan` and `/agent-
 
 <details>
 <summary><strong>Every file in the template with a one-line description</strong> — expand if you need a map</summary>
+
+All payload paths below are relative to `skills/cast-init/assets/` in this repo.
+
+### Skill and plugin machinery
+
+| File | Description |
+|---|---|
+| `skills/cast-init/SKILL.md` | The `/cast-init` adoption workflow: seven phases from discovery to the final report |
+| `skills/cast-init/references/discovery.md` | Phase 1 checklists and the adoption-inventory template |
+| `skills/cast-init/references/roster.md` | Canonical 15-agent roster, tiers, alias tables, and the pipeline-skills mapping |
+| `skills/cast-init/references/dispositions.md` | Per-file disposition tables for docs/templates/artifacts/root and the plan-file format |
+| `skills/cast-init/references/execution.md` | Phase 5 install mechanics and customization-preservation rules |
+| `skills/cast-init/references/validation.md` | Phase 6 validation checklist and the Phase 7 report template |
+| `.claude-plugin/plugin.json` | Plugin manifest (name `cast`, version, the cast-init skill) |
+| `.claude-plugin/marketplace.json` | Marketplace manifest enabling `/plugin marketplace add Raxvis/CAST` |
 
 ### root/ (1 file)
 
@@ -464,13 +494,15 @@ If you do not want a CEO planning gate, **delete both `/agent-plan` and `/agent-
 | `agents/validator.md` | Defines the validator agent; enforces agent protocols, resolves conflicts, tracks milestones, runs retrospectives |
 | `agents/README.md` | Master overview of the agent system: roster, interaction diagram, planning and engineering stage workflows, and placeholder reference |
 
-### commands/ → `.claude/commands/` (3 files)
+### skills/ → `.claude/skills/` (3 pipeline skills + README)
+
+> **Note:** `skills/README.md` is metadata about the directory. It is NOT installed to the target project.
 
 | File | Description |
 |---|---|
-| `commands/agent-plan.md` | Defines the `/agent-plan` slash command; orchestrates the Planning Stage end-to-end (Product → Architecture + UI → Security + Performance → CEO) |
-| `commands/agent-code.md` | Defines the `/agent-code` slash command; orchestrates the Engineering Stage per task (Coder → Tester → Reviewer, with Defects through Debugger → Bug Gatherer → Product and Issues through Refactor → Reviewer) |
-| `commands/agent-task.md` | Defines the `/agent-task` slash command; runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone or CEO verdict |
+| `skills/agent-plan/SKILL.md` | Defines the `/agent-plan` pipeline skill; orchestrates the Planning Stage end-to-end (Product → Architecture + UI → Security + Performance → CEO) |
+| `skills/agent-code/SKILL.md` | Defines the `/agent-code` pipeline skill; orchestrates the Engineering Stage per task (Coder → Tester → Reviewer, with Defects through Debugger → Bug Gatherer → Product and Issues through Refactor → Reviewer) |
+| `skills/agent-task/SKILL.md` | Defines the `/agent-task` pipeline skill; runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone or CEO verdict |
 
 ### docs/ (reference material, 20 files)
 
@@ -489,7 +521,7 @@ Reference documentation. Never holds work artifacts. Document templates live in 
 | `docs/ERROR_HANDLING.md` | Guidelines for handling errors across all categories; defines principles, patterns, and user-facing message standards |
 | `docs/TEST_FRAMEWORK.md` | Testing strategy, test runner setup, file conventions, and coverage requirements |
 | `docs/MODEL_OPTIMIZATION.md` | Model policy for the agent roster: the Claude Opus 4.x ladder, per-model behavior profiles, and the 4.6 → 4.7 → 4.8 upgrade checklists |
-| `docs/FIRST_RUN.md` | Interactive checklist to run in Claude Code after a fresh install; verifies that subagents load and slash commands register |
+| `docs/FIRST_RUN.md` | Interactive checklist to run in Claude Code after a fresh install; verifies that subagents load and pipeline skills register |
 | `docs/CLAUDE_CODE_SETTINGS.md` | Reference for `.claude/settings.json` — explains permission rules, environment variables, and hooks, with common extension patterns |
 | `docs/FRONTEND.md` | Topic-specific reference for frontend projects; delete if not applicable |
 | `docs/BACKEND.md` | Topic-specific reference for API servers, workers, and pipelines; delete if not applicable |
@@ -501,7 +533,7 @@ Reference documentation. Never holds work artifacts. Document templates live in 
 
 ### templates/ (document templates, 8 files)
 
-Reusable document skeletons. Agents copy them — never fill in place — to produce instances under `artifacts/`. See [`templates/README.md`](templates/README.md).
+Reusable document skeletons. Agents copy them — never fill in place — to produce instances under `artifacts/`. See [`templates/README.md`](skills/cast-init/assets/templates/README.md).
 
 | File | Description |
 |---|---|
@@ -534,12 +566,13 @@ Live work artifacts produced by the agents. Copied as a seed into the target pro
 
 ## License and contributing
 
-CAST is a Markdown template — every agent definition, slash command, and document template is plain text you can fork, edit, and republish. If you find a rough edge, open an issue or a pull request on [`Raxvis/CAST`](https://github.com/Raxvis/CAST).
+CAST is [MIT-licensed](LICENSE) Markdown — every agent definition, pipeline skill, and document template is plain text you can fork, edit, and republish. If you find a rough edge, open an issue or a pull request on [`Raxvis/CAST`](https://github.com/Raxvis/CAST).
 
-Significant changes must bump the template version in **three synchronized locations** and ship an annotated git tag plus a GitHub Release at the same push. The full policy is in [`CLAUDE.md`](CLAUDE.md) → Release and Tagging Policy. Short version:
+Significant changes must bump the template version in **four synchronized locations** and ship an annotated git tag plus a GitHub Release at the same push. The full policy is in [`CLAUDE.md`](CLAUDE.md) → Release and Tagging Policy. Short version:
 
 1. `README.md` — the version badge and the `Current template version` hero line
-2. `PROMPT.md` — the `Template version targeted` header
-3. `CHANGELOG.md` — a new version entry following the existing format
+2. `CHANGELOG.md` — a new version entry following the existing format
+3. `.claude-plugin/plugin.json` — the `version` field
+4. `skills/cast-init/SKILL.md` — the `metadata.version` frontmatter field
 
-All three land in the same commit. Immediately after pushing: annotated tag (`git tag -a v<new>`) + GitHub Release (`gh release create v<new> --notes-file ... --latest`).
+All four land in the same commit. Immediately after pushing: annotated tag (`git tag -a v<new>`) + GitHub Release (`gh release create v<new> --notes-file ... --latest`).

@@ -10,7 +10,7 @@ HOW TO CUSTOMIZE:
 - Update the subdirectory table as new work types are introduced.
 - Do NOT add design documentation, coding conventions, or templates to this directory —
   those belong in `docs/`.
-- Delete this comment block when adopting the template.
+- This comment block is stripped automatically by /cast-init at install.
 -->
 
 # [PROJECT_NAME] — Work Artifacts (`artifacts/`)

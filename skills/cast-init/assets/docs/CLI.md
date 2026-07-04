@@ -17,7 +17,7 @@
   - Keep code blocks as illustrative patterns — the bracket-style identifiers
     (e.g., `[dispatchCommand]`, `[ExitCode]`) are intentional.
   - Add project-specific pitfalls to "Common Pitfalls" as they surface in review.
-  - Delete this comment block before committing.
+  - This comment block is stripped automatically by /cast-init at install.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->

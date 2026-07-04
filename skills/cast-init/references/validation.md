@@ -16,6 +16,7 @@ After execution:
    - Each agent has `name:`, `description:`, `model:` in the frontmatter
    - Description length ≤ 120 characters
    - Model is one of `claude-opus-4-8` (default), `claude-opus-4-7`, or `claude-opus-4-6` (or an override the user approved — e.g. `claude-haiku-4-5` on a utility agent)
+6. **Verify template scaffolding was stripped**: `grep -rln 'TEMPLATE INSTRUCTIONS' .claude/ docs/ artifacts/ CLAUDE.md` must return nothing. Only the files under `templates/` may carry `<!-- TEMPLATE INSTRUCTIONS -->` blocks (they install verbatim as reusable skeletons). Any hit elsewhere means the install-time strip rule in `execution.md` was skipped for that file.
 
 If any validation check fails, report it and ask the user how to proceed before writing the Phase 7 report. Do not silently mask failures.
 

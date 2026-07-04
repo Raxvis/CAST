@@ -20,7 +20,6 @@ HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
 2. If your project uses milestone identifiers other than `{N}` (numeric), update the
    filename patterns below (e.g., swap `milestone-{N}-{slug}` for `M{N}-{slug}`).
-3. Delete this comment block once the skill is customized for your project.
 
 INSTALLATION: This skill installs to `.claude/skills/agent-plan/SKILL.md` in your target
 project (done automatically by /cast-init). Claude Code registers it as the /agent-plan

@@ -4,9 +4,42 @@ This file tracks changes to the multi-agent workflow **template itself**. It is 
 
 Format is loosely based on [Keep a Changelog](https://keepachangelog.com/). Versions follow semantic versioning: major = breaking structural changes that require migration, minor = additive or reorganizing changes, patch = doc fixes and small corrections.
 
-The current template version is recorded in the root `README.md`, `PROMPT.md`, and `CHANGELOG.md`.
+The current template version is recorded in four synchronized locations: the root `README.md` (badge + hero line), this `CHANGELOG.md`, `.claude-plugin/plugin.json` (`version`), and `skills/cast-init/SKILL.md` (`metadata.version`).
 
 ---
+
+## [1.0.0] — 2026-07-03
+
+CAST is now a skill. Adoption moves from "clone the repo and follow `PROMPT.md`" to installing the `/cast-init` skill — either `npx skills add Raxvis/CAST` or the Claude Code plugin marketplace (`/plugin marketplace add Raxvis/CAST` + `/plugin install cast@cast`) — and running `/cast-init` inside the target project. Installed projects keep the same shape except that the three pipeline commands are now pipeline **skills** under `.claude/skills/`.
+
+### Added
+
+- **`skills/cast-init/`** — the adoption skill. `SKILL.md` carries the seven-phase workflow (discovery → classification → migration plan → approval gate → execution → validation → report) that `PROMPT.md` used to define; the detail moved to five progressive-disclosure reference files: `references/discovery.md` (Phase 1 checklists + inventory template), `references/roster.md` (canonical 15-agent roster, tiers, alias tables, pipeline-skills mapping), `references/dispositions.md` (docs/templates/artifacts/root disposition tables + plan format), `references/execution.md` (Phase 5 install mechanics + customization-preservation rules), and `references/validation.md` (Phase 6 checklist + Phase 7 report template).
+- **`.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`** — the plugin install route. The plugin exposes exactly one component: the cast-init skill.
+- **Pre-converted pipeline skills in the payload** — `assets/skills/{agent-plan,agent-code,agent-task}/SKILL.md` with YAML frontmatter (`name`, `description`), replacing the frontmatter-less command files.
+- **`LICENSE`** — MIT, referenced from `plugin.json` and the SKILL.md frontmatter.
+
+### Changed
+
+- **The entire template payload moved under `skills/cast-init/assets/`** (`agents/`, `docs/`, `templates/`, `artifacts/`, `root/`, and the former `commands/` as `skills/`) via `git mv`, so the whole payload travels inside the skill directory on install. `example/` stays at the repo root and is never installed.
+- **Target install path for the three pipelines changed** from `.claude/commands/<name>.md` to `.claude/skills/<name>/SKILL.md`. `/cast-init` detects pre-1.0 command files, migrates preserved customizations into the new skills, and proposes deleting the old files.
+- **Fixed stale "Templates are read from `docs/`" wording** in all three pipeline definitions (stale since the 0.10.0 `templates/` split) and corrected their related-agent links for the new install depth (`../../agents/`).
+- **`$ARGUMENTS` command interpolation removed** from the pipeline definitions — skills receive the invocation text as input; each pipeline now has an `## Input` section and asks when no input was provided.
+- **`<!-- TEMPLATE INSTRUCTIONS -->` blocks are stripped at install.** These blocks date to the original manual-adoption era; they remain in the repo as per-file documentation, but `/cast-init` now removes them (and the dangling `<!-- Placeholders — see README.md ... -->` pointer comments) from every file it installs. Exception: the eight `templates/*` skeletons install verbatim — their blocks instruct the agents that instantiate them. Phase 6 validation checks that no installed file outside `templates/` carries a block.
+- **`/cast-init` no longer creates target-root `TROUBLESHOOTING.md` / `CHANGELOG.md`.** The old `PROMPT.md` claimed to "create from CAST template" but no such root templates ever existed; installed docs now link to the repo's `TROUBLESHOOTING.md` on GitHub, and `root/CLAUDE.md` is the only file installed at the target root.
+- **Release policy: the synchronized version locations are now four** — `README.md`, `CHANGELOG.md`, `.claude-plugin/plugin.json`, and `skills/cast-init/SKILL.md` (`metadata.version`) — replacing the retired `PROMPT.md` header.
+- **`README.md`** — Install and Quick Start rewritten around the two install routes + `/cast-init`; directory structure, file listing, prerequisites, and limitations updated for the skill layout; version badge and hero line bumped to v1.0.0.
+
+### Removed
+
+- **`PROMPT.md`** — `/cast-init` is the only adoption path. Its content lives on in `skills/cast-init/SKILL.md` and `references/` (moved with history via `git mv`).
+- **Top-level `agents/`, `commands/`, `docs/`, `templates/`, `artifacts/`, `root/`** — moved (not deleted) under `skills/cast-init/assets/`.
+
+### Migration
+
+- **New adoptions:** `npx skills add Raxvis/CAST` (or the plugin route), restart Claude Code, then run `/cast-init`.
+- **Existing CAST projects:** install cast-init and re-run `/cast-init`. It detects pre-1.0 `.claude/commands/agent-*.md` files, merges any customizations into the new `.claude/skills/<name>/SKILL.md` counterparts, and proposes deleting the old command files (approval required — keeping both would register a duplicate `/agent-plan`). No agent, doc, template, or artifact paths change inside target projects.
+- **Contributors:** template content now lives under `skills/cast-init/assets/`; edit files there. Version bumps must update all four synchronized locations.
 
 ## [0.11.0] — 2026-07-03
 

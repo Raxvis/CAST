@@ -4,16 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repository Is
 
-This is **CAST — Claude Agent Staged Team**, a multi-agent AI-assisted development workflow template. It contains no source code — only markdown template files with `[PLACEHOLDER]` tokens that are replaced when adapting the template to a new project. CAST establishes agent roles, documentation structure, and development conventions for Claude Code-based development.
+This is **CAST — Claude Agent Staged Team**, a multi-agent AI-assisted development workflow template. It contains no source code — only markdown template files with `[PLACEHOLDER]` tokens that are replaced when adapting the template to a new project. CAST establishes agent roles, documentation structure, and development conventions for Claude Code-based development. It is distributed as the `/cast-init` skill (installable via `npx skills add Raxvis/CAST`) and as a Claude Code plugin (via `/plugin marketplace add Raxvis/CAST`); running `/cast-init` in a target project performs the adoption.
 
 ## Directory Structure
 
-- **`root/`** — Files copied to a target project's root (CLAUDE.md template)
-- **`agents/`** — 15 agent role definitions plus a master `README.md` (product, architect, ui, security, performance, ceo, coder, tester, reviewer, debugger, refactor, bug-gatherer, docs-writer, release, validator). Each file includes YAML frontmatter for Claude Code subagent auto-discovery and defines one agent's purpose, authority, inputs, outputs, and decision log. Copied to `.claude/agents/` in the target project
-- **`commands/`** — Slash command definitions (`/agent-plan`, `/agent-code`, `/agent-task`) that orchestrate the planning and engineering stages of the agent workflow plus a mini pipeline for one-off tasks. Copied to `.claude/commands/` in the target project
-- **`docs/`** — **Reference material only.** Requirements, conventions, and design rationale (PRD, code patterns, file conventions, glossary, etc.). Never receives work artifacts.
-- **`templates/`** — **Document templates only.** Reusable skeletons (architecture templates, UI spec template, milestone templates) that agents copy into `artifacts/` as instances. Never filled in place.
-- **`artifacts/`** — **Work artifacts only.** Milestone plans, per-milestone architecture and UI specs, security/performance/CEO reviews, bug reports, and the session log. Everything produced by `/agent-plan` and `/agent-code` lands here.
+- **`.claude-plugin/`** — `plugin.json` and `marketplace.json`, the manifests for the plugin install route
+- **`skills/cast-init/SKILL.md`** — The adoption workflow (seven phases: discovery → classification → migration plan → approval gate → execution → validation → report). Must stay under 500 lines; detail belongs in `references/`
+- **`skills/cast-init/references/`** — Detailed phase docs the skill loads on demand: `discovery.md`, `roster.md`, `dispositions.md`, `execution.md`, `validation.md`
+- **`skills/cast-init/assets/`** — The installable payload. Everything below is relative to this directory:
+  - **`root/`** — Files copied to a target project's root (CLAUDE.md template)
+  - **`agents/`** — 15 agent role definitions plus a master `README.md` (product, architect, ui, security, performance, ceo, coder, tester, reviewer, debugger, refactor, bug-gatherer, docs-writer, release, validator). Each file includes YAML frontmatter for Claude Code subagent auto-discovery and defines one agent's purpose, authority, inputs, outputs, and decision log. Installed to `.claude/agents/` in the target project
+  - **`skills/`** — Pipeline skill definitions (`/agent-plan`, `/agent-code`, `/agent-task`) that orchestrate the planning and engineering stages of the agent workflow plus a mini pipeline for one-off tasks. Installed to `.claude/skills/` in the target project. Each SKILL.md's frontmatter `name` must equal its directory name
+  - **`docs/`** — **Reference material only.** Requirements, conventions, and design rationale (PRD, code patterns, file conventions, glossary, etc.). Never receives work artifacts.
+  - **`templates/`** — **Document templates only.** Reusable skeletons (architecture templates, UI spec template, milestone templates) that agents copy into `artifacts/` as instances. Never filled in place.
+  - **`artifacts/`** — **Work artifacts only.** Milestone plans, per-milestone architecture and UI specs, security/performance/CEO reviews, bug reports, and the session log. Everything produced by `/agent-plan` and `/agent-code` lands here.
+- **`example/`** — Populated "Acme Todo" fixture. Repo-only; deliberately outside the skill directory so it is never installed
 
 ## The docs/templates/artifacts Split
 
@@ -40,34 +45,39 @@ When editing templates, preserve placeholder tokens — do not replace them with
 ## Key Files
 
 - `README.md` — Master index with full placeholder reference table and quick start guide
-- `root/CLAUDE.md` — The CLAUDE.md template that gets placed in target projects (heavily parameterized)
-- `agents/README.md` — Agent roster, interaction diagram, and planning/engineering stage workflows
-- `commands/agent-plan.md` — Slash command that orchestrates the Planning Stage end-to-end
-- `commands/agent-code.md` — Slash command that orchestrates the Engineering Stage per task
-- `docs/README.md` — Documentation index listing all doc templates and their purposes
+- `skills/cast-init/SKILL.md` — The `/cast-init` adoption workflow (replaced `PROMPT.md` in v1.0.0); detailed phase docs live beside it in `references/`
+- `.claude-plugin/plugin.json` — Plugin manifest; carries one of the four synchronized version fields
+- `skills/cast-init/assets/root/CLAUDE.md` — The CLAUDE.md template that gets placed in target projects (heavily parameterized)
+- `skills/cast-init/assets/agents/README.md` — Agent roster, interaction diagram, and planning/engineering stage workflows
+- `skills/cast-init/assets/skills/agent-plan/SKILL.md` — Pipeline skill that orchestrates the Planning Stage end-to-end
+- `skills/cast-init/assets/skills/agent-code/SKILL.md` — Pipeline skill that orchestrates the Engineering Stage per task
+- `skills/cast-init/assets/docs/README.md` — Documentation index listing all doc templates and their purposes
 
 ## Working With This Repo
 
-- All files are markdown — there are no build, lint, or test commands
-- Every template file begins with an HTML comment block (`<!-- TEMPLATE INSTRUCTIONS -->`) explaining how to customize it
+- All files are markdown plus the two JSON plugin manifests — there are no build, lint, or test commands (`claude plugin validate .` checks the manifests)
+- Every template file begins with an HTML comment block (`<!-- TEMPLATE INSTRUCTIONS -->`) explaining how to customize it. These blocks are repo documentation only — `/cast-init` strips them (and the placeholder-pointer comments) from every installed file except the `templates/*` skeletons, so keep them accurate but don't count on them existing in target projects
 - Agent files include YAML frontmatter (`name`, `description`) for Claude Code subagent registration; they are self-contained and removing one does not break others
-- `root/CLAUDE.md` contains `@import` directives at the bottom referencing docs that should be loaded as context
+- Keep `skills/cast-init/SKILL.md` under 500 lines — move detail into `skills/cast-init/references/` (progressive disclosure)
+- Payload pipeline skills (`assets/skills/<name>/SKILL.md`) must keep frontmatter `name` equal to the directory name, and their `[PLACEHOLDER]` tokens intact
+- `assets/root/CLAUDE.md` contains `@import` directives at the bottom referencing docs that should be loaded as context
 
 ## Release and Tagging Policy
 
-Whenever the template version is bumped, the new version must be tagged and released on GitHub at the same time the commit is pushed. This is a hard rule, not a preference — `PROMPT.md` references the template version, and downstream users rely on GitHub tags to pin a known-good revision. A push without a corresponding tag leaves the canonical version floating and breaks reproducible installs.
+Whenever the template version is bumped, the new version must be tagged and released on GitHub at the same time the commit is pushed. This is a hard rule, not a preference — `plugin.json` and the SKILL.md metadata carry the template version, and downstream users rely on GitHub tags to pin a known-good revision (skill installs via `npx skills update` are content-hash based, but the plugin route and humans pin by tag). A push without a corresponding tag leaves the canonical version floating and breaks reproducible installs.
 
 **A version bump is any change to one of the following synchronized locations:**
 
 - `README.md` — the version badge and the `Current template version` hero line
-- `PROMPT.md` — the `Template version targeted` header
 - `CHANGELOG.md` — a new version entry
+- `.claude-plugin/plugin.json` — the `version` field
+- `skills/cast-init/SKILL.md` — the `metadata.version` frontmatter field
 
-All three of these must land in the same commit. A commit that bumps one without the others is incomplete and should not be pushed.
+All four of these must land in the same commit. A commit that bumps one without the others is incomplete and should not be pushed.
 
 **Release checklist (run every time the version changes):**
 
-1. Update all three locations above in a single commit.
+1. Update all four locations above in a single commit.
 2. Add a `CHANGELOG.md` entry for the new version, following the existing format (Added / Changed / Removed / Migration subsections as applicable). The entry must describe every substantive change since the prior version, not just the new feature.
 3. Commit the version bump with a message that starts with the new version number (e.g. `"Release v<NEW>: ..."`) so the tag-creation step can use the commit as the tag target.
 4. Push the commit to `origin main`.
@@ -96,7 +106,7 @@ Throughout these steps, replace `<NEW>` with the actual new semver string (e.g. 
 **Do not do any of the following:**
 
 - Push a version-bump commit without creating the matching tag and release in the same session.
-- Bump the version in some locations but not others. All three synchronized locations must match.
+- Bump the version in some locations but not others. All four synchronized locations must match.
 - Use a lightweight tag (`git tag v<NEW> <sha>` without `-a`). Always use an annotated tag.
 - Skip the GitHub Release step because "the tag exists". The tag and the Release are separate artifacts; downstream tooling depends on both.
 - Bump the version without a `CHANGELOG.md` entry. Every tag must have a corresponding CHANGELOG section the release notes can cite.
@@ -104,9 +114,9 @@ Throughout these steps, replace `<NEW>` with the actual new semver string (e.g. 
 **When not to bump:** content changes that do not affect the template's externally visible behavior (README prose tweaks, typo fixes, internal refactors of agent decision logs) do not require a version bump. Bump only when one of these is true:
 
 - A new file is added that users would import or reference
-- An existing file's public contract changes (agent outputs, command stages, template slot names)
+- An existing file's public contract changes (agent outputs, pipeline stages, template slot names)
 - A file is renamed, moved, or removed
-- A bug in the adoption prompt is fixed in a way users should re-run with
-- The workflow gains or loses an agent, command, or stage
+- A bug in the adoption skill is fixed in a way users should re-run with
+- The workflow gains or loses an agent, pipeline skill, or stage
 
 If in doubt, bump — the cost of an unnecessary patch release is much lower than the cost of a silent behavior change reaching users at `main`.

@@ -14,7 +14,7 @@
   - Update Memory Imports to match your actual docs and to include the topic-specific
     doc(s) your project needs (FRONTEND, BACKEND, CLI, MOBILE).
   - Add project-specific patterns under "Domain-Specific Patterns" as they emerge.
-  - Delete this comment block before committing.
+  - This comment block is stripped automatically by /cast-init at install.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->

@@ -17,7 +17,7 @@ HOW TO CUSTOMIZE:
 2. Adjust the Review Checklist to reflect the business and technical gates that matter most
    for your project.
 3. The verdict vocabulary (APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED) is used
-   by the /agent-plan slash command — keep it consistent if you rely on that command.
+   by the /agent-plan pipeline skill — keep it consistent if you rely on that pipeline.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->

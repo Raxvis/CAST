@@ -2,6 +2,17 @@
 
 Read this file before writing any file in Phase 5. Execute the approved plan's actions in the order of the sections below, reporting progress along the way.
 
+## Global rule — strip template scaffolding at install
+
+Every file written into the target project (agents, pipeline skills, docs, artifacts scaffold, root CLAUDE.md) must have its template scaffolding removed before writing:
+
+1. The leading `<!-- TEMPLATE INSTRUCTIONS ... -->` comment block.
+2. Any `<!-- Placeholders — see README.md → Placeholder Reference -->` pointer comment (it references the CAST repo's README, which does not exist in the target project).
+
+These blocks are documentation for people browsing the CAST repo; installed files must not carry them. **Exception: the eight `templates/*` files install verbatim, blocks included** — they are reusable skeletons, and their comment blocks instruct the agents that instantiate them (the instantiated copies in `artifacts/` must not carry the blocks, which is what the Phase 6 docs/artifacts-split check enforces).
+
+When updating an existing installed file that still carries one of these blocks from a pre-1.0 install, remove it as part of the update — it is CAST-owned scaffolding, not a user customization.
+
 ## 5.1 — Preflight
 
 Verify:
@@ -34,8 +45,7 @@ After completing the loop, **re-enumerate the 15 names and confirm each `.claude
 
 **Standard CAST agent sections** (these are CAST-owned; replace during update):
 
-- Template instructions comment block
-- Placeholder pointer comment
+- Template instructions comment block and placeholder pointer comment (stripped at install per the global rule — remove, never carry over)
 - Agent Activation blockquote
 - Title heading (`# [PROJECT_NAME] — <Role> Agent`)
 - `**Model**:` line
@@ -150,4 +160,4 @@ When merging an existing doc file with a CAST reference template:
 1. **Header** (title, metadata): use CAST's format.
 2. **Body content**: preserve the user's content entirely. CAST reference docs are templates — they become real content when filled in. If the user has already filled in the content, do not overwrite it.
 3. **Structure**: if the user's doc has the same sections as CAST's template but in a different order, preserve their order.
-4. **Template instructions comment block**: remove from populated files (the user's file is not a template anymore; it's real content).
+4. **Template instructions comment block**: never present in installed files (the global strip rule covers new installs; remove it from pre-existing files during merge).

@@ -12,7 +12,7 @@
     patterns below to match.
   - Do NOT relax the `docs/` / `templates/` / `artifacts/` split. It is load-bearing — agents
     rely on it to decide where to read templates and write every output.
-  - Delete this comment block before committing.
+  - This comment block is stripped automatically by /cast-init at install.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->

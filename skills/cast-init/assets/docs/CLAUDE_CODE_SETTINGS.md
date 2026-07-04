@@ -123,7 +123,7 @@ Hooks are NOT in the shipped example. They are a genuine power tool but also a g
 - **Secrets**: API keys, database passwords, auth tokens. Use `.env.local` (gitignored) or your secret manager.
 - **User preferences**: theme, keybindings, font size. Those go in user-level `~/.claude/settings.json`.
 - **Agent definitions**: those live in `.claude/agents/`, not here.
-- **Slash commands**: those live in `.claude/commands/`, not here.
+- **Pipeline skills**: those live in `.claude/skills/`, not here.
 - **Template placeholders**: don't put `[PROJECT_NAME]` in settings.json — Claude Code parses it as JSON and will fail on any placeholder that isn't a valid JSON value.
 
 ---

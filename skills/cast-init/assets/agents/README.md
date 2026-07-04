@@ -216,7 +216,7 @@ halts and instructs the user to re-run via `/agent-plan`.
 
 ## Workflow
 
-The workflow is split into two stages, each wrapped by a slash command, plus a third command for self-contained one-off work:
+The workflow is split into two stages, each wrapped by a pipeline skill, plus a third pipeline for self-contained one-off work:
 
 - **Planning Stage** — `/agent-plan` — produces planning documents only.
 - **Engineering Stage** — `/agent-code` — implements an approved milestone.

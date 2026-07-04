@@ -2,7 +2,7 @@
   FILE: FIRST_RUN.md
   PURPOSE: A short interactive checklist the user runs the first time they open
   Claude Code in a freshly-installed template. Verifies that Claude Code actually
-  loads the subagents, the slash commands appear, and /agent-plan runs end-to-end.
+  loads the subagents, the pipeline skills appear, and /agent-plan runs end-to-end.
 
   This file is reference material and stays in docs/. It does not get populated
   per-project; every project uses it the same way.
@@ -25,7 +25,7 @@ claude
 
 **Verify:** `CLAUDE.md` loads automatically at session start. You should see your populated project identity in the session context (the first line of your `CLAUDE.md` mentions the project name you filled in).
 
-**If it fails:** your `CLAUDE.md` is probably at the wrong path. It must live at the project root, not inside `docs/` or anywhere else. See the CAST template's `TROUBLESHOOTING.md` → "`CLAUDE.md` context is not being loaded".
+**If it fails:** your `CLAUDE.md` is probably at the wrong path. It must live at the project root, not inside `docs/` or anywhere else. See the CAST repo's [`TROUBLESHOOTING.md`](https://github.com/Raxvis/CAST/blob/main/TROUBLESHOOTING.md) → "`CLAUDE.md` context is not being loaded".
 
 ---
 
@@ -47,7 +47,7 @@ In the Claude Code session, type:
 
 ## Step 3 — Run `/agent-plan`, `/agent-code`, and `/agent-task` as "tab completion" smoke checks
 
-Type `/agent` and check that all three commands auto-complete:
+Type `/agent` and check that all three pipeline skills auto-complete (on current Claude Code versions, skills are invocable as `/<name>`):
 
 ```
 /agent-plan
@@ -55,9 +55,9 @@ Type `/agent` and check that all three commands auto-complete:
 /agent-task
 ```
 
-**Verify:** every command you kept in `.claude/commands/` appears in the completion list. You do not need to actually run them yet — just confirm Claude Code sees them.
+**Verify:** every pipeline skill you kept in `.claude/skills/` appears in the completion list. You do not need to actually run them yet — just confirm Claude Code sees them.
 
-**If a command is missing:** restart the session. Claude Code reads `.claude/commands/` at session start; if you installed while a session was already open, the new files are not picked up until you restart.
+**If a pipeline is missing:** restart the session. Claude Code discovers `.claude/skills/` at session start; if you installed while a session was already open, the new files are not picked up until you restart. If it is still missing after a restart, confirm the file exists at `.claude/skills/<name>/SKILL.md` and its frontmatter `name` matches the directory name.
 
 ---
 
@@ -75,7 +75,7 @@ You can interrupt the planning run as soon as Product starts writing — you are
 
 **If Product never writes a file:** the Product agent is not loading. Check `.claude/agents/product.md` for frontmatter issues, or re-run `/agents` to confirm Product is listed.
 
-**If `/agent-plan` halts with a "missing template" error:** your `templates/` directory is missing `MILESTONE_TASKS.md` or another planning template that the command references. Re-copy `templates/` from the template.
+**If `/agent-plan` halts with a "missing template" error:** your `templates/` directory is missing `MILESTONE_TASKS.md` or another planning template that the pipeline references. Re-run `/cast-init` to reinstall `templates/`.
 
 ---
 
@@ -89,7 +89,7 @@ For a lighter-weight verification that the engineering pipeline is working:
 
 **Verify:** the Coder agent picks up the task, makes the one-line change, the Tester agent runs, the Reviewer agent approves, and the Product agent validates. You can roll the commit back afterward.
 
-**If any agent in the chain halts:** read the halt message. It should cite the specific agent and the specific reason. Cross-reference the CAST template's `TROUBLESHOOTING.md`.
+**If any agent in the chain halts:** read the halt message. It should cite the specific agent and the specific reason. Cross-reference the CAST repo's [`TROUBLESHOOTING.md`](https://github.com/Raxvis/CAST/blob/main/TROUBLESHOOTING.md).
 
 ---
 
@@ -161,4 +161,4 @@ Each probe is a single prompt to launch the named agent explicitly. Each takes u
 
 ---
 
-_See also: the CAST template's `TROUBLESHOOTING.md` for symptom-based diagnostics and `example/` for a worked fixture showing what successful outputs look like._
+_See also: the CAST repo's [`TROUBLESHOOTING.md`](https://github.com/Raxvis/CAST/blob/main/TROUBLESHOOTING.md) for symptom-based diagnostics and its `example/` directory for a worked fixture showing what successful outputs look like._
