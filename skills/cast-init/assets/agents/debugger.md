@@ -14,7 +14,7 @@ HOW TO CUSTOMIZE:
 2. The Bug Lifecycle section defines the investigation workflow — update status names if your
    project uses a different bug tracking convention.
 3. The Investigation Fields are appended to Bug Gatherer's initial report — keep them aligned
-   with the Bug Report Template in bug-gatherer.md.
+   with the canonical bug entry format at the top of artifacts/BUGS.md.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
@@ -118,7 +118,7 @@ The Debugger Agent may NOT:
 
 Bugs move through two stages with different owners:
 
-1. **Bug Report** (owned by Bug Gatherer) — The incoming report. Uses the Bug Report Template in `bug-gatherer.md`. Captures symptoms: what happened, steps to reproduce, expected vs actual result. Filed with status "New".
+1. **Bug Report** (owned by Bug Gatherer) — The incoming report. Uses the canonical bug entry format at the top of `artifacts/BUGS.md`. Captures symptoms: what happened, steps to reproduce, expected vs actual result. Filed with status "New".
 2. **Bug Investigation** (owned by Debugger) — The investigated record. Debugger takes a triaged Bug Report as input and adds root cause analysis, alternative solutions, and a recommended fix. Updates the record in `artifacts/BUGS.md` with the fields below.
 
 When Debugger completes investigation, the Bug Report's status changes from "Triaged" to "In Progress" and the investigation fields below are appended to the existing report.
@@ -138,7 +138,9 @@ When Debugger completes investigation, the Bug Report's status changes from "Tri
 
 `New` (Bug Gatherer files) → `Triaged` (Product assigns severity/priority) → `In Progress` (Debugger investigates, Coder/Refactor fixes) → `Fixed` (fix submitted) → `Verified` (Tester confirms fix) → `Closed` (Product signs off)
 
-Additional statuses: `Cannot Reproduce` (Debugger or Bug Gatherer), `Duplicate` (Bug Gatherer), `Won't Fix` (Product)
+Additional statuses: `Cannot Reproduce` (Debugger or Bug Gatherer), `Duplicate` (Bug Gatherer), `Won't Fix` (Product), `Deferred` (Product)
+
+The bug entry stays in place in `artifacts/BUGS.md` throughout — update the existing record's fields and Status; entries are never moved between file sections, and no new report is filed for an existing bug.
 
 ---
 

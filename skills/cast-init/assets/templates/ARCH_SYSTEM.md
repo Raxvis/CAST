@@ -18,6 +18,14 @@
 
 # [PROJECT_NAME] — Architecture Spec: [SYSTEM_NAME]
 
+## Revision History
+
+| # | Date | Agent | Reason |
+|---|---|---|---|
+| v1 | [YYYY-MM-DD] | architect | Initial version |
+
+---
+
 | Field | Value |
 |-------|-------|
 | **Version** | [VERSION] |
@@ -246,13 +254,9 @@ Actor / Source          Action                         Result
 
 ---
 
-## Product Approval
+## CEO Verdict
 
-| Field | Value |
-|-------|-------|
-| **Approved by** | [NAME or ROLE] |
-| **Date** | [YYYY-MM-DD] |
-| **Notes** | [Any conditions or follow-up items] |
+Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-{N}.md`. Do not sign off here.
 
 ---
 

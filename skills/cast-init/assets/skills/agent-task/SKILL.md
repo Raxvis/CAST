@@ -47,8 +47,8 @@ This skill invokes the following agents. Open any of them for the full role defi
 - [coder](../../agents/coder.md) — implements the task
 - [tester](../../agents/tester.md) — writes and runs tests; gates Reviewer behind a green test suite
 - [reviewer](../../agents/reviewer.md) — reviews the code and classifies findings as Defects or Issues
-- [debugger](../../agents/debugger.md) — investigates Defect findings when raised
-- [bug-gatherer](../../agents/bug-gatherer.md) — files investigated defects as structured bug reports
+- [bug-gatherer](../../agents/bug-gatherer.md) — files Defect findings as structured bug reports
+- [debugger](../../agents/debugger.md) — investigates triaged defects when Product says fix now
 - [refactor](../../agents/refactor.md) — addresses Issue findings and loops back to Reviewer
 - [product](../../agents/product.md) — validates the finished task against the original task description
 
@@ -126,11 +126,11 @@ After Tester passes, launch the **reviewer** agent to:
 
 - Review the code against project conventions, existing patterns in adjacent code, and any topic-specific doc that applies.
 - Classify every finding as a **Defect** or an **Issue** using the same routing as `/agent-code`:
-  - **Defect** → **debugger** → **bug-gatherer** → **product** for triage. If Product triages as "fix now", the defect returns to Coder.
+  - **Defect** → **bug-gatherer** files it in `artifacts/BUGS.md` (status New) → **product** triages (sets final severity; status Triaged) → if "fix now", **debugger** investigates (status In Progress) and the defect returns to Coder with the root-cause analysis.
   - **Issue** → **refactor** → back to **reviewer** (Tester re-runs first).
 - If the Reviewer's findings reveal missing design context (e.g., "this change should not exist without a new architecture document" or "this introduces a pattern not used elsewhere"), **stop and instruct the user to run `/agent-plan` to introduce the missing context**. Do not attempt to retrofit design work into a one-off task.
 
-The Reviewer loop may cycle; track the count and escalate after `[MAX_LOOP_COUNT]` cycles on the same task.
+The Reviewer loop may cycle; track the count and escalate after `[MAX_LOOP_COUNT]` cycles on the same task. Record the count in `artifacts/STANDUP.md` after each cycle (`Task <id>: loop <k>/[MAX_LOOP_COUNT]`) so an interrupted run resumes with the real count. Refactor→Reviewer rounds increment the same counter.
 
 ### Step 4 — Product Validation
 
@@ -148,7 +148,7 @@ After the task passes Product validation:
 
 1. Run `[TEST_CMD]` one final time to confirm everything still passes.
 2. Append a one-line entry to `artifacts/STANDUP.md` with the date, task summary, and any bug ID resolved.
-3. If the task resolved a bug filed in `artifacts/BUGS.md`, update the bug's status (Open → Fixed) and add the investigation / fix fields.
+3. If the task resolved a bug filed in `artifacts/BUGS.md`, update the bug's status (→ Fixed, with the resolution fields — Commit, Files Changed, Regression Notes — filled in).
 4. Summarize what changed, what tests were affected, and any follow-up items or deferred scope.
 
 ### Error Handling

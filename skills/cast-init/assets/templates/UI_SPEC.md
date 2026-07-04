@@ -20,6 +20,14 @@
 
 # [PROJECT_NAME] — UI Spec: [COMPONENT_OR_SCREEN_NAME]
 
+## Revision History
+
+| # | Date | Agent | Reason |
+|---|---|---|---|
+| v1 | [YYYY-MM-DD] | ui | Initial version |
+
+---
+
 | Field | Value |
 |-------|-------|
 | **Version** | [VERSION] |
@@ -197,14 +205,9 @@
 
 ---
 
-## Product Approval
+## CEO Verdict
 
-| Field | Value |
-|-------|-------|
-| **Approved by** | [NAME or ROLE] |
-| **Date** | [YYYY-MM-DD] |
-| **Status** | Pending / Approved / Changes Requested |
-| **Notes** | [Any conditions or feedback.] |
+Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-{N}.md`. Do not sign off here.
 
 ---
 

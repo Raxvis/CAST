@@ -109,7 +109,7 @@ The Product Agent may NOT:
 
 ## Templates
 
-When producing milestone artifacts, read the corresponding template from `docs/` **first** and follow its structure exactly. The milestone definition file and the task breakdown file are deliberately separate — one captures what and why (the CEO's primary read during planning review), the other captures how (the Coder's primary read during engineering).
+When producing milestone artifacts, read the corresponding template from `templates/` **first** and follow its structure exactly. The milestone definition file and the task breakdown file are deliberately separate — one captures what and why (the CEO's primary read during planning review), the other captures how (the Coder's primary read during engineering).
 
 | Artifact type | Template to read | Instance destination |
 |---|---|---|

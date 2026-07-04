@@ -92,6 +92,7 @@ The Security Agent may NOT:
 | Source | Input |
 |---|---|
 | Architecture | New or updated architecture documents, design decisions, and plans |
+| Product | The milestone definition (scope and success metrics under review) |
 | Coder | New code that handles sensitive data, authentication, or external inputs |
 | User | Direct requests for security review of specific areas |
 | Release | Pre-release security checklist requests |

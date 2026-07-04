@@ -86,6 +86,7 @@ The Tester Agent may NOT:
 | Architecture | Module specifications and data schemas (to derive test cases) |
 | Product | Acceptance criteria (to derive acceptance tests) |
 | UI | Screen specifications (to derive UI/interaction tests) |
+| `docs/TEST_FRAMEWORK.md` | Testing strategy, runner setup, and coverage configuration — read before writing tests |
 
 ---
 
@@ -103,6 +104,7 @@ The Tester Agent may NOT:
 ## Interaction Rules
 
 - Tester runs after every Coder change — this is automatic, not optional.
+- Tester reads `docs/TEST_FRAMEWORK.md` (testing strategy, runner setup, coverage config) before writing tests, and follows the conventions documented there.
 - Tester reports failures to Coder first. If the issue is non-trivial, Tester also notifies Debugger.
 - Tester generates tests before or alongside Coder's implementation when specifications are available.
 - Tester does not approve or reject work — it provides test results that Reviewer uses in its evaluation.

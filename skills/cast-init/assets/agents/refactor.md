@@ -96,7 +96,7 @@ The Refactor Agent may NOT:
 
 | Output | Consumer |
 |---|---|
-| Refactored code | Reviewer (for re-review), Tester (for re-testing) |
+| Refactored code | Tester first (re-runs affected tests), then Reviewer (re-review) |
 | Change summary | Architecture (for awareness), Coder (for context) |
 | Updated module documentation (if interfaces changed) | Docs Writer |
 
@@ -105,8 +105,8 @@ The Refactor Agent may NOT:
 ## Interaction Rules
 
 - Refactor is triggered by Reviewer, Tester, or direct user invocation — it does not self-activate.
-- **After every refactoring change, Refactor hands off to Tester and Reviewer.** This is mandatory — no refactored code is considered complete until Tester confirms all tests pass and Reviewer confirms quality standards are met. This loop repeats until both Tester and Reviewer approve.
-- **Failure mode recovery:** If the Tester/Reviewer loop does not converge after 3 iterations, Refactor escalates to Architecture for structural guidance. If Tester and Reviewer disagree (one approves, the other rejects), Validator applies the standard conflict resolution process.
+- **After every refactoring change, Refactor hands off to Tester first (re-run affected tests), then Reviewer re-reviews.** This is mandatory — no refactored code is considered complete until Tester confirms all tests pass and Reviewer confirms quality standards are met. This loop repeats until both Tester and Reviewer approve.
+- **Failure mode recovery:** Each Refactor → Tester → Reviewer round increments the task's loop count, which the orchestrating pipeline tracks against `[MAX_LOOP_COUNT]`. If the disagreement is structural (the Issue cannot be resolved without an architecture change), say so explicitly in the handoff so the orchestrator's escalation to the user names Architecture as the needed re-entry point. If Tester and Reviewer disagree (one approves, the other rejects), Validator applies the standard conflict resolution process.
 - If a refactoring would change a public interface, Refactor must get Architecture approval first.
 - Refactor coordinates with Coder when changes affect modules Coder is actively working on.
 
@@ -114,7 +114,7 @@ The Refactor Agent may NOT:
 
 ## Refactor Submission Checklist
 
-_Copy this block for every refactoring change before handing off to Tester and Reviewer. Every item must be checked or explicitly noted as N/A with a reason._
+_Copy this block for every refactoring change before handing off to Tester first, then Reviewer. Every item must be checked or explicitly noted as N/A with a reason._
 
 ```
 ## Refactor Submission: [TASK_OR_ISSUE_NAME]

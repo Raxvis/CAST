@@ -13,13 +13,23 @@
   - Copy the Task Template block for each task and fill in all fields.
   - Task IDs should follow a consistent format (e.g., M2-T01, M2-T02).
   - Status values: Not Started / In Progress / Blocked / Complete / Deferred.
-  - Needs Arch Doc / Needs UI Spec: Yes / No / Done.
+  - Needs Arch Doc / Needs UI Spec live ONLY in each task's per-task field table
+    (Yes / No / Done → link) — they are deliberately not repeated in the Summary table.
   - Dependencies: List task IDs that must be complete before this task can start, or "None".
+  - The milestone Goal lives in the milestone definition file (MILESTONE_DEFINITION.md
+    instance) — do not restate it here.
+  - The CEO Approval Conditions section is filled after the CEO verdict; keep it.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
 
 # [PROJECT_NAME] — [MILESTONE_NAME] Task Breakdown
+
+## Revision History
+
+| # | Date | Agent | Reason |
+|---|---|---|---|
+| v1 | [YYYY-MM-DD] | product | Initial version |
 
 ---
 
@@ -27,7 +37,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Goal** | [One sentence describing what completing this milestone achieves.] |
+| **Definition** | see `milestone-[M#]-[slug].md` |
 | **Status** | Not Started / In Progress / Blocked / Complete |
 | **Requirements Reference** | [REQUIREMENTS_REFERENCE] |
 
@@ -35,12 +45,22 @@
 
 ## Summary
 
-| Task ID | Task Name | Status | Dependencies | Needs Arch Doc | Needs UI Spec |
-|---------|-----------|--------|-------------|----------------|--------------|
-| [M#-T01] | [Task name] | Not Started | None | No | No |
-| [M#-T02] | [Task name] | Not Started | [M#-T01] | Yes | No |
-| [M#-T03] | [Task name] | Not Started | [M#-T01] | No | Yes |
-| [M#-T04] | [Task name] | Not Started | [M#-T02], [M#-T03] | No | No |
+| Task ID | Task Name | Status | Dependencies |
+|---------|-----------|--------|-------------|
+| [M#-T01] | [Task name] | Not Started | None |
+| [M#-T02] | [Task name] | Not Started | [M#-T01] |
+| [M#-T03] | [Task name] | Not Started | [M#-T01] |
+| [M#-T04] | [Task name] | Not Started | [M#-T02], [M#-T03] |
+
+---
+
+## CEO Approval Conditions
+
+_Filled after the CEO verdict. Coder tracks each condition during engineering; Reviewer and Product verify at completion._
+
+| Condition | Source | Status |
+|-----------|--------|--------|
+| [Condition text, or "None — verdict was APPROVED"] | `artifacts/reviews/ceo-review-milestone-[M#].md` | Open / Addressed / Verified |
 
 ---
 
@@ -71,8 +91,6 @@
 - [ ] No linter or type-check errors introduced
 - [ ] Manually tested on [PLATFORM(s)]
 
-**Architecture Docs**: [Link to ARCH_MODULE.md, ARCH_SYSTEM.md, or "None required"]
-
 ---
 
 ### [M#-T02]: [Task Name]
@@ -97,8 +115,6 @@
 - [ ] [Specific, testable criterion]
 - [ ] No linter or type-check errors introduced
 - [ ] Manually tested on [PLATFORM(s)]
-
-**Architecture Docs**: [Link or "None required"]
 
 ---
 
@@ -125,8 +141,6 @@
 - [ ] No linter or type-check errors introduced
 - [ ] Manually tested on [PLATFORM(s)]
 
-**Architecture Docs**: [Link or "None required"]
-
 ---
 
 ### [M#-T04]: [Task Name]
@@ -151,8 +165,6 @@
 - [ ] [Specific, testable criterion]
 - [ ] No linter or type-check errors introduced
 - [ ] Manually tested on [PLATFORM(s)]
-
-**Architecture Docs**: [Link or "None required"]
 
 ---
 
@@ -181,8 +193,6 @@ _Copy this block to add a new task._
 - [ ] [Criterion]
 - [ ] No linter or type-check errors introduced
 - [ ] Manually tested on [PLATFORM(s)]
-
-**Architecture Docs**: [Link or "None required"]
 ```
 
 ---

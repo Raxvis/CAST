@@ -91,11 +91,12 @@ Input to pass: the milestone definition and task breakdown from Stage 1.
 In parallel with Architecture, launch the **ui** agent to:
 
 1. Read the milestone definition from Stage 1.
-2. Produce the UI specification at `artifacts/ui-specs/ui-milestone-{N}.md` using the template in `templates/UI_SPEC.md`.
-3. Define screen layouts, component structure, interaction states, and accessibility notes.
-4. Reference existing UI specs in `artifacts/ui-specs/` for consistency.
+2. Read the task breakdown from Stage 1 — the per-task `Needs UI Spec` flags identify every screen the milestone introduces.
+3. Produce the UI specification at `artifacts/ui-specs/ui-milestone-{N}.md` using the template in `templates/UI_SPEC.md`.
+4. Define screen layouts, component structure, interaction states, and accessibility notes.
+5. Reference existing UI specs in `artifacts/ui-specs/` for consistency.
 
-Input to pass: the milestone definition from Stage 1. Coordinate state-shape questions with the architect agent if they arise.
+Input to pass: the milestone definition and the task breakdown from Stage 1 (the `Needs UI Spec` flags live in the task breakdown). Coordinate state-shape questions with the architect agent if they arise.
 
 Both Architecture and UI must complete before Stage 3 begins.
 

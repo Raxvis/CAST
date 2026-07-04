@@ -42,7 +42,7 @@ The **Tier** column indicates which Minimum Viable Agent Set tier each agent bel
 | Coder | `coder.md` | T1 | Implements features as directed by Product, Architecture, and UI. Writes all production code and performs pre-handoff self-review. |
 | Tester | `tester.md` | T1 | Generates and maintains automated test coverage. Runs after every change the Coder makes. |
 | Reviewer | `reviewer.md` | T1 | Reviews everything the Coder produces. Classifies findings as Defects (→ Debugger) or Issues (→ Refactor). |
-| Debugger | `debugger.md` | T2 | Investigates defects raised by Reviewer. Logs investigation and hands reports to Bug Gatherer. |
+| Debugger | `debugger.md` | T2 | Investigates defects Product triages as fix-now. Updates the bug record with root-cause analysis for Coder. |
 | Refactor | `refactor.md` | T3 | Improves code structure without changing behaviour. Triggered by Reviewer issues. Flows back to Reviewer on completion. |
 | Bug Gatherer | `bug-gatherer.md` | T3 | Collects and structures bug reports from Debugger and other sources. Produces standardized reports that Product triages. |
 | Docs Writer | `docs-writer.md` | T2 | Produces and maintains developer-facing documentation. Runs after any other agent completes work. Accepts direct user input. |
@@ -92,7 +92,7 @@ Agents with specialized responsibilities include additional sections after the c
 - **Validator**: Session-Start Checklist, Conflict Resolution Protocol, Agent Status Dashboard
 - **Product**: Task Validation Checklist, User Validation Feedback Log
 - **Coder**: Pre-Handoff Checklist, Work Selection Strategy, Implementation Status
-- **Bug Gatherer**: Workflow, Severity Rubric, Bug Report Template
+- **Bug Gatherer**: Workflow, Severity Rubric (canonical bug entry format lives in `artifacts/BUGS.md`)
 
 ---
 
@@ -237,7 +237,7 @@ Run per task within the approved milestone:
 1. **Coder** implements the task, completes the Pre-Handoff Checklist, and hands off.
 2. **Tester** writes or updates tests and runs the test suite (automated gate). If tests fail, work returns to **Coder**. Tester must pass before Reviewer runs.
 3. **Reviewer** reviews the code against the architecture document, UI specification, project conventions, and any CEO Approval Conditions. Findings are classified as:
-   - **Defects** — route to **Debugger** → **Bug Gatherer** → **Product** for triage. If Product triages as fix-now, the defect returns to Coder.
+   - **Defects** — route to **Bug Gatherer** (files the report, status New) → **Product** (triages, sets final severity, status Triaged) → if fix-now, **Debugger** (investigates root cause, status In Progress). The defect then returns to Coder with the root-cause analysis.
    - **Issues** — route to **Refactor**. Refactor hands off back to **Tester** and **Reviewer** until the issue is resolved.
 4. **Product** validates the finished task against its acceptance criteria. On rejection, work returns to Coder.
 5. **Docs Writer** updates documentation after each agent completes work.
@@ -252,11 +252,11 @@ Run for a single self-contained task (bug fix, typo, small refactor, dependency 
 2. **Coder** implements the change following the conventions in `CLAUDE.md` and `docs/`, completes the Pre-Handoff Checklist, and hands off.
 3. **Tester** writes or updates unit tests and runs the test suite (automated gate). If tests fail, work returns to **Coder**. Tester must pass before Reviewer runs.
 4. **Reviewer** reviews the code against project conventions and adjacent patterns. Findings are classified as:
-   - **Defects** — route to **Debugger** → **Bug Gatherer** → **Product** for triage. If Product triages as fix-now, the defect returns to Coder.
+   - **Defects** — route to **Bug Gatherer** (files the report, status New) → **Product** (triages, sets final severity, status Triaged) → if fix-now, **Debugger** (investigates root cause, status In Progress). The defect then returns to Coder with the root-cause analysis.
    - **Issues** — route to **Refactor**. Refactor hands off back to **Tester** and **Reviewer** until the issue is resolved.
    - If Reviewer discovers the change needs new architectural decisions or cross-cutting design work, **halt and instruct the user to re-run via `/agent-plan`**. Do not retrofit design work into a one-off task.
 5. **Product** validates the finished change against the task description itself (no milestone means the description is the acceptance criteria). Product also checks that no out-of-scope changes snuck in. On rejection, work returns to Coder.
-6. **Completion**: append a one-line entry to `artifacts/STANDUP.md` with the date, task summary, and any bug ID resolved. If the task resolved a bug filed in `artifacts/BUGS.md`, update the bug's status (Open → Fixed) and add the investigation/fix fields.
+6. **Completion**: append a one-line entry to `artifacts/STANDUP.md` with the date, task summary, and any bug ID resolved. If the task resolved a bug filed in `artifacts/BUGS.md`, update the bug's status (→ Fixed) and fill in the resolution fields (Commit, Files Changed, Regression Notes).
 7. `/agent-task` does **not** write to `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, or `artifacts/reviews/` — those directories are owned by `/agent-plan` outputs.
 
 ### Cross-Reference Rules
@@ -332,7 +332,7 @@ The table below records **where each agent writes its work artifacts**. Template
 | Code review verdicts | Reviewer | `reviewer.md` → Current Work | Submission / Source Agent / Date / Verdict / Notes |
 | Test results and coverage | Tester | `tester.md` → Current Work | Change / Source Agent / Tests Run / Pass-Fail / Coverage Delta |
 | Bug investigations | Debugger | `artifacts/BUGS.md` | Bug ID / Source / Status / Assigned To / Notes |
-| Bug reports (initial) | Bug Gatherer | `artifacts/BUGS.md` via Bug Report Template | See `bug-gatherer.md` → Bug Report Template |
+| Bug reports (initial) | Bug Gatherer | `artifacts/BUGS.md` | Canonical entry format at the top of `artifacts/BUGS.md` |
 | Security audit findings (planning) | Security | `artifacts/reviews/security-review-milestone-{N}.md` | Finding / Severity / Module / Status / Notes |
 | Security findings index | Security | `security.md` → Current Work | Finding / Severity / Module / Status / Notes |
 | Performance analysis (planning) | Performance | `artifacts/reviews/performance-review-milestone-{N}.md` | Finding / Metric / Impact / Status / Notes |

@@ -20,6 +20,14 @@
 
 # [PROJECT_NAME] — Architecture Spec: [MODULE_NAME]
 
+## Revision History
+
+| # | Date | Agent | Reason |
+|---|---|---|---|
+| v1 | [YYYY-MM-DD] | architect | Initial version |
+
+---
+
 | Field | Value |
 |-------|-------|
 | **Version** | [VERSION] |
@@ -119,23 +127,15 @@ function [functionName]([param]: [type]): [ReturnType]
 
 ---
 
-## Integration with Store
+## State / Integration Boundary (if applicable)
 
-[Describe how this module connects to the application's state management layer.]
+[Describe how this module's state is exposed to and consumed by the rest of the application, if it holds state. Name the mechanism (state layer, service interface, event bus, plain function calls) and the direction of each interaction.]
 
-```
-// Example: how the store calls into this module
-[storeAction]: ([param]) => {
-  const result = [moduleFunctionName](get().[stateField], [param]);
-  set({ [stateField]: result });
-}
-```
+State fields owned or updated by this module's outputs:
 
-State fields managed by this module's outputs:
-
-| Store Field | Type | Updated By |
+| State Field | Type | Updated By |
 |-------------|------|-----------|
-| `[field]` | `[type]` | `[action name]` |
+| `[field]` | `[type]` | `[function or operation name]` |
 
 ---
 
@@ -211,11 +211,7 @@ State fields managed by this module's outputs:
 
 ## Performance Budget
 
-| Metric | Target | Measurement Method |
-|--------|--------|--------------------|
-| [Computation time] | [< X ms] | [How to measure] |
-| [Memory usage] | [< X KB] | [How to measure] |
-| [Other metric] | [Target] | [How to measure] |
+Budgets: see the system-level table in the `ARCH_SYSTEM.md` instance and live tracking in `.claude/agents/performance.md`.
 
 ---
 
@@ -226,19 +222,15 @@ State fields managed by this module's outputs:
 - [ ] All unit test cases pass
 - [ ] All manual testing steps verified
 - [ ] Performance budget met
-- [ ] Integrated with store and verified via UI
+- [ ] State / integration boundary wired and verified end-to-end (if applicable)
 - [ ] No linter or type-check errors
 - [ ] Code reviewed and merged
 
 ---
 
-## Product Approval
+## CEO Verdict
 
-| Field | Value |
-|-------|-------|
-| **Approved by** | [NAME or ROLE] |
-| **Date** | [YYYY-MM-DD] |
-| **Notes** | [Any conditions or follow-up items] |
+Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-{N}.md`. Do not sign off here.
 
 ---
 

@@ -109,7 +109,7 @@ The UI Agent may NOT:
 
 ## Templates
 
-When producing UI specifications, read the template from `docs/` **first** and follow its structure exactly. The template ensures every spec covers interaction states (default, focused, disabled, loading, error, empty), accessibility requirements, and platform-specific concerns consistently.
+When producing UI specifications, read the template from `templates/` **first** and follow its structure exactly. The template ensures every spec covers interaction states (default, focused, disabled, loading, error, empty), accessibility requirements, and platform-specific concerns consistently.
 
 | Artifact type | Template to read | Instance destination |
 |---|---|---|

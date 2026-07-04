@@ -2,16 +2,16 @@
 name: agent-code
 description: >-
   Run the CAST Engineering Stage for a CEO-approved milestone: Coder → Tester →
-  Reviewer, with Defects routed through Debugger → Bug Gatherer → Product and Issues
-  through Refactor → Reviewer, then Product validation. Use when the user asks to
-  implement an approved milestone or invokes /agent-code. Requires an existing CEO
+  Reviewer, with Defects routed through Bug Gatherer → Product triage → Debugger and
+  Issues through Refactor → Reviewer, then Product validation. Use when the user asks
+  to implement an approved milestone or invokes /agent-code. Requires an existing CEO
   verdict in artifacts/reviews/.
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
 PURPOSE: This file defines the /agent-code pipeline skill. It runs the Engineering Stage of
 the multi-agent workflow for an approved milestone: Coder → Tester → Reviewer, with defects
-routed to Debugger → Bug Gatherer → Product, and quality issues routed to Refactor → Reviewer.
+routed to Bug Gatherer → Product → Debugger, and quality issues routed to Refactor → Reviewer.
 
 All work artifacts (bug reports, progress log entries, milestone completion records) are
 written to `artifacts/`. Templates are read from `templates/`; guidelines are read from
@@ -42,8 +42,8 @@ This skill invokes the following agents. Open any of them for the full role defi
 - [coder](../../agents/coder.md) — implements each task and completes the Pre-Handoff Checklist
 - [tester](../../agents/tester.md) — writes and runs tests; gates Reviewer behind a green test suite
 - [reviewer](../../agents/reviewer.md) — reviews the code and classifies findings as Defects or Issues
-- [debugger](../../agents/debugger.md) — investigates Defect findings and produces root-cause analysis
-- [bug-gatherer](../../agents/bug-gatherer.md) — files investigated defects as structured bug reports
+- [bug-gatherer](../../agents/bug-gatherer.md) — files Defect findings as structured bug reports
+- [debugger](../../agents/debugger.md) — investigates triaged defects and produces root-cause analysis
 - [refactor](../../agents/refactor.md) — addresses Issue findings without changing behaviour and loops back to Reviewer
 - [product](../../agents/product.md) — triages bug reports and validates completed tasks against acceptance criteria
 
@@ -59,7 +59,7 @@ Each stage runs on the model pinned in that agent's file (default: `claude-opus-
 
 - **Opus 4.8 / 4.7** — these models delegate conservatively; the explicit stage invocations below are load-bearing. Execute every stage exactly as written, including the Defect/Issue routing loops.
 - **Opus 4.6** — this model over-delegates; invoke only the agents named in the stages below and spawn no ad-hoc subagents beyond them.
-- **Effort** — run the Coder and Reviewer stages at `xhigh` on Opus 4.7+ (`high` on Opus 4.6); Tester, routing, and Product validation at `high`.
+- **Effort** — run the Coder, Reviewer, and Debugger stages at `xhigh` on Opus 4.7+ (`high` on Opus 4.6); Tester, Refactor, routing, and Product validation at `high`.
 - **Review recall (Opus 4.8 / 4.7)** — these models follow severity filters literally: the Reviewer stage must report every Defect and Issue found; filtering happens in the routing stages, never at review time.
 
 ## Instructions
@@ -87,7 +87,7 @@ Before any task begins:
 
 ### Per-Task Loop
 
-For each task, run this sequence. The loop may cycle — track the count and escalate to the user after `[MAX_LOOP_COUNT]` full cycles on a single task.
+For each task, run this sequence. The loop may cycle — track the count and escalate to the user after `[MAX_LOOP_COUNT]` full cycles on a single task. Record the count in `artifacts/STANDUP.md` after each cycle (`Task <id>: loop <k>/[MAX_LOOP_COUNT]`) so an interrupted run resumes with the real count. Refactor→Reviewer rounds increment the same counter.
 
 **Step 1 — Coder**
 
@@ -115,14 +115,14 @@ After Tester passes, launch the **reviewer** agent to:
 - Classify every finding as a **Defect** (incorrect behaviour, broken functionality, violated contract) or an **Issue** (structural problem, convention violation, maintainability concern).
 - If there are no findings, proceed to Step 4.
 
-**Step 3a — Defects → Debugger → Bug Gatherer → Product**
+**Step 3a — Defects → Bug Gatherer → Product → Debugger**
 
 For every Reviewer finding classified as a **Defect**:
 
-1. Launch the **debugger** agent to investigate the root cause and propose solutions. Debugger logs the investigation.
-2. Launch the **bug-gatherer** agent to file the finding as a structured bug report in `artifacts/BUGS.md` using the Bug Report Template.
-3. Hand the filed report to the **product** agent for triage. Product decides whether the defect blocks the current task, is fixed later, or is closed as not-a-bug.
-4. If Product triages the defect as "fix now", the defect returns to Coder (loop back to Step 1) with Debugger's root-cause analysis attached.
+1. Launch the **bug-gatherer** agent to file the finding as a structured bug report in `artifacts/BUGS.md` (status New), using the canonical entry format at the top of that file.
+2. Hand the filed report to the **product** agent for triage. Product decides whether the defect is fixed now, fixed later, or closed as not-a-bug, and sets the final severity (status Triaged).
+3. If Product triages the defect as "fix now", launch the **debugger** agent to investigate the root cause and update the existing record with the investigation fields (status In Progress).
+4. The defect returns to Coder (loop back to Step 1) with Debugger's root-cause analysis attached.
 
 **Step 3b — Issues → Refactor → Reviewer**
 

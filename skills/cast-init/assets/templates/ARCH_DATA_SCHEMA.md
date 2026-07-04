@@ -19,6 +19,14 @@
 
 # [PROJECT_NAME] — Architecture Spec: [SCHEMA_NAME] Data Schema
 
+## Revision History
+
+| # | Date | Agent | Reason |
+|---|---|---|---|
+| v1 | [YYYY-MM-DD] | architect | Initial version |
+
+---
+
 | Field | Value |
 |-------|-------|
 | **Version** | [VERSION] |
@@ -238,13 +246,9 @@ const value = data.[DOMAIN_ENTITY].[field];
 
 ---
 
-## Product Approval
+## CEO Verdict
 
-| Field | Value |
-|-------|-------|
-| **Approved by** | [NAME or ROLE] |
-| **Date** | [YYYY-MM-DD] |
-| **Notes** | [Any conditions or follow-up items] |
+Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-{N}.md`. Do not sign off here.
 
 ---
 

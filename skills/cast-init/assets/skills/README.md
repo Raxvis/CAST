@@ -30,7 +30,7 @@ Claude Code auto-discovers any `<name>/SKILL.md` under `.claude/skills/` at sess
 | Directory | Skill | Purpose |
 |---|---|---|
 | `agent-plan/` | `/agent-plan <feature description>` | Runs the full Planning Stage: Product → Architecture + UI → Security + Performance → CEO. Produces milestone plans, architecture documents, UI specs, reviews, and a CEO verdict in `artifacts/`. No code is written. |
-| `agent-code/` | `/agent-code <milestone or task>` | Runs the Engineering Stage for a CEO-approved milestone: Coder → Tester → Reviewer → Product validation. Defect findings route through Debugger → Bug Gatherer → Product for triage. Issue findings route through Refactor → Reviewer loop. |
+| `agent-code/` | `/agent-code <milestone or task>` | Runs the Engineering Stage for a CEO-approved milestone: Coder → Tester → Reviewer → Product validation. Defect findings route through Bug Gatherer → Product triage → Debugger investigation. Issue findings route through Refactor → Reviewer loop. |
 | `agent-task/` | `/agent-task <task description>` | Runs a mini engineering pipeline for a single one-off task without requiring a milestone, planning artifacts, or CEO verdict. Same Defect/Issue routing as `/agent-code` but no planning stage. Bails out and recommends `/agent-plan` if the task turns out to need architectural work. |
 
 ## When to use each skill

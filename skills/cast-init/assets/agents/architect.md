@@ -105,7 +105,7 @@ The Architecture Agent may NOT:
 
 ## Templates
 
-When producing architecture artifacts, read the corresponding template from `docs/` **first** and follow its structure exactly. Do not improvise document shape — the templates exist so downstream agents (Coder, Reviewer, CEO) can rely on predictable sections when consuming the output.
+When producing architecture artifacts, read the corresponding template from `templates/` **first** and follow its structure exactly. Do not improvise document shape — the templates exist so downstream agents (Coder, Reviewer, CEO) can rely on predictable sections when consuming the output.
 
 | Artifact type | Template to read | Instance destination |
 |---|---|---|

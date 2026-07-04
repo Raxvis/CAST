@@ -86,6 +86,8 @@ The Performance Agent may NOT:
 | Source | Input |
 |---|---|
 | Architecture | New or updated architecture documents, design decisions, and plans |
+| UI | The milestone UI specification (rendering cost, interaction hot paths) |
+| Product | The milestone definition (scope and success metrics under review) |
 | Coder | New code that may affect performance-critical paths |
 | Tester | Performance test results and benchmarks |
 | User | Direct requests for performance analysis of specific areas |

@@ -15,9 +15,9 @@ HOW TO CUSTOMIZE:
 4. Replace [AREA_*] in the bug report template with the actual feature areas or modules in
    your project — this helps Bug Gatherer route reports to the right owner.
 5. Review the Severity Rubric and adjust the examples to match your project's severity scale.
-   The four levels (Critical, Major, Minor, Cosmetic) are a starting point.
-6. The Bug Report Template format is the canonical format for all reports. Keep it intact.
-   Agents and humans should reference this format when filing bugs.
+   The four levels (Critical, High, Medium, Low) match the canonical schema in artifacts/BUGS.md.
+6. The canonical bug entry format lives at the top of artifacts/BUGS.md — this file
+   deliberately does not restate it. Keep the two aligned if you customize either.
 7. Review the Rules section and remove or adjust any that do not apply to your workflow.
 -->
 
@@ -112,7 +112,7 @@ The Bug Gatherer Agent may NOT:
 
 - **Trigger**: Bug Gatherer activates when any agent or external source submits a bug. Sources include: Reviewer (defect reports), Debugger (investigated defects), Tester (failure reports), Product (validation bugs), Coder (self-reported issues), and external testers/stakeholders.
 - Bug Gatherer is the single entry point for all bug reports. No agent logs bugs directly to `artifacts/BUGS.md` without going through Bug Gatherer first.
-- Bug Gatherer files the initial report. Debugger later adds investigation fields. See `debugger.md` → Bug Lifecycle for the full status flow.
+- Bug Gatherer files the initial report. Debugger later adds investigation fields. The canonical entry format, status flow, and field ownership live at the top of `artifacts/BUGS.md`.
 - Bug Gatherer coordinates with Debugger to prevent duplicate entries.
 - Bug Gatherer does not assign bugs to Coder without Product's triage approval.
 
@@ -128,7 +128,7 @@ The Bug Gatherer follows these five steps for every incoming report:
 
 3. **Suggest Severity** — Apply the Severity Rubric below. State the suggested level and briefly explain why.
 
-4. **Write Report** — Produce a complete bug report using the Bug Report Template. Include all required fields, all situational fields that apply, and all auto-determined fields.
+4. **Write Report** — Produce a complete bug report using the canonical entry format at the top of `artifacts/BUGS.md`. Include all required fields, all situational fields that apply, and all auto-determined fields.
 
 5. **Confirm** — Read the completed report back to the reporter. Ask: "Does this accurately describe what you observed?" Make corrections if needed, then submit to Product.
 
@@ -157,7 +157,7 @@ _Include these fields only when they apply._
 | Field | When to Include |
 |---|---|
 | Screenshot / Recording | Whenever visual evidence is available |
-| Frequency | When the bug is intermittent (include % if known: "3 out of 5 attempts") |
+| Frequency | When the bug is intermittent — use the canonical enum: `Intermittent — N of M` (e.g., "Intermittent — 3 of 5") |
 | Workaround | If the reporter knows a way to avoid or work around the bug |
 | Regression | If this worked correctly in a previous version — include what changed |
 | Related Bug | If this appears to be connected to another known issue |
@@ -182,91 +182,17 @@ _Bug Gatherer fills these in without asking the reporter._
 | Level | Definition | Examples |
 |---|---|---|
 | **Critical** | The product cannot be used or data is at risk. No workaround exists. | App crashes on launch; data is deleted unexpectedly; purchase completes but item is not granted |
-| **Major** | A significant feature is broken or produces wrong output. A workaround exists but is cumbersome. | A primary user action does not work; incorrect values are displayed; navigation is broken for a key path |
-| **Minor** | A feature works but behaves incorrectly in edge cases or under specific conditions. The workaround is straightforward. | An edge-case calculation is wrong; a UI element shows the wrong state under unusual conditions |
-| **Cosmetic** | Visual or textual issue only. No functional impact. | Misaligned element; incorrect color; typo; text truncation in an uncommon scenario |
+| **High** | A significant feature is broken or produces wrong output. A workaround exists but is cumbersome. | A primary user action does not work; incorrect values are displayed; navigation is broken for a key path |
+| **Medium** | A feature works but behaves incorrectly in edge cases or under specific conditions. The workaround is straightforward. | An edge-case calculation is wrong; a UI element shows the wrong state under unusual conditions |
+| **Low** | Visual or textual issue only. No functional impact. | Misaligned element; incorrect color; typo; text truncation in an uncommon scenario |
 
 When in doubt, round up (assign the higher severity level) and let Product adjust downward.
 
 ---
 
-## Bug Report Template
+## Bug Report Format
 
-_Every completed bug report must use this format. This is the initial report — Debugger will later add investigation fields (root cause, alternative solutions, recommended fix) when the bug is investigated. See `debugger.md` → Bug Lifecycle for the full status flow._
-
-```
-## Bug Report: [BUG_ID] — [TITLE]
-**Date Reported**: [DATE]
-**Reported By**: [SOURCE]
-**Status**: New | Triaged | In Progress | Fixed | Verified | Closed | Cannot Reproduce
-**Suggested Severity**: Critical | Major | Minor | Cosmetic
-**Final Severity**: [SET_BY_PRODUCT]
-**Milestone / Version**: [MILESTONE_OR_VERSION]
-**Platform**: [PLATFORM(S)]
-
----
-
-### Description
-
-[Reporter's original description, lightly cleaned up for clarity. Preserve the reporter's intent.]
-
----
-
-### Steps to Reproduce
-
-1. [STEP_1]
-2. [STEP_2]
-3. [STEP_3]
-4. (Continue until the bug appears)
-
----
-
-### Expected Result
-
-[What should have happened.]
-
----
-
-### Actual Result
-
-[What actually happened.]
-
----
-
-### Frequency
-
-[Always / Intermittent — [N] out of [M] attempts / Observed once / Unknown]
-
----
-
-### Evidence
-
-[Link to screenshot, recording, or log. Or: "None available."]
-
----
-
-### Workaround
-
-[Description of workaround, if any. Or: "None known."]
-
----
-
-### Regression
-
-[Did this work in a previous version? If yes, what changed? Or: "Unknown."]
-
----
-
-### Related Issues
-
-[Reference to related bug IDs or tasks. Or: "None."]
-
----
-
-### Notes
-
-[Any additional context, including Bug Gatherer's observations or severity rationale.]
-```
+The canonical bug entry format and field ownership live at the top of `artifacts/BUGS.md` — file reports in exactly that format. IDs follow the `BUG-XXX` convention (sequential, zero-padded, never reused). Every report is filed with status `New`; the full status flow is `New → Triaged → In Progress → Fixed → Verified → Closed`, with terminal states `Cannot Reproduce / Duplicate / Won't Fix / Deferred`. Frequency uses the canonical enum: `Always / Intermittent — N of M / Observed once / Unknown`. Debugger later adds the investigation fields, and Coder fills the resolution fields at fix time — do not fill those on initial filing.
 
 ---
 

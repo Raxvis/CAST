@@ -103,7 +103,7 @@ The Reviewer Agent may NOT:
 
 ## Interaction Rules
 
-- **Trigger**: Reviewer runs after Tester passes. If Tester blocks a submission (tests fail), Reviewer does not run until tests pass.
+- **Trigger**: Reviewer runs after Tester passes. If Tester blocks a submission (tests fail), Reviewer does not run until tests pass. This gate also applies inside the Issue loop: after Refactor hands off, Tester re-runs before Reviewer re-reviews.
 - Reviewer reviews every change the Coder or Refactor submits — no code bypasses review.
 - Reviewer must cite the specific standard, document, or convention that a piece of code violates when requesting changes.
 - When Reviewer finds a defect, it routes to Debugger for investigation and Bug Gatherer for logging.
@@ -124,7 +124,7 @@ _Applied to every Coder submission._
 - [ ] No hardcoded values that should be constants
 - [ ] Implementation matches the approved architecture document
 - [ ] Implementation matches the approved UI specification (if applicable)
-- [ ] Error handling follows documented strategy
+- [ ] Error handling follows the documented strategy in `docs/ERROR_HANDLING.md`
 - [ ] No performance anti-patterns
 - [ ] No new dependencies introduced without Architecture approval
 - [ ] Pre-Handoff Checklist is complete
