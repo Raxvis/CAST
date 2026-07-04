@@ -8,8 +8,8 @@ conventions, templates) stays in `docs/`.
 HOW TO CUSTOMIZE:
 - Replace [PROJECT_NAME] with your project name.
 - Update the subdirectory table as new work types are introduced.
-- Do NOT add design documentation, coding conventions, or templates to this directory —
-  those belong in `docs/`.
+- Do NOT add design documentation or coding conventions (those belong in `docs/`) or
+  document templates (those belong in `templates/`) to this directory.
 - This comment block is stripped automatically by /cast-init at install.
 -->
 
@@ -19,7 +19,7 @@ This directory holds every artifact produced by work on [PROJECT_NAME]: mileston
 
 > **Provenance:** Every file under this directory is produced by an agent running inside the `/agent-plan` or `/agent-code` pipeline. Review accordingly — these are agent outputs, not hand-authored reference material. Humans may edit these files (to revise plans, triage bugs, or close milestones), but the canonical producer of each artifact is named at the top of the file.
 
-**Rule:** `artifacts/` is for **instances** of work. `docs/` is for **reference and templates**. If you are unsure where a file belongs, ask: "Is this content about a specific piece of work (feature, milestone, bug, session)?" If yes → `artifacts/`. "Is this content reusable guidance or a template?" If yes → `docs/`.
+**Rule:** `artifacts/` is for **instances** of work. `docs/` is for **reference material**; `templates/` is for **reusable document skeletons**. If you are unsure where a file belongs, ask: "Is this content about a specific piece of work (feature, milestone, bug, session)?" If yes → `artifacts/`. "Is this a reusable skeleton agents copy?" If yes → `templates/`. "Is this reusable guidance?" If yes → `docs/`.
 
 ---
 
@@ -32,7 +32,7 @@ artifacts/
   STANDUP.md                       # Rolling session progress log
 
   milestones/
-    milestone-{N}-{slug}.md        # Milestone definition (from templates/MILESTONE_TASKS.md)
+    milestone-{N}-{slug}.md        # Milestone definition (from templates/MILESTONE_DEFINITION.md)
     milestone-{N}-{slug}-tasks.md  # Task breakdown for that milestone
 
   architecture/
@@ -49,7 +49,7 @@ artifacts/
     ceo-review-milestone-{N}.md    # CEO planning-stage verdict
 ```
 
-Subdirectories are created the first time an artifact of that type is produced. Do not create empty subdirectories.
+The four subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`) are pre-created empty by `/cast-init` so the expected structure exists from day one; they fill up during `/agent-plan` and `/agent-code` runs. Do not create additional empty subdirectories beyond these.
 
 ---
 
@@ -69,7 +69,7 @@ Subdirectories are created the first time an artifact of that type is produced. 
 | Milestone completion report | `artifacts/milestones/milestone-{N}-{slug}-completion.md` | Product (after `/agent-code`) |
 | Milestone validation record | `artifacts/milestones/milestone-{N}-{slug}-validation.md` | Product (after `/agent-code`) |
 
-Templates for every artifact type live in `docs/` — see `docs/README.md`.
+Templates for every artifact type live in `templates/` — see `templates/README.md`.
 
 ---
 

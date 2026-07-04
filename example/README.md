@@ -47,8 +47,9 @@ Read these in order for the clearest picture:
 ## Deliberate Omissions
 
 - **No `.claude/` directory.** In a real populated project this would hold
-  unchanged copies of the template agent and command files. Including them
-  here would just duplicate the template's `agents/` directory verbatim.
+  the installed agent files (`.claude/agents/*.md`) and pipeline skills
+  (`.claude/skills/agent-plan/SKILL.md`, `agent-code`, `agent-task`).
+  Including them here would just duplicate the template payload verbatim.
 - **No `src/` directory.** This fixture demonstrates the *planning and review
   artifacts*, not a working build. Acme Todo is not a real package.
 - **No full `docs/` set.** Only `PRD.md`, `CONCEPT.md`, and `GLOSSARY.md`

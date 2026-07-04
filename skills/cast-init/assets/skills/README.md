@@ -41,7 +41,7 @@ Short version:
 - **Bug fix, typo, small refactor, dependency bump?** → `/agent-task`
 - **Unsure?** → `/agent-plan` first. It is strictly safer to plan and not need it than to skip planning and discover you needed it mid-implementation.
 
-Longer version with a decision table: see the repo's `TROUBLESHOOTING.md` → "Which command should I use?"
+Longer version with a decision table: see the repo's `TROUBLESHOOTING.md` → "Which pipeline should I use?"
 
 ## Model compatibility
 
@@ -62,7 +62,7 @@ You can edit any installed SKILL.md freely. Common edits:
 - Remove agents from the pipeline if you have deleted them from `.claude/agents/`.
 - Change the `[MAX_LOOP_COUNT]` placeholder in `agent-code/SKILL.md` and `agent-task/SKILL.md` to match your project's tolerance for Coder/Tester/Reviewer retry cycles.
 
-If you delete `agent-plan/` or `agent-code/`, you must also delete `agents/ceo.md` — the CEO agent exists to serve those pipelines. See `README.md` → Minimum Viable Agent Set for the full coupling rules.
+If you delete `agent-plan/` or `agent-code/`, you must also delete `agents/ceo.md` — the CEO agent exists to serve those pipelines. See the CAST repo's [`README.md` → Minimum Viable Agent Set](https://github.com/Raxvis/CAST#minimum-viable-agent-set) for the full coupling rules.
 
 ---
 

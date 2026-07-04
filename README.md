@@ -10,7 +10,7 @@
 
 > **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three pipeline skills, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v1.0.1-blue)
+![Template version](https://img.shields.io/badge/template-v1.0.2-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
 
@@ -55,7 +55,7 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 - **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v1.0.1` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v1.0.2` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
@@ -511,7 +511,7 @@ Reference documentation. Never holds work artifacts. Document templates live in 
 | File | Description |
 |---|---|
 | `docs/README.md` | Documentation index; master navigation entry point for all project documentation |
-| `docs/PRD.md` | Product Requirements Document; describes goals, user stories, and acceptance criteria for the current scope |
+| `docs/PRD.md` | Product Requirements Document skeleton; describes goals, user stories, and acceptance criteria for the current scope. Not auto-installed — `/cast-init` prompts for it, since a PRD is user content |
 | `docs/CONCEPT.md` | High-level project vision, core loop, and design pillars |
 | `docs/ADDITIONAL.md` | Supplementary context that does not fit the primary documents; captures edge cases and open questions |
 | `docs/GLOSSARY.md` | Canonical definitions for all domain-specific terms used across documents |

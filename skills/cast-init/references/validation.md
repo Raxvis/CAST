@@ -16,7 +16,10 @@ After execution:
    - Each agent has `name:`, `description:`, `model:` in the frontmatter
    - Description length ≤ 120 characters
    - Model is one of `claude-opus-4-8` (default), `claude-opus-4-7`, or `claude-opus-4-6` (or an override the user approved — e.g. `claude-haiku-4-5` on a utility agent)
-6. **Verify template scaffolding was stripped**: `grep -rln 'TEMPLATE INSTRUCTIONS' .claude/ docs/ artifacts/ CLAUDE.md` must return nothing. Only the files under `templates/` may carry `<!-- TEMPLATE INSTRUCTIONS -->` blocks (they install verbatim as reusable skeletons). Any hit elsewhere means the install-time strip rule in `execution.md` was skipped for that file.
+6. **Verify template scaffolding was stripped**: `grep -rln 'TEMPLATE INSTRUCTIONS' .claude/ docs/ artifacts/ CLAUDE.md templates/README.md` must return nothing. Only the eight template skeletons under `templates/` may carry `<!-- TEMPLATE INSTRUCTIONS -->` blocks (they install verbatim). Any hit elsewhere means the install-time strip rule in `execution.md` was skipped for that file.
+7. **Verify topic-doc pairing and imports**:
+   - If the project type is mobile (or mixed-with-mobile), both `docs/FRONTEND.md` and `docs/MOBILE.md` must be installed — one without the other is an error.
+   - The Memory Imports block in the installed `CLAUDE.md` must reference only docs that actually exist in the project, and must include every installed topic doc. A dangling `@import` or a topic doc missing from the imports means execution step 5.8.4 was skipped.
 
 If any validation check fails, report it and ask the user how to proceed before writing the Phase 7 report. Do not silently mask failures.
 

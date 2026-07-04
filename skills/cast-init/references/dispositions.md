@@ -9,7 +9,7 @@ For each CAST reference doc and document template, determine the disposition fro
 | CAST file | If missing and no match | If existing match |
 |---|---|---|
 | `docs/README.md` | Create (CAST index) | Update to CAST format, preserving existing entries |
-| `docs/PRD.md` | Prompt user — PRD is user content, not template | Rename to `docs/PRD.md`, update header to CAST format |
+| `docs/PRD.md` | Prompt user — PRD is user content, not template. The shipped skeleton is **never auto-installed**; offer it only if the user asks for a starting point, and flag any skeleton install in the report as needing real requirements | Rename to `docs/PRD.md`, update header to CAST format |
 | `docs/CONCEPT.md` | Skip (optional) | Rename to `docs/CONCEPT.md` |
 | `docs/GLOSSARY.md` | Skip (optional) | Rename to `docs/GLOSSARY.md` |
 | `docs/DESIGN_RATIONALE.md` | Skip (optional) | Rename to `docs/DESIGN_RATIONALE.md`, preserve all decision entries |
@@ -29,6 +29,7 @@ For each CAST reference doc and document template, determine the disposition fro
 | `templates/ARCH_SYSTEM.md` | **Always install** | Same |
 | `templates/ARCH_DATA_SCHEMA.md` | **Always install** | Same |
 | `templates/UI_SPEC.md` | Install unless project is clearly backend/CLI-only with no user interface | Same |
+| `templates/README.md` | **Always install** — the in-directory index mapping each template to its producing agent and artifact destination. Unlike the eight skeletons, it installs with placeholder substitution and scaffolding strip (it is documentation, not a template) | Update to CAST format, preserving user-added rows |
 | `docs/FRONTEND.md` | Install if project type is frontend, mobile, or mixed | Prompt user if ambiguous |
 | `docs/BACKEND.md` | Install if project type is backend, data pipeline, or mixed | Same |
 | `docs/CLI.md` | Install if project type is CLI or mixed | Same |

@@ -4,11 +4,9 @@ It describes every agent, how they interact, and the conventions that govern the
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with the name of your project.
-2. Replace [FEATURE_AREA_*] placeholders with real feature areas, modules, or subsystems in your project.
-3. Replace [ARTIFACT_TYPE_*] with the categories of deliverables your project produces.
-4. Review the Agent table and remove rows for agents your project does not need.
-5. Update the ASCII diagram to reflect any changes to the agent lineup.
-6. Update the Documentation Placement table to match your actual folder/file conventions.
+2. Review the Agent table and remove rows for agents your project does not need.
+3. Update the ASCII diagram to reflect any changes to the agent lineup.
+4. Update the Documentation Placement table to match your actual folder/file conventions.
 
 Per-agent AI models are pre-configured in each agent file's YAML frontmatter and are
 not placeholders. Every agent is pinned to claude-opus-4-8 (the Claude Opus 4.x family
@@ -31,7 +29,7 @@ Every agent runs on the Claude Opus 4.x family, pinned to `claude-opus-4-8` by d
 
 ## Agent Roster
 
-The **Tier** column indicates which Minimum Viable Agent Set tier each agent belongs to. Tiers form a gradient: `T1` is always required, `T2` is strongly recommended, `T3` adds the Defect/Issue routing that `/agent-task` needs, and `T4` adds the planning-stage producers that `/agent-plan` and `/agent-code` need. See `README.md` → Minimum Viable Agent Set for the full tier description and for which agents you can delete when pruning the roster.
+The **Tier** column indicates which Minimum Viable Agent Set tier each agent belongs to. Tiers form a gradient: `T1` is always required, `T2` is strongly recommended, `T3` adds the Defect/Issue routing that `/agent-task` needs, `T4` adds the planning-stage producers that `/agent-plan` and `/agent-code` need, and `T5` (Release, Validator) is project-type optional but **installed by default** — `/cast-init` includes both unless you explicitly opt out. See the CAST repo's [`README.md` → Minimum Viable Agent Set](https://github.com/Raxvis/CAST#minimum-viable-agent-set) for the full tier description and for which agents you can delete when pruning the roster.
 
 | Agent | File | Tier | Role |
 |---|---|---|---|
@@ -48,8 +46,8 @@ The **Tier** column indicates which Minimum Viable Agent Set tier each agent bel
 | Refactor | `refactor.md` | T3 | Improves code structure without changing behaviour. Triggered by Reviewer issues. Flows back to Reviewer on completion. |
 | Bug Gatherer | `bug-gatherer.md` | T3 | Collects and structures bug reports from Debugger and other sources. Produces standardized reports that Product triages. |
 | Docs Writer | `docs-writer.md` | T2 | Produces and maintains developer-facing documentation. Runs after any other agent completes work. Accepts direct user input. |
-| Release | `release.md` | Opt | Owns release preparation: changelogs, versioning, and build verification. Keep for projects with formal releases. |
-| Validator | `validator.md` | Opt | Owns the process. Enforces agent protocols, resolves conflicts between agents, tracks milestone progress, and runs retrospectives. Keep for large teams or complex workflows. |
+| Release | `release.md` | T5 | Owns release preparation: changelogs, versioning, and build verification. Installed by default; drop only for scratch projects that never cut a release. |
+| Validator | `validator.md` | T5 | Owns the process. Enforces agent protocols, resolves conflicts between agents, tracks milestone progress, and runs retrospectives. Installed by default; drop only for strict single-developer workflows with no agent-vs-agent escalation. |
 
 ---
 
@@ -309,7 +307,7 @@ When two agents cover related territory, one is the **primary owner** and the ot
 | Bug severity assignment | Bug Gatherer | Debugger | Bug Gatherer suggests initial severity when filing the report (status: New). Debugger does not change severity — it adds investigation fields (root cause, alternative solutions). Product sets final severity during triage. |
 | Implementation scope | Coder | Refactor | Coder implements new features and fixes assigned bugs. Refactor restructures existing code without changing behaviour. When Reviewer or Tester flags a structural issue, it goes to Refactor. When a feature or bug fix is needed, it goes to Coder. |
 | Pre-submission quality checks | Coder (self-check) | Product (validation) | Coder's Pre-Handoff Checklist is a self-assessment before submission. Product's Task Validation Checklist is an independent verification. Both are required — they are complementary, not redundant. Coder checks before submitting; Product validates after receiving. |
-| Scope classification | Human (via command choice) | Reviewer | The user decides whether a change belongs in `/agent-task` (self-contained) or `/agent-plan` (cross-cutting). Reviewer enforces the boundary during Step 3 — if a `/agent-task` change reveals missing design context, Reviewer halts and instructs the user to re-run via `/agent-plan`. |
+| Scope classification | Human (via pipeline choice) | Reviewer | The user decides whether a change belongs in `/agent-task` (self-contained) or `/agent-plan` (cross-cutting). Reviewer enforces the boundary during Step 3 — if a `/agent-task` change reveals missing design context, Reviewer halts and instructs the user to re-run via `/agent-plan`. |
 
 ---
 
@@ -326,7 +324,7 @@ The table below records **where each agent writes its work artifacts**. Template
 | Document Type | Owner | Location | Tracking Format |
 |---|---|---|---|
 | Feature requirements (backlog) | Product | `product.md` → Current Work | Task / Milestone / Status / Notes |
-| Milestone definitions and tasks | Product | `artifacts/milestones/milestone-{N}-{slug}.md` + `-tasks.md` | Per `templates/MILESTONE_TASKS.md` template |
+| Milestone definitions and tasks | Product | `artifacts/milestones/milestone-{N}-{slug}.md` + `-tasks.md` | Per `templates/MILESTONE_DEFINITION.md` (definition) and `templates/MILESTONE_TASKS.md` (breakdown) |
 | Architecture documents (planning) | Architecture | `artifacts/architecture/arch-milestone-{N}.md` | Per `templates/ARCH_MODULE.md` / `ARCH_SYSTEM.md` / `ARCH_DATA_SCHEMA.md` |
 | Architecture document index | Architecture | `architect.md` → Architecture Documents table | Document / Module / Status / Milestone |
 | Screen specifications (planning) | UI | `artifacts/ui-specs/ui-milestone-{N}.md` | Per `templates/UI_SPEC.md` |

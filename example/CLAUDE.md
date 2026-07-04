@@ -204,10 +204,13 @@ Current dependencies (see `package.json`):
 
 ## Directory Conventions
 
-The project uses a strict split between reference material and work artifacts:
+The project uses a strict split between reference material, document templates, and work artifacts:
 
 - **`docs/`** - reference only: PRD, concept, glossary, conventions. Never
   receives work artifacts.
+- **`templates/`** - reusable document skeletons (architecture, UI spec,
+  milestone files). Agents copy them into `artifacts/` as instances; never
+  filled in place.
 - **`artifacts/`** - all live work: milestone plans, per-milestone architecture
   and review outputs, bug reports (`artifacts/BUGS.md`), and the rolling
   session log (`artifacts/STANDUP.md`). Everything produced by `/agent-plan`

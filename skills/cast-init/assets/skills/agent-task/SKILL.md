@@ -158,7 +158,7 @@ After the task passes Product validation:
 - If the change turns out to touch more modules than initially expected, stop and recommend running `/agent-plan` for a proper milestone scope. Do not attempt to finish a large change inside a one-off task — that defeats the purpose of the planning gate.
 - If tests fail due to environment rather than code, Tester flags the failure as "Environment Issue" and the user decides whether to continue.
 
-### Scope Boundaries (what this command will NOT do)
+### Scope Boundaries (what this skill will NOT do)
 
 `/agent-task` explicitly does not:
 - Produce milestone definitions, task breakdowns, architecture documents, UI specs, security reviews, performance reviews, or CEO verdicts. Those are outputs of `/agent-plan`.

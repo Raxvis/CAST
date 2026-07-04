@@ -11,7 +11,7 @@ description: >-
   produces the migration plan without changing files.
 license: MIT
 metadata:
-  version: "1.0.1"
+  version: "1.0.2"
   source: "https://github.com/Raxvis/CAST"
 ---
 
@@ -170,7 +170,7 @@ Run every check in `references/validation.md`:
 
 1. Placeholder scan (expected sub-template tokens like `[DATE]` are fine; real unfilled placeholders are not).
 2. All 15 agents exist with frontmatter matching the canonical roles (Tier 5 absences require a recorded opt-out; Tier 1–4 absences are hard failures).
-3. The pipeline skills exist at `.claude/skills/<name>/SKILL.md` with valid frontmatter, and no superseded pre-1.0 command files remain.
+3. The pipeline skills the user chose to keep exist at `.claude/skills/<name>/SKILL.md` with valid frontmatter, and no superseded pre-1.0 command files remain.
 4. The docs/artifacts split is clean in both directions.
 5. Every agent file has valid `name`/`description`/`model` frontmatter.
 6. No installed file outside `templates/` carries a `<!-- TEMPLATE INSTRUCTIONS -->` block.

@@ -8,6 +8,28 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [1.0.2] — 2026-07-03
+
+Consistency batch from the post-1.0 review sweep. No pipeline or agent behavior changes — this release corrects stale wording that predated the v0.10.0 `templates/` split and the v1.0.0 commands→skills conversion, closes two specification gaps, and adds two Phase 6 validation checks.
+
+### Fixed
+
+- **`artifacts/README.md`** (installed): "templates live in `docs/`" corrected to `templates/`; the milestone-definition row now cites `templates/MILESTONE_DEFINITION.md` (was `MILESTONE_TASKS.md`, same fix in `agents/README.md`); the "do not create empty subdirectories" line now acknowledges `/cast-init` pre-creates the four scaffold subdirectories; the two-way split rule updated to the three-way docs/templates/artifacts split.
+- **`agents/README.md`**: tier scheme aligned with the authoritative roster — Release and Validator are now Tier 5, installed by default unless opted out (previously labeled "Opt" with keep-if language); stale `[FEATURE_AREA_*]`/`[ARTIFACT_TYPE_*]` customize bullets removed; "Minimum Viable Agent Set" cross-reference now links to the repo README explicitly.
+- **Terminology stragglers**: "command" → "skill"/"pipeline" in `agent-task/SKILL.md` (installed), `agents/README.md`, `skills/README.md`, and `example/README.md`; `example/CLAUDE.md` Directory Conventions updated to the three-way split.
+- **SKILL.md ↔ validation.md drift**: the Phase 6 summary now scopes the pipeline-skill check to the set the user chose to keep, matching `references/validation.md`.
+
+### Added
+
+- **`templates/README.md` disposition** (previously unspecified): always installs, as documentation — with placeholder substitution and scaffolding strip — unlike the eight skeletons, which continue to install verbatim.
+- **Phase 6 validation checks**: mobile projects must have both `docs/FRONTEND.md` and `docs/MOBILE.md`; the installed `CLAUDE.md` Memory Imports must match the docs actually installed.
+- **Install-date substitution**: `[YYYY-MM-DD]` "Last updated" tokens in installed README files are replaced with the install date.
+- **`docs/PRD.md` semantics stated explicitly** in both the disposition table and the repo README: the skeleton is never auto-installed; `/cast-init` prompts, because a PRD is user content.
+
+### Migration
+
+- Existing installs: no action required. Re-running `/cast-init` refreshes the corrected `artifacts/README.md`, `agents/README.md`, and `agent-task` skill wording, and installs `templates/README.md` if missing.
+
 ## [1.0.1] — 2026-07-03
 
 Codifies the fallback behavior for permission-blocked writes during adoption. Previously, if a session could not get approval to write under `.claude/` (non-interactive or restricted-permission sessions), the outcome was unspecified. Interactive adoption is unchanged — you approve the write prompts and nothing is staged.
