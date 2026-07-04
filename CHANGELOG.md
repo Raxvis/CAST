@@ -8,6 +8,37 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [1.2.0] — 2026-07-03
+
+The agent-system optimization release, targeting Opus 4.6/4.7/4.8 effectiveness and per-invocation efficiency. Agent definitions shrink from 3,933 to ~2,500 lines (−36%) and stop growing with project age; the pipeline stops disagreeing with itself about bugs and loops. Sourced from a three-agent deep analysis of how the 15 agents, docs, and templates work together.
+
+### Added
+
+- **`artifacts/AGENT_STATE.md`** — live working state for every agent (Current Work, Decisions Logs, validator's dashboards), one section per agent. Agent definitions are now immutable and cheap to load; they carry a 3-line State pointer instead of mutable tables. `/cast-init` migrates populated tables from pre-1.2 agent files during updates.
+- **`docs/PIPELINE_LOOP.md`** — the canonical engineering-loop contract (per-task sequence, Defect/Issue routing, loop-counter rules, test-gate rule, targeted re-runs, pass-forward rule, Environment Issue rule). Both `/agent-code` and `/agent-task` execute this loop and carry only their deltas — the ~65% duplicated loop text is gone and can no longer drift.
+- **`templates/CEO_REVIEW.md`** and **`templates/UX_REVIEW.md`** — the CEO checklist (now with all six mandated inputs including the task breakdown) and UI's UX review checklist, promoted out of the agent files; `templates/MILESTONE_VALIDATION.md` absorbed Product's task-validation checklist, feedback log, and regression sections.
+- **`(required)` / `(optional)` markers on every template section** (~149 headings across 10 templates) — Opus 4.7 thins unmarked sections; the gates now have an explicit contract to check.
+
+### Changed
+
+- **Bug lifecycle unified on a single `artifacts/BUGS.md` schema**: one entry format, canonical status flow (New → Triaged → In Progress → Fixed → Verified → Closed, plus terminal states), one severity scale (Critical/High/Medium/Low), one frequency enum, explicit field ownership per stage — Coder now owns the resolution fields (Commit, Files Changed, Regression Notes) that previously had no owner; Tester owns the Regression Checklist. bug-gatherer and debugger reference the schema instead of restating divergent copies.
+- **Defect routing corrected in `/agent-code`**: Bug Gatherer files (New) → Product triages → Debugger investigates — the skill previously ran Debugger before a report existed and before triage, inverting the documented lifecycle.
+- **Loop control unified**: everything counts against `[MAX_LOOP_COUNT]` (refactor's private 3-iteration counter is gone), counts persist to `artifacts/STANDUP.md` across interruptions, Refactor↔Reviewer rounds increment the same counter, and the Tester-first re-run rule is encoded in reviewer.md and refactor.md, not just the skills.
+- **Planning handoff contracts fixed**: Performance's inputs now include the UI spec and milestone definition (it is told to read both but its contract omitted them); Security's inputs include the milestone definition; UI now receives the task breakdown (where the `Needs UI Spec` flags live); the `docs/` vs `templates/` template-path contradiction in product/architect/ui is fixed.
+- **Orphaned inline template systems deleted** from architect.md (−433 lines) and ui.md (−268): they duplicated and contradicted the canonical `templates/` files — ui.md's copy omitted the Pressed/Disabled states the CEO gate grades, so an agent following its own file failed the pipeline's own review.
+- **Model Configuration collapsed in all 15 agents** to an effort line + the three role-specific per-model bullets; the model ladder and rules live only in `docs/MODEL_OPTIMIZATION.md` (a model change no longer touches 16 files). The `xhigh`-requires-4.7+ caveat now appears wherever `xhigh` is recommended.
+- **Per-model guards propagated**: the 4.6 anti-delegation guard ("do not spawn subagents") in every agent; the 4.6 structured-output guard in the four review agents; the 4.8 terse-handoff directive ("no narrative recap") everywhere.
+- **docs-writer batched to checkpoints**: runs at task completion and milestone completion, draining a `docs:` queue in STANDUP.md — previously "after any other agent completes work," the roster's least cost-justified trigger.
+- **Session-start imports slimmed**: always-on = PRD + CODE_PATTERNS + topic doc; the navigation indexes and FILE_CONVENTIONS/ERROR_HANDLING move to a commented on-demand group (agents read them by path). TEST_FRAMEWORK and ERROR_HANDLING are now actually cited by tester and reviewer — previously referenced by zero agents.
+- **Efficiency rules in the loop**: targeted test re-runs inside Defect/Issue cycles (full suite still gates validation and completion); orchestrators pass artifact content forward instead of each stage re-reading the same files.
+- **Template slots de-duplicated**: milestone arch/UI linkage stated once; the performance-budget table lives in two places instead of four; "Product Approval" signature blocks replaced by CEO-verdict pointers; CEO Approval Conditions get a tracking slot in the task breakdown; ARCH_MODULE de-Reacted (framework-neutral state/integration wording).
+- **Validator staleness thresholds ship as defaults** (14/7/3 days) instead of nowhere-defined placeholders.
+
+### Migration
+
+- Existing installs: re-run `/cast-init`. It installs AGENT_STATE.md and PIPELINE_LOOP.md, migrates any populated state tables out of your pre-1.2 agent files, and updates the slimmed agents and skills while preserving your custom sections. Bug entries in an existing BUGS.md keep their data; map `Open → New`, `Major/Minor/Cosmetic → High/Medium/Low` when convenient.
+- If you customized the deleted inline templates in architect.md/ui.md, port those customizations to the canonical `templates/ARCH_*.md` / `templates/UI_SPEC.md` files.
+
 ## [1.1.0] — 2026-07-03
 
 The adoption-workflow batch from the post-1.0 review: fewer surviving placeholders, a much faster Phase 5, and specified behavior for unattended runs, interrupted runs, and repeat runs.

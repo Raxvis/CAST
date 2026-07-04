@@ -10,7 +10,7 @@
 
 > **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three pipeline skills, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v1.1.0-blue)
+![Template version](https://img.shields.io/badge/template-v1.2.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
 
@@ -55,7 +55,7 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 - **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v1.1.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v1.2.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
