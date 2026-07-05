@@ -30,9 +30,9 @@ Planning stage — /agent-plan
 
 Engineering stage — /agent-code
 
-    Coder  →  Tester  →  Reviewer  ──┬──  Defect  →  Debugger  →  Bug Gatherer  →  Product
+    Coder  →  Tester  →  Reviewer  ──┬──  Defect  →  Bug Gatherer  →  Product  →  Debugger  →  Coder
                                      │
-                                     └──  Issue   →  Refactor  →  Reviewer (loop)
+                                     └──  Issue   →  Refactor  →  Tester  →  Reviewer (loop)
                                                                       │
                                                                       ▼
                                                                     Product
@@ -130,7 +130,7 @@ CAST/
         skills/          #   Pipeline skills (installed to .claude/skills/)
         docs/            #   Reference material: requirements, conventions, rationale
         templates/       #   Document templates instantiated into artifacts/
-        artifacts/       #   Work artifact scaffold: bug tracker, session log
+        artifacts/       #   Work artifact scaffold: agent state, bug tracker, session log
   example/               # Populated fixture: a full "Acme Todo" project walkthrough
 ```
 
@@ -160,7 +160,7 @@ Each file defines one agent role with YAML frontmatter for Claude Code auto-disc
 
 ### skills/ (pipeline skills)
 
-Each subdirectory defines one pipeline skill that orchestrates a multi-agent workflow stage end-to-end. When installed to `.claude/skills/` in the target project, Claude Code registers them as skills named after the directory (e.g. `agent-plan/SKILL.md` becomes `/agent-plan`). Three pipelines ship with this template: `/agent-plan` runs the Planning Stage (Product → Architecture + UI → Security + Performance → CEO), `/agent-code` runs the Engineering Stage (Coder → Tester → Reviewer, with defects to Debugger → Bug Gatherer → Product and issues to Refactor → Reviewer), and `/agent-task` runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone, planning artifacts, or a CEO verdict — use it for bug fixes, typos, small refactors, and dependency bumps, not for new modules or cross-cutting changes.
+Each subdirectory defines one pipeline skill that orchestrates a multi-agent workflow stage end-to-end. When installed to `.claude/skills/` in the target project, Claude Code registers them as skills named after the directory (e.g. `agent-plan/SKILL.md` becomes `/agent-plan`). Three pipelines ship with this template: `/agent-plan` runs the Planning Stage (Product → Architecture + UI → Security + Performance → CEO), `/agent-code` runs the Engineering Stage (Coder → Tester → Reviewer, with defects to Bug Gatherer → Product → Debugger and issues to Refactor → Tester → Reviewer), and `/agent-task` runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone, planning artifacts, or a CEO verdict — use it for bug fixes, typos, small refactors, and dependency bumps, not for new modules or cross-cutting changes.
 
 ### docs/
 
@@ -400,18 +400,19 @@ With agent files in `.claude/agents/`, Claude Code can invoke them in three ways
 | Skill | Purpose |
 |---|---|
 | `/agent-plan <feature>` | Run the Planning Stage end-to-end. Product → Architecture + UI → Security + Performance → CEO. Produces planning documents and a CEO verdict. No code is written. |
-| `/agent-code <milestone-or-task>` | Run the Engineering Stage for a CEO-approved milestone. Coder → Tester → Reviewer, with Defects routed through Debugger → Bug Gatherer → Product and Issues routed through Refactor → Reviewer. |
+| `/agent-code <milestone-or-task>` | Run the Engineering Stage for a CEO-approved milestone. Coder → Tester → Reviewer, with Defects routed through Bug Gatherer → Product (triage) → Debugger and Issues routed through Refactor → Tester → Reviewer. |
 | `/agent-task <task description>` | Run a mini engineering pipeline for a single one-off task without requiring a milestone or CEO verdict. Coder → Tester → Reviewer, with the same Defect/Issue routing as `/agent-code`. Use for bug fixes, typos, small refactors, and dependency bumps — NOT for new modules or cross-cutting changes. |
 
 ### Inter-Agent Handoff
 
 Agents communicate through shared documents. When one agent completes work, the next agent reads the updated files:
 
-- **Current Work tables** in each agent file track in-progress and completed tasks.
-- **`artifacts/BUGS.md`** is the shared bug tracker (Bug Gatherer files, Debugger investigates, Coder fixes).
+- **`artifacts/AGENT_STATE.md`** holds every agent's live working state (Current Work tables, decision logs) in one file, one section per agent — agent definition files are immutable and carry only a pointer to their section.
+- **`docs/PIPELINE_LOOP.md`** is the canonical engineering-loop contract (per-task sequence, Defect/Issue routing, loop-counter and test-gate rules) that both `/agent-code` and `/agent-task` execute.
+- **`artifacts/BUGS.md`** is the shared bug tracker (Bug Gatherer files, Product triages, Debugger investigates, Coder fixes).
 - **Planning architecture documents** at `artifacts/architecture/arch-milestone-{N}.md` are the contract between Architect and Coder for a specific milestone. Templates live at `templates/ARCH_MODULE.md`, `templates/ARCH_SYSTEM.md`, and `templates/ARCH_DATA_SCHEMA.md`.
 - **Planning UI specifications** at `artifacts/ui-specs/ui-milestone-{N}.md` are the contract between UI and Coder. Template lives at `templates/UI_SPEC.md`.
-- **CEO planning verdicts** at `artifacts/reviews/ceo-review-milestone-{N}.md` gate entry into the engineering stage.
+- **CEO planning verdicts** at `artifacts/reviews/ceo-review-milestone-{N}.md` gate entry into the engineering stage. Template lives at `templates/CEO_REVIEW.md`.
 
 ### Minimum Viable Agent Set
 
@@ -431,9 +432,9 @@ The required agent roster depends on which shipped pipeline skills you want to k
 **Tier 3 — Required for `/agent-task`:**
 
 `/agent-task` runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) without any planning stage. On top of Tier 1, it needs the Defect/Issue routing targets to exist, otherwise Reviewer's hand-offs dead-end:
-- **Debugger** — receives Defects from Reviewer
-- **Refactor** — receives Issues from Reviewer and loops back
-- **Bug Gatherer** — files Defect reports and routes them to Product for triage
+- **Bug Gatherer** — files Reviewer's Defects as structured bug reports and routes them to Product for triage
+- **Debugger** — investigates Defects that Product triages as "fix now"
+- **Refactor** — receives Issues from Reviewer and loops back through Tester
 
 A project that wants `/agent-task` but not the planning stage can delete `.claude/skills/agent-plan/`, `.claude/skills/agent-code/`, `.claude/agents/ceo.md`, and optionally `.claude/agents/ui.md`, `.claude/agents/security.md`, `.claude/agents/performance.md`, and still have a functional engineering loop via `/agent-task`.
 
@@ -496,11 +497,11 @@ All payload paths below are relative to `skills/cast-init/assets/` in this repo.
 | `agents/ceo.md` | Defines the CEO agent; final reviewer of the planning stage, integrates Product/Architecture/UI/Security/Performance into a go/no-go verdict |
 | `agents/coder.md` | Defines the implementation agent; responsible for writing feature code within established conventions |
 | `agents/tester.md` | Defines the testing agent; runs after every Coder change to generate and maintain automated test coverage |
-| `agents/reviewer.md` | Defines the code review agent; classifies findings as Defects (→ Debugger) or Issues (→ Refactor) |
-| `agents/debugger.md` | Defines the debugging agent; investigates defects raised by Reviewer and hands reports to Bug Gatherer |
-| `agents/refactor.md` | Defines the refactoring agent; addresses Reviewer Issues without changing behaviour, loops back to Reviewer |
+| `agents/reviewer.md` | Defines the code review agent; classifies findings as Defects (→ Bug Gatherer) or Issues (→ Refactor) |
+| `agents/debugger.md` | Defines the debugging agent; investigates defects Product triages as "fix now" and hands root-cause analysis back to Coder |
+| `agents/refactor.md` | Defines the refactoring agent; addresses Reviewer Issues without changing behaviour, loops back through Tester to Reviewer |
 | `agents/bug-gatherer.md` | Defines the bug gatherer agent; structures bug reports and routes them to Product for triage |
-| `agents/docs-writer.md` | Defines the documentation agent; updates docs after any agent completes work, accepts direct user input |
+| `agents/docs-writer.md` | Defines the documentation agent; drains the `docs:` queue at task- and milestone-completion checkpoints, accepts direct user input |
 | `agents/release.md` | Defines the release preparation agent; responsible for changelogs, versioning, and build verification |
 | `agents/validator.md` | Defines the validator agent; enforces agent protocols, resolves conflicts, tracks milestones, runs retrospectives |
 | `agents/README.md` | Master overview of the agent system: roster, interaction diagram, planning and engineering stage workflows, and placeholder reference |
@@ -512,10 +513,10 @@ All payload paths below are relative to `skills/cast-init/assets/` in this repo.
 | File | Description |
 |---|---|
 | `skills/agent-plan/SKILL.md` | Defines the `/agent-plan` pipeline skill; orchestrates the Planning Stage end-to-end (Product → Architecture + UI → Security + Performance → CEO) |
-| `skills/agent-code/SKILL.md` | Defines the `/agent-code` pipeline skill; orchestrates the Engineering Stage per task (Coder → Tester → Reviewer, with Defects through Debugger → Bug Gatherer → Product and Issues through Refactor → Reviewer) |
+| `skills/agent-code/SKILL.md` | Defines the `/agent-code` pipeline skill; orchestrates the Engineering Stage per task (Coder → Tester → Reviewer, with Defects through Bug Gatherer → Product → Debugger and Issues through Refactor → Tester → Reviewer) |
 | `skills/agent-task/SKILL.md` | Defines the `/agent-task` pipeline skill; runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone or CEO verdict |
 
-### docs/ (reference material, 20 files)
+### docs/ (reference material, 21 files)
 
 Reference documentation. Never holds work artifacts. Document templates live in `templates/` (below).
 
@@ -532,6 +533,7 @@ Reference documentation. Never holds work artifacts. Document templates live in 
 | `docs/ERROR_HANDLING.md` | Guidelines for handling errors across all categories; defines principles, patterns, and user-facing message standards |
 | `docs/TEST_FRAMEWORK.md` | Testing strategy, test runner setup, file conventions, and coverage requirements |
 | `docs/MODEL_OPTIMIZATION.md` | Model policy for the agent roster: the Claude Opus 4.x ladder, per-model behavior profiles, and the 4.6 → 4.7 → 4.8 upgrade checklists |
+| `docs/PIPELINE_LOOP.md` | The canonical engineering-loop contract executed by both `/agent-code` and `/agent-task`: per-task sequence, Defect/Issue routing, loop-counter rules, test gate, targeted re-runs, pass-forward rule |
 | `docs/FIRST_RUN.md` | Interactive checklist to run in Claude Code after a fresh install; verifies that subagents load and pipeline skills register |
 | `docs/CLAUDE_CODE_SETTINGS.md` | Reference for `.claude/settings.json` — explains permission rules, environment variables, and hooks, with common extension patterns |
 | `docs/FRONTEND.md` | Topic-specific reference for frontend projects; delete if not applicable |
@@ -542,7 +544,7 @@ Reference documentation. Never holds work artifacts. Document templates live in 
 | `docs/ASSETS.md` | Registry of all project assets (images, fonts, etc.) with status and source information |
 | `docs/MVP_LAUNCH.md` | Checklist and criteria for the initial public release |
 
-### templates/ (document templates, 8 files)
+### templates/ (document templates, 10 files)
 
 Reusable document skeletons. Agents copy them — never fill in place — to produce instances under `artifacts/`. See [`templates/README.md`](skills/cast-init/assets/templates/README.md).
 
@@ -556,6 +558,8 @@ Reusable document skeletons. Agents copy them — never fill in place — to pro
 | `templates/ARCH_SYSTEM.md` | Template for documenting a high-level system (instances live in `artifacts/architecture/`) |
 | `templates/ARCH_DATA_SCHEMA.md` | Template for documenting a data schema or save format (instances live in `artifacts/architecture/`) |
 | `templates/UI_SPEC.md` | Template for specifying a UI screen or component (instances live in `artifacts/ui-specs/`) |
+| `templates/CEO_REVIEW.md` | Template for the CEO planning verdict: the six mandated inputs, the review checklist, and the APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED verdict block. Instance at `artifacts/reviews/ceo-review-milestone-{N}.md`. |
+| `templates/UX_REVIEW.md` | Template for UI's UX review of an implemented milestone (instances live in `artifacts/reviews/`) |
 
 ### artifacts/ (work artifacts)
 
@@ -564,7 +568,8 @@ Live work artifacts produced by the agents. Copied as a seed into the target pro
 | Path | Description |
 |---|---|
 | `artifacts/README.md` | Explains the `docs/` vs `artifacts/` split and lists the subdirectory layout |
-| `artifacts/BUGS.md` | Active bug tracker — instance (not template). Filed by Bug Gatherer, investigated by Debugger |
+| `artifacts/AGENT_STATE.md` | Live working state for all 15 agents (Current Work tables, decision logs, validator dashboards), one section per agent — the mutable counterpart to the immutable agent definition files |
+| `artifacts/BUGS.md` | Active bug tracker — instance (not template). Filed by Bug Gatherer, triaged by Product, investigated by Debugger |
 | `artifacts/STANDUP.md` | Rolling log of progress updates, blockers, and decisions from work sessions |
 | `artifacts/milestones/` | Milestone definitions, task breakdowns, completion reports, and validation records (one per milestone) |
 | `artifacts/architecture/` | Architecture documents produced per milestone during `/agent-plan` |

@@ -36,11 +36,11 @@ When editing templates, preserve placeholder tokens — do not replace them with
 
 **Planning Stage** (`/agent-plan`): **Product** (requirements) → **Architecture** + **UI** (design specs in parallel) → **Security** + **Performance** (review architecture in parallel) → **CEO** (final planning-stage review, integrates all prior outputs and issues APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED).
 
-**Engineering Stage** (`/agent-code`): **Coder** (implementation) → **Tester** (automated gate) → **Reviewer** (classifies findings as Defects or Issues). Defects → **Debugger** → **Bug Gatherer** → **Product** (triage). Issues → **Refactor** → **Reviewer** (loop). Then **Product** validates against acceptance criteria.
+**Engineering Stage** (`/agent-code`): **Coder** (implementation) → **Tester** (automated gate) → **Reviewer** (classifies findings as Defects or Issues). Defects → **Bug Gatherer** (files report) → **Product** (triage) → **Debugger** (if fix-now) → back to Coder. Issues → **Refactor** → **Tester** → **Reviewer** (loop). Then **Product** validates against acceptance criteria.
 
 **One-Off Task Pipeline** (`/agent-task`): for small self-contained work — bug fixes, typos, single-function refactors, dependency bumps — that does not justify a full milestone plan. Coder → Tester → Reviewer (with the same Defect/Issue routing as `/agent-code`) → Product validates against the task description. Bails out with a "run `/agent-plan` first" message if the task implies architectural or cross-cutting work.
 
-**Docs Writer** updates docs after every agent. **Release** handles versioning. **Validator** enforces process. Conflict resolution priority: Product > Architecture > UI.
+**Docs Writer** drains the `docs:` queue at task- and milestone-completion checkpoints. **Release** handles versioning. **Validator** enforces process. Conflict resolution priority: Product > Architecture > UI.
 
 ## Key Files
 
