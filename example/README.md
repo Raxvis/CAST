@@ -35,14 +35,18 @@ Read these in order for the clearest picture:
 3. **`artifacts/milestones/milestone-1-task-crud.md`** — the M1 plan.
 4. **`artifacts/reviews/ceo-review-milestone-1.md`** — the APPROVED WITH
    CONDITIONS verdict and the three conditions that shaped implementation.
-5. **`artifacts/BUGS.md`** — BUG-001 (fixed during T-3) and BUG-002 (deferred).
-6. **`artifacts/STANDUP.md`** — the rolling session log across the three days.
+5. **`artifacts/BUGS.md`** — BUG-001 (closed during M1) and BUG-002 (deferred),
+   in the canonical single-list schema with per-stage field ownership.
+6. **`artifacts/AGENT_STATE.md`** — every agent's live working state after
+   Milestone 1 closed: current work, decision logs, and the validator's
+   dashboards, one section per agent.
+7. **`artifacts/STANDUP.md`** — the rolling session log across the three days.
 
 ## Directory Layout
 
 - `CLAUDE.md` — populated project root context
 - `docs/` — PRD, CONCEPT, GLOSSARY (only these; see Deliberate Omissions below)
-- `artifacts/` — all live milestone work, reviews, bugs, and session log
+- `artifacts/` — all live milestone work, reviews, bugs, agent state, and session log
 
 ## Deliberate Omissions
 

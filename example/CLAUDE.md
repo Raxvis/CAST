@@ -212,8 +212,9 @@ The project uses a strict split between reference material, document templates, 
   milestone files). Agents copy them into `artifacts/` as instances; never
   filled in place.
 - **`artifacts/`** - all live work: milestone plans, per-milestone architecture
-  and review outputs, bug reports (`artifacts/BUGS.md`), and the rolling
-  session log (`artifacts/STANDUP.md`). Everything produced by `/agent-plan`
+  and review outputs, bug reports (`artifacts/BUGS.md`), the rolling
+  session log (`artifacts/STANDUP.md`), and every agent's live working state
+  (`artifacts/AGENT_STATE.md`). Everything produced by `/agent-plan`
   and `/agent-code` lands here.
 
 When in doubt, read `docs/FILE_CONVENTIONS.md` and `artifacts/README.md`.
@@ -221,15 +222,22 @@ When in doubt, read `docs/FILE_CONVENTIONS.md` and `artifacts/README.md`.
 ## Memory Imports
 
 These documents are loaded into Claude Code's context at every session start.
-They provide the baseline context all agents need.
+They provide the baseline context all agents need. The list is kept lean —
+every import is paid in every session. The Directory Conventions section above
+already covers where files live; agents read the detailed reference docs on
+demand by path.
 
-<!-- Core context: documentation index, requirements, coding patterns, file rules, error handling -->
-@import docs/README.md
+<!-- Core context -->
 @import docs/PRD.md
 @import docs/CODE_PATTERNS.md
-@import docs/FILE_CONVENTIONS.md
-@import docs/ERROR_HANDLING.md
-@import artifacts/README.md
 
 <!-- Topic-specific context: this is a CLI project -->
 @import docs/CLI.md
+
+<!-- On-demand reference — agents read these by path when a task calls for them
+     (coder/docs-writer: FILE_CONVENTIONS; coder/reviewer: ERROR_HANDLING; tester:
+     TEST_FRAMEWORK; navigation: docs/README.md, artifacts/README.md). Uncomment an
+     import only if sessions repeatedly need one unprompted:
+@import docs/FILE_CONVENTIONS.md
+@import docs/ERROR_HANDLING.md
+-->

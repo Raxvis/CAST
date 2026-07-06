@@ -8,6 +8,27 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [1.2.1] — 2026-07-05
+
+The post-1.2.0 documentation sweep: the repo's own docs and the `example/` fixture caught up with the 1.2.0 payload changes they still contradicted.
+
+### Added
+
+- **`example/artifacts/AGENT_STATE.md`** — a fully populated instance of the 1.2.0 live-state file, showing all 15 agent sections as they stand after Acme Todo's Milestone 1 closed: current work, decision logs (including the architect's five-column ADR variant), the performance budget tracking table with measured values, and the validator's dashboards and milestone progress.
+
+### Changed
+
+- **`example/artifacts/BUGS.md` rewritten to the canonical 1.2.0 schema.** The fixture still used the pre-1.2 format (Open/Fixed sections, `Open / In Progress / Fixed / Won't Fix / Deferred` statuses, ad-hoc frequency values). It now demonstrates the single-list schema: full lifecycle header with the `New → Triaged → In Progress → Fixed → Verified → Closed` status flow, terminal states, split initial/final Severity, the canonical Frequency enum, and the per-stage field-ownership table. BUG-001 is `Closed` with populated Investigation (Debugger) and Resolution (Coder) blocks; BUG-002 is `Deferred`, set by Product at triage with no investigation — matching the corrected defect routing.
+- **`example/CLAUDE.md` Memory Imports slimmed to the 1.2.0 always-on set** (PRD + CODE_PATTERNS + the CLI topic doc), with FILE_CONVENTIONS/ERROR_HANDLING moved to the commented on-demand group, mirroring the payload template. The Directory Conventions section now lists `artifacts/AGENT_STATE.md`.
+- **`example/README.md` and `example/artifacts/STANDUP.md`** updated to include the new state file in the reading order, directory layout, and related-documents table.
+- **Root `README.md` and `CLAUDE.md` synced with the 1.2.0 content changes** (landed on `main` as `75a9276`): Defect/Issue routing corrected to Bug Gatherer → Product (triage) → Debugger with Tester in the Issue loop everywhere the old order appeared; the four 1.2.0 payload files added to the File Listing with corrected counts; Inter-Agent Handoff rewritten around `AGENT_STATE.md` and `PIPELINE_LOOP.md`; Docs Writer trigger updated to batched checkpoints.
+
+### Migration
+
+- None. Documentation and fixture changes only — no payload behavior changed, and existing installs need no action.
+
+---
+
 ## [1.2.0] — 2026-07-03
 
 The agent-system optimization release, targeting Opus 4.6/4.7/4.8 effectiveness and per-invocation efficiency. Agent definitions shrink from 3,933 to ~2,500 lines (−36%) and stop growing with project age; the pipeline stops disagreeing with itself about bugs and loops. Sourced from a three-agent deep analysis of how the 15 agents, docs, and templates work together.

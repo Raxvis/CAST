@@ -66,6 +66,7 @@ Copy this block and fill it in at the start (or end) of each session:
 | Document | Purpose |
 |----------|---------|
 | `BUGS.md` | Active bug tracker — reference when reporting blockers |
+| `AGENT_STATE.md` | Live per-agent working state — each agent reads its own section on activation |
 | `artifacts/milestones/milestone-1-task-crud.md` | Current milestone task breakdown — reference for planned work |
 | `artifacts/milestones/milestone-1-task-crud-completion.md` | Milestone 1 acceptance record — reference when validating completed work |
 | `artifacts/reviews/ceo-review-milestone-1.md` | Planning sign-off and Approval Conditions |
