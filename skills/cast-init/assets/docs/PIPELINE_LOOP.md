@@ -27,7 +27,7 @@ The loop may cycle. One full cycle is any return to Step 1 (Coder) or any Refact
 
 - Track the count per task and **escalate to the user after `[MAX_LOOP_COUNT]` cycles** on a single task, stating the specific blocker.
 - Record the count in `artifacts/STANDUP.md` after each cycle (`Task <id>: loop <k>/[MAX_LOOP_COUNT]`) so an interrupted run resumes with the real count.
-- **Refactor→Reviewer rounds increment the same counter** — the Issue subloop has no private limit of its own.
+- **Refactor → Tester → Reviewer rounds increment the same counter** — the Issue subloop has no private limit of its own.
 - If Refactor reports that an Issue cannot be resolved without an architecture change (structural disagreement), the escalation to the user must carry that flag and name Architecture as the needed re-entry point (`/agent-plan`).
 
 ## Test gate rule

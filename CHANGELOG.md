@@ -8,6 +8,26 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [1.2.2] — 2026-07-05
+
+CI hardening: the validation workflow now enforces the 1.2.0 single-source-of-truth invariants, and writing those checks immediately caught three stale routing lines the 1.2.0 sweep missed in the payload itself.
+
+### Changed
+
+- **Three leftover pre-1.2 routing phrasings corrected in the payload.** The Issue loop is `Refactor → Tester → Reviewer` since 1.2.0, but three places still said `Refactor → Reviewer`: the `/agent-code` skill's frontmatter `description` (functional metadata Claude Code reads for skill discovery), the pipeline-skills table in `assets/skills/README.md`, and the loop-counter rule in `docs/PIPELINE_LOOP.md` ("Refactor→Reviewer rounds"). All three now state the full sequence.
+- **`.github/workflows/validate.yml` gains five invariant checks** (repo CI only, not installed):
+  - *No stale pipeline-routing orders* — greps README, CLAUDE.md, TROUBLESHOOTING.md, the payload, and the example for the pre-1.2 adjacencies (`Debugger → Bug Gatherer`, `Refactor → Reviewer` in any bold/arrow/spacing variant); `docs/PIPELINE_LOOP.md` is the canonical loop contract. CHANGELOG.md is excluded as historical.
+  - *Template markers* — every level-2 heading in `templates/*.md` must carry `(required)` or `(optional)` (level-3 per-instance blocks and the `## Task Template` sub-skeleton are exempt).
+  - *Canonical bug lifecycle* — payload and example `BUGS.md` must contain the `New → Triaged → In Progress → Fixed → Verified → Closed` flow and the field-ownership table; the example must not use pre-1.2 status vocabulary.
+  - *1.2 state files present* — `AGENT_STATE.md` (payload + example) and `docs/PIPELINE_LOOP.md` must exist.
+  - *README File Listing counts* — the `docs/` and `templates/` file counts claimed in README.md must match the payload.
+
+### Migration
+
+- Existing installs: re-run `/cast-init` (or `npx skills update` first) if you want the corrected skill description and loop wording; nothing behavioral changed beyond the three phrasings.
+
+---
+
 ## [1.2.1] — 2026-07-05
 
 The post-1.2.0 documentation sweep: the repo's own docs and the `example/` fixture caught up with the 1.2.0 payload changes they still contradicted.

@@ -70,3 +70,63 @@ jobs:
         run: |
           node -e "JSON.parse(require('fs').readFileSync('.claude-plugin/plugin.json','utf8')); console.log('plugin.json ok')"
           node -e "JSON.parse(require('fs').readFileSync('.claude-plugin/marketplace.json','utf8')); console.log('marketplace.json ok')"
+
+      - name: No stale pipeline-routing orders (docs/PIPELINE_LOOP.md is canonical)
+        run: |
+          # Since 1.2.0: Defects route Bug Gatherer -> Product -> Debugger, and the Issue
+          # loop is Refactor -> Tester -> Reviewer. Any prose stating the old adjacencies
+          # (Debugger -> Bug Gatherer, or Refactor directly -> Reviewer) is drift.
+          # CHANGELOG.md is excluded: its historical entries describe the old behavior.
+          hits=$(grep -rnE 'Debugger(\*\*)? *(→|↔|->) *(\*\*)? *Bug Gatherer|Refactor(\*\*)? *(→|↔|->) *(\*\*)? *Reviewer' \
+            README.md CLAUDE.md TROUBLESHOOTING.md skills/ example/ || true)
+          if [ -n "$hits" ]; then
+            echo "Stale routing found (canonical: Defects = Bug Gatherer → Product → Debugger; Issues = Refactor → Tester → Reviewer):"
+            echo "$hits"; exit 1
+          fi
+          echo "clean"
+
+      - name: Template level-2 headings carry (required)/(optional) markers
+        run: |
+          # Since 1.2.0 every template section states its contract. Level-3 headings are
+          # exempt (repeatable per-instance blocks like task or module entries), as is the
+          # "## Task Template" sub-skeleton in MILESTONE_TASKS.md.
+          fail=0
+          for f in skills/cast-init/assets/templates/*.md; do
+            [ "$(basename "$f")" = "README.md" ] && continue
+            while IFS= read -r h; do
+              [ "$h" = "## Task Template" ] && continue
+              echo "$h" | grep -qE '\((required|optional)\)' || { echo "UNMARKED [$f]: $h"; fail=1; }
+            done < <(grep -E '^## ' "$f")
+          done
+          [ "$fail" -eq 0 ] && echo "all marked"
+          exit $fail
+
+      - name: BUGS.md carries the canonical bug lifecycle (payload and example)
+        run: |
+          flow='New → Triaged → In Progress → Fixed → Verified → Closed'
+          for f in skills/cast-init/assets/artifacts/BUGS.md example/artifacts/BUGS.md; do
+            grep -qF "$flow" "$f" || { echo "$f: missing canonical status flow"; exit 1; }
+            grep -qF 'Field ownership' "$f" || { echo "$f: missing field-ownership table"; exit 1; }
+          done
+          stale=$(grep -n '\*\*Status\*\*: Open' example/artifacts/BUGS.md || true)
+          if [ -n "$stale" ]; then
+            echo "example BUGS.md uses pre-1.2 status vocabulary:"; echo "$stale"; exit 1
+          fi
+          echo "clean"
+
+      - name: Example fixture includes the 1.2 state files
+        run: |
+          test -f skills/cast-init/assets/artifacts/AGENT_STATE.md
+          test -f skills/cast-init/assets/docs/PIPELINE_LOOP.md
+          test -f example/artifacts/AGENT_STATE.md
+          echo "present"
+
+      - name: README File Listing counts match the payload
+        run: |
+          docs_actual=$(ls skills/cast-init/assets/docs/*.md | wc -l | tr -d ' ')
+          docs_claim=$(grep -oE '### docs/ \(reference material, [0-9]+ files\)' README.md | grep -oE '[0-9]+')
+          tmpl_actual=$(ls skills/cast-init/assets/templates/*.md | grep -cv README.md)
+          tmpl_claim=$(grep -oE '### templates/ \(document templates, [0-9]+ files\)' README.md | grep -oE '[0-9]+')
+          echo "docs: claim=$docs_claim actual=$docs_actual; templates: claim=$tmpl_claim actual=$tmpl_actual"
+          test -n "$docs_claim" && test "$docs_claim" = "$docs_actual"
+          test -n "$tmpl_claim" && test "$tmpl_claim" = "$tmpl_actual"

@@ -3,7 +3,7 @@ name: agent-code
 description: >-
   Run the CAST Engineering Stage for a CEO-approved milestone: Coder → Tester →
   Reviewer, with Defects routed through Bug Gatherer → Product triage → Debugger and
-  Issues through Refactor → Reviewer, then Product validation. Use when the user asks
+  Issues through Refactor → Tester → Reviewer, then Product validation. Use when the user asks
   to implement an approved milestone or invokes /agent-code. Requires an existing CEO
   verdict in artifacts/reviews/.
 ---
