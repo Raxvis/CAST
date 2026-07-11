@@ -24,15 +24,22 @@ If the session's permission system blocks writes to a target path (most commonly
 
 Files that were written directly (typically `docs/`, `templates/`, `artifacts/`, root `CLAUDE.md`) are unaffected — stage only what was blocked. Never leave a partially-staged adoption unreported: if `.cast-stage/` exists when the report is written, the report must say so.
 
+## Global rule — progress ledger and rollback
+
+As each planned action is executed (in 5.2 through 5.9), check it off in `artifacts/adoption-plan.md` — mark the action's entry (e.g. prefix with `[x]` or append `— DONE`) immediately after the write lands, not in a batch at the end. The ledger is what makes an interrupted adoption resumable: the 5.1 resume path re-verifies checked actions instead of re-planning from scratch.
+
+**Abort and recovery.** Because the 5.1 preflight guarantees a clean tree, aborting mid-Phase-5 is always recoverable: `git checkout -- <touched paths>` plus `git clean -fd <touched paths>` restores the pre-adoption tree. Keep the three adoption files (`artifacts/adoption-inventory.md`, `adoption-plan.md`, `adoption-report.md`) out of the cleanup — they are exempt from the preflight and hold the ledger a later resume needs. In a non-git project there is no such safety net, which is why the preflight requires explicit confirmation there.
+
 ## 5.1 — Preflight
 
 Verify:
 
-1. Git working tree is clean (`git status` returns nothing modified or staged). Two exceptions, both requiring user confirmation before proceeding:
-   - **Resuming an interrupted adoption**: if the only dirty files are ones the prior CAST run wrote (cross-check against the existing `artifacts/adoption-plan.md`), offer to resume — re-verify each already-written file against its planned action instead of demanding a stash. Anything dirty that the plan does not account for still blocks.
+1. Git working tree is clean (`git status` returns nothing modified or staged). The adoption's own files — `artifacts/adoption-inventory.md`, `artifacts/adoption-plan.md`, `artifacts/adoption-report.md` (and the `artifacts/` directory Phase 1 created to hold them) — are **always exempt**: Phases 1 and 3 write them before Phase 5 by design, so they never count as dirty. Two further exceptions, both requiring user confirmation before proceeding:
+   - **Resuming an interrupted adoption**: if the only dirty files are ones the prior CAST run wrote (cross-check against the ledger checkmarks in the existing `artifacts/adoption-plan.md`), offer to resume — re-verify each already-written file against its planned action instead of demanding a stash. Anything dirty that the plan does not account for still blocks.
    - **Completing a staged adoption**: if `.cast-stage/` exists from a prior permission-blocked run, offer to complete the move per the staging rule below instead of starting over.
    Otherwise, stop and ask the user to commit or stash.
-2. `CAST_SOURCE` (resolved in SKILL.md as `<CAST_SKILL_DIR>/assets`) exists and contains `agents/`, `skills/`, `docs/`, `templates/`, `artifacts/`, and `root/`. If missing, stop — the cast-init install is incomplete; ask the user to re-install with `npx skills add Raxvis/CAST` or `/plugin install cast@cast`.
+2. **Not a git repository?** If `git rev-parse --is-inside-work-tree` fails, there is no rollback safety net: warn the user explicitly, then either get their explicit confirmation to proceed without one or offer to run `git init` (plus an initial commit) so the recovery path exists. Do not proceed silently. In a non-git project, every `git mv`/`git rm` below becomes plain `mv`/`rm`.
+3. `CAST_SOURCE` (resolved in SKILL.md as `<CAST_SKILL_DIR>/assets`) exists and contains `agents/`, `skills/`, `docs/`, `templates/`, `artifacts/`, and `root/`. If missing, stop — the cast-init install is incomplete; ask the user to re-install with `npx skills add Raxvis/CAST` or `/plugin install cast@cast`.
 
 ## 5.1a — Fast path for pure-Create actions
 
@@ -51,7 +58,7 @@ Create any missing directories: `.claude/agents/`, `.claude/skills/`, `docs/`, `
 
 ## 5.3 — Handle directory renames
 
-If the plan includes a rename of `features/` (or similar) → `artifacts/`, execute it with `git mv` so history is preserved. Then update every string reference to the old directory across `.claude/`, `docs/`, and the project README. Use Grep to find references before renaming.
+If the plan includes a rename of `features/` (or similar) → `artifacts/`, execute it with `git mv` so history is preserved. **The destination directory will already exist** — Phase 1 creates `artifacts/` for the inventory — so a directory-level `git mv features/ artifacts/` would fail or nest `features/` inside it. Move the source directory's *contents* instead: per-file `git mv features/<path> artifacts/<path>`, creating subdirectories as needed, then remove the emptied `features/` directory. In a non-git project (per the 5.1 preflight), use plain `mv` instead of `git mv`. Then update every string reference to the old directory across `.claude/`, `docs/`, and the project README. Use Grep to find references before renaming.
 
 ## 5.4 — Install agent files
 
@@ -60,10 +67,10 @@ Walk the canonical 15-agent list in the order given by the roster table in `rost
 For each agent:
 
 1. Read the CAST agent file from `<CAST_SOURCE>/agents/<name>.md`. **Never install `<CAST_SOURCE>/agents/README.md`** — it is payload documentation, and a `.claude/agents/README.md` would be registered as a bogus subagent.
-2. Substitute every placeholder that has a collected inventory value — identity (`[PROJECT_NAME]`, `[PROJECT_TYPE]`, `[ONE_SENTENCE_PITCH]`), tech (`[LANGUAGE]`, `[FRAMEWORK]`, `[FRAMEWORK_VERSION]`, `[EXT]`, `[STATE_LIBRARY]`, `[NAVIGATION_LIBRARY]`, `[PERSISTENCE_LAYER]`, `[TEST_RUNNER]`), commands (`[TEST_CMD]`, `[DEV_SERVER_CMD]`, `[BUILD_CMD]`, `[TYPE_CHECK_CMD]`), packaging (`[PKG_MANAGER]`, `[PKG_MANIFEST]`, `[PKG_ADD_CMD]`, `[TYPE_CONFIG]`, `[FRAMEWORK_CONFIG]`, `[BUNDLER_CONFIG]`), platforms (`[TARGET_PLATFORMS]`), structure (`[SCREEN_DIR]`, `[LOGIC_DIR]`, `[STORE_DIR]`, `[COMPONENTS_DIR]`, `[HOOKS_DIR]`, `[CONSTANTS_DIR]`, `[ASSETS_DIR]`), and conventions (`[LOWER_CASE_CONVENTION]`, `[PASCAL_CASE_CONVENTION]`, `[UPPER_SNAKE_CONVENTION]`). Domain tokens the user answered in Phase 3 substitute too; unanswered ones stay and go in the report.
+2. Substitute every placeholder that has a collected inventory value — identity (`[PROJECT_NAME]`, `[PROJECT_TYPE]`, `[ONE_SENTENCE_PITCH]`), tech (`[LANGUAGE]`, `[FRAMEWORK]`, `[FRAMEWORK_VERSION]`, `[EXT]`, `[STATE_LIBRARY]`, `[NAVIGATION_LIBRARY]`, `[PERSISTENCE_LAYER]`, `[TEST_RUNNER]`), commands (`[TEST_CMD]`, `[DEV_SERVER_CMD]`, `[BUILD_CMD]`, `[TYPE_CHECK_CMD]`), packaging (`[PKG_MANAGER]`, `[PKG_MANIFEST]`, `[PKG_ADD_CMD]`, `[TYPE_CONFIG]`, `[FRAMEWORK_CONFIG]`), platforms (`[TARGET_PLATFORMS]`), structure (`[LOGIC_DIR]`, `[STORE_DIR]`, `[COMPONENTS_DIR]`, `[CONSTANTS_DIR]`), and conventions (`[LOWER_CASE_CONVENTION]`, `[PASCAL_CASE_CONVENTION]`, `[UPPER_SNAKE_CONVENTION]`). `[CAST_VERSION]` (the adoption version stamp) substitutes wherever it appears — always with this skill's own `metadata.version` frontmatter value from SKILL.md, never from the inventory and never asked. Domain tokens the user answered in Phase 3 substitute too; unanswered ones stay and go in the report.
 3. If the action is **Create**: write to `.claude/agents/<name>.md` directly.
 4. If the action is **Rename + Update**: read the existing file first, identify custom sections (anything not in CAST's standard section list), write the CAST template as the base, insert custom sections as an appendix after the standard sections, then move the old file to the new canonical name.
-5. If the action is **Update in place**: read the existing file, identify custom sections, replace CAST-owned sections with CAST's current versions, leave custom sections untouched.
+5. If the action is **Update in place**: read the existing file, identify custom sections, replace CAST-owned sections with CAST's current versions, leave custom sections untouched. **Role-mismatch guard**: before merging, compare the existing file's frontmatter `description` (and its evident role) against the roster's Role column for that name. If they diverge — e.g. `.claude/agents/coder.md` exists but is not a coder-role agent — the file is occupying a canonical CAST path without fulfilling the CAST role: never silently update in place. Treat it as an Ask (rename the user's file aside and Create fresh, or merge deliberately), stopping to get the user's answer if the Phase 3 plan did not already resolve it.
 6. Verify YAML frontmatter is valid (`name`, `description`, `model` keys present, properly quoted description).
 
 After completing the loop, **re-enumerate the 15 names and confirm each `.claude/agents/<name>.md` exists**. If any file is missing, that means the action was skipped. Create it from the canonical template before moving on to 5.5.
@@ -105,6 +112,10 @@ For each of `agent-plan`, `agent-code`, `agent-task`:
 4. If updating an existing similar-named pipeline: preserve any project-specific pre-flight or post-completion steps by moving them to an appendix section labelled `## Project-Specific Extensions (preserved from pre-CAST version)`.
 5. **Pre-1.0 migration**: if `.claude/commands/<name>.md` exists (the pipelines were slash commands before CAST v1.0.0), treat it as the existing counterpart — merge its preserved custom sections into the new SKILL.md per rule 4, then propose Delete of the old command file. The delete requires explicit user approval (per the safety rules), but leaving both files registers a duplicate `/<name>`, so flag it clearly rather than silently keeping both.
 
+## 5.5a — Execute approved Deletes
+
+Execute every Delete action the user explicitly approved in Phase 4 — most commonly the superseded pre-1.0 command files at `.claude/commands/<name>.md` left behind by the 5.5.5 migration. Use `git rm` (plain `rm` in a non-git project) and check each executed Delete off in the plan ledger. Never execute a Delete that lacks explicit approval; in unattended mode Deletes were downgraded to flagged TODOs, so this step is a no-op there. Run this step before validation — Phase 6 check 3 fails if superseded command files remain.
+
 ## 5.6 — Install reference docs and templates
 
 For each CAST reference doc and document template in the plan:
@@ -134,6 +145,7 @@ Special handling because `CLAUDE.md` is where user project identity lives.
    - **CAST content** (install or update): Directory Conventions section (docs/ vs artifacts/), Memory Imports block.
 3. Append the CAST sections if missing; update them if out-of-date.
 4. Update Memory Imports to reference every installed doc, including the detected topic doc(s) (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`). Mobile projects should import both `docs/FRONTEND.md` and `docs/MOBILE.md`.
+5. **Version stamp**: the CAST section carries the line `Adopted with CAST v[CAST_VERSION]` — substitute `[CAST_VERSION]` with this skill's `metadata.version` frontmatter value. This is the canonical stamp Phase 1 reads on later runs to detect the installed version; on an upgrade or forced re-run, replace the old version in that line. Never leave the token unfilled and never drop the line during a merge.
 
 ## 5.9 — Placeholder substitution pass
 

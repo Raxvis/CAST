@@ -10,7 +10,7 @@
 
 > **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three pipeline skills, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v1.2.2-blue)
+![Template version](https://img.shields.io/badge/template-v1.3.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
 
@@ -55,7 +55,7 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 - **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v1.2.2` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v1.3.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
@@ -78,6 +78,8 @@ npx skills add Raxvis/CAST        # installs the cast-init skill into .claude/sk
 /plugin marketplace add Raxvis/CAST
 /plugin install cast@cast
 ```
+
+> **Note on plugin-route footprint:** the plugin manifest points at the repo root, so a plugin install copies the entire repository — including `example/`, `CHANGELOG.md`, and `.github/` — into your local plugin cache. This is harmless (none of it is installed into your project; `/cast-init` only ever writes the payload under `skills/cast-init/assets/`), just a few hundred kilobytes of extra cache. The `npx skills` route fetches only the `cast-init` skill directory.
 
 **Then run the adoption.** Open Claude Code inside your project (restart the session if it was already open so the skill is discovered) and invoke:
 
@@ -186,7 +188,7 @@ Work artifacts produced by the agents during `/agent-plan` and `/agent-code`: mi
 Project-specific content in every template file is marked with `[UPPER_SNAKE_CASE]` tokens — things like `[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[TEST_CMD]`. The `/cast-init` skill detects project values and substitutes them during install; any remaining unfilled tokens are reported in the adoption report for you to fill in by hand. The skill also strips the `<!-- TEMPLATE INSTRUCTIONS -->` comment blocks (repo documentation) from every file it installs — only the `templates/` skeletons keep theirs, since those blocks instruct the agents that instantiate them.
 
 <details>
-<summary><strong>Full placeholder reference</strong> (12 categories, ~60 tokens) — expand if you're populating files manually or writing a values file</summary>
+<summary><strong>Full placeholder reference</strong> (10 categories, ~40 tokens) — expand if you're populating files manually or writing a values file</summary>
 
 ### Identity
 
@@ -195,6 +197,7 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 | `[PROJECT_NAME]` | Human-readable name of the project | Acme Dashboard |
 | `[PROJECT_TYPE]` | Category of software being built | mobile app, CLI tool, web service |
 | `[ONE_SENTENCE_PITCH]` | Single sentence describing what the product does and for whom | A budgeting tool that helps freelancers track project income in real time |
+| `[CAST_VERSION]` | CAST template version stamped into the installed `CLAUDE.md` (`Adopted with CAST v[CAST_VERSION]`). Auto-filled by `/cast-init` from its own version — never fill by hand | 1.3.0 |
 
 ### Tech
 
@@ -204,7 +207,6 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 | `[FRAMEWORK_VERSION]` | Framework version | v14, SDK 52 |
 | `[LANGUAGE]` | Primary programming language | any typed or untyped language |
 | `[STATE_LIBRARY]` | Client-side or application-level state management library | any state management solution |
-| `[STATE_LIBRARY_VERSION]` | Version of the state management library | 4.x, 2.0 |
 | `[PERSISTENCE_LAYER]` | Storage mechanism for application data | any database, file store, or cache |
 | `[NAVIGATION_LIBRARY]` | Routing or navigation solution | React Router, GoRouter |
 | `[TEST_RUNNER]` | Tool used to execute automated tests | any test runner or framework |
@@ -213,7 +215,6 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 | `[PKG_MANIFEST]` | Package or dependency manifest file | package.json, pubspec.yaml |
 | `[FRAMEWORK_CONFIG]` | Framework configuration file | app.json, next.config.js |
 | `[TYPE_CONFIG]` | Type checker configuration file | tsconfig.json |
-| `[BUNDLER_CONFIG]` | Bundler or build configuration file | metro.config.js, webpack.config.js |
 | `[EXT]` | File extension for source files | tsx, dart, rb |
 
 ### Commands
@@ -238,14 +239,10 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 
 | Placeholder | Description | Example value |
 |---|---|---|
-| `[SCREEN_DIR]` | Directory where screen or page files live | app/, pages/ |
 | `[LOGIC_DIR]` | Directory for pure business logic | src/game/, lib/domain/ |
 | `[STORE_DIR]` | Directory for state management files | src/store/ |
 | `[COMPONENTS_DIR]` | Directory for UI components | src/components/ |
-| `[HOOKS_DIR]` | Directory for reusable hooks or providers | src/hooks/ |
 | `[CONSTANTS_DIR]` | Directory for constants and configuration | src/constants/ |
-| `[ASSETS_DIR]` | Directory for static assets | assets/ |
-| `[MAIN_SCREEN]` | Core feature screen file name | game, dashboard |
 
 ### Conventions
 
@@ -260,30 +257,13 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 | Placeholder | Description | Example value |
 |---|---|---|
 | `[SAVE_KEY]` | Storage key for persisted data | my_app_data_v1 |
-| `[SAVE_VERSION]` | Current save format version number | 1 |
 
 ### Platform
 
 | Placeholder | Description | Example value |
 |---|---|---|
 | `[TARGET_PLATFORMS]` | Comma-separated list of deployment targets | web, iOS, Android, desktop |
-| `[PLATFORM_1]` | Primary target platform name | iOS |
-| `[PLATFORM_2]` | Secondary target platform name | Android |
-| `[TARGET_PLATFORM_1]` | First platform for Build & Test instructions | iOS simulator |
-| `[TARGET_PLATFORM_2]` | Second platform for Build & Test instructions | Android emulator |
-| `[TARGET_PLATFORM_3]` | Third platform for Build & Test instructions | web browser |
-| `[INPUT_METHOD]` | Primary input method | touch, mouse, keyboard |
 | `[MIN_TOUCH_TARGET]` | Minimum interactive element size for touch interfaces | any size specification in platform units |
-| `[THEME_FILE_PATH]` | Relative path from the project root to the theme or design-token file | path to the project's theme constants |
-| `[OTHER_DEP_1]` | Additional project dependency | any package name |
-| `[OTHER_DEP_2]` | Additional project dependency | any package name |
-
-### Testing
-
-| Placeholder | Description | Example value |
-|---|---|---|
-| `[COVERAGE_TARGET]` | Minimum code coverage percentage threshold | 80% |
-| `[BRANCH_TARGET]` | Minimum branch coverage percentage threshold | 80% |
 
 ### Performance
 
@@ -293,16 +273,13 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 | `[TICK_METRIC]` | Maximum acceptable update loop duration | 16ms |
 | `[RENDER_METRIC]` | Maximum acceptable frame render time | 16ms |
 | `[MEMORY_METRIC]` | Maximum acceptable memory usage | 200MB |
-| `[STORAGE_METRIC]` | Maximum acceptable local storage usage | 50MB |
 
 ### Process
 
 | Placeholder | Description | Example value |
 |---|---|---|
 | `[SESSION_TYPE]` | Type of user validation session | playtest, usability test, A/B test |
-| `[MAX_AGE_DAYS]` | Maximum age in days before a task is flagged stale | 14 |
-| `[MAX_BLOCKED_DAYS]` | Maximum days a task can remain blocked before escalation | 7 |
-| `[CRITICAL_BLOCKED_DAYS]` | Maximum days a critical task can remain blocked | 3 |
+| `[MAX_LOOP_COUNT]` | Maximum Defect/Issue loop iterations in the engineering pipeline before escalating to the user (used in `refactor.md`; loop semantics in `docs/PIPELINE_LOOP.md`) | 3 |
 
 ### Agents
 
@@ -544,7 +521,7 @@ Reference documentation. Never holds work artifacts. Document templates live in 
 | `docs/ASSETS.md` | Registry of all project assets (images, fonts, etc.) with status and source information |
 | `docs/MVP_LAUNCH.md` | Checklist and criteria for the initial public release |
 
-### templates/ (document templates, 10 files)
+### templates/ (document templates, 11 files)
 
 Reusable document skeletons. Agents copy them — never fill in place — to produce instances under `artifacts/`. See [`templates/README.md`](skills/cast-init/assets/templates/README.md).
 
@@ -560,6 +537,7 @@ Reusable document skeletons. Agents copy them — never fill in place — to pro
 | `templates/UI_SPEC.md` | Template for specifying a UI screen or component (instances live in `artifacts/ui-specs/`) |
 | `templates/CEO_REVIEW.md` | Template for the CEO planning verdict: the six mandated inputs, the review checklist, and the APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED verdict block. Instance at `artifacts/reviews/ceo-review-milestone-{N}.md`. |
 | `templates/UX_REVIEW.md` | Template for UI's UX review of an implemented milestone (instances live in `artifacts/reviews/`) |
+| `templates/MILESTONE_RETROSPECTIVE.md` | Template for the Validator's end-of-milestone retrospective: what went well, what didn't, process issues, metrics, and improvement actions. Instance at `artifacts/reviews/retrospective-milestone-{N}.md`. |
 
 ### artifacts/ (work artifacts)
 

@@ -66,10 +66,122 @@ jobs:
           fi
           echo "clean"
 
-      - name: Plugin manifests are valid JSON
+      - name: Plugin manifests are valid JSON (fast pre-check)
         run: |
           node -e "JSON.parse(require('fs').readFileSync('.claude-plugin/plugin.json','utf8')); console.log('plugin.json ok')"
           node -e "JSON.parse(require('fs').readFileSync('.claude-plugin/marketplace.json','utf8')); console.log('marketplace.json ok')"
+
+      - name: Plugin manifests pass the real validator (claude plugin validate)
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate .
+
+      - name: Every README placeholder-table token exists in the payload
+        run: |
+          # Each token documented in README's "Full placeholder reference" table must
+          # appear somewhere under skills/cast-init/assets/, or the table is documenting
+          # a substitution target that no longer exists (the v1.2.x dead-token bug).
+          # Allowlist: tokens that are deliberate exceptions.
+          #   CAST_VERSION — stamped into the installed CLAUDE.md by /cast-init from its
+          #   own version at install time; allowlisted so the check stays green even if
+          #   the payload carries it only transiently.
+          allow="CAST_VERSION"
+          fail=0
+          for tok in $(grep -oE '\| `\[[A-Z][A-Z0-9_]*\]`' README.md | grep -oE '[A-Z][A-Z0-9_]*'); do
+            case " $allow " in *" $tok "*) continue ;; esac
+            grep -rqF "[$tok]" skills/cast-init/assets/ || { echo "README table documents [$tok] but it appears nowhere in the payload"; fail=1; }
+          done
+          [ "$fail" -eq 0 ] && echo "all README-table tokens are live"
+          exit $fail
+
+      - name: Example fixture contains no placeholder tokens
+        run: |
+          # README sells example/ as a fully substituted instance — no [UPPER_SNAKE]
+          # tokens may remain. Allowlist (extended regex, matched against "file:line:token")
+          # exists for legitimate literal mentions; currently nothing is allowlisted.
+          allow_re='^$'
+          hits=$(grep -rnoE '\[[A-Z][A-Z0-9_]+\]' example/ | grep -vE "$allow_re" || true)
+          if [ -n "$hits" ]; then
+            echo "Placeholder tokens found in example/:"; echo "$hits"; exit 1
+          fi
+          echo "clean"
+
+      - name: docs/templates/artifacts path-split lint
+        run: |
+          # Hard rule: templates are only ever referenced under templates/, and work
+          # instances only ever under artifacts/. Both sub-checks derive their inputs
+          # from the payload at run time.
+          fail=0
+          # (1) No payload file may reference a template basename under docs/ or artifacts/.
+          for t in skills/cast-init/assets/templates/*.md; do
+            b=$(basename "$t"); [ "$b" = "README.md" ] && continue
+            hits=$(grep -rnE "(docs|artifacts)/$b" skills/cast-init/assets/ || true)
+            if [ -n "$hits" ]; then
+              echo "Template basename referenced under docs/ or artifacts/:"; echo "$hits"; fail=1
+            fi
+          done
+          # (2) No instance-pattern path may appear under docs/ or templates/.
+          hits=$(grep -rnE '(docs|templates)/[A-Za-z0-9_{}./-]*(milestone-|ceo-review-|ux-review-|retrospective-)' skills/cast-init/assets/ || true)
+          if [ -n "$hits" ]; then
+            echo "Instance-pattern path under docs/ or templates/:"; echo "$hits"; fail=1
+          fi
+          [ "$fail" -eq 0 ] && echo "path split clean"
+          exit $fail
+
+      - name: Relative markdown links resolve (README, TROUBLESHOOTING, example README)
+        run: |
+          fail=0
+          for f in README.md TROUBLESHOOTING.md example/README.md; do
+            dir=$(dirname "$f")
+            while IFS= read -r target; do
+              target=${target%%#*}
+              [ -z "$target" ] && continue
+              case "$target" in http://*|https://*|mailto:*) continue ;; esac
+              [ -e "$dir/$target" ] || { echo "broken link in $f -> $target"; fail=1; }
+            done < <(grep -oE '\]\([^)]+\)' "$f" | sed -E 's/^\]\(//; s/\)$//')
+          done
+          [ "$fail" -eq 0 ] && echo "all relative links resolve"
+          exit $fail
+
+      - name: Example instances carry their template's required level-2 headings
+        run: |
+          # Each fixture artifact must contain every "## X (required)" heading of the
+          # template it instantiates (marker suffix stripped; extra sections are fine).
+          # Required headings are read from the template files at run time.
+          fail=0
+          pairs="example/artifacts/milestones/milestone-1-task-crud.md:MILESTONE_DEFINITION.md
+          example/artifacts/milestones/milestone-1-task-crud-tasks.md:MILESTONE_TASKS.md
+          example/artifacts/milestones/milestone-1-task-crud-completion.md:MILESTONE_COMPLETION.md
+          example/artifacts/architecture/arch-milestone-1.md:ARCH_SYSTEM.md
+          example/artifacts/ui-specs/ui-milestone-1.md:UI_SPEC.md
+          example/artifacts/reviews/ceo-review-milestone-1.md:CEO_REVIEW.md"
+          while IFS=: read -r inst tmpl; do
+            inst=$(echo "$inst" | sed 's/^ *//'); [ -z "$inst" ] && continue
+            t="skills/cast-init/assets/templates/$tmpl"
+            [ -f "$inst" ] || { echo "missing instance: $inst"; fail=1; continue; }
+            [ -f "$t" ] || { echo "missing template: $t"; fail=1; continue; }
+            while IFS= read -r req; do
+              grep -qxF "$req" "$inst" || { echo "$inst is missing required section: '$req' (from $tmpl)"; fail=1; }
+            done < <(grep -E '^## .*\(required\)' "$t" | sed 's/ (required)$//')
+          done <<< "$pairs"
+          [ "$fail" -eq 0 ] && echo "all example instances match their template contracts"
+          exit $fail
+
+      - name: All agent files carry the identical model pin
+        run: |
+          fail=0
+          pins=""
+          for f in skills/cast-init/assets/agents/*.md; do
+            [ "$(basename "$f")" = "README.md" ] && continue
+            pin=$(awk '/^model:/{print $2; exit}' "$f")
+            [ -n "$pin" ] || { echo "$f: no model: frontmatter line"; fail=1; continue; }
+            pins="$pins$pin"$'\n'
+          done
+          distinct=$(printf '%s' "$pins" | sort -u)
+          count=$(printf '%s\n' "$distinct" | grep -c .)
+          echo "model pins found: $distinct ($count distinct)"
+          [ "$count" -eq 1 ] || { echo "agent model pins are not identical"; fail=1; }
+          exit $fail
 
       - name: No stale pipeline-routing orders (docs/PIPELINE_LOOP.md is canonical)
         run: |

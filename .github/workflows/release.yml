@@ -1,0 +1,129 @@
+name: Release
+
+# Automates steps 5-6 of CLAUDE.md's Release and Tagging Policy: when a version
+# bump lands on main (plugin.json version with no matching v<version> tag), this
+# workflow verifies the four synchronized version locations agree, creates the
+# annotated tag, and publishes the GitHub Release from the top CHANGELOG entry.
+# The manual checklist in CLAUDE.md remains the documented fallback.
+#
+# A second job (tag-integrity) runs on manually pushed v* tags and verifies the
+# tag matches plugin.json and the CHANGELOG top entry at that commit. Tags pushed
+# by this workflow's own GITHUB_TOKEN do not re-trigger workflows (GitHub's
+# recursion guard), which is fine — those tags are verified before creation.
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  tag-and-release:
+    if: github.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history so existing tags are visible
+
+      - name: Read plugin.json version and check for an existing tag
+        id: ver
+        run: |
+          version=$(node -e "console.log(JSON.parse(require('fs').readFileSync('.claude-plugin/plugin.json','utf8')).version)")
+          echo "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo "plugin.json version '$version' is not plain semver"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          git fetch --tags --force --quiet
+          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            echo "Tag v$version already exists — nothing to release (re-run guard)."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Tag v$version does not exist yet — releasing."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify the four synchronized version locations agree
+        if: steps.ver.outputs.exists == 'false'
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          readme_badge=$(grep -oE 'template-v[0-9]+\.[0-9]+\.[0-9]+' README.md | head -1 | sed 's/template-v//')
+          readme_hero=$(grep -oE 'Current template version: `v[0-9]+\.[0-9]+\.[0-9]+`' README.md | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          changelog=$(grep -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          skill=$(grep -oE 'version: "[0-9]+\.[0-9]+\.[0-9]+"' skills/cast-init/SKILL.md | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "plugin.json=$VERSION README badge=$readme_badge hero=$readme_hero CHANGELOG=$changelog SKILL.md=$skill"
+          fail=0
+          [ "$readme_badge" = "$VERSION" ] || { echo "MISMATCH: README badge ($readme_badge) != plugin.json ($VERSION)"; fail=1; }
+          [ "$readme_hero" = "$VERSION" ] || { echo "MISMATCH: README hero line ($readme_hero) != plugin.json ($VERSION)"; fail=1; }
+          [ "$changelog" = "$VERSION" ] || { echo "MISMATCH: CHANGELOG top entry ($changelog) != plugin.json ($VERSION)"; fail=1; }
+          [ "$skill" = "$VERSION" ] || { echo "MISMATCH: SKILL.md metadata.version ($skill) != plugin.json ($VERSION)"; fail=1; }
+          if [ "$fail" -ne 0 ]; then
+            echo "Version bump is incomplete — all four locations must match before a tag is created (see CLAUDE.md)."
+            exit 1
+          fi
+
+      - name: Create and push the annotated tag
+        if: steps.ver.outputs.exists == 'false'
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v$VERSION" -m "CAST v$VERSION" "$GITHUB_SHA"
+          git push origin "v$VERSION"
+
+      - name: Publish the GitHub Release from the top CHANGELOG entry
+        if: steps.ver.outputs.exists == 'false'
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Extract everything from the first "## [" heading up to (not including)
+          # the second, dropping the heading line itself. Never use the single-range
+          # awk pattern (awk '/^## \[X\]/,/^## \[/') — the heading matches both ends
+          # and yields one line (see CLAUDE.md).
+          awk '/^## \[/{n++} n==1' CHANGELOG.md | sed '1d' > notes.md
+          if ! [ -s notes.md ]; then
+            echo "Release notes are empty — CHANGELOG.md has no top entry to publish."
+            exit 1
+          fi
+          echo "--- release notes ---"; cat notes.md; echo "---------------------"
+          gh release create "v$VERSION" \
+            --title "CAST v$VERSION" \
+            --notes-file notes.md \
+            --latest
+          rm notes.md
+
+  tag-integrity:
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tag matches plugin.json and the CHANGELOG top entry at this commit
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          echo "$TAG" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+$' || { echo "Tag '$TAG' is not v<semver> — skipping integrity check."; exit 0; }
+          version="${TAG#v}"
+          plugin=$(node -e "console.log(JSON.parse(require('fs').readFileSync('.claude-plugin/plugin.json','utf8')).version)")
+          changelog=$(grep -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "tag=$version plugin.json=$plugin CHANGELOG=$changelog"
+          fail=0
+          [ "$plugin" = "$version" ] || { echo "MISMATCH: tag $TAG does not match plugin.json version $plugin at this commit"; fail=1; }
+          [ "$changelog" = "$version" ] || { echo "MISMATCH: tag $TAG does not match CHANGELOG top entry $changelog at this commit"; fail=1; }
+          exit $fail
+
+      - name: Tag is annotated, not lightweight
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          echo "$TAG" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+$' || { echo "Not a v<semver> tag — skipping."; exit 0; }
+          git fetch --force --quiet origin "refs/tags/$TAG:refs/tags/$TAG"
+          type=$(git cat-file -t "refs/tags/$TAG")
+          echo "tag object type: $type"
+          if [ "$type" != "tag" ]; then
+            echo "Tag $TAG is lightweight — the release policy requires annotated tags (git tag -a)."
+            exit 1
+          fi

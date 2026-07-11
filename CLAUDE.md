@@ -26,7 +26,7 @@ This is a hard rule enforced across the template: **`docs/` is documentation, `t
 
 ## Placeholder Convention
 
-All project-specific content uses `[UPPER_SNAKE_CASE]` tokens in square brackets. Categories: Identity (`[PROJECT_NAME]`, `[PROJECT_TYPE]`), Tech (`[FRAMEWORK]`, `[LANGUAGE]`), Commands (`[DEV_SERVER_CMD]`, `[TEST_CMD]`), Domain (`[DOMAIN_ENTITY]`, `[CORE_MECHANIC]`), Platform (`[TARGET_PLATFORMS]`), Project Structure (`[SCREEN_DIR]`, `[LOGIC_DIR]`), Conventions (`[LOWER_CASE_CONVENTION]`), Persistence (`[SAVE_KEY]`), Testing (`[COVERAGE_TARGET]`), Performance (`[STARTUP_METRIC]`), Process (`[MAX_AGE_DAYS]`). Per-agent AI models are pre-configured in each agent file's YAML frontmatter and are not placeholders.
+All project-specific content uses `[UPPER_SNAKE_CASE]` tokens in square brackets. Categories: Identity (`[PROJECT_NAME]`, `[PROJECT_TYPE]`, `[CAST_VERSION]` — the latter auto-stamped by `/cast-init` from its own version), Tech (`[FRAMEWORK]`, `[LANGUAGE]`), Commands (`[DEV_SERVER_CMD]`, `[TEST_CMD]`), Domain (`[DOMAIN_ENTITY]`, `[CORE_MECHANIC]`), Platform (`[TARGET_PLATFORMS]`), Project Structure (`[LOGIC_DIR]`, `[COMPONENTS_DIR]`), Conventions (`[LOWER_CASE_CONVENTION]`), Persistence (`[SAVE_KEY]`), Performance (`[STARTUP_METRIC]`), Process (`[SESSION_TYPE]`, `[MAX_LOOP_COUNT]`). Every token documented in README's placeholder table must appear somewhere under `skills/cast-init/assets/` — CI enforces this. Per-agent AI models are pre-configured in each agent file's YAML frontmatter and are not placeholders.
 
 When editing templates, preserve placeholder tokens — do not replace them with concrete values unless adapting the template for a specific project.
 
@@ -66,6 +66,8 @@ When editing templates, preserve placeholder tokens — do not replace them with
 
 Whenever the template version is bumped, the new version must be tagged and released on GitHub at the same time the commit is pushed. This is a hard rule, not a preference — `plugin.json` and the SKILL.md metadata carry the template version, and downstream users rely on GitHub tags to pin a known-good revision (skill installs via `npx skills update` are content-hash based, but the plugin route and humans pin by tag). A push without a corresponding tag leaves the canonical version floating and breaks reproducible installs.
 
+**Automation:** `.github/workflows/release.yml` automates checklist steps 5–6. On every push to `main` it reads `.claude-plugin/plugin.json`; if no `v<version>` tag exists yet, it verifies the four synchronized locations agree (failing loudly on mismatch), creates the annotated tag, and publishes the GitHub Release from the top `CHANGELOG.md` section. A second job triggered by `v*` tag pushes verifies tag/version/CHANGELOG integrity. The manual checklist below remains the fallback if the workflow is unavailable — and step 7 (verify) should be run either way.
+
 **A version bump is any change to one of the following synchronized locations:**
 
 - `README.md` — the version badge and the `Current template version` hero line
@@ -81,13 +83,13 @@ All four of these must land in the same commit. A commit that bumps one without 
 2. Add a `CHANGELOG.md` entry for the new version, following the existing format (Added / Changed / Removed / Migration subsections as applicable). The entry must describe every substantive change since the prior version, not just the new feature.
 3. Commit the version bump with a message that starts with the new version number (e.g. `"Release v<NEW>: ..."`) so the tag-creation step can use the commit as the tag target.
 4. Push the commit to `origin main`.
-5. **Immediately after pushing**, create an annotated git tag at the same commit matching the new version:
+5. _(Automated by `release.yml` on push — do manually only if the workflow is unavailable.)_ **Immediately after pushing**, create an annotated git tag at the same commit matching the new version:
    ```bash
    git tag -a v<NEW> -m "CAST v<NEW>" <commit-sha>
    git push origin v<NEW>
    ```
    The tag name is `v` followed by the semver string. Use an annotated tag (`-a`), never a lightweight tag — annotated tags carry the tagger, date, and message and are what GitHub Releases consume.
-6. **Immediately after pushing the tag**, create a GitHub Release at that tag with the release notes pulled from the corresponding `CHANGELOG.md` entry. The new entry is always the topmost version section, so extract everything from the first `## [` heading up to (but not including) the second, drop the heading line itself, and pass the result to `gh release create`:
+6. _(Automated by `release.yml` on push — do manually only if the workflow is unavailable.)_ **Immediately after pushing the tag**, create a GitHub Release at that tag with the release notes pulled from the corresponding `CHANGELOG.md` entry. The new entry is always the topmost version section, so extract everything from the first `## [` heading up to (but not including) the second, drop the heading line itself, and pass the result to `gh release create`:
    ```bash
    awk '/^## \[/{n++} n==1' CHANGELOG.md | sed '1d' > /tmp/notes.md
    cat /tmp/notes.md   # MUST be non-empty and match the <NEW> entry — do not publish blank notes

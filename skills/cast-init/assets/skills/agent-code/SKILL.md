@@ -46,9 +46,12 @@ This skill invokes the following agents. Open any of them for the full role defi
 - [bug-gatherer](../../agents/bug-gatherer.md) — files Defect findings as structured bug reports
 - [debugger](../../agents/debugger.md) — investigates triaged defects and produces root-cause analysis
 - [refactor](../../agents/refactor.md) — addresses Issue findings without changing behaviour and loops back to Reviewer
-- [product](../../agents/product.md) — triages bug reports and validates completed tasks against acceptance criteria
+- [product](../../agents/product.md) — triages bug reports, validates completed tasks against acceptance criteria, and writes the milestone completion and validation records
+- [ui](../../agents/ui.md) — performs the milestone UX review at the milestone-completion checkpoint (milestones with UI-flagged tasks only)
+- [docs-writer](../../agents/docs-writer.md) — drains the `docs` queue from `artifacts/STANDUP.md` at task- and milestone-completion checkpoints
+- [validator](../../agents/validator.md) — records task and milestone outcomes in `artifacts/AGENT_STATE.md` and writes the milestone retrospective
 
-The planning-stage outputs this skill reads were produced earlier by [architect](../../agents/architect.md), [ui](../../agents/ui.md), [security](../../agents/security.md), [performance](../../agents/performance.md), and signed off by [ceo](../../agents/ceo.md). This skill does not re-invoke them.
+The planning-stage outputs this skill reads were produced earlier by [architect](../../agents/architect.md), [ui](../../agents/ui.md), [security](../../agents/security.md), [performance](../../agents/performance.md), and signed off by [ceo](../../agents/ceo.md). This skill does not re-invoke them during the per-task loop; the only planning-stage agent it re-invokes is **ui**, once, for the milestone-completion UX review.
 
 ## Input
 
@@ -78,13 +81,14 @@ Before any task begins:
    - `artifacts/ui-specs/ui-milestone-{N}.md`
    - `artifacts/reviews/ceo-review-milestone-{N}.md`
 2. Read the CEO review and confirm the verdict is APPROVED or APPROVED WITH CONDITIONS. If REVISION REQUIRED or artifacts are missing, stop and instruct the user to run `/agent-plan <milestone>` first.
-3. If APPROVED WITH CONDITIONS, extract the Approval Conditions. They must be addressed as part of implementation and verified during Reviewer / Product validation.
+3. If APPROVED WITH CONDITIONS, read the Approval Conditions from the **CEO Approval Conditions** table in `artifacts/milestones/milestone-{N}-{slug}-tasks.md` (backfilled by Product at the end of `/agent-plan`). Cross-check the table against the CEO review itself; if the table is missing or stale, extract the conditions from the CEO review and backfill the table before proceeding. The conditions must be addressed as part of implementation and verified during Reviewer / Product validation.
 
 ### Task Selection
 
 1. Read the task breakdown in `artifacts/milestones/milestone-{N}-{slug}-tasks.md`.
-2. If the invocation input specifies a single task, work on only that task.
-3. Otherwise, work through tasks in dependency order, respecting any `blockedBy` relationships.
+2. **Skip any task whose Status is already Complete.** The task-completion checkpoint below writes Status back to the task breakdown, so a re-invocation after an interruption resumes from the first non-Complete task instead of redoing finished work.
+3. If the invocation input specifies a single task, work on only that task.
+4. Otherwise, work through tasks in dependency order, respecting each task's **Dependencies** field (defined in `templates/MILESTONE_TASKS.md`).
 
 ### Per-Task Loop
 
@@ -92,23 +96,36 @@ For each task, execute the engineering loop defined in `docs/PIPELINE_LOOP.md` �
 
 Inputs specific to this skill, passed into the loop per the loop doc's pass-forward rule (read once in Pre-Flight/Task Selection, supply the content to each stage — don't have each agent re-open the same files):
 
-- **Coder (Step 1)** receives the task definition from the task breakdown, the architecture document (`artifacts/architecture/arch-milestone-{N}.md`), the UI specification (`artifacts/ui-specs/ui-milestone-{N}.md`), and any Approval Conditions extracted in Pre-Flight, and follows the conventions in `CLAUDE.md`, `docs/CODE_PATTERNS.md`, and `docs/FILE_CONVENTIONS.md`.
+- **Coder (Step 1)** receives the task definition from the task breakdown, the architecture document (`artifacts/architecture/arch-milestone-{N}.md`), the UI specification (`artifacts/ui-specs/ui-milestone-{N}.md`), and any Approval Conditions read in Pre-Flight (from the tasks file's CEO Approval Conditions table), and follows the conventions in `CLAUDE.md`, `docs/CODE_PATTERNS.md`, and `docs/FILE_CONVENTIONS.md`.
 - **Reviewer (Step 3)** receives the same architecture document, UI specification, and Approval Conditions, and reviews against them plus project conventions.
 - **Product validation (Step 4)** validates against the task's acceptance criteria using the Task Validation Checklist in `templates/MILESTONE_VALIDATION.md`.
 
 ### Completion
 
-After all tasks for the milestone are complete (or the specified task is done):
+#### Task-completion checkpoint (after every task)
+
+Run this checkpoint each time a task passes Product validation — including single-task invocations:
+
+1. **Status writeback.** Mark the task's **Status** as Complete in `artifacts/milestones/milestone-{N}-{slug}-tasks.md` — both the Summary table row and the task's own field table. When every task in the breakdown is Complete, set the Header **Status** field to Complete as well. This writeback is what makes the skill resumable (see Task Selection).
+2. **Docs Writer.** Invoke the **docs-writer** agent to drain the `docs` entries from `artifacts/STANDUP.md` (entries of the form `- <agent> | docs | <note>` — see that file's Entry Grammar). Docs Writer marks each drained entry with ✅.
+3. **Validator.** Invoke the **validator** agent to record the task outcome in `artifacts/AGENT_STATE.md` (Agent Status Dashboard and Milestone Progress tables in its section).
+
+#### Milestone-completion checkpoint
+
+After all tasks for the milestone are complete:
 
 1. Run `[TEST_CMD]` one final time to confirm everything still passes.
-2. Write a milestone completion record at `artifacts/milestones/milestone-{N}-{slug}-completion.md` using the template in `templates/MILESTONE_COMPLETION.md`.
-3. Append a final entry to `artifacts/STANDUP.md` summarizing the run.
-4. Summarize what was implemented, test results, any defects filed in `artifacts/BUGS.md`, and the status of every Approval Condition from the CEO.
-5. Suggest next steps — additional tasks, a release via the **release** agent, or a new planning run via `/agent-plan`.
+2. Launch the **product** agent to write the milestone completion record at `artifacts/milestones/milestone-{N}-{slug}-completion.md` using `templates/MILESTONE_COMPLETION.md`, and the milestone validation record at `artifacts/milestones/milestone-{N}-{slug}-validation.md` using `templates/MILESTONE_VALIDATION.md`. Product — not the orchestrator — writes both records (they are Product's artifacts; see `artifacts/README.md`).
+3. **UX review.** If the milestone contains UI-flagged tasks (any task with **Needs UI Spec** = Yes or Done), launch the **ui** agent once to review the implemented screens against `artifacts/ui-specs/ui-milestone-{N}.md` and write `artifacts/reviews/ux-review-milestone-{N}.md` using `templates/UX_REVIEW.md`. Skip this step for milestones with no UI-flagged tasks.
+4. **Docs Writer.** Invoke the **docs-writer** agent to drain any remaining `docs` entries from `artifacts/STANDUP.md` (per its Entry Grammar; drained entries are marked ✅).
+5. **Validator.** Invoke the **validator** agent to record the milestone outcome in `artifacts/AGENT_STATE.md` and write the milestone retrospective at `artifacts/reviews/retrospective-milestone-{N}.md` using `templates/MILESTONE_RETROSPECTIVE.md`.
+6. Append a final entry to `artifacts/STANDUP.md` summarizing the run, using that file's Entry Grammar.
+7. Summarize what was implemented, test results, any defects filed in `artifacts/BUGS.md` (including any still open as Deferred), and the status of every Approval Condition from the CEO.
+8. Suggest next steps — additional tasks, a release (the **release** agent is user-invoked after milestone completion; this skill does not launch it), or a new planning run via `/agent-plan`.
 
 ### Error Handling
 
-- If a task is blocked by an unfinished dependency, skip it and record the blocker in `artifacts/STANDUP.md`.
+- If a task is blocked by an unfinished dependency, skip it and record the blocker in `artifacts/STANDUP.md` (a `blocker` entry per its Entry Grammar).
 - If the architecture document or UI specification is ambiguous, flag it rather than guessing. Pause the task and notify the user to re-run the relevant stage of `/agent-plan`.
 - Loop-cap escalation (`[MAX_LOOP_COUNT]`) and Environment Issue handling follow the rules in `docs/PIPELINE_LOOP.md`.
 

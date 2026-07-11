@@ -11,7 +11,7 @@ description: >-
   produces the migration plan without changing files.
 license: MIT
 metadata:
-  version: "1.2.2"
+  version: "1.3.0"
   source: "https://github.com/Raxvis/CAST"
 ---
 
@@ -34,11 +34,11 @@ All template files are read from `CAST_SOURCE` with the Read tool. No files are 
 
 - **Full adoption** (default) — run Phases 1 through 7. The user reviews and approves the plan before execution.
 - **Dry run** — run Phases 1 through 3 only. Produce the inventory and migration plan, then stop. Useful for scoping a migration without committing to changes. The user must explicitly request this mode.
-- **Unattended** — for non-interactive sessions (CI, headless runs). Valid only when the invocation explicitly pre-approves the plan AND pre-supplies the answers the gates would ask for (project type, pitch, test command, agent opt-outs). When both are present, treat the Phase 1 and Phase 4 gates as satisfied, record every auto-approved decision verbatim in the Phase 7 report, and never exercise a Delete action — downgrade Deletes to flagged TODOs, since destructive actions require a live approval. A non-interactive invocation *without* explicit pre-approval runs as a dry run.
+- **Unattended** — for non-interactive sessions (CI, headless runs). Valid only when the invocation explicitly pre-approves the plan AND pre-supplies the answers the gates would ask for (project type, pitch, test command, agent opt-outs). When both are present, treat the Phase 1 and Phase 4 gates as satisfied, record every auto-approved decision verbatim in the Phase 7 report, and never exercise a Delete action — downgrade Deletes to flagged TODOs, since destructive actions require a live approval. Any Ask item the pre-supplied answers do not resolve (including novel Asks that arise mid-run) downgrades to **Preserve** plus a TODO in the Phase 7 report — never guess an answer. If a Phase 6 validation check fails, do not prompt: halt and write a failed-adoption report per `references/validation.md`. A non-interactive invocation *without* explicit pre-approval runs as a dry run.
 
 If the user has not specified a mode, assume full adoption.
 
-**Upgrades.** If Phase 1 finds an existing CAST install that records a version, compare it against this skill's `metadata.version` before planning: if they are equal, report "already at <version>" and stop (offer a forced re-run if the user suspects drift); if the installed version is *newer* than this skill, warn that the local cast-init copy is stale and suggest `npx skills update` (or `/plugin marketplace update`) before proceeding.
+**Upgrades.** If Phase 1 finds an existing CAST install that records a version — the canonical stamp is the `Adopted with CAST v<X.Y.Z>` line in the target's `CLAUDE.md` CAST section (see `references/discovery.md` 1.1) — compare it against this skill's `metadata.version` before planning: if they are equal, report "already at <version>" and stop (offer a forced re-run if the user suspects drift); if the installed version is *newer* than this skill, warn that the local cast-init copy is stale and suggest `npx skills update` (or `/plugin marketplace update`) before proceeding. A **forced re-run** repeats all seven phases treating the same-version install as upgradeable: CAST-owned files and sections are overwritten from the current payload while user content and custom sections are preserved, exactly per the normal Update-in-place rules in `references/execution.md` — it refreshes drifted CAST content, never wholesale-resets the project.
 
 ## Role and canonical structure
 
@@ -69,7 +69,7 @@ Internalize these before starting. They override any instruction below if there 
 5. **Never write work artifacts to `docs/`.** `docs/` is reference-only. Any live work goes in `artifacts/`.
 6. **Commit nothing automatically.** Leave the user to review and commit their own changes.
 7. **Never execute the target project's code.** Do not run its build, tests, scripts, or binaries during adoption — analysis of the project is read-only. Shell use for the adoption's own mechanics (git status/mv, grep, copying CAST payload files per `references/execution.md`) is fine.
-8. **Require a clean git working tree before Phase 5.** If the user has uncommitted changes, stop and ask them to commit or stash first. Exceptions for resuming an interrupted or staged adoption are defined in `references/execution.md` preflight.
+8. **Require a clean git working tree before Phase 5.** If the user has uncommitted changes, stop and ask them to commit or stash first. The adoption's own files (`artifacts/adoption-inventory.md`, `artifacts/adoption-plan.md`, `artifacts/adoption-report.md`) are exempt — Phases 1 and 3 write them before Phase 5 by design, so they never count as dirty. Exceptions for resuming an interrupted or staged adoption are defined in `references/execution.md` preflight. If the project is not a git repository, warn the user there is no rollback safety net, then either get their explicit confirmation to proceed without one or offer to run `git init` (plus an initial commit) first.
 
 ## Phase 1 — Discovery
 
@@ -78,9 +78,9 @@ Crawl the project and map everything relevant using Read, Glob, and Grep. Follow
 - **1.1 Claude Code state** — `CLAUDE.md`, `.claude/agents/`, `.claude/skills/` (prior CAST 1.x installs), `.claude/commands/` (pre-1.0 CAST installs), `.claude/settings.json`
 - **1.2 Existing agentic workflow artifacts** outside `.claude/` (including legacy pre-0.3.0 `features/` directories)
 - **1.3 Documentation state** — map existing docs to CAST reference docs by content, not filename
-- **1.4 Project metadata** — tech stack, commands, and project type (frontend / backend / CLI / library / data / mobile / mixed) detected from manifests
+- **1.4 Project metadata** — tech stack, commands, project type (frontend / backend / CLI / library / data / mobile / mixed), and workspace/monorepo layout detected from manifests
 - **1.5 Source code structure** — source layout, naming conventions, test patterns, CI config
-- **1.6 The inventory** — write findings to `artifacts/adoption-inventory.md` using the template in the reference file
+- **1.6 The inventory** — archive any prior run's `adoption-*.md` files (date suffix, or confirmed overwrite in interactive mode), then write findings to `artifacts/adoption-inventory.md` using the template in the reference file
 
 **Stop after writing the inventory** and present it to the user:
 
@@ -122,7 +122,7 @@ Produce a detailed migration plan tailored to the classification. Structure it a
 
 Build the plan from these reference files:
 
-- **`references/roster.md`** — the canonical 15-agent roster with tiers, models, and effort levels; alias tables for matching existing files by role; and the pipeline-skills mapping (including the pre-1.0 command → skill migration path). **All 15 agents are non-negotiable by default**: every one must appear in the plan as Create / Rename+Update / Update-in-place / Preserve unless the user explicitly opts out of `release` or `validator`. Before closing the plan, enumerate all 15 names and verify each has an action — add the missing Create actions if any slipped through.
+- **`references/roster.md`** — the canonical 15-agent roster with tiers, models, and effort levels; alias tables for matching existing files by role; and the pipeline-skills mapping (including the pre-1.0 command → skill migration path). **All 15 agents are non-negotiable by default**: every one must appear in the plan as Create / Rename+Update / Update-in-place / Preserve unless the user explicitly opts out of `release`, `validator`, or — for a clearly backend/CLI-only project with no user interface — `ui` (see the opt-out rules in `references/roster.md`). Before closing the plan, enumerate all 15 names and verify each has an action — add the missing Create actions if any slipped through.
 - **`references/dispositions.md`** — per-file disposition tables for docs and templates (including which topic docs install for which project type), artifacts scaffold rules, root-file rules (`root/CLAUDE.md` is the only file installed at target root), and the plan-file format.
 
 Write the full plan to `artifacts/adoption-plan.md` using the format in `references/dispositions.md`. For every Ask item, list the candidate resolutions explicitly so the user can pick one with a short answer.
@@ -153,39 +153,45 @@ Wait for explicit approval. **Do not proceed on ambiguous responses** like "look
 
 For each Ask question in the plan, require a specific answer before executing the related actions. If the user says "do whatever you think is best" for an Ask item, restate the recommendation, then proceed only after they confirm the recommendation itself.
 
+Once approval is given, **record every Phase 4 resolution into `artifacts/adoption-plan.md` before entering Phase 5** — Ask answers, user modifications to actions, and skipped actions — so the plan file matches exactly what will execute. The Phase 5 resume path and the Phase 7 report both cross-reference the plan file; a stale plan breaks both.
+
 ## Phase 5 — Execution
 
-Once the plan is approved, execute the actions in a safe order, reporting progress as you go. **Read `references/execution.md` before writing any file** — it contains the full install mechanics and the customization-preservation rules, including the global rule that `<!-- TEMPLATE INSTRUCTIONS -->` blocks and placeholder-pointer comments are stripped from every installed file (the eight `templates/*` skeletons excepted). The step order:
+Once the plan is approved, execute the actions in a safe order, reporting progress as you go. **Read `references/execution.md` before writing any file** — it contains the full install mechanics and the customization-preservation rules, including the global rule that `<!-- TEMPLATE INSTRUCTIONS -->` blocks and placeholder-pointer comments are stripped from every installed file (the eight `templates/*` skeletons excepted). Execute its sections in order:
 
-1. **Preflight** — clean git tree (with resume/staged-adoption exceptions); `CAST_SOURCE` present and complete.
-2. **Fast path** — bulk-copy + single substitution/strip passes for pure-Create actions; per-file merge only where customizations must be preserved.
-3. **Create directories** — `.claude/agents/`, `.claude/skills/`, `docs/`, `templates/`, `artifacts/` + subdirectories.
-4. **Directory renames** — `features/` → `artifacts/` via `git mv`, updating all references.
-5. **Install agent files** — all 15 in roster order, with placeholder substitution and custom-section preservation; never install `agents/README.md`; re-enumerate all 15 afterward.
-6. **Install pipeline skills** — `agent-plan`, `agent-code`, `agent-task` to `.claude/skills/<name>/SKILL.md`, substituting `[PROJECT_NAME]`, `[TEST_CMD]`, `[MAX_LOOP_COUNT]`; migrate any pre-1.0 command files and propose deleting them.
-7. **Install reference docs and templates** — per the disposition tables; `docs/FILE_CONVENTIONS.md` always.
-8. **Install artifacts scaffold** — `BUGS.md`, `STANDUP.md`, `AGENT_STATE.md`, `README.md`, four empty subdirectories.
-9. **Install CLAUDE.md** — merge with the user's existing file per the preservation rules.
-10. **Placeholder substitution pass** — scan for remaining `[UPPER_SNAKE_CASE]` tokens; substitute only from inventory values; never guess.
+1. **5.1 Preflight**
+2. **5.1a Fast path for pure-Create actions**
+3. **5.2 Create directories**
+4. **5.3 Handle directory renames**
+5. **5.4 Install agent files**
+6. **5.5 Install pipeline skills**
+7. **5.5a Execute approved Deletes**
+8. **5.6 Install reference docs and templates**
+9. **5.7 Install artifacts scaffold**
+10. **5.8 Install CLAUDE.md**
+11. **5.9 Placeholder substitution pass**
+
+As each executed action completes, check it off in `artifacts/adoption-plan.md` — that ledger is the resume and rollback record (see the progress-ledger rule in `references/execution.md`).
 
 ## Phase 6 — Validation
 
 Run every check in `references/validation.md`:
 
 1. Placeholder scan (expected sub-template tokens like `[DATE]` are fine; real unfilled placeholders are not).
-2. All 15 agents exist with frontmatter matching the canonical roles (Tier 5 absences require a recorded opt-out; Tier 1–4 absences are hard failures).
+2. All 15 agents exist with frontmatter matching the canonical roles (Tier 5 absences and a `ui` absence on a backend/CLI-only project require a recorded opt-out; other Tier 1–4 absences are hard failures).
 3. The pipeline skills the user chose to keep exist at `.claude/skills/<name>/SKILL.md` with valid frontmatter, and no superseded pre-1.0 command files remain.
 4. The docs/artifacts split is clean in both directions.
 5. Every agent file has valid `name`/`description`/`model` frontmatter.
 6. No installed file outside `templates/` carries a `<!-- TEMPLATE INSTRUCTIONS -->` block.
+7. UI opt-out consistency: the `ui` agent and the UI templates (`templates/UI_SPEC.md`, `templates/UX_REVIEW.md`) are installed together or skipped together.
 
-If any validation check fails, report it and ask the user how to proceed before writing the Phase 7 report. Do not silently mask failures.
+If any validation check fails, report it and ask the user how to proceed before writing the Phase 7 report — in unattended mode, do not prompt: halt and write a failed-adoption report per `references/validation.md`. Do not silently mask failures.
 
 ## Phase 7 — Report
 
-Write the final report to `artifacts/adoption-report.md` using the template in `references/validation.md`, then present it with the closing summary:
+Write the final report to `artifacts/adoption-report.md` using the template in `references/validation.md`, then present it with the closing summary, filling every slot to match the actual outcome:
 
-> CAST adoption complete. <N> files created, <N> renamed, <N> updated, <N> preserved. <M> validation warnings or errors listed in the report. Recommended next step: restart Claude Code and walk through `docs/FIRST_RUN.md`. The full report is in `artifacts/adoption-report.md`.
+> CAST adoption <complete / complete with warnings / staged / failed at Phase <N>>. <N> files created, <N> renamed, <N> updated, <N> preserved, <N> deleted. <M> validation warnings or errors listed in the report. <If any paths were staged: "Staged paths: <list>. Complete the install with: <exact `mv` command(s)>, then remove the empty `.cast-stage/` directory."> Recommended next step: <restart Claude Code and walk through `docs/FIRST_RUN.md` / for a partial or failed adoption: the first recovery step from the report>. The full report is in `artifacts/adoption-report.md`.
 
 ## Decision rubric (when to act vs when to ask)
 

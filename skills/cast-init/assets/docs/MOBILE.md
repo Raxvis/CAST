@@ -3,7 +3,7 @@
   PURPOSE: Topic-specific reference for native and cross-platform mobile apps —
   iOS, Android, React Native, Expo, Flutter, SwiftUI, Jetpack Compose. Covers
   the mobile-specific delta on top of the universal UI patterns in docs/FRONTEND.md.
-  Loaded into Claude Code's context via an @import in the project's root CLAUDE.md.
+  Loaded into Claude Code's context via an @docs/... memory import in the project's root CLAUDE.md.
 
   WHO NEEDS THIS FILE:
   - Keep this file if your project ships a native or cross-platform mobile app on
@@ -14,7 +14,7 @@
     performance), and MOBILE covers only the mobile-specific concerns on top.
   - Delete this file if your project is web-only, desktop-only, a headless backend,
     a library, a CLI, or a data pipeline with no mobile target. Also remove the
-    @import line from root CLAUDE.md.
+    @docs/MOBILE.md import line from root CLAUDE.md.
 
   HOW TO CUSTOMIZE:
   - Replace every [PLACEHOLDER] token with project-specific values.

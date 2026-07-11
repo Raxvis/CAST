@@ -15,7 +15,7 @@
 |-------|-------|
 | **Goal** | Deliver a working CLI that can add, list, complete, and delete tasks backed by SQLite. |
 | **Status** | Complete |
-| **Requirements Reference** | `artifacts/prd.md` §3 (Core CRUD), §5 (Persistence) |
+| **Requirements Reference** | `docs/PRD.md` §3 (Core CRUD), §5 (Persistence) |
 | **Milestone Definition** | `artifacts/milestones/milestone-1-task-crud.md` |
 | **CEO Review** | `artifacts/reviews/ceo-review-milestone-1.md` |
 
@@ -35,6 +35,18 @@ Dependency graph: T-1 blocks T-2/T-3/T-4 (parallel), which all block T-5.
 
 ---
 
+## CEO Approval Conditions
+
+_Filled after the CEO verdict (APPROVED WITH CONDITIONS, 2026-04-08). Coder tracked each condition during engineering; Reviewer and Product verified at completion._
+
+| Condition | Source | Status |
+|-----------|--------|--------|
+| 1. All SQL queries use parameterized bindings — no string concatenation into SQL (Security) | `artifacts/reviews/ceo-review-milestone-1.md` | Verified (Reviewer, 2026-04-10) |
+| 2. WAL mode enabled in the migration + index on the `completed` column (Performance) | `artifacts/reviews/ceo-review-milestone-1.md` | Verified (Reviewer, 2026-04-10) |
+| 3. `list` handles a missing database file by running migrations on first invocation (Error handling) | `artifacts/reviews/ceo-review-milestone-1.md` | Verified (Product, 2026-04-10) |
+
+---
+
 ## Tasks
 
 ---
@@ -45,7 +57,7 @@ Dependency graph: T-1 blocks T-2/T-3/T-4 (parallel), which all block T-5.
 |-------|-------|
 | **Status** | Complete |
 | **Dependencies** | None |
-| **Needs Arch Doc** | Done -> `artifacts/architecture.md` (data layer) |
+| **Needs Arch Doc** | Done -> `artifacts/architecture/arch-milestone-1.md` (data layer) |
 | **Needs UI Spec** | No |
 | **CEO Conditions** | Condition 1 (parameterized SQL), Condition 2 (WAL + index) |
 
@@ -73,7 +85,7 @@ and must enable WAL mode plus an index on `completed` to satisfy CEO Condition 2
 - [x] No linter or type-check errors introduced.
 - [x] Vitest unit tests cover the idempotency of `runMigrations`.
 
-**Architecture Docs**: `artifacts/architecture.md` §4 (Data Layer)
+**Architecture Docs**: `artifacts/architecture/arch-milestone-1.md` §4 (Data Layer)
 
 ---
 
@@ -83,8 +95,8 @@ and must enable WAL mode plus an index on `completed` to satisfy CEO Condition 2
 |-------|-------|
 | **Status** | Complete |
 | **Dependencies** | T-1 |
-| **Needs Arch Doc** | Done -> `artifacts/architecture.md` §5 (Commands) |
-| **Needs UI Spec** | Done -> `artifacts/ui-spec.md` §2 |
+| **Needs Arch Doc** | Done -> `artifacts/architecture/arch-milestone-1.md` §5 (Commands) |
+| **Needs UI Spec** | Done -> `artifacts/ui-specs/ui-milestone-1.md` §2 |
 | **CEO Conditions** | Condition 1 (parameterized SQL) |
 
 **Description**:
@@ -104,7 +116,7 @@ inserts a new row into `tasks` with `completed = 0`, `createdAt = new Date().toI
 - [x] Vitest suite covers happy path and missing-title error path.
 - [x] No linter or type-check errors introduced.
 
-**Architecture Docs**: `artifacts/architecture.md` §5.1
+**Architecture Docs**: `artifacts/architecture/arch-milestone-1.md` §5.1
 
 ---
 
@@ -114,8 +126,8 @@ inserts a new row into `tasks` with `completed = 0`, `createdAt = new Date().toI
 |-------|-------|
 | **Status** | Complete |
 | **Dependencies** | T-1 |
-| **Needs Arch Doc** | Done -> `artifacts/architecture.md` §5.2 |
-| **Needs UI Spec** | Done -> `artifacts/ui-spec.md` §3 |
+| **Needs Arch Doc** | Done -> `artifacts/architecture/arch-milestone-1.md` §5.2 |
+| **Needs UI Spec** | Done -> `artifacts/ui-specs/ui-milestone-1.md` §3 |
 | **CEO Conditions** | Condition 1 (parameterized SQL), Condition 3 (first-run migration) |
 
 **Description**:
@@ -139,7 +151,7 @@ on first invocation rather than throwing — this is the path BUG-001 surfaced.
 - [x] Vitest suite covers: empty DB, mixed open/completed, `--all` flag, first-run migration.
 - [x] No linter or type-check errors introduced.
 
-**Architecture Docs**: `artifacts/architecture.md` §5.2
+**Architecture Docs**: `artifacts/architecture/arch-milestone-1.md` §5.2
 
 ---
 
@@ -149,8 +161,8 @@ on first invocation rather than throwing — this is the path BUG-001 surfaced.
 |-------|-------|
 | **Status** | Complete |
 | **Dependencies** | T-1 |
-| **Needs Arch Doc** | Done -> `artifacts/architecture.md` §5.3 |
-| **Needs UI Spec** | Done -> `artifacts/ui-spec.md` §4 |
+| **Needs Arch Doc** | Done -> `artifacts/architecture/arch-milestone-1.md` §5.3 |
+| **Needs UI Spec** | Done -> `artifacts/ui-specs/ui-milestone-1.md` §4 |
 | **CEO Conditions** | Condition 1 (parameterized SQL) |
 
 **Description**:
@@ -173,7 +185,7 @@ was filed during validation and is deferred to M2.
 - [x] Vitest suite covers happy path and missing-id path for `delete` (and for `done` once BUG-002 is fixed in M2).
 - [x] No linter or type-check errors introduced.
 
-**Architecture Docs**: `artifacts/architecture.md` §5.3
+**Architecture Docs**: `artifacts/architecture/arch-milestone-1.md` §5.3
 
 ---
 
@@ -183,8 +195,8 @@ was filed during validation and is deferred to M2.
 |-------|-------|
 | **Status** | Complete |
 | **Dependencies** | T-2, T-3, T-4 |
-| **Needs Arch Doc** | Done -> `artifacts/architecture.md` §6 |
-| **Needs UI Spec** | Done -> `artifacts/ui-spec.md` §5 (help output) |
+| **Needs Arch Doc** | Done -> `artifacts/architecture/arch-milestone-1.md` §6 |
+| **Needs UI Spec** | Done -> `artifacts/ui-specs/ui-milestone-1.md` §5 (help output) |
 | **CEO Conditions** | None direct; exercises Condition 3 via `list` |
 
 **Description**:
@@ -208,7 +220,7 @@ that opens the DB, runs migrations, dispatches, and closes the DB.
 - [x] Vitest suite covers parser happy paths, `--help`, and unknown-command error.
 - [x] No linter or type-check errors introduced.
 
-**Architecture Docs**: `artifacts/architecture.md` §6 (Entrypoint)
+**Architecture Docs**: `artifacts/architecture/arch-milestone-1.md` §6 (Entrypoint)
 
 ---
 

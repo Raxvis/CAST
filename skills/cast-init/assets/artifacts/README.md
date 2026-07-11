@@ -38,17 +38,19 @@ artifacts/
 
   architecture/
     arch-milestone-{N}.md          # Milestone-specific architecture document
-    [MODULE]_MODULE.md             # Module-level architecture docs produced during work
+    module-{slug}.md               # Module-level architecture docs produced during work
 
   ui-specs/
     ui-milestone-{N}.md            # Milestone-specific UI spec
-    [SCREEN]_SCREEN.md             # Screen-level specs produced during work
+    screen-{slug}.md               # Screen-level specs produced during work
+    component-{slug}.md            # Component-level specs produced during work
 
   reviews/
     security-review-milestone-{N}.md
     performance-review-milestone-{N}.md
     ceo-review-milestone-{N}.md    # CEO planning-stage verdict
-    ux-review-milestone-{N}.md     # UX review of implemented screens
+    ux-review-milestone-{N}.md     # UX review at /agent-code milestone completion (UI-flagged milestones only)
+    retrospective-milestone-{N}.md # Milestone retrospective (Validator, at milestone completion)
 ```
 
 The four subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`) are pre-created empty by `/cast-init` so the expected structure exists from day one; they fill up during `/agent-plan` and `/agent-code` runs. Do not create additional empty subdirectories beyond these.
@@ -69,9 +71,12 @@ The four subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`
 | Bug reports | Entries in `artifacts/BUGS.md` | Bug Gatherer |
 | Session progress log | Entries in `artifacts/STANDUP.md` | Any agent / user |
 | Agent working state (Current Work, Decisions Logs, dashboards) | The agent's own section in `artifacts/AGENT_STATE.md` | Each agent |
-| UX review of an implemented screen | `artifacts/reviews/ux-review-milestone-{N}.md` | UI (during engineering review) |
-| Milestone completion report | `artifacts/milestones/milestone-{N}-{slug}-completion.md` | Product (after `/agent-code`) |
-| Milestone validation record | `artifacts/milestones/milestone-{N}-{slug}-validation.md` | Product (after `/agent-code`) |
+| Screen-level UI spec | `artifacts/ui-specs/screen-{slug}.md` | UI |
+| Component-level UI spec | `artifacts/ui-specs/component-{slug}.md` | UI |
+| UX review of a milestone's implemented screens | `artifacts/reviews/ux-review-milestone-{N}.md` | UI (once per milestone, at `/agent-code` milestone completion; only for milestones with UI-flagged tasks) |
+| Milestone completion report | `artifacts/milestones/milestone-{N}-{slug}-completion.md` | Product (at `/agent-code` milestone completion) |
+| Milestone validation record | `artifacts/milestones/milestone-{N}-{slug}-validation.md` | Product (at `/agent-code` milestone completion) |
+| Milestone retrospective | `artifacts/reviews/retrospective-milestone-{N}.md` | Validator (at `/agent-code` milestone completion, from `templates/MILESTONE_RETROSPECTIVE.md`) |
 
 Templates for every artifact type live in `templates/` — see `templates/README.md`.
 

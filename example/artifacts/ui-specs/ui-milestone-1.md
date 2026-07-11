@@ -42,6 +42,29 @@ Arguments are case-sensitive. The command name is always the first positional ar
 
 ---
 
+## Layout Diagram
+
+For a CLI, the "layout" is the anatomy of a rendered `list` screen. Every labeled element below is specified precisely in Output Formats.
+
+```
+┌────────────────────────────────────────────────────────────┐
+│ $ acme-todo list --all                    ← invocation     │
+│ ID  TITLE                    STATUS   CREATED               │
+│ ▲   ▲                        ▲        ▲                     │
+│ │   │                        │        └ CREATED col (10)    │
+│ │   │                        └ STATUS col (8)               │
+│ │   └ TITLE col (40, ellipsis truncation)                   │
+│ └ ID col (4)                                                │
+│ 7   buy milk                 done     2026-04-08            │
+│ 8   renew passport           pending  2026-04-08            │
+│      ↑ columns separated by exactly two spaces              │
+└────────────────────────────────────────────────────────────┘
+```
+
+Single-line outputs (`add`, `done`, `delete`) have no columnar layout; their exact strings are in Output Formats. Errors never appear in this stdout layout — they go to stderr (see Error Messages and Exit Codes).
+
+---
+
 ## Output Formats
 
 ### `add` success
@@ -128,6 +151,24 @@ STORAGE
 
 ---
 
+## States
+
+The GUI state vocabulary maps onto per-invocation outcomes for a CLI. Every command resolves to exactly one of these states per run:
+
+| State | Description | Visible Result |
+|-------|-------------|----------------|
+| Default (success) | Command completed its effect | Success string on stdout (see Output Formats), exit 0 |
+| Empty | `list` matched zero rows | Header line only, no rows, exit 0 — deliberately no "No tasks" string, so output stays pipe-friendly |
+| Loading / First-run | DB file absent on invocation | Migrations run transparently, then the command proceeds as Default or Empty (CEO Condition 3); no user-visible "loading" output |
+| Error (user) | Bad arguments or unknown command | `acme-todo: `-prefixed message on stderr, exit 1 |
+| Error (not found) | `done`/`delete` on a missing id | `acme-todo: task <id> not found` on stderr, exit 3 |
+| Error (internal) | I/O or database failure | `acme-todo: database error: ...` on stderr, exit 2 |
+| Idempotent repeat | `done` on an already-done task | Same success string, exit 0, `completedAt` untouched |
+
+There are no Pressed/Disabled states — a CLI has no persistent interactive surface in v1 (no prompts, no TTY-dependent behavior).
+
+---
+
 ## Error Messages and Exit Codes
 
 All error output is written to **stderr**, prefixed with `acme-todo: `. stdout is never used for errors, so `command 2>/dev/null` silences them cleanly.
@@ -163,11 +204,18 @@ acme-todo: task 42 not found
 
 ---
 
-## Color and Formatting
+## Visual Style
 
 **v1 ships plain text — no ANSI escape codes, anywhere.**
 
 Rationale: keeps output universally pipe-safe, avoids Windows legacy-console edge cases, and punts a color-scheme decision to a later milestone. Deferring color is explicit, not an oversight.
+
+| Property | Value | Theme Key |
+|----------|-------|-----------|
+| Color | None — plain text only | — (no theme file in v1) |
+| Typeface | Whatever monospace font the user's terminal renders | — |
+| Table borders | None (ASCII columns, two-space separator) | — |
+| Emphasis / bold | None | — |
 
 Formatting rules:
 
@@ -176,6 +224,28 @@ Formatting rules:
 - No trailing whitespace on any line
 - Every line ends with `\n` (Node's `console.log` handles the platform newline on write)
 - No Unicode box-drawing characters in tables (only ASCII)
+
+---
+
+## Data Requirements
+
+### Reads
+
+| Data | Source | Format | Notes |
+|------|--------|--------|-------|
+| Open tasks (`completed = 0`) | `tasks` table via `src/db/connection.ts` | `Task[]` | Default `list` query; uses `idx_tasks_completed` |
+| All tasks | `tasks` table | `Task[]` | `list --all`; no filter |
+| `createdAt` per row | `tasks.createdAt` | ISO 8601 string | Rendered as the `YYYY-MM-DD` prefix in the CREATED column |
+| DB path override | `ACME_TODO_DB` env var | absolute path string | Falls back to `~/.acme-todo/tasks.db` |
+
+### Writes / Actions
+
+| Action | Trigger | Effect |
+|--------|---------|--------|
+| Insert task | `acme-todo add <title...>` | New row with `completed = 0`, `createdAt = now`; new id printed |
+| Mark done | `acme-todo done <id>` | Sets `completed = 1`, stamps `completedAt` if null |
+| Delete task | `acme-todo delete <id>` | Removes the row permanently |
+| Run migrations | Any command on a missing/stale DB | Creates the DB file and schema before the command's own query (CEO Condition 3) |
 
 ---
 
@@ -228,14 +298,9 @@ Target platforms: macOS, Linux, Windows.
 
 ---
 
-## Product Approval
+## CEO Verdict
 
-| Field | Value |
-|-------|-------|
-| **Approved by** | CEO (Product agent) |
-| **Date** | 2026-04-08 |
-| **Status** | Approved |
-| **Notes** | Plain-text-only decision confirmed for v1; color scheme deferred to a later milestone. |
+Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-1.md`: **APPROVED WITH CONDITIONS** (2026-04-08). None of the three conditions target this spec directly; the plain-text-only decision was confirmed for v1, with the color scheme deferred to a later milestone.
 
 ---
 

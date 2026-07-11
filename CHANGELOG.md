@@ -8,6 +8,42 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [1.3.0] — 2026-07-11
+
+Full-system hardening pass: a four-track review of the adoption skill, agent roster, pipeline skills, and packaging produced 45 improvements, all landed here. Headlines: the installed CLAUDE.md's memory imports actually load now, defect routing is stated identically everywhere, the pipelines are resumable and their documented-but-never-invoked stages (Docs Writer, Validator, UX review) are wired in, `/cast-init` handles re-runs/monorepos/non-git projects, and releases are automated.
+
+### Added
+
+- **`templates/MILESTONE_RETROSPECTIVE.md`** — milestone retrospectives were previously written *into* `validator.md`, violating both the artifacts split and the immutable-agent-file rule. They are now instances at `artifacts/reviews/retrospective-milestone-{N}.md`, written by Validator at the `/agent-code` milestone checkpoint.
+- **`[CAST_VERSION]` version stamp.** `/cast-init` now stamps `Adopted with CAST v<X.Y.Z>` into the installed CLAUDE.md (sourced from its own `metadata.version`) and reads it back on re-runs — the documented upgrade path finally has something to compare against. Forced re-run semantics are defined.
+- **Adoption-skill coverage for previously undefined situations:** monorepo/workspace detection (root-level install default, manifest ambiguity becomes a Phase 3 Ask), non-git projects (explicit confirmation, plain `mv`, no-rollback warning), same-named agent files with divergent roles (always an Ask, never silent update-in-place), archival of prior adoption records, an explicit execute-approved-Deletes step, a Phase 5 progress ledger with abort/recovery instructions, unattended-mode fallbacks for novel Asks and validation failures, and a documented `ui` opt-out for backend/CLI-only projects (UI templates skipped iff the agent is skipped; `/agent-plan` skips its UI stage when no `ui` agent is installed).
+- **Pipeline wiring for stages that previously had no invoker:** both engineering skills drain the Docs Writer queue at task/milestone checkpoints; Validator is invoked at those checkpoints to record outcomes in `artifacts/AGENT_STATE.md`; the UX review runs once per UI-flagged milestone at `/agent-code` milestone completion; Release is explicitly user-invoked.
+- **Resumability:** `/agent-code` writes task Status back to the milestone tasks file and skips Complete tasks on re-invocation; `/agent-plan` writes per-stage checkpoints to STANDUP, defines milestone numbering (max existing + 1), and caps the REVISION REQUIRED loop at 3 cycles before escalating.
+- **`.github/workflows/release.yml`** — on push to main with an untagged `plugin.json` version: verifies the four synchronized version locations, creates the annotated tag, and publishes the GitHub Release from the top CHANGELOG section; a second job verifies integrity on `v*` tag pushes. Checklist steps 5–6 are now automated with the manual path as fallback.
+- **Six new CI checks in `validate.yml`:** README placeholder-table tokens must exist in the payload; `example/` must be token-free; docs/templates/artifacts path-split lint; offline relative-link check; example instances must carry their template's required headings; agent model pins must be identical. Manifests are validated with `claude plugin validate` instead of bare `JSON.parse`.
+
+### Changed
+
+- **Installed CLAUDE.md memory imports fixed.** The template used `@import docs/X.md`, a syntax Claude Code does not support — every adopted project silently loaded no core context. Imports are now bare `@docs/X.md` lines; commented suggestions use inert code spans; `/cast-init` validation now checks the syntax and that imported paths exist.
+- **Defect routing stated identically everywhere.** Canonical flow: Reviewer → Bug Gatherer (files report, status New) → Product triage (**Fix Now** → Debugger → Coder; **Defer** — allowed only when acceptance criteria are unaffected, task proceeds; **Not a Bug** — closed with rationale). `reviewer.md`, `debugger.md`, `tester.md`, `bug-gatherer.md`, and `docs/PIPELINE_LOOP.md` all previously contradicted this in different ways; Tester failures route to Coder only. "Clean version" = no open Fix Now defects.
+- **All 15 agent frontmatter descriptions rewritten trigger-first** for Claude Code subagent auto-discovery (e.g. Tester: "Use PROACTIVELY after every Coder change"), and the roster table in `references/roster.md` synced verbatim (CI-enforced).
+- **Agent Model Configuration boilerplate compressed** from ~8–10 duplicated lines per file to ~2, with every behavioral constraint kept in-file and the shared model-ladder rationale consolidated in `docs/MODEL_OPTIMIZATION.md` (~100+ lines removed across the roster).
+- **Cross-agent contract fixes:** Architect/Product/UI Inputs tables now receive Security/Performance findings and CEO revision requests; Coder hands off to Tester (not Product); Release gates on "Critical or High" (the 4-level scale — "Major" existed nowhere); Security's Informational findings are review-document-only (never filed as bugs); `docs/CHANGELOG.md` has a single owner (Release; Docs Writer routes through it); CI/build infrastructure and dependency maintenance have assigned owners; Release's checklist gains the security pre-release gate.
+- **One STANDUP entry grammar** (`### YYYY-MM-DD — <skill> — <milestone/task>` sections with `- <agent> | <type> | <note>` entries; types progress/loop/docs/decision/blocker) replaces the four incompatible formats previously implied by STANDUP.md, `agent-task`, PIPELINE_LOOP, and the roster README.
+- **CEO Approval Conditions** are backfilled into the milestone tasks file by Product after the verdict; `/agent-code` Pre-Flight reads them from there. Product (not the orchestrator) writes completion and validation records.
+- **Naming/path corrections:** artifact instance names unified to lower-hyphen (`module-{slug}.md`, `screen-{slug}.md`, new `component-{slug}.md`), STANDUP's related-documents links fixed, "Work Queue" renamed to AGENT_STATE's actual "Current Work — Ready to Start", `validator.md`'s stale "Product's file" reference fixed, path-split wording bugs in `security.md`/`docs-writer.md` corrected.
+- **README placeholder table pruned of 22 dead tokens** (also from `references/execution.md`/`discovery.md` substitution lists) and gains `[CAST_VERSION]` + `[MAX_LOOP_COUNT]`; the docs/ "never receives work" wording now carries the `docs/CHANGELOG.md` carve-out; the plugin-route asymmetry (full repo in the plugin cache) is documented; `/artifacts/` is gitignored at the repo root.
+- **Example fixture synced to the 1.2.0 template contracts:** milestone definition, tasks file, architecture doc, UI spec, and CEO review all restructured to their templates' required sections (CI-enforced from now on); stray `[MILESTONE_NAME]` token removed; example imports fixed to the working syntax and trimmed to files the fixture ships.
+- **`/cast-init` validation hardening:** placeholder grep scoped to the installed file set with `templates/*` exempt; new ui-agent ⇔ UI-templates consistency check; import-syntax check; Phase 7 closing summary and report parameterized for staged/partial/failed outcomes.
+
+### Migration
+
+- Existing installs: re-run `/cast-init` (after `npx skills update`). The memory-import fix alone is worth it — installs adopted from any earlier version load no `docs/` context at session start. The re-run also delivers the corrected defect routing, the retrospective/UX-review/Docs-Writer wiring, and stamps the version for future upgrades.
+- If you customized `reviewer.md`, `debugger.md`, `tester.md`, or `docs/PIPELINE_LOOP.md`, review the merge: the defect-routing and triage-outcome wording changed in all four.
+- `validator.md` no longer accumulates retrospectives in place; move any existing ones to `artifacts/reviews/retrospective-milestone-{N}.md`.
+
+---
+
 ## [1.2.2] — 2026-07-05
 
 CI hardening: the validation workflow now enforces the 1.2.0 single-source-of-truth invariants, and writing those checks immediately caught three stale routing lines the 1.2.0 sweep missed in the payload itself.

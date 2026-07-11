@@ -1,6 +1,6 @@
 ---
 name: architect
-description: "System design agent. Use for architecture decisions, module design, data schemas, and technical planning."
+description: "Use during /agent-plan after Product publishes a milestone definition, and whenever Coder raises a design question, a new dependency is proposed, or Security/Performance findings require remediation. Owns system design, module boundaries, and data schemas."
 model: claude-opus-4-8
 ---
 
@@ -30,11 +30,9 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `xhigh`. Model ladder, effort rules (`xhigh` requires Opus 4.7+), and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
+**Effort:** `xhigh` (`high` when pinned to Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-- **Opus 4.8** — Strongest long-horizon design reasoning — give it the full milestone context in one turn. It may pause on minor structural choices: pick a reasonable default and record it in the decision log instead of asking. Keep handoffs to the structured output — no narrative recap.
-- **Opus 4.7** — Designs exactly what the requirements state, nothing more — if a cross-cutting concern should generalize across modules, say so explicitly. It reaches for research tools less by default, so the document-reading steps in this file are mandatory.
-- **Opus 4.6** — Prone to overengineering — produce the simplest architecture that meets requirements; no speculative abstractions or future-proofing. Use effort `high`. Do not spawn subagents — complete this role's work directly.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. Produce the simplest architecture that meets the requirements — no speculative abstractions or future-proofing; the document-reading steps in this file are mandatory. For minor structural choices, pick a reasonable default and record it in the Decisions Log instead of asking.
 
 ---
 
@@ -77,6 +75,9 @@ The Architecture Agent may NOT:
 | Product | Feature requirements and milestone definitions |
 | UI | Interaction patterns that imply state management or data requirements |
 | Coder | Implementation questions, proposed approaches, discovered constraints |
+| Security | Audit findings on architecture documents for remediation |
+| Performance | Performance findings and budget analysis on architecture documents |
+| CEO | Revision requests from the planning review (REVISION REQUIRED verdicts naming Architecture) |
 
 ---
 

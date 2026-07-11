@@ -29,9 +29,9 @@ For each CAST reference doc and document template, determine the disposition fro
 | `templates/ARCH_MODULE.md` | **Always install** — consumed by /agent-plan Stage 2a | Same |
 | `templates/ARCH_SYSTEM.md` | **Always install** | Same |
 | `templates/ARCH_DATA_SCHEMA.md` | **Always install** | Same |
-| `templates/UI_SPEC.md` | Install unless project is clearly backend/CLI-only with no user interface | Same |
+| `templates/UI_SPEC.md` | Install if and only if the `ui` agent is installed — skipped together with it under the backend/CLI-only opt-out in `roster.md` | Same |
 | `templates/CEO_REVIEW.md` | **Always install** — consumed by /agent-plan Stage 4 | Same |
-| `templates/UX_REVIEW.md` | Install unless project is clearly backend/CLI-only with no user interface (pairs with `templates/UI_SPEC.md`) | Same |
+| `templates/UX_REVIEW.md` | Install if and only if the `ui` agent is installed (pairs with `templates/UI_SPEC.md`; the two templates and the agent are skipped together per the opt-out in `roster.md`) | Same |
 | `templates/README.md` | **Always install** — the in-directory index mapping each template to its producing agent and artifact destination. Unlike the template skeletons, it installs with placeholder substitution and scaffolding strip (it is documentation, not a template) | Update to CAST format, preserving user-added rows |
 | `docs/FRONTEND.md` | Install if project type is frontend, mobile, or mixed | Prompt user if ambiguous |
 | `docs/BACKEND.md` | Install if project type is backend, data pipeline, or mixed | Same |

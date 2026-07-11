@@ -227,17 +227,18 @@ every import is paid in every session. The Directory Conventions section above
 already covers where files live; agents read the detailed reference docs on
 demand by path.
 
-<!-- Core context -->
-@import docs/PRD.md
-@import docs/CODE_PATTERNS.md
+<!-- Core context (Claude Code memory-import syntax: a bare @path per line) -->
+@docs/PRD.md
 
-<!-- Topic-specific context: this is a CLI project -->
-@import docs/CLI.md
+<!-- Fixture note: this example ships only PRD.md, CONCEPT.md, and GLOSSARY.md
+     under docs/ (see README.md → Deliberate Omissions), so only PRD.md is
+     imported above. A real populated project would also import its conventions
+     doc and its project-type reference doc here — for a CLI project like this
+     one, add lines reading "@docs/CODE_PATTERNS.md" and "@docs/CLI.md"
+     (without the quotes). -->
 
 <!-- On-demand reference — agents read these by path when a task calls for them
      (coder/docs-writer: FILE_CONVENTIONS; coder/reviewer: ERROR_HANDLING; tester:
-     TEST_FRAMEWORK; navigation: docs/README.md, artifacts/README.md). Uncomment an
-     import only if sessions repeatedly need one unprompted:
-@import docs/FILE_CONVENTIONS.md
-@import docs/ERROR_HANDLING.md
--->
+     TEST_FRAMEWORK; navigation: docs/README.md, artifacts/README.md). Add an
+     import line ("@docs/FILE_CONVENTIONS.md", "@docs/ERROR_HANDLING.md") only
+     if sessions repeatedly need one unprompted. -->

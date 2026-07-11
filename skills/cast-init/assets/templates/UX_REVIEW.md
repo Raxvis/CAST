@@ -1,18 +1,20 @@
 <!-- TEMPLATE INSTRUCTIONS
   FILE: UX_REVIEW.md
-  PURPOSE: UX review template. The UI Agent copies this skeleton when reviewing a Coder
-           implementation against an approved UI specification, and records the verdict
-           Product uses during sign-off.
+  PURPOSE: UX review template. The UI Agent copies this skeleton once per milestone, at
+           the /agent-code milestone-completion checkpoint (only for milestones containing
+           UI-flagged tasks), reviewing the implemented screens against the approved UI
+           specification and recording the verdict Product uses during sign-off.
 
   HOW TO CUSTOMIZE:
-  - Replace [SCREEN_OR_COMPONENT_NAME] with the screen or component under review.
+  - Replace [SCREEN_OR_COMPONENT_NAME] with the screen or component under review; a
+    milestone with several screens repeats the per-screen sections within the one instance.
   - Reference the approved spec instance in artifacts/ui-specs/, not the template.
   - Work through every section; check items only after verifying them against the
     running implementation.
   - For CLI projects, read the layout-oriented items against terminal output (alignment,
     color usage, truncation, exit-state messaging) rather than pixels.
-  - Instance destination: artifacts/reviews/ux-review-milestone-{N}.md (or
-    ux-review-[SCREEN].md for a single-screen review). Never fill this template in place.
+  - Instance destination: artifacts/reviews/ux-review-milestone-{N}.md — one instance per
+    milestone. Never fill this template in place.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. Reviewer and Product check required sections.
 -->

@@ -51,6 +51,7 @@ This skill invokes the following agents. Open any of them for the full role defi
 - [debugger](../../agents/debugger.md) — investigates triaged defects when Product says fix now
 - [refactor](../../agents/refactor.md) — addresses Issue findings and loops back to Reviewer
 - [product](../../agents/product.md) — validates the finished task against the original task description
+- [docs-writer](../../agents/docs-writer.md) — drains the `docs` queue from `artifacts/STANDUP.md` at the completion checkpoint
 
 This skill explicitly does NOT invoke [architect](../../agents/architect.md), [ui](../../agents/ui.md), [security](../../agents/security.md), [performance](../../agents/performance.md), or [ceo](../../agents/ceo.md). If the task turns out to need any of those, Pre-Flight or Reviewer will halt and tell you to run `/agent-plan` instead.
 
@@ -120,9 +121,10 @@ Deltas specific to this skill:
 After the task passes Product validation:
 
 1. Run `[TEST_CMD]` one final time to confirm everything still passes.
-2. Append a one-line entry to `artifacts/STANDUP.md` with the date, task summary, and any bug ID resolved.
-3. If the task resolved a bug filed in `artifacts/BUGS.md`, update the bug's status (→ Fixed, with the resolution fields — Commit, Files Changed, Regression Notes — filled in).
-4. Summarize what changed, what tests were affected, and any follow-up items or deferred scope.
+2. Append an entry to `artifacts/STANDUP.md` using that file's Entry Grammar: a session heading `### YYYY-MM-DD — agent-task — <task summary>` (if this run has not added one yet) and a `- product | progress | <task summary, any bug ID resolved>` line.
+3. **Docs Writer.** Invoke the **docs-writer** agent to drain the `docs` entries from `artifacts/STANDUP.md` (entries of the form `- <agent> | docs | <note>` — see that file's Entry Grammar). Docs Writer marks each drained entry with ✅.
+4. If the task resolved a bug filed in `artifacts/BUGS.md`, update the bug's status (→ Fixed, with the resolution fields — Commit, Files Changed, Regression Notes — filled in).
+5. Summarize what changed, what tests were affected, and any follow-up items or deferred scope.
 
 ### Error Handling
 
@@ -134,7 +136,7 @@ After the task passes Product validation:
 
 `/agent-task` explicitly does not:
 - Produce milestone definitions, task breakdowns, architecture documents, UI specs, security reviews, performance reviews, or CEO verdicts. Those are outputs of `/agent-plan`.
-- Write files to `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, or `artifacts/reviews/`. Those directories are owned by `/agent-plan` outputs.
+- Write files to `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, or `artifacts/reviews/`. Those directories are owned by `/agent-plan` and `/agent-code` outputs.
 - Write any work artifact to `docs/`. `docs/` is reference-only.
 
 If the work you are doing needs any of the above, run `/agent-plan` first. The planning gate exists for a reason.

@@ -26,7 +26,7 @@ The per-task engineering sequence executed by `/agent-code` and `/agent-task`. T
 The loop may cycle. One full cycle is any return to Step 1 (Coder) or any Refactor→Tester→Reviewer round.
 
 - Track the count per task and **escalate to the user after `[MAX_LOOP_COUNT]` cycles** on a single task, stating the specific blocker.
-- Record the count in `artifacts/STANDUP.md` after each cycle (`Task <id>: loop <k>/[MAX_LOOP_COUNT]`) so an interrupted run resumes with the real count.
+- Record the count in `artifacts/STANDUP.md` after each cycle as a `loop` entry per that file's Entry Grammar — `- <agent> | loop | Task <id>: loop <k>/[MAX_LOOP_COUNT]`, where `<agent>` is the agent whose findings sent the loop back — so an interrupted run resumes with the real count.
 - **Refactor → Tester → Reviewer rounds increment the same counter** — the Issue subloop has no private limit of its own.
 - If Refactor reports that an Issue cannot be resolved without an architecture change (structural disagreement), the escalation to the user must carry that flag and name Architecture as the needed re-entry point (`/agent-plan`).
 
@@ -75,9 +75,12 @@ After Tester passes, launch the **reviewer** agent to:
 For every Reviewer finding classified as a **Defect**:
 
 1. Launch the **bug-gatherer** agent to file the finding as a structured bug report in `artifacts/BUGS.md` (status New), using the canonical entry format at the top of that file.
-2. Hand the filed report to the **product** agent for triage. Product decides whether the defect is fixed now, fixed later, or closed as not-a-bug, and sets the final severity (status Triaged).
-3. If Product triages the defect as "fix now", launch the **debugger** agent to investigate the root cause and update the existing record with the investigation fields (status In Progress).
-4. The defect returns to Coder (loop back to Step 1) with Debugger's root-cause analysis attached.
+2. Hand the filed report to the **product** agent for triage. Product sets the final severity and issues one of three triage outcomes:
+   - **Fix Now** — launch the **debugger** agent to investigate the root cause and update the existing record with the investigation fields (status In Progress). The defect then returns to Coder (loop back to Step 1) with Debugger's root-cause analysis attached.
+   - **Defer** — the report stays open in `artifacts/BUGS.md` with status Deferred. Deferral is allowed only if the defect does not violate the task's acceptance criteria; the task proceeds without looping.
+   - **Not a Bug** — the report is closed with a rationale recorded in `artifacts/BUGS.md`; the task proceeds without looping.
+
+Only **Fix Now** defects send the task back through the loop. Deferred and Not-a-Bug reports never block the task.
 
 ### Step 3b — Issues → Refactor → Tester → Reviewer
 
@@ -86,7 +89,9 @@ For every Reviewer finding classified as an **Issue**:
 1. Launch the **refactor** agent to restructure the code without changing behaviour, citing the architectural principle or quality standard that justifies the change. Refactor's handoff names the tests to re-run for the affected modules.
 2. After Refactor hands off, **Tester re-runs first** (targeted set, per the test gate rule), then return to **Reviewer** (loop back to Step 3) to confirm the issue is resolved.
 
-Step 3a and Step 3b may run in parallel when the findings are independent. A task does not advance to Step 4 until the Reviewer has approved a clean version.
+Step 3a and Step 3b may run in parallel when the findings are independent. A task does not advance to Step 4 until the Reviewer has approved a clean version — **clean means no open Fix Now defects and no unresolved Issues**. Open Deferred and closed Not-a-Bug reports do not count against a clean version.
+
+(Tester failures are not Defects in this sense — they route back to Coder directly at Step 2, without Bug Gatherer or triage.)
 
 ## Step 4 — Product Validation
 

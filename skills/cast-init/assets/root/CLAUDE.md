@@ -9,6 +9,8 @@
 
   HOW TO CUSTOMIZE:
   - Replace every [PLACEHOLDER] token with project-specific values.
+  - Exception: [CAST_VERSION] is stamped automatically by /cast-init at install time
+    (the "Adopted with CAST v[CAST_VERSION]" line in Directory Conventions) — leave it as-is.
   - See README.md for the full placeholder reference table.
   - Delete sections not relevant to your project (e.g., Persistence for a stateless service).
   - Update Memory Imports to match your actual docs and to include the topic-specific
@@ -155,11 +157,14 @@ Current dependencies (see `[PKG_MANIFEST]`):
 
 The project uses a strict split between reference material, document templates, and work artifacts:
 
-- **`docs/`** — reference only: requirements, conventions, design rationale. Never receives work artifacts.
+- **`docs/`** — reference only: requirements, conventions, design rationale. Never receives work artifacts. One deliberate exception: `docs/CHANGELOG.md` is a long-lived project register maintained by the release agent (see `docs/README.md` → Project Registers and Reference Logs).
 - **`templates/`** — reusable document templates (architecture, UI spec, milestone files). Agents copy them into `artifacts/` as instances; never filled in place.
 - **`artifacts/`** — all live work: milestone plans, per-milestone architecture and UI specs, security/performance/CEO reviews, bug reports (`artifacts/BUGS.md`), the rolling session log (`artifacts/STANDUP.md`), and every agent's live working state (`artifacts/AGENT_STATE.md`). Everything produced by `/agent-plan` and `/agent-code` lands here.
 
 When in doubt, read `docs/FILE_CONVENTIONS.md` and `artifacts/README.md`.
+
+This structure and the agent workflow were installed by [CAST](https://github.com/Raxvis/CAST).
+Adopted with CAST v[CAST_VERSION]
 
 ## Memory Imports
 
@@ -169,27 +174,20 @@ paid in every session. The Directory Conventions section above already covers wh
 files live; agents read the detailed reference docs on demand by path.
 
 <!-- Core context — keep these -->
-@import docs/PRD.md
-@import docs/CODE_PATTERNS.md
+@docs/PRD.md
+@docs/CODE_PATTERNS.md
 
-<!-- Topic-specific context — keep the one(s) that match your project type, delete the rest.
-     These files ship with the template and can be edited freely.
-@import docs/FRONTEND.md
-@import docs/BACKEND.md
-@import docs/CLI.md
-@import docs/MOBILE.md
--->
+<!-- Topic-specific context — add a bare import line (like the two above) for the
+     one(s) that match your project type, and ignore the rest. These files ship with
+     the template and can be edited freely: `@docs/FRONTEND.md`, `@docs/BACKEND.md`,
+     `@docs/CLI.md`, `@docs/MOBILE.md`. Paths in backticks here are inert — an import
+     only fires as a bare `@path` line, so copy one out to activate it. -->
 
 <!-- On-demand reference — agents read these by path when a task calls for them
      (coder/docs-writer: FILE_CONVENTIONS; coder/reviewer: ERROR_HANDLING; tester:
-     TEST_FRAMEWORK; navigation: docs/README.md, artifacts/README.md). Uncomment an
-     import only if your sessions repeatedly need one unprompted:
-@import docs/FILE_CONVENTIONS.md
-@import docs/ERROR_HANDLING.md
--->
+     TEST_FRAMEWORK; navigation: docs/README.md, artifacts/README.md). Add an import
+     line only if your sessions repeatedly need one unprompted:
+     `@docs/FILE_CONVENTIONS.md`, `@docs/ERROR_HANDLING.md` -->
 
 <!-- Add once they contain real project content:
-@import docs/CONCEPT.md
-@import docs/ADDITIONAL.md
-@import docs/GLOSSARY.md
--->
+     `@docs/CONCEPT.md`, `@docs/ADDITIONAL.md`, `@docs/GLOSSARY.md` -->

@@ -79,6 +79,7 @@ templates/
   MILESTONE_VALIDATION.md        # Task validation / milestone acceptance template
   CEO_REVIEW.md                  # CEO planning-review template
   UX_REVIEW.md                   # UX review template
+  MILESTONE_RETROSPECTIVE.md     # Milestone retrospective template
 ```
 
 Templates are copied — never filled in place — to produce instances under `artifacts/`.
@@ -100,16 +101,19 @@ artifacts/
 
   architecture/
     arch-milestone-{N}.md                  # Milestone-specific architecture document
-    [MODULE]_MODULE.md                     # Module-level architecture specs
+    module-{slug}.md                       # Module-level architecture specs
 
   ui-specs/
     ui-milestone-{N}.md                    # Milestone-specific UI spec
-    [SCREEN]_SCREEN.md                     # Screen-level UI specs
+    screen-{slug}.md                       # Screen-level UI specs
+    component-{slug}.md                    # Component-level UI specs
 
   reviews/
     security-review-milestone-{N}.md
     performance-review-milestone-{N}.md
     ceo-review-milestone-{N}.md
+    ux-review-milestone-{N}.md             # UX review (/agent-code milestone completion)
+    retrospective-milestone-{N}.md         # Milestone retrospective (Validator)
 ```
 
 Subdirectories are created the first time an artifact of that type is produced. Do not create empty subdirectories.
@@ -144,16 +148,17 @@ Templates live in `templates/` and are copied — never filled in place — to p
 
 | Template | Instance Destination |
 |---|---|
-| `templates/ARCH_MODULE.md` | `artifacts/architecture/[MODULE]_MODULE.md` |
-| `templates/ARCH_SYSTEM.md` | `artifacts/architecture/[SYSTEM]_SYSTEM.md` |
-| `templates/ARCH_DATA_SCHEMA.md` | `artifacts/architecture/[SCHEMA]_SCHEMA.md` |
-| `templates/UI_SPEC.md` | `artifacts/ui-specs/[SCREEN]_SCREEN.md` or `ui-milestone-{N}.md` |
+| `templates/ARCH_MODULE.md` | `artifacts/architecture/module-{slug}.md` |
+| `templates/ARCH_SYSTEM.md` | `artifacts/architecture/system-{slug}.md` |
+| `templates/ARCH_DATA_SCHEMA.md` | `artifacts/architecture/schema-{slug}.md` |
+| `templates/UI_SPEC.md` | `artifacts/ui-specs/ui-milestone-{N}.md`, `screen-{slug}.md`, or `component-{slug}.md` |
 | `templates/MILESTONE_DEFINITION.md` | `artifacts/milestones/milestone-{N}-{slug}.md` |
 | `templates/MILESTONE_TASKS.md` | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
 | `templates/MILESTONE_COMPLETION.md` | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
 | `templates/MILESTONE_VALIDATION.md` | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
 | `templates/CEO_REVIEW.md` | `artifacts/reviews/ceo-review-milestone-{N}.md` |
 | `templates/UX_REVIEW.md` | `artifacts/reviews/ux-review-milestone-{N}.md` |
+| `templates/MILESTONE_RETROSPECTIVE.md` | `artifacts/reviews/retrospective-milestone-{N}.md` |
 
 ### Milestone Artifacts (`artifacts/milestones/`)
 
@@ -174,14 +179,14 @@ Templates live in `templates/` and are copied — never filled in place — to p
 Two naming patterns are valid:
 
 - `arch-milestone-{N}.md` — architecture document covering an entire milestone (written by `/agent-plan`).
-- `[MODULE]_MODULE.md`, `[SYSTEM]_SYSTEM.md`, `[SCHEMA]_SCHEMA.md` — module-, system-, or schema-scoped specs.
+- `module-{slug}.md`, `system-{slug}.md`, `schema-{slug}.md` — module-, system-, or schema-scoped specs.
 
 ### UI Artifacts (`artifacts/ui-specs/`)
 
 Two naming patterns are valid:
 
 - `ui-milestone-{N}.md` — UI spec covering an entire milestone (written by `/agent-plan`).
-- `[SCREEN]_SCREEN.md`, `[COMPONENT]_COMPONENT.md` — screen- or component-scoped specs.
+- `screen-{slug}.md`, `component-{slug}.md` — screen- or component-scoped specs.
 
 ### Review Artifacts (`artifacts/reviews/`)
 
@@ -192,6 +197,8 @@ Two naming patterns are valid:
 | Security | `security-review-milestone-{N}.md` |
 | Performance | `performance-review-milestone-{N}.md` |
 | CEO planning verdict | `ceo-review-milestone-{N}.md` |
+| UX review (`/agent-code` milestone completion, UI-flagged milestones only) | `ux-review-milestone-{N}.md` |
+| Milestone retrospective (Validator, `/agent-code` milestone completion) | `retrospective-milestone-{N}.md` |
 
 ---
 
@@ -206,15 +213,17 @@ Two naming patterns are valid:
 | Filing performance findings | Performance writes `artifacts/reviews/performance-review-milestone-{N}.md` |
 | Recording a CEO verdict | CEO writes `artifacts/reviews/ceo-review-milestone-{N}.md` |
 | Logging a bug | Bug Gatherer adds an entry to `artifacts/BUGS.md` |
-| Completing a milestone | Product writes `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
-| Recording session progress | Any agent appends to `artifacts/STANDUP.md` (both `/agent-code` completion and `/agent-task` completion write entries here) |
+| Completing a milestone | Product writes `artifacts/milestones/milestone-{N}-{slug}-completion.md` and `-validation.md` |
+| Reviewing implemented UI at milestone completion | UI writes `artifacts/reviews/ux-review-milestone-{N}.md` (UI-flagged milestones only) |
+| Writing the milestone retrospective | Validator writes `artifacts/reviews/retrospective-milestone-{N}.md` |
+| Recording session progress | Any agent appends to `artifacts/STANDUP.md` using its Entry Grammar (both `/agent-code` completion and `/agent-task` completion write entries here) |
 | Updating agent working state | Each agent appends to its own section in `artifacts/AGENT_STATE.md` |
 | Appending a `/agent-task` completion entry | Any agent appends to `artifacts/STANDUP.md` |
 | Updating reference documentation | Docs Writer edits the relevant file in `docs/` |
 | Adding a release changelog entry | Release appends to `docs/CHANGELOG.md` |
 | Creating any new reference doc | Docs Writer registers it in `docs/README.md` |
 
-**`/agent-task` scope note.** `/agent-task` is bounded to `artifacts/STANDUP.md`, `artifacts/BUGS.md`, and `artifacts/AGENT_STATE.md` updates. It does **not** write to `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, or `artifacts/reviews/` — those directories are owned by `/agent-plan` outputs. If a one-off task turns out to need any of those, `/agent-task` halts and instructs the user to run `/agent-plan` first. See `TROUBLESHOOTING.md` for the full decision table on which command to use.
+**`/agent-task` scope note.** `/agent-task` is bounded to `artifacts/STANDUP.md`, `artifacts/BUGS.md`, and `artifacts/AGENT_STATE.md` updates. It does **not** write to `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, or `artifacts/reviews/` — those directories are owned by `/agent-plan` and `/agent-code` outputs. If a one-off task turns out to need any of those, `/agent-task` halts and instructs the user to run `/agent-plan` first. See `TROUBLESHOOTING.md` for the full decision table on which command to use.
 
 ---
 
@@ -265,7 +274,7 @@ The following behaviors violate these conventions. Do not do them:
 | Content type | Location | Naming |
 |---|---|---|
 | Reference docs | `docs/` | `UPPER_SNAKE_CASE.md` |
-| Document templates | `docs/` | `UPPER_SNAKE_CASE.md` |
+| Document templates | `templates/` | `UPPER_SNAKE_CASE.md` |
 | Release changelog | `docs/CHANGELOG.md` | fixed |
 | Active bug tracker | `artifacts/BUGS.md` | fixed |
 | Rolling session log | `artifacts/STANDUP.md` | fixed |
@@ -275,15 +284,17 @@ The following behaviors violate these conventions. Do not do them:
 | Milestone completion | `artifacts/milestones/` | `milestone-{N}-{slug}-completion.md` |
 | Milestone validation | `artifacts/milestones/` | `milestone-{N}-{slug}-validation.md` |
 | Milestone architecture | `artifacts/architecture/` | `arch-milestone-{N}.md` |
-| Module architecture | `artifacts/architecture/` | `[MODULE]_MODULE.md` |
-| System architecture | `artifacts/architecture/` | `[SYSTEM]_SYSTEM.md` |
-| Data schema | `artifacts/architecture/` | `[SCHEMA]_SCHEMA.md` |
+| Module architecture | `artifacts/architecture/` | `module-{slug}.md` |
+| System architecture | `artifacts/architecture/` | `system-{slug}.md` |
+| Data schema | `artifacts/architecture/` | `schema-{slug}.md` |
 | Milestone UI spec | `artifacts/ui-specs/` | `ui-milestone-{N}.md` |
-| Screen spec | `artifacts/ui-specs/` | `[SCREEN]_SCREEN.md` |
-| Component spec | `artifacts/ui-specs/` | `[COMPONENT]_COMPONENT.md` |
+| Screen spec | `artifacts/ui-specs/` | `screen-{slug}.md` |
+| Component spec | `artifacts/ui-specs/` | `component-{slug}.md` |
 | Security review | `artifacts/reviews/` | `security-review-milestone-{N}.md` |
 | Performance review | `artifacts/reviews/` | `performance-review-milestone-{N}.md` |
 | CEO review | `artifacts/reviews/` | `ceo-review-milestone-{N}.md` |
+| UX review | `artifacts/reviews/` | `ux-review-milestone-{N}.md` |
+| Milestone retrospective | `artifacts/reviews/` | `retrospective-milestone-{N}.md` |
 
 ---
 

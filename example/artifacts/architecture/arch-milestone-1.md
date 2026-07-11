@@ -40,9 +40,84 @@ Milestone 1 introduces the foundational layers of Acme Todo: a typed task model,
 - ANSI colors in output
 - Interactive prompts
 
+### Key Components
+
+| Component | Role |
+|-----------|------|
+| `src/types/` | Shared TypeScript types (`Task`, `TaskRow`, `ExitCode`) |
+| `src/db/` | SQLite schema, idempotent migration runner, connection factory |
+| `src/commands/` | One handler per subcommand (`add`, `list`, `done`, `delete`) |
+| `src/cli.ts` + `src/index.ts` | argv routing and the process entry point |
+| SQLite (`better-sqlite3`) | Persistence layer — single file at `~/.acme-todo/tasks.db` |
+
 ---
 
-## Modules
+## System Architecture
+
+### Component Diagram
+
+```
+  ┌────────────────────────────────────────────────────────┐
+  │                     acme-todo CLI                      │
+  │                                                        │
+  │  ┌───────────────┐      ┌────────────────────────┐    │
+  │  │  src/index.ts │─────▶│        src/cli.ts      │    │
+  │  │  (entrypoint) │      │     (argv dispatch)    │    │
+  │  └───────────────┘      └───────────┬────────────┘    │
+  │                                     │                  │
+  │              ┌──────────────────────┼─────────────┐    │
+  │              ▼            ▼         ▼         ▼        │
+  │        ┌────────┐  ┌────────┐ ┌────────┐ ┌────────┐   │
+  │        │ add.ts │  │list.ts │ │done.ts │ │delete  │   │
+  │        └────┬───┘  └────┬───┘ └───┬────┘ └───┬────┘   │
+  │             └───────────┴─────┬───┴───────────┘        │
+  │                               ▼                        │
+  │                  ┌─────────────────────────┐           │
+  │                  │   src/db/connection.ts  │           │
+  │                  │ (openDatabase + migrate)│           │
+  │                  └────────────┬────────────┘           │
+  └───────────────────────────────┼────────────────────────┘
+                                  ▼
+                     SQLite file (WAL mode)
+                   ~/.acme-todo/tasks.db
+```
+
+All command modules share the `src/types/` definitions; `db/connection.ts` composes `db/schema.ts` and `db/migrations.ts`.
+
+### Data Flow
+
+End-to-end flow for a single user command:
+
+```
+  argv (process.argv.slice(2))
+       │
+       ▼
+  src/index.ts        ── imports runCli, awaits, calls process.exit(code)
+       │
+       ▼
+  src/cli.ts          ── parses first positional as subcommand
+       │                 routes to commands/<name>.run(rest)
+       ▼
+  src/commands/*.ts   ── validates args, resolves DB path
+       │
+       ▼
+  src/db/connection   ── openDatabase() returns a migrated handle
+       │
+       ▼
+  SQLite (WAL)        ── parameterized statement executes
+       │                 [CEO Condition 1 — Security]
+       ▼
+  result rows         ── command formats stdout and returns exit code
+       │
+       ▼
+  stdout / stderr + exit code
+```
+
+A command handler never touches `process.exit` directly; it returns a number and lets `index.ts` own the process lifecycle. This keeps commands unit-testable.
+
+---
+
+## Module Specifications
 
 The module pipeline for M1 is `types → db → commands → cli → index`. Each layer depends only on layers to its left.
 
@@ -108,36 +183,39 @@ Timestamps are stored as ISO 8601 TEXT (see Decisions Log for rationale).
 
 ---
 
-## Data Flow
+## Message Flow
 
-End-to-end flow for a single user command:
+Primary use case — `acme-todo add "buy milk"`:
 
 ```
-  argv (process.argv.slice(2))
-       │
-       ▼
-  src/index.ts        ── imports runCli, awaits, calls process.exit(code)
-       │
-       ▼
-  src/cli.ts          ── parses first positional as subcommand
-       │                 routes to commands/<name>.run(rest)
-       ▼
-  src/commands/*.ts   ── validates args, resolves DB path
-       │
-       ▼
-  src/db/connection   ── openDatabase() returns a migrated handle
-       │
-       ▼
-  SQLite (WAL)        ── parameterized statement executes
-       │                 [CEO Condition 1 — Security]
-       ▼
-  result rows         ── command formats stdout and returns exit code
-       │
-       ▼
-  stdout / stderr + exit code
+Actor / Source          Action                              Result
+─────────────────────────────────────────────────────────────────────────────
+USER               →   acme-todo add "buy milk"        →   process starts
+src/index.ts       →   awaits runCli(argv)             →   owns process.exit
+src/cli.ts         →   routes "add" to commands/add    →   handler invoked
+commands/add.ts    →   validates title, opens DB       →   migrated handle
+db/migrations.ts   →   runMigrations() (idempotent)    →   schema current
+SQLite (WAL)       →   INSERT via bound parameters     →   new row, id returned
+commands/add.ts    →   formats success string          →   "Added task #7: ..."
+src/index.ts       →   process.exit(0)                 →   shell prompt back
 ```
 
-A command handler never touches `process.exit` directly; it returns a number and lets `index.ts` own the process lifecycle. This keeps commands unit-testable.
+`list`, `done`, and `delete` follow the identical shape; only the SQL statement and the stdout formatting differ.
+
+---
+
+## State Management
+
+There is no in-process state layer (no store library, no caches): every invocation is a fresh process, and the SQLite file is the single source of truth. "State management" for M1 is therefore the persistence contract below plus the exit-code contract in Error Handling.
+
+### State Storage
+
+| State Field | Type | Persisted | Owner Module |
+|-------------|------|-----------|-------------|
+| `tasks` rows (`id`, `title`, `completed`, `createdAt`, `completedAt`) | SQLite table | Yes | `src/db/` |
+| `schema_version` | SQLite table (single row) | Yes | `src/db/migrations.ts` |
+| Parsed command + flags | `ParsedCommand` (in-memory) | No | `src/cli.ts` |
+| Resolved DB path | `string` (in-memory, from `ACME_TODO_DB` or homedir) | No | `src/db/connection.ts` |
 
 ---
 
@@ -191,6 +269,32 @@ Acme Todo is a single-user CLI; there is no server process and no long-lived han
 2. **Crash safety.** WAL's checkpointing behavior is more robust against partial writes than the default rollback journal.
 
 No cross-process locking is implemented. SQLite's file-level locking is sufficient for the expected usage pattern (one interactive user, occasional concurrent shells). If we later ship a daemon mode, this section must be revisited.
+
+---
+
+## Integration Points
+
+| External System | Relationship | Data Exchanged | Direction |
+|----------------|-------------|---------------|----------|
+| Terminal (stdout/stderr) | Consumes command output per the UI spec's formats | Formatted text rows, error strings, exit codes | System → shell |
+| SQLite file (`~/.acme-todo/tasks.db`) | Reads/writes all task state | `tasks` and `schema_version` rows | Bidirectional |
+| Filesystem | Creates the parent directory on first run | `~/.acme-todo/` directory | System → FS |
+| Environment (`ACME_TODO_DB`) | Overrides the DB file location | Absolute path string | Env → System |
+
+There are no network integrations, background services, or other processes in M1.
+
+---
+
+## Performance Budget
+
+| Metric | Target | Notes |
+|--------|--------|-------|
+| Command latency (cold start) | < 100 ms | Includes Node startup + migration idempotency check |
+| Command latency (warm) | < 50 ms | Second invocation in the same shell session |
+| `list` latency at 1,000 rows | < 100 ms | Must use `idx_tasks_completed`, not a table scan (CEO Condition 2) |
+| DB file size at 1,000 rows | < 1 MB | ISO-8601 TEXT timestamps accepted within this budget |
+
+The Performance Agent owns the live Current/Status tracking for these targets in `artifacts/AGENT_STATE.md` → performance section.
 
 ---
 
@@ -252,14 +356,9 @@ No cross-process locking is implemented. SQLite's file-level locking is sufficie
 
 ---
 
-## Product Approval
+## CEO Verdict
 
-| Field | Value |
-|-------|-------|
-| **Approved by** | CEO (Product agent) |
-| **Date** | 2026-04-08 |
-| **Status** | Approved with conditions |
-| **Notes** | Conditions 1–3 listed above must be verified by the Reviewer before M1 sign-off. |
+Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-1.md`: **APPROVED WITH CONDITIONS** (2026-04-08). Conditions 1–3 (traceability table above) were verified by Reviewer and Product before M1 sign-off on 2026-04-10.
 
 ---
 

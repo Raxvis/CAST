@@ -232,7 +232,7 @@ _Questions raised to Architecture, UI, or Product. Implementation of affected wo
 
 ### Implementation Status by Milestone
 
-_Duplicate the table below per milestone, under a `#### [MILESTONE_NAME]` heading._
+_Duplicate the table below per milestone, under a `####` heading named after the milestone (as with Milestone 1 — Task CRUD below)._
 
 #### Milestone 1 — Task CRUD
 

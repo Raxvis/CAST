@@ -61,6 +61,10 @@ This skill orchestrates the **Planning Stage** of the agent workflow. It runs th
 
 **Pass inputs forward.** Each stage's "Input to pass" means include the content in the agent's invocation — read each artifact once as it is produced and hand it to the consuming stages. Do not make every agent independently re-open files the orchestrator has already read; an agent re-reads a file itself only when it needs sections that were not supplied.
 
+**Milestone numbering.** Unless the invocation input names an existing milestone to re-plan, allocate `{N}` as the highest milestone number already present in `artifacts/milestones/` plus one (`1` if there are none). Allocate it once, before Stage 1, and use it in every artifact filename for the run.
+
+**Stage checkpoints.** At the start of the run, add a session heading `### YYYY-MM-DD — agent-plan — milestone-{N}-{slug}` to `artifacts/STANDUP.md`. After each stage completes, append a checkpoint entry under it using that file's Entry Grammar, e.g. `- architect | progress | Stage 2a complete: artifacts/architecture/arch-milestone-{N}.md`. These checkpoints are what let an interrupted planning run resume at the right stage.
+
 ### Stage 1 — Product
 
 Launch the **product** agent to:
@@ -100,6 +104,8 @@ In parallel with Architecture, launch the **ui** agent to:
 
 Input to pass: the milestone definition and the task breakdown from Stage 1 (the `Needs UI Spec` flags live in the task breakdown). Coordinate state-shape questions with the architect agent if they arise.
 
+If the project installed no `ui` agent (a backend/CLI adoption that opted out of the UI role), skip this stage entirely and note the skip in the stage checkpoint entry (`- agent-plan | progress | Stage 2b skipped: no ui agent installed`); downstream stages then run without a UI specification.
+
 Both Architecture and UI must complete before Stage 3 begins.
 
 ### Stage 3a — Security
@@ -137,9 +143,9 @@ After Security, Performance, and UI have all completed, launch the **ceo** agent
 
 Input to pass: all artifacts from Stages 1–3, and the template `templates/CEO_REVIEW.md`.
 
-**If REVISION REQUIRED**: the CEO's Revision Requests identify which agent owns each change. Re-run the affected stage with the revision notes, then re-run the CEO review on the revised plan. Planning does not advance until the CEO issues APPROVED or APPROVED WITH CONDITIONS.
+**If REVISION REQUIRED**: the CEO's Revision Requests identify which agent owns each change. Re-run the affected stage with the revision notes, then re-run the CEO review on the revised plan. Planning does not advance until the CEO issues APPROVED or APPROVED WITH CONDITIONS. **Revision cap:** allow at most 3 revision cycles (one cycle = re-running the affected stages plus one CEO re-review). If the third cycle still ends in REVISION REQUIRED, stop the run and escalate to the user with a summary of the unresolved objections — do not keep looping.
 
-**If APPROVED WITH CONDITIONS**: record the Approval Conditions. They are tracked by Coder during engineering and verified by Reviewer and Product on completion.
+**After any approval-level verdict**: launch the **product** agent to backfill the **CEO Approval Conditions** table in `artifacts/milestones/milestone-{N}-{slug}-tasks.md` (the table is defined by `templates/MILESTONE_TASKS.md`) — one row per condition with its source and Status Open, or a single "None — verdict was APPROVED" row. `/agent-code` reads the conditions from that table (its Pre-Flight may still cross-check them against the CEO review); Coder tracks them during engineering and Reviewer and Product verify them on completion.
 
 ### Revision Handling
 

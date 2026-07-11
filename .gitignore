@@ -10,3 +10,7 @@ Thumbs.db
 *~
 # Claude
 .claude/settings.local.json
+
+# Local CAST pipeline runs inside this repo (repo root only — the payload's
+# skills/cast-init/assets/artifacts/ must stay tracked)
+/artifacts/

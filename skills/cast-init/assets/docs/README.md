@@ -58,7 +58,7 @@ These documents describe how the project is built and the conventions that gover
 
 These four files are scoped to a project type rather than being universal. **Keep the
 one(s) that match your project and delete the rest.** The shipped `CLAUDE.md` has
-commented `@import` lines for all four — uncomment the relevant line(s) to load the
+commented `@docs/...` import lines for all four — uncomment the relevant line(s) to load the
 matching patterns into session context.
 
 | File | Description |
@@ -126,7 +126,8 @@ appropriate `artifacts/` subdirectory first.
 | `templates/MILESTONE_COMPLETION.md` | Template for milestone completion reports | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
 | `templates/MILESTONE_VALIDATION.md` | Template for per-task validation checklists and milestone acceptance records | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
 | `templates/CEO_REVIEW.md` | Template for the CEO's planning-stage review and verdict | `artifacts/reviews/ceo-review-milestone-{N}.md` |
-| `templates/UX_REVIEW.md` | Template for UI's UX review of implemented screens | `artifacts/reviews/ux-review-milestone-{N}.md` |
+| `templates/UX_REVIEW.md` | Template for UI's UX review of a milestone's implemented screens — written once per milestone at the `/agent-code` milestone-completion checkpoint, only for milestones with UI-flagged tasks | `artifacts/reviews/ux-review-milestone-{N}.md` |
+| `templates/MILESTONE_RETROSPECTIVE.md` | Template for the milestone retrospective, written by Validator at the `/agent-code` milestone-completion checkpoint | `artifacts/reviews/retrospective-milestone-{N}.md` |
 
 ---
 

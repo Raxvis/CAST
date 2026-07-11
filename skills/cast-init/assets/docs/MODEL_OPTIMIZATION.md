@@ -17,7 +17,7 @@
 
 # [PROJECT_NAME] — Agent Model Optimization Guide
 
-This document is the single source of truth for which Claude model each CAST agent runs on, how the supported models differ in behavior, and how to move the roster between them. Each agent file carries only a compact **Model Configuration** section — the frontmatter `model:` pin, a one-line recommended effort, and three role-specific per-model bullets. The model ladder table, effort rules (`xhigh` requires Opus 4.7+), behavior profiles, and upgrade checklists live only in this file — a model change never requires editing per-agent tables, just the frontmatter pin (and effort substitution when pinning 4.6).
+This document is the single source of truth for which Claude model each CAST agent runs on, how the supported models differ in behavior, and how to move the roster between them. Each agent file carries only a compact **Model Configuration** section — the frontmatter `model:` pin, a one-line recommended effort, and a short **Rules (all models)** block holding that role's binding behavioral constraints (no subagents, structured-output handoffs, silence-is-not-a-clean-report for review roles, plus role-specific discipline). The model ladder table, effort rules (`xhigh` requires Opus 4.7+), per-model behavior profiles, and upgrade checklists live only in this file — a model change never requires editing per-agent sections, just the frontmatter pin (and effort substitution when pinning 4.6).
 
 ---
 
@@ -65,7 +65,7 @@ Every agent's YAML frontmatter pins `model: claude-opus-4-8`. Differentiation be
 
 ## Behavior Profiles
 
-Each supported model executes the same agent definitions differently. The per-agent "Model Configuration" sections carry role-specific notes; these are the family-wide profiles behind them.
+Each supported model executes the same agent definitions differently. The per-agent "Model Configuration" sections carry only the role's binding rules; these family-wide profiles are the rationale behind them — consult the profile for whichever model you pin before re-tuning an agent's prompt.
 
 ### Claude Opus 4.8 (default)
 

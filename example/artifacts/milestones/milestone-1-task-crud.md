@@ -19,7 +19,7 @@
 | **Planned** | 2026-04-08 |
 | **Target Completion** | 2026-04-10 |
 | **Owner** | Product |
-| **Requirements Reference** | `artifacts/prd.md` §3 (Core CRUD), §5 (Persistence) |
+| **Requirements Reference** | `docs/PRD.md` §3 (Core CRUD), §5 (Persistence) |
 
 ---
 
@@ -30,6 +30,20 @@ delete tasks, with state persisted in a local SQLite database. After this milest
 a user can run `acme-todo add "buy milk"`, `acme-todo list`, `acme-todo done 1`,
 and `acme-todo delete 1` from any Node 20+ shell and have their tasks survive
 across invocations.
+
+---
+
+## Why This Matters
+
+Without persistence-backed CRUD there is no product — every later milestone
+(error signaling in M2, tags and due dates in M3+) edits or extends task rows
+that this milestone teaches the CLI to create, read, and mutate. Shipping the
+four commands against a real SQLite file also settles the two decisions with
+the highest cost-of-change (the on-disk schema and the argv dispatch shape)
+while the codebase is still small enough to redo them cheaply. Finally, a solo
+developer needs a usable tool on day one: after M1, Acme Todo is something its
+own author can adopt for daily task tracking, which is the fastest feedback
+loop available.
 
 ---
 
@@ -71,12 +85,17 @@ across invocations.
 
 ---
 
-## Dependencies
+## Dependencies and Risks
 
-- **External**: `better-sqlite3` (native module, pnpm-installed), Node.js 20+, pnpm.
-- **Internal**: None — this is the first implementation milestone.
-- **Docs**: `artifacts/architecture.md` (data layer section), `artifacts/ui-spec.md`
-  (CLI output formats).
+| Type | Item | Mitigation / Status |
+|---|---|---|
+| Dependency | `better-sqlite3` (native module) | Pinned in `package.json`; prebuilt binaries verified for Node 20+ on macOS/Linux/Windows |
+| Dependency | Node.js 20+ and pnpm on the developer machine | Documented in `CLAUDE.md` Build & Test |
+| Dependency | Architecture data-layer section and UI spec output formats | Both approved 2026-04-08: `artifacts/architecture/arch-milestone-1.md`, `artifacts/ui-specs/ui-milestone-1.md` |
+| Risk | SQLite file locking with concurrent shells on Windows | WAL mode (CEO Condition 2) allows read-while-write; accepted for a single-user CLI |
+| Risk | First-run crash when the DB file does not exist yet | Migrations run on every invocation (CEO Condition 3); covered by regression tests |
+
+No internal milestone dependencies — this is the first implementation milestone.
 
 ---
 
@@ -130,9 +149,9 @@ See `artifacts/reviews/ceo-review-milestone-1.md` for the full verdict.
 
 - **Task Breakdown**: `artifacts/milestones/milestone-1-task-crud-tasks.md`
 - **CEO Review**: `artifacts/reviews/ceo-review-milestone-1.md`
-- **Architecture**: `artifacts/architecture.md`
-- **UI Spec**: `artifacts/ui-spec.md`
-- **PRD**: `artifacts/prd.md`
+- **Architecture**: `artifacts/architecture/arch-milestone-1.md`
+- **UI Spec**: `artifacts/ui-specs/ui-milestone-1.md`
+- **PRD**: `docs/PRD.md`
 
 ---
 

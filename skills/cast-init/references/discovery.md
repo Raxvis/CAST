@@ -4,9 +4,10 @@ Crawl the project and map everything relevant. Use Read, Glob, and Grep. Build a
 
 ## 1.1 — Claude Code state
 
-- Does `CLAUDE.md` exist at the project root? Read it. Note its section list and any custom content.
+- Does `CLAUDE.md` exist at the project root? Read it. Note its section list and any custom content. If its CAST section carries an `Adopted with CAST v<X.Y.Z>` line, record that version — this is the **canonical version stamp** written at install time, and the value SKILL.md's Upgrades rule compares against this skill's `metadata.version`.
+- Is the project a git repository (`git rev-parse --is-inside-work-tree`)? If not, flag it in the inventory — Phase 5's preflight and rollback path depend on git (see SKILL.md safety rule 8).
 - Does `.claude/agents/` exist? List every file. For each, parse YAML frontmatter and note `name`, `description`, `model`.
-- Does `.claude/skills/` exist? List every skill directory. Note the skill name (directory name) and summarize the first 30 lines of each `SKILL.md`. If `agent-plan/`, `agent-code/`, or `agent-task/` are present, this is a prior CAST 1.x install — note the installed version if the SKILL.md records one, and treat these as existing counterparts for update-in-place.
+- Does `.claude/skills/` exist? List every skill directory. Note the skill name (directory name) and summarize the first 30 lines of each `SKILL.md`. If `agent-plan/`, `agent-code/`, or `agent-task/` are present, this is a prior CAST 1.x install — treat these as existing counterparts for update-in-place, and if `CLAUDE.md` carries no version stamp (older installs predate it), fall back to any version a SKILL.md records.
 - Does `.claude/commands/` exist? List every file. Note the command name (filename minus `.md`) and summarize the first 30 lines of each. If `agent-plan.md`, `agent-code.md`, or `agent-task.md` are present, this is a pre-1.0 CAST install — the three pipelines were commands before they became skills. Flag them for the skills migration path in `execution.md`.
 - Does `.claude/settings.json` exist? Note its structure (permissions, hooks, env).
 
@@ -76,12 +77,21 @@ Extract and record:
 - **Package manager** — `npm`, `pnpm`, `yarn`, `pip`, `poetry`, `cargo`, `go`, `bundle`, etc.
 - **Package manifest** — the manifest file itself (`package.json`, `pyproject.toml`, `Cargo.toml`, …)
 - **Dependency add command** — from the package manager (`npm install`, `pnpm add`, `poetry add`, `cargo add`, …)
-- **Config files** — type-checker config (`tsconfig.json`, `mypy.ini`) and framework/bundler config (`next.config.js`, `vite.config.ts`, `metro.config.js`) if present
+- **Config files** — type-checker config (`tsconfig.json`, `mypy.ini`) and framework config (`next.config.js`, `vite.config.ts`, `metro.config.js`) if present
 - **Persistence layer** — best guess from dependencies (SQLite, Postgres, Mongo, Redis, localStorage, flat files) or "none detected"
 - **State / navigation libraries** — if the dependency list names one (Redux, Zustand, React Router, GoRouter, …)
 - **Target platforms** — from the project type and manifests: web, iOS, Android, desktop, server, CLI (e.g. a React Native app → "iOS, Android"; a CLI → "macOS / Linux / any [LANGUAGE] runtime")
 
-These feed the substitution pass directly: each maps to a placeholder (`[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[FRAMEWORK_VERSION]`, `[TEST_CMD]`, `[TEST_RUNNER]`, `[DEV_SERVER_CMD]`, `[BUILD_CMD]`, `[TYPE_CHECK_CMD]`, `[PKG_MANAGER]`, `[PKG_MANIFEST]`, `[PKG_ADD_CMD]`, `[TYPE_CONFIG]`, `[FRAMEWORK_CONFIG]`, `[BUNDLER_CONFIG]`, `[PERSISTENCE_LAYER]`, `[STATE_LIBRARY]`, `[NAVIGATION_LIBRARY]`, `[TARGET_PLATFORMS]`). Record "unknown" rather than guessing — unknowns become Phase 3 questions or report TODOs, never invented values.
+These feed the substitution pass directly: each maps to a placeholder (`[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[FRAMEWORK_VERSION]`, `[TEST_CMD]`, `[TEST_RUNNER]`, `[DEV_SERVER_CMD]`, `[BUILD_CMD]`, `[TYPE_CHECK_CMD]`, `[PKG_MANAGER]`, `[PKG_MANIFEST]`, `[PKG_ADD_CMD]`, `[TYPE_CONFIG]`, `[FRAMEWORK_CONFIG]`, `[PERSISTENCE_LAYER]`, `[STATE_LIBRARY]`, `[NAVIGATION_LIBRARY]`, `[TARGET_PLATFORMS]`). Record "unknown" rather than guessing — unknowns become Phase 3 questions or report TODOs, never invented values.
+
+### Monorepos and workspaces
+
+Detect workspace layouts before settling the metadata above: `pnpm-workspace.yaml`, a `workspaces` field in the root `package.json`, a `[workspace]` table in the root `Cargo.toml`, a `go.work` file, or equivalent (Nx/Turborepo/Lerna configs are corroborating signals). If the project is a workspace:
+
+- **Default to a root-level install.** CAST installs once at the repository root — one `CLAUDE.md`, one `.claude/`, one `docs/`/`templates/`/`artifacts/` — not per package. Only deviate if the user explicitly asks for a package-scoped install.
+- **Prefer workspace-wide values** for the metadata placeholders: the root manifest's `name` for `[PROJECT_NAME]`, workspace-wide commands (`pnpm -r test`, `cargo test --workspace`, `go test ./...`) for `[TEST_CMD]`/`[BUILD_CMD]`, and so on.
+- **Turn manifest ambiguity into Phase 3 Ask items.** When the root manifest lacks a value and multiple packages could supply it (which package's name is `[PROJECT_NAME]`? whose framework is `[FRAMEWORK]`? which test command is canonical?), do not pick one silently — record each ambiguity in the inventory's open questions and surface it as an Ask in the Phase 3 plan, listing the candidate packages.
+- Record the workspace tool and member-package list in the inventory. Multiple languages across packages usually mean project type **Mixed**.
 
 Detect project type:
 
@@ -98,17 +108,21 @@ Read the top of the existing `README.md` for the project's one-sentence pitch. I
 ## 1.5 — Source code structure
 
 - Glob top-level directories and identify where source lives (`src/`, `lib/`, `app/`, `cmd/`, `pkg/`, etc.)
-- Map source subdirectories to their roles where identifiable — screens/pages (`[SCREEN_DIR]`), business logic (`[LOGIC_DIR]`), state management (`[STORE_DIR]`), UI components (`[COMPONENTS_DIR]`), hooks/providers (`[HOOKS_DIR]`), constants/config (`[CONSTANTS_DIR]`), static assets (`[ASSETS_DIR]`). Record only mappings the directory names or contents make clear; leave the rest unknown.
+- Map source subdirectories to their roles where identifiable — business logic (`[LOGIC_DIR]`), state management (`[STORE_DIR]`), UI components (`[COMPONENTS_DIR]`), constants/config (`[CONSTANTS_DIR]`). Record only mappings the directory names or contents make clear; leave the rest unknown.
 - Note naming conventions: camelCase vs snake_case vs PascalCase vs kebab-case for file names (`[LOWER_CASE_CONVENTION]`, `[PASCAL_CASE_CONVENTION]`, `[UPPER_SNAKE_CONVENTION]`)
 - Note any existing test directory pattern (`tests/`, `test/`, `spec/`, colocated `*.test.ts`, etc.)
 - If there's a dominant language, note the file extension for source files (`[EXT]`)
 - Note any CI config (`.github/workflows/`, `.gitlab-ci.yml`, `circle.yml`) — helps confirm test/build commands
 
-**Domain tokens are asked, not detected.** `[DOMAIN_ENTITY]`, `[RESOURCE_TYPE]`, `[CORE_MECHANIC]`, `[PROGRESSION_UNIT]`, `[SAVE_KEY]`, `[SAVE_VERSION]`, and `[ONE_SENTENCE_PITCH]` (when no README pitch exists) cannot be inferred from code. Batch them into the Phase 3 plan's Ask section when a file that carries them is being installed; if the user declines to answer, leave the token and list it in the Phase 7 report.
+**Domain tokens are asked, not detected.** `[DOMAIN_ENTITY]`, `[RESOURCE_TYPE]`, `[CORE_MECHANIC]`, `[PROGRESSION_UNIT]`, `[SAVE_KEY]`, and `[ONE_SENTENCE_PITCH]` (when no README pitch exists) cannot be inferred from code. Batch them into the Phase 3 plan's Ask section when a file that carries them is being installed; if the user declines to answer, leave the token and list it in the Phase 7 report.
 
 ## 1.6 — Write the inventory
 
-Write your findings to `artifacts/adoption-inventory.md` (create the directory if needed, but note in Phase 3 that this directory may later be renamed if you propose moving it). Use this structure:
+Write your findings to `artifacts/adoption-inventory.md` (create the directory if needed, but note in Phase 3 that this directory may later be renamed if you propose moving it).
+
+**Prior adoption records**: if any `artifacts/adoption-inventory.md`, `adoption-plan.md`, or `adoption-report.md` already exists from an earlier run, do not silently overwrite it — those files are the audit trail of the earlier install. Archive each one first by renaming it with a date suffix (e.g. `adoption-report-2026-07-11.md`, using the prior file's generation date); in interactive mode you may instead ask the user to confirm an overwrite.
+
+Use this structure:
 
 ```markdown
 # CAST Adoption Inventory
@@ -116,6 +130,8 @@ Generated: <ISO date>
 
 ## Claude Code state
 - `CLAUDE.md`: <present/absent>, <line count>, sections: <list>
+- Installed CAST version: <from the `Adopted with CAST v…` stamp | none found>
+- Git repository: <yes / no — no rollback safety net>
 - `.claude/agents/`: <N files> — list with detected roles
 - `.claude/skills/`: <N skills> — list with detected purposes (note any prior CAST pipelines)
 - `.claude/commands/`: <N files> — list with detected purposes (note any pre-1.0 CAST commands)
@@ -141,11 +157,12 @@ Generated: <ISO date>
 - **Persistence layer**: <detected or "none detected">
 - **State / navigation libraries**: <detected or "—">
 - **Target platforms**: <detected>
+- **Workspace / monorepo**: <none | tool + member packages, with any manifest ambiguities flagged as open questions>
 
 ## Source structure
 - Top-level directories: <list>
 - Source directory: <best guess>
-- Directory role mapping: <screens / logic / store / components / hooks / constants / assets, where identifiable>
+- Directory role mapping: <logic / store / components / constants, where identifiable>
 - Test directory: <best guess>
 - File naming convention: <best guess>
 - Source file extension: <best guess>

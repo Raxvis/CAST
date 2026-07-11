@@ -1,6 +1,6 @@
 ---
 name: refactor
-description: "Refactoring agent. Use for improving code structure without changing behavior."
+description: "Use when Reviewer classifies a finding as an Issue, or on direct user request for structural cleanup — behavior-preserving restructuring, then hands back to Tester and Reviewer."
 model: claude-opus-4-8
 ---
 
@@ -25,11 +25,9 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `high`. Model ladder, effort rules (`xhigh` requires Opus 4.7+), and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
+**Effort:** `high`. Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-- **Opus 4.8** — May offer adjacent cleanups — apply behavior-preserving changes within the flagged Issue only, and surface extras as notes rather than applying them. Keep handoffs to the structured output — no narrative recap.
-- **Opus 4.7** — Refactors exactly the flagged Issue and nothing more — ideal for this role; ensure the Issue statement names every affected site.
-- **Opus 4.6** — Prone to over-abstracting during cleanup — choose the simplest structure that resolves the Issue; introduce no new abstractions. Do not spawn subagents — complete this role's work directly.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. Apply behavior-preserving changes within the flagged Issue only — choose the simplest structure that resolves it, introduce no new abstractions, and surface adjacent cleanups as notes rather than applying them.
 
 ---
 

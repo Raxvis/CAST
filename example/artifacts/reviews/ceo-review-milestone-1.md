@@ -8,27 +8,23 @@
 
 ---
 
-**Reviewer**: CEO Agent
-**Model**: claude-opus-4-8
-**Date**: 2026-04-08
-**Stage**: `/agent-plan` Stage 4
-
----
-
-## CEO Review: Milestone 1 — Task CRUD + SQLite Persistence
+## Header
 
 **Date**: 2026-04-08
-**Reviewer**: CEO Agent
+**Reviewer**: CEO Agent (claude-opus-4-8, `/agent-plan` Stage 4)
 **Inputs Reviewed**:
 - Milestone: `artifacts/milestones/milestone-1-task-crud.md`
+- Task Breakdown: `artifacts/milestones/milestone-1-task-crud-tasks.md`
 - Architecture: `artifacts/architecture/arch-milestone-1.md`
 - UI Spec: `artifacts/ui-specs/ui-milestone-1.md`
 - Security Findings: `artifacts/reviews/security-review-milestone-1.md`
 - Performance Findings: `artifacts/reviews/performance-review-milestone-1.md`
 
+**Review Cycle**: v1 — first review of this plan; no prior Revision Requests to re-verify.
+
 ---
 
-### 1. Scope & Business Intent
+## 1. Scope & Business Intent
 - [x] Milestone goals are clear and measurable.
 - [x] Acceptance criteria are testable.
 - [x] Scope is appropriate for a single milestone (not overloaded, not trivial).
@@ -38,7 +34,7 @@
 
 ---
 
-### 2. Architectural Soundness
+## 2. Architectural Soundness
 - [x] Architecture document covers every module touched by the milestone.
 - [x] Data schemas are versioned and migration-safe.
 - [x] Module boundaries align with the feature scope.
@@ -48,17 +44,17 @@
 
 ---
 
-### 3. UI & User Experience
+## 3. UI & User Experience
 - [x] UI spec covers every screen or component the milestone introduces.
 - [x] Interaction states (default, pressed, disabled, loading, error, empty) are specified.
 - [x] UI spec is consistent with the architecture (state shape, events, data flow).
 - [x] Accessibility considerations are recorded.
 
-**Notes**: PASS. For a CLI, "UI" means the command surface and its output. The UI spec enumerates every command, every flag, every success message, and every error message, and specifies exit codes for each outcome. The empty state (`list` with no tasks) has a specific message ("No tasks. Add one with `acme add <title>`."). Accessibility for a CLI is covered by plain-text output with no ANSI escapes when `NO_COLOR` is set. The Error Messages section called out the "missing DB file on first run" case explicitly — see Cross-Cutting Risks below.
+**Notes**: PASS. For a CLI, "UI" means the command surface and its output. The UI spec enumerates every command, every flag, every success message, and every error message, and specifies exit codes for each outcome. The empty state (`list` with no tasks) is specified deliberately: header row only, no "No tasks" string, so output stays pipe-friendly. Accessibility for a CLI is covered by plain-text output with no ANSI escapes anywhere in v1. The Error Messages section called out the "missing DB file on first run" case explicitly — see Cross-Cutting Risks below.
 
 ---
 
-### 4. Security Posture
+## 4. Security Posture
 - [x] All Critical and High findings have a remediation plan inside this milestone.
 - [x] No Critical finding is deferred to "future work" without explicit Product acceptance.
 - [x] New dependencies introduced by the architecture have been reviewed.
@@ -67,7 +63,7 @@
 
 ---
 
-### 5. Performance Budget
+## 5. Performance Budget
 - [x] The milestone respects the project's performance budgets.
 - [x] Hot paths are identified and have a measurement plan.
 - [x] No budget violation is deferred without explicit Product acceptance.
@@ -76,7 +72,7 @@
 
 ---
 
-### 6. Cross-Cutting Risks
+## 6. Cross-Cutting Risks
 - [x] No UI requirement contradicts the architecture.
 - [x] No architecture decision contradicts a Product acceptance criterion.
 - [x] No security/performance finding invalidates a task in the milestone.
@@ -86,7 +82,7 @@
 
 ---
 
-### Revision Requests
+## Revision Requests
 
 | # | Addressed To | Section | Required Change |
 |---|---|---|---|
@@ -94,7 +90,7 @@
 
 ---
 
-### Approval Conditions (for APPROVED WITH CONDITIONS)
+## Approval Conditions (for APPROVED WITH CONDITIONS)
 
 | # | Condition | Verified By | Verified At |
 |---|---|---|---|
@@ -104,7 +100,7 @@
 
 ---
 
-### Verdict
+## Verdict
 
 - [ ] **APPROVED**
 - [x] **APPROVED WITH CONDITIONS** — Milestone may proceed. Coder must satisfy the Approval Conditions above; Reviewer and Product verify on completion.
