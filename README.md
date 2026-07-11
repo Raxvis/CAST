@@ -569,4 +569,4 @@ Significant changes must bump the template version in **four synchronized locati
 3. `.claude-plugin/plugin.json` — the `version` field
 4. `skills/cast-init/SKILL.md` — the `metadata.version` frontmatter field
 
-All four land in the same commit. Immediately after pushing: annotated tag (`git tag -a v<new>`) + GitHub Release (`gh release create v<new> --notes-file ... --latest`).
+All four land in the same commit, with the message starting `Release v<new>:`. On push to `main`, [`release.yml`](.github/workflows/release.yml) does the rest automatically: it verifies the four locations agree, creates the annotated `v<new>` tag, and publishes the GitHub Release with notes extracted from the top `CHANGELOG.md` entry. After pushing, confirm with `gh release view v<new>`. Tag and Release by hand (`git tag -a` + `gh release create`, per the CLAUDE.md checklist) only if the workflow is unavailable.

@@ -68,6 +68,8 @@ Whenever the template version is bumped, the new version must be tagged and rele
 
 **Automation:** `.github/workflows/release.yml` automates checklist steps 5–6. On every push to `main` it reads `.claude-plugin/plugin.json`; if no `v<version>` tag exists yet, it verifies the four synchronized locations agree (failing loudly on mismatch), creates the annotated tag, and publishes the GitHub Release from the top `CHANGELOG.md` section. A second job triggered by `v*` tag pushes verifies tag/version/CHANGELOG integrity. The manual checklist below remains the fallback if the workflow is unavailable — and step 7 (verify) should be run either way.
 
+Known quirk: when `release.yml` itself pushes the tag, the `tag-integrity` job does NOT fire — GitHub suppresses workflow triggers from events created with `GITHUB_TOKEN` (recursion guard). This is expected; the integrity job exists to check *manually* pushed tags. Absence of a `tag-integrity` run after an automated release is not a failure — `gh release view v<NEW>` is the verification that matters.
+
 **A version bump is any change to one of the following synchronized locations:**
 
 - `README.md` — the version badge and the `Current template version` hero line
