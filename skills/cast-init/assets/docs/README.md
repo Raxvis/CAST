@@ -57,9 +57,10 @@ These documents describe how the project is built and the conventions that gover
 ## Topic-Specific Technical Documents
 
 These four files are scoped to a project type rather than being universal. **Keep the
-one(s) that match your project and delete the rest.** The shipped `CLAUDE.md` has
-commented `@docs/...` import lines for all four — uncomment the relevant line(s) to load the
-matching patterns into session context.
+one(s) that match your project and delete the rest.** The shipped `CLAUDE.md` lists all
+four as inert backticked paths inside a comment — an import only fires as a bare `@path`
+line, so copy the relevant path out of the comment as its own bare `@docs/X.md` line to
+load the matching patterns into session context.
 
 | File | Description |
 |------|-------------|

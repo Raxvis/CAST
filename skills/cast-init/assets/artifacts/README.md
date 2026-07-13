@@ -33,8 +33,10 @@ artifacts/
   AGENT_STATE.md                   # Live working state for every agent (one section per agent)
 
   milestones/
-    milestone-{N}-{slug}.md        # Milestone definition (from templates/MILESTONE_DEFINITION.md)
-    milestone-{N}-{slug}-tasks.md  # Task breakdown for that milestone
+    milestone-{N}-{slug}.md              # Milestone definition (from templates/MILESTONE_DEFINITION.md)
+    milestone-{N}-{slug}-tasks.md        # Task breakdown for that milestone
+    milestone-{N}-{slug}-completion.md   # Completion report (Product, at /agent-code milestone completion)
+    milestone-{N}-{slug}-validation.md   # Milestone validation record (Product, at /agent-code milestone completion)
 
   architecture/
     arch-milestone-{N}.md          # Milestone-specific architecture document

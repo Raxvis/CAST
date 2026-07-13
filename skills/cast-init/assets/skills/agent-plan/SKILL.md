@@ -63,7 +63,7 @@ This skill orchestrates the **Planning Stage** of the agent workflow. It runs th
 
 **Milestone numbering.** Unless the invocation input names an existing milestone to re-plan, allocate `{N}` as the highest milestone number already present in `artifacts/milestones/` plus one (`1` if there are none). Allocate it once, before Stage 1, and use it in every artifact filename for the run.
 
-**Stage checkpoints.** At the start of the run, add a session heading `### YYYY-MM-DD — agent-plan — milestone-{N}-{slug}` to `artifacts/STANDUP.md`. After each stage completes, append a checkpoint entry under it using that file's Entry Grammar, e.g. `- architect | progress | Stage 2a complete: artifacts/architecture/arch-milestone-{N}.md`. These checkpoints are what let an interrupted planning run resume at the right stage.
+**Stage checkpoints.** At the start of the run, add a session heading `### YYYY-MM-DD — agent-plan — milestone-{N}-{slug}` to `artifacts/STANDUP.md`. After each stage completes, append a checkpoint entry under it using that file's Entry Grammar, e.g. `- architect | progress | Stage 2a complete: artifacts/architecture/arch-milestone-{N}.md`. These checkpoints are what let an interrupted planning run resume at the right stage. Planning stages may also enqueue documentation work in their checkpoint entries: when a stage's output changes something documentation-worthy (APIs, commands, config, conventions, user-facing behavior), append a `- <agent> | docs | <note>` entry under the session heading — Docs Writer drains these at the next `/agent-code` or `/agent-task` completion checkpoint.
 
 ### Stage 1 — Product
 
@@ -72,7 +72,8 @@ Launch the **product** agent to:
 1. Define the feature scope, goals, and success metrics.
 2. Write the milestone definition at `artifacts/milestones/milestone-{N}-{slug}.md` using `templates/MILESTONE_DEFINITION.md` as the template. This file captures what the milestone is and why it matters — goal, success metrics, in-scope, out-of-scope, top-level acceptance criteria, dependencies and risks, cross-cutting concerns.
 3. Write the task breakdown at `artifacts/milestones/milestone-{N}-{slug}-tasks.md` using `templates/MILESTONE_TASKS.md` as the template. This file captures how the work is decomposed — one task per row with ID, dependencies, per-task acceptance criteria, and files touched.
-4. Reference existing context in `docs/PRD.md`, `docs/CONCEPT.md`, and `docs/GLOSSARY.md`.
+4. Review the Deferred backlog while defining the milestone: re-triage every Deferred bug in `artifacts/BUGS.md` and any Deferred tasks from prior milestone breakdowns — pull items into this milestone's scope, keep them Deferred with an updated rationale, or close them as Won't Fix with a rationale. Deferred is a held-open state, not terminal (see `artifacts/BUGS.md` → Bug Lifecycle).
+5. Reference existing context in `docs/PRD.md`, `docs/CONCEPT.md`, and `docs/GLOSSARY.md`.
 
 The two files are deliberately separate: the definition is the CEO's primary read during planning review, the breakdown is the Coder's primary read during engineering. Keeping them in separate files means each audience can find what they need without scrolling past the other.
 
@@ -80,13 +81,14 @@ Input to pass ("pass" means include the content in the agent's invocation — do
 - Feature request: the invocation input
 - Output directory: `artifacts/milestones/`
 - Templates: `templates/MILESTONE_DEFINITION.md` (for the definition file) and `templates/MILESTONE_TASKS.md` (for the task breakdown)
+- Deferred backlog: the Deferred entries in `artifacts/BUGS.md` and any Deferred tasks in prior `artifacts/milestones/*-tasks.md` files (for the re-triage in step 4)
 
 ### Stage 2a — Architecture
 
 After Product completes, launch the **architect** agent to:
 
 1. Read the milestone definition and task breakdown from Stage 1.
-2. Produce the architecture document at `artifacts/architecture/arch-milestone-{N}.md` using the templates in `templates/ARCH_MODULE.md`, `templates/ARCH_SYSTEM.md`, and `templates/ARCH_DATA_SCHEMA.md` as appropriate.
+2. Produce the architecture document at `artifacts/architecture/arch-milestone-{N}.md` as an **instance of `templates/ARCH_SYSTEM.md`** — that template defines the milestone architecture document's required headings. When the milestone needs module- or schema-level depth beyond it, additionally instantiate `templates/ARCH_MODULE.md` as `artifacts/architecture/module-{slug}.md` and/or `templates/ARCH_DATA_SCHEMA.md` as `artifacts/architecture/schema-{slug}.md`, and link them from the milestone document.
 3. Define module boundaries, data schemas, cross-module contracts, and data flows.
 4. Reference existing architecture artifacts in `artifacts/architecture/` for consistency and name any new dependencies in the Decisions Log.
 
@@ -106,11 +108,11 @@ Input to pass: the milestone definition and the task breakdown from Stage 1 (the
 
 If the project installed no `ui` agent (a backend/CLI adoption that opted out of the UI role), skip this stage entirely and note the skip in the stage checkpoint entry (`- agent-plan | progress | Stage 2b skipped: no ui agent installed`); downstream stages then run without a UI specification.
 
-Both Architecture and UI must complete before Stage 3 begins.
+**Stage trigger:** Stage 3 (both 3a and 3b) starts only after **both** Architecture (Stage 2a) and UI (Stage 2b) have completed — Stage 3b's input includes the UI spec. (If Stage 2b was skipped because no `ui` agent is installed, Stage 3 starts when Architecture completes.)
 
 ### Stage 3a — Security
 
-After Architecture completes, launch the **security** agent to:
+After both Architecture and UI have completed (the Stage 3 trigger above), launch the **security** agent to:
 
 1. Read the architecture document and milestone definition.
 2. Identify vulnerabilities, insecure patterns, and risky dependencies introduced by the milestone.
@@ -130,20 +132,20 @@ In parallel with Security, launch the **performance** agent to:
 
 Input to pass: the milestone definition, architecture document, and UI specification.
 
-Both Security and Performance must complete before Stage 4 begins. If either requires architectural changes, return to Stage 2a for revision and re-run Stage 3 on the revised architecture.
+**Stage trigger:** Stage 4 starts only after **both** Stage 3 reviews (Security and Performance) have completed. If either requires architectural changes, return to Stage 2a for revision and re-run Stage 3 on the revised architecture.
 
 ### Stage 4 — CEO Final Review
 
-After Security, Performance, and UI have all completed, launch the **ceo** agent to:
+After both Stage 3 reviews (Security and Performance) have completed (the Stage 4 trigger above), launch the **ceo** agent to:
 
 1. Read every Stage 1–3 artifact: milestone definition, task breakdown, architecture document, UI specification, security findings, and performance findings.
-2. Produce the review using `templates/CEO_REVIEW.md` as the template — copy it, fill in every section, and list all six inputs reviewed by path.
+2. Produce the review using `templates/CEO_REVIEW.md` as the template — copy it, fill in every section, and list all six inputs reviewed by path. (In a no-ui run, the UI Spec input row and Section 3 read "N/A — no ui agent installed", per the template.)
 3. Save the review to `artifacts/reviews/ceo-review-milestone-{N}.md`.
-4. Produce a verdict: **APPROVED**, **APPROVED WITH CONDITIONS**, or **REVISION REQUIRED**.
+4. Produce a verdict — **APPROVED**, **APPROVED WITH CONDITIONS**, or **REVISION REQUIRED** — recorded as the review's single `**Verdict**:` line with exactly one of the three strings, per `templates/CEO_REVIEW.md`. This skill's revision handling and `/agent-code`'s Pre-Flight both parse that `**Verdict**:` line.
 
 Input to pass: all artifacts from Stages 1–3, and the template `templates/CEO_REVIEW.md`.
 
-**If REVISION REQUIRED**: the CEO's Revision Requests identify which agent owns each change. Re-run the affected stage with the revision notes, then re-run the CEO review on the revised plan. Planning does not advance until the CEO issues APPROVED or APPROVED WITH CONDITIONS. **Revision cap:** allow at most 3 revision cycles (one cycle = re-running the affected stages plus one CEO re-review). If the third cycle still ends in REVISION REQUIRED, stop the run and escalate to the user with a summary of the unresolved objections — do not keep looping.
+**If REVISION REQUIRED** (read from the review's `**Verdict**:` line): the CEO's Revision Requests identify which agent owns each change. Re-run the affected stage with the revision notes. If the revision touched the architecture — a Stage 2a re-run, or a UI revision that changes the architecture — re-run Stage 3 (Security and Performance) on the revised plan **before** the CEO re-review, so the CEO never re-reviews against stale security or performance findings. Then re-run the CEO review on the revised plan. Planning does not advance until the CEO issues APPROVED or APPROVED WITH CONDITIONS. **Revision cap:** allow at most 3 revision cycles (one cycle = re-running the affected stages plus one CEO re-review). If the third cycle still ends in REVISION REQUIRED, stop the run and escalate to the user with a summary of the unresolved objections — do not keep looping.
 
 **After any approval-level verdict**: launch the **product** agent to backfill the **CEO Approval Conditions** table in `artifacts/milestones/milestone-{N}-{slug}-tasks.md` (the table is defined by `templates/MILESTONE_TASKS.md`) — one row per condition with its source and Status Open, or a single "None — verdict was APPROVED" row. `/agent-code` reads the conditions from that table (its Pre-Flight may still cross-check them against the CEO review); Coder tracks them during engineering and Reviewer and Product verify them on completion.
 

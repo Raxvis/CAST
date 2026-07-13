@@ -12,7 +12,12 @@
   - Add a row to the Summary table for each task in this milestone.
   - Copy the Task Template block for each task and fill in all fields.
   - Task IDs should follow a consistent format (e.g., M2-T01, M2-T02).
-  - Status values: Not Started / In Progress / Blocked / Complete / Deferred.
+  - Status values: Not Started / In Progress / Blocked / Complete / Deferred. Deferred is
+    a held-open state, not terminal: /agent-code Task Selection skips Deferred tasks (as it
+    does Complete ones), the milestone-completion checkpoint fires when every task is
+    Complete or Deferred, and Product re-triages Deferred tasks at that checkpoint and at
+    the next /agent-plan Stage 1. A milestone with Deferred tasks completes as "Complete
+    with Deferrals" (see MILESTONE_COMPLETION.md), listing them under Known Issues.
   - Needs Arch Doc / Needs UI Spec live ONLY in each task's per-task field table
     (Yes / No / Done → link) — they are deliberately not repeated in the Summary table.
   - Dependencies: List task IDs that must be complete before this task can start, or "None".
@@ -40,7 +45,7 @@
 | Field | Value |
 |-------|-------|
 | **Definition** | see `milestone-[M#]-[slug].md` |
-| **Status** | Not Started / In Progress / Blocked / Complete |
+| **Status** | Not Started / In Progress / Blocked / Complete / Deferred |
 | **Requirements Reference** | [REQUIREMENTS_REFERENCE] |
 
 ---
@@ -53,6 +58,8 @@
 | [M#-T02] | [Task name] | Not Started | [M#-T01] |
 | [M#-T03] | [Task name] | Not Started | [M#-T01] |
 | [M#-T04] | [Task name] | Not Started | [M#-T02], [M#-T03] |
+
+_Status values (Summary and per-task tables): Not Started / In Progress / Blocked / Complete / Deferred._
 
 ---
 
@@ -74,7 +81,7 @@ _Filled after the CEO verdict. Coder tracks each condition during engineering; R
 
 | Field | Value |
 |-------|-------|
-| **Status** | Not Started / In Progress / Blocked / Complete |
+| **Status** | Not Started / In Progress / Blocked / Complete / Deferred |
 | **Dependencies** | None / [Task IDs] |
 | **Needs Arch Doc** | Yes / No / Done → `[link or filename]` |
 | **Needs UI Spec** | Yes / No / Done → `[link or filename]` |
@@ -99,7 +106,7 @@ _Filled after the CEO verdict. Coder tracks each condition during engineering; R
 
 | Field | Value |
 |-------|-------|
-| **Status** | Not Started / In Progress / Blocked / Complete |
+| **Status** | Not Started / In Progress / Blocked / Complete / Deferred |
 | **Dependencies** | [M#-T01] |
 | **Needs Arch Doc** | Yes / No / Done → `[link or filename]` |
 | **Needs UI Spec** | Yes / No / Done → `[link or filename]` |
@@ -124,7 +131,7 @@ _Filled after the CEO verdict. Coder tracks each condition during engineering; R
 
 | Field | Value |
 |-------|-------|
-| **Status** | Not Started / In Progress / Blocked / Complete |
+| **Status** | Not Started / In Progress / Blocked / Complete / Deferred |
 | **Dependencies** | [M#-T01] |
 | **Needs Arch Doc** | Yes / No / Done → `[link or filename]` |
 | **Needs UI Spec** | Yes / No / Done → `[link or filename]` |
@@ -149,7 +156,7 @@ _Filled after the CEO verdict. Coder tracks each condition during engineering; R
 
 | Field | Value |
 |-------|-------|
-| **Status** | Not Started / In Progress / Blocked / Complete |
+| **Status** | Not Started / In Progress / Blocked / Complete / Deferred |
 | **Dependencies** | [M#-T02], [M#-T03] |
 | **Needs Arch Doc** | Yes / No / Done → `[link or filename]` |
 | **Needs UI Spec** | Yes / No / Done → `[link or filename]` |

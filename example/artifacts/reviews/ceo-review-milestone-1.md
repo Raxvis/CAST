@@ -102,8 +102,8 @@
 
 ## Verdict
 
-- [ ] **APPROVED**
-- [x] **APPROVED WITH CONDITIONS** — Milestone may proceed. Coder must satisfy the Approval Conditions above; Reviewer and Product verify on completion.
-- [ ] **REVISION REQUIRED**
+**Verdict**: APPROVED WITH CONDITIONS
+
+Milestone may proceed. Coder must satisfy the Approval Conditions above; Reviewer and Product verify on completion.
 
 **Verdict Notes**: The plan is coherent, appropriately scoped, and internally consistent across Product, Architecture, and UI. Every finding raised by Security and Performance has a concrete inline remediation that fits inside the existing task list — none require rework of the architecture or UI documents. Returning the plan to the owning agents for revision would add a round-trip without changing the substance of the work Coder will do. Conditional approval is the faster, cleaner path: Coder carries the three conditions forward as explicit checklist items during `/agent-code`, Reviewer gates the first two on merge, and Product gates the third during milestone validation. Engineering may begin.

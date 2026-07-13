@@ -26,19 +26,21 @@ This file is the single canonical schema for bug entries. All agents file, updat
 
 **Status flow**: `New → Triaged → In Progress → Fixed → Verified → Closed`
 
-**Terminal states** (may be set instead of continuing the flow): `Cannot Reproduce` / `Duplicate` / `Won't Fix` / `Deferred`
+**Terminal states**: `Closed` / `Won't Fix` / `Duplicate` / `Cannot Reproduce` — once set, the entry never advances again. `Won't Fix` is the status a "Not a Bug" triage outcome maps to, and always carries a rationale in Notes.
+
+**Deferred is an OPEN held state, not terminal.** A Deferred bug stays open until Product re-triages it — which happens at every `/agent-code` milestone-completion checkpoint and at `/agent-plan` Stage 1 — and either schedules it (back into the flow), re-defers it with an updated rationale, or closes it as `Won't Fix`.
 
 **Severity**: `Critical` (product unusable or data at risk, no workaround) / `High` (major feature broken or wrong output; workaround cumbersome) / `Medium` (edge-case misbehavior; straightforward workaround) / `Low` (cosmetic or textual; no functional impact)
 
 **Frequency**: `Always` / `Intermittent — N of M` / `Observed once` / `Unknown`
 
-**Field ownership** — who writes what, and when:
+**Field ownership** — who writes what, and when. This table is **canonical**: agent files and pipeline skills cite it rather than restating status ownership.
 
 | Owner | Writes | Status set |
 |---|---|---|
-| **Bug Gatherer** | Files the initial entry: ID, Description, Expected, Actual, Steps to Reproduce, Platform, Frequency, Evidence, Likely Files, Regression, Related Issues, initial Severity | `New` |
-| **Product** | Triages: sets final Severity, accepts/rejects/defers | `Triaged` (or `Won't Fix` / `Duplicate` / `Deferred`) |
-| **Debugger** | Investigation fields: Root Cause, Affected Module(s), Alternative Solutions, Recommended Fix, Assigned To, Investigation Date | `In Progress` |
+| **Bug Gatherer** | Files the initial entry: ID, Description, Expected, Actual, Steps to Reproduce, Platform, Frequency, Evidence, Likely Files, Regression, Related Issues, initial Severity | `New` (or `Duplicate` at filing, when the report duplicates an existing entry — cite the original ID in Related Issues) |
+| **Product** | Triages: sets final Severity, accepts/rejects/defers; re-triages `Deferred` entries at `/agent-code` milestone completion and `/agent-plan` Stage 1 | `Triaged` (or `Won't Fix` / `Deferred`) |
+| **Debugger** | Investigation fields: Root Cause, Affected Module(s), Alternative Solutions, Recommended Fix, Assigned To, Investigation Date | `In Progress` (or `Cannot Reproduce` after an investigation that fails to reproduce the bug) |
 | **Coder** | Resolution fields at fix time: Commit, Files Changed, Regression Notes | `Fixed` |
 | **Tester / Product** | Tester confirms the fix; Product signs off | `Verified` → `Closed` |
 

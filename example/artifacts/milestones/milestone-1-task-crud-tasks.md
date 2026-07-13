@@ -13,25 +13,26 @@
 
 | Field | Value |
 |-------|-------|
-| **Goal** | Deliver a working CLI that can add, list, complete, and delete tasks backed by SQLite. |
+| **Definition** | see `milestone-1-task-crud.md` |
 | **Status** | Complete |
 | **Requirements Reference** | `docs/PRD.md` §3 (Core CRUD), §5 (Persistence) |
-| **Milestone Definition** | `artifacts/milestones/milestone-1-task-crud.md` |
 | **CEO Review** | `artifacts/reviews/ceo-review-milestone-1.md` |
 
 ---
 
 ## Summary
 
-| Task ID | Task Name | Status | Dependencies | Needs Arch Doc | Needs UI Spec |
-|---------|-----------|--------|--------------|----------------|---------------|
-| T-1 | Task type, schema, migration runner | Complete | None | Done | No |
-| T-2 | `add` command | Complete | T-1 | Done | Done |
-| T-3 | `list` command | Complete | T-1 | Done | Done |
-| T-4 | `done` + `delete` commands | Complete | T-1 | Done | Done |
-| T-5 | CLI argument parser wiring | Complete | T-2, T-3, T-4 | Done | Done |
+| Task ID | Task Name | Status | Dependencies |
+|---------|-----------|--------|--------------|
+| T-1 | Task type, schema, migration runner | Complete | None |
+| T-2 | `add` command | Complete | T-1 |
+| T-3 | `list` command | Complete | T-1 |
+| T-4 | `done` + `delete` commands | Complete | T-1 |
+| T-5 | CLI argument parser wiring | Complete | T-2, T-3, T-4 |
 
-Dependency graph: T-1 blocks T-2/T-3/T-4 (parallel), which all block T-5.
+_Status values (Summary and per-task tables): Not Started / In Progress / Blocked / Complete / Deferred. Deferred is a held-open state — Product re-triages Deferred tasks at the milestone-completion checkpoint and at the next `/agent-plan` Stage 1._
+
+Dependency graph: T-1 blocks T-2/T-3/T-4 (parallel), which all block T-5. Needs Arch Doc / Needs UI Spec live only in each task's per-task field table below.
 
 ---
 

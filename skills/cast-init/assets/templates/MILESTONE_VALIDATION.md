@@ -1,17 +1,23 @@
 <!-- TEMPLATE INSTRUCTIONS
   FILE: MILESTONE_VALIDATION.md
-  PURPOSE: Validation record template, used at two grains by the Product Agent:
-           - Per task: copy the "Task Validation Checklist" section for each task the
-             Product Agent validates during /agent-code or /agent-task (Step 4).
-           - Per milestone: fill the whole document to formally verify that a
-             milestone's requirements have been met before marking it complete.
+  PURPOSE: Milestone validation record template. The document instance is milestone-grain
+           only: the Product Agent fills the whole document once, at the /agent-code
+           milestone-completion checkpoint, to formally verify that the milestone's
+           requirements have been met.
+           The "Task Validation Checklist" section also serves a second, lighter use:
+           during /agent-code Step 4 (Product validation) Product applies it to each task
+           as *criteria* only — the per-task outcome is recorded as the task's Status in
+           the milestone tasks file plus a `progress` entry in artifacts/STANDUP.md, and
+           NO per-task document is created. (/agent-task validates against the task
+           description instead and does not use this template.)
 
   HOW TO CUSTOMIZE:
   - Replace [PROJECT_NAME] with your project name.
   - Replace [MILESTONE_NAME] with the specific milestone being validated (e.g., "M2: Core Loop").
   - Replace [VALIDATOR] with the name or role of the person or agent conducting the validation.
-  - Duplicate the Task Validation Checklist section once per validated task; fill in every
-    field and do not skip sections.
+  - In the milestone-grain instance, duplicate the Task Validation Checklist section once
+    per validated task; fill in every field and do not skip sections. (Mid-milestone, the
+    checklist is applied as criteria only — see PURPOSE above; no per-task instance.)
   - Fill in the Milestone Validation Checklist with the specific acceptance criteria for
     this milestone.
   - Rename the "User Validation Feedback Log" section to match your review process
@@ -57,7 +63,7 @@
 
 ## Task Validation Checklist (required)
 
-_Duplicate this section for each task validated by the Product Agent. Fill in every field. Do not skip sections._
+_Duplicate this section for each task validated by the Product Agent. Fill in every field. Do not skip sections. (This section also defines the criteria Product applies per task at Step 4 mid-milestone — there, the outcome goes into the tasks file's Status plus a STANDUP `progress` entry; no per-task document is produced.)_
 
 ### Task Validation: [TASK_NAME]
 
@@ -215,6 +221,8 @@ _Duplicate a checklist block for each major feature area._
 | ID | Description | Severity | Owner | Target Date |
 |----|-------------|----------|-------|------------|
 | | | | | |
+
+_Deferred items that Product re-triaged at the milestone-completion checkpoint and kept Deferred do NOT belong here and do not block closing the milestone — they are listed under Known Issues in the completion report ("Complete with Deferrals") and are re-triaged again at the next `/agent-plan` Stage 1._
 
 ---
 

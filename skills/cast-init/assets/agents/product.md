@@ -116,13 +116,15 @@ Every milestone file written under `artifacts/milestones/` must include the `## 
 ## Interaction Rules
 
 - Product reviews Coder's completed work using the Task Validation Checklist in `templates/MILESTONE_VALIDATION.md`.
-- Product triages every bug report Bug Gatherer files, with one of three outcomes: **Fix Now** (Debugger investigates the triaged report, then Coder fixes; loop continues), **Defer** (report stays open in `artifacts/BUGS.md` with status Deferred; allowed only if the defect does not violate the task's acceptance criteria; the task proceeds), or **Not a Bug** (closed with rationale).
+- Product triages every bug report Bug Gatherer files, with one of three outcomes: **Fix Now** (Debugger investigates the triaged report, then Coder fixes; loop continues), **Defer** (report stays open in `artifacts/BUGS.md` with status Deferred; allowed only if the defect does not violate the task's acceptance criteria; the task proceeds), or **Not a Bug** (status Won't Fix with rationale).
+- **Deferred re-triage duty**: Deferred is an open held state, not terminal. Product re-triages every Deferred bug at `/agent-code` milestone completion and again when planning the next milestone in `/agent-plan` Stage 1 — each re-triage ends in Fix Now (schedule it), Defer again (with rationale), or Won't Fix (with rationale).
 - Product must cite a specific criterion when rejecting work — "doesn't feel right" is not sufficient.
 - Product escalates unresolved conflicts with Architecture or UI to Validator.
 - Product publishes milestone definitions before Architecture or Coder begin work on that milestone.
+- When your work changes something documentation-worthy — a requirement, acceptance criterion, convention, or user-facing behavior — append `- product | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
 
 ---
 
 ## State
 
-Live state lives in `artifacts/AGENT_STATE.md` → `## product` (Current Work, Review Queue, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.
+Live state lives in `artifacts/AGENT_STATE.md` → `## product` (Current Work, Review Queue, Decisions Log, Future Work). Read that section on activation. Logs are append-only — append new rows, never rewrite history; current-state cells (dashboards, status columns, % done) update in place. Log decisions per the format defined there.

@@ -28,7 +28,7 @@ Files that were written directly (typically `docs/`, `templates/`, `artifacts/`,
 
 As each planned action is executed (in 5.2 through 5.9), check it off in `artifacts/adoption-plan.md` — mark the action's entry (e.g. prefix with `[x]` or append `— DONE`) immediately after the write lands, not in a batch at the end. The ledger is what makes an interrupted adoption resumable: the 5.1 resume path re-verifies checked actions instead of re-planning from scratch.
 
-**Abort and recovery.** Because the 5.1 preflight guarantees a clean tree, aborting mid-Phase-5 is always recoverable: `git checkout -- <touched paths>` plus `git clean -fd <touched paths>` restores the pre-adoption tree. Keep the three adoption files (`artifacts/adoption-inventory.md`, `adoption-plan.md`, `adoption-report.md`) out of the cleanup — they are exempt from the preflight and hold the ledger a later resume needs. In a non-git project there is no such safety net, which is why the preflight requires explicit confirmation there.
+**Abort and recovery.** Because the 5.1 preflight guarantees a clean tree, aborting mid-Phase-5 is always recoverable — but note that `git mv`/`git rm` stage their changes to the index, and `git checkout -- <paths>` restores *from* the index, so it cannot undo them. Use instead: `git restore --source=HEAD --staged --worktree <touched paths>` for every tracked path the run touched (including the sources and destinations of any `git mv` and the targets of any `git rm` — this resets both index and worktree to HEAD), then `git clean -fd <touched paths>` to remove files the run created. Keep the three adoption files (`artifacts/adoption-inventory.md`, `adoption-plan.md`, `adoption-report.md`) out of the cleanup — they are exempt from the preflight and hold the ledger a later resume needs. In a non-git project there is no such safety net, which is why the preflight requires explicit confirmation there.
 
 ## 5.1 — Preflight
 
@@ -46,7 +46,7 @@ Verify:
 Most greenfield adoptions are dominated by **Create** actions with no merge work. Do not read-and-retype those files one at a time. Instead:
 
 1. Copy the payload subtrees mechanically with shell (`cp -R "<CAST_SOURCE>/docs/." docs/` etc., or per-file `cp` driven by the plan's Create list). This is permitted: the safety rule forbids executing the *target project's* code, not using the shell to copy CAST's own payload files.
-2. Run **one substitution pass** over the copied files, replacing every token listed in 5.4.2 with its inventory value (e.g. a scripted find-and-replace per token).
+2. Run **one substitution pass** over the copied files, replacing every token listed in 5.4.2 with its inventory value (e.g. a scripted find-and-replace per token). The pass must also cover the tokens introduced outside 5.4.2: `[MAX_LOOP_COUNT]` (default 3 — see 5.5.2 and the 5.6.1 note on `docs/PIPELINE_LOOP.md`) and the `[YYYY-MM-DD]` "Last updated" token in installed README files, which is replaced with the install date per 5.6.6.
 3. Run **one scaffolding-strip pass** over the copied files per the global strip rule (skip the `templates/*` skeletons).
 4. Spot-check one file per class (an agent, a pipeline skill, a doc) to confirm substitution and strip landed, then rely on Phase 6 validation for full coverage.
 
@@ -100,7 +100,7 @@ After completing the loop, **re-enumerate the 15 names and confirm each `.claude
 - "Project Glossary"
 - Agent-specific workflow appendices
 
-Place preserved custom sections after the Future Work section, under a new H2 heading `## Custom Extensions (preserved from pre-CAST version)`.
+Place preserved custom sections in a `## Project Customizations (preserved)` section appended at the **end of the agent file**, after all standard sections. (Do not look for a "Future Work" section to anchor on — post-1.2 agent files no longer carry one; the state tables migrated to `artifacts/AGENT_STATE.md`.)
 
 ## 5.5 — Install pipeline skills
 
@@ -114,7 +114,7 @@ For each of `agent-plan`, `agent-code`, `agent-task`:
 
 ## 5.5a — Execute approved Deletes
 
-Execute every Delete action the user explicitly approved in Phase 4 — most commonly the superseded pre-1.0 command files at `.claude/commands/<name>.md` left behind by the 5.5.5 migration. Use `git rm` (plain `rm` in a non-git project) and check each executed Delete off in the plan ledger. Never execute a Delete that lacks explicit approval; in unattended mode Deletes were downgraded to flagged TODOs, so this step is a no-op there. Run this step before validation — Phase 6 check 3 fails if superseded command files remain.
+Execute every Delete action the user explicitly approved in Phase 4 — most commonly the superseded pre-1.0 command files at `.claude/commands/<name>.md` left behind by the 5.5.5 migration. Use `git rm` (plain `rm` in a non-git project) and check each executed Delete off in the plan ledger. Never execute a Delete that lacks explicit approval; in unattended mode Deletes were downgraded to flagged TODOs, so this step is a no-op there. Run this step before validation — Phase 6 check 3 (pipeline skills / superseded command files) fails if superseded command files remain without a recorded decision (in unattended mode the downgraded-Delete TODO in the report is that record, and check 3 passes).
 
 ## 5.6 — Install reference docs and templates
 
@@ -124,7 +124,7 @@ For each CAST reference doc and document template in the plan:
 2. For **Rename + Update**: read the existing file first, preserve all non-template content (e.g., an existing PRD with real requirements) as the body, update only the header and any CAST-specific framing.
 3. For **Update in place**: same as Rename + Update but without moving the file.
 4. Always install `docs/FILE_CONVENTIONS.md` — it's load-bearing for the docs/templates/artifacts split enforcement.
-5. The `templates/*` skeletons (architecture, UI spec, milestone, CEO review, and UX review templates — every `templates/*` file except `README.md`) install verbatim into the project's top-level `templates/` directory. Create the directory if it does not exist. `templates/README.md` also installs, but as documentation — with placeholder substitution and the scaffolding strip applied, per its disposition row.
+5. The `templates/*` skeletons (architecture, UI spec, milestone, milestone-retrospective, CEO review, and UX review templates — every `templates/*` file except `README.md`, eleven skeletons in all) install verbatim into the project's top-level `templates/` directory. Create the directory if it does not exist. `templates/README.md` also installs, but as documentation — with placeholder substitution and the scaffolding strip applied, per its disposition row.
 6. In installed README files (`docs/README.md`, `templates/README.md`, `artifacts/README.md`), replace any `[YYYY-MM-DD]` "Last updated" token with the install date.
 
 ## 5.7 — Install artifacts scaffold
@@ -151,7 +151,7 @@ Special handling because `CLAUDE.md` is where user project identity lives.
 
 After every file is written:
 
-1. Scan all installed files for remaining `[UPPER_SNAKE_CASE]` tokens using grep: `grep -rEn '\[[A-Z][A-Z0-9_]+\]' --include='*.md'`
+1. Scan all installed files for remaining `[UPPER_SNAKE_CASE]` tokens using grep: `grep -rEn '\[[A-Z][A-Z0-9_]+\]' --include='*.md' --exclude-dir=cast-init` (the exclusion keeps a project-local cast-init install's own payload out of the scan — same rule as Phase 6 check 1)
 2. For each remaining token, check whether it corresponds to something in the Phase 1 inventory. If yes, substitute. If no, leave it for the user and note it in the Phase 7 report.
 3. Do not guess values. If the inventory didn't find a project name, don't make one up.
 
@@ -165,9 +165,9 @@ When merging an existing agent file with a CAST template:
 
 1. **Frontmatter**: use CAST's YAML (name, description, model tier). If the existing file has a custom model pin that the user explicitly chose, keep it and note the divergence from CAST defaults in the adoption report.
 2. **Standard sections** (Purpose, Goals, Authority, Inputs, Outputs, Interaction Rules, Templates, State): use CAST's content as the base structure. If the existing file has additional bullets or custom rules inside these sections, merge them as additional bullets at the end of the relevant section.
-3. **Custom appendix sections**: preserve verbatim, placed after the standard sections under `## Custom Extensions (preserved from pre-CAST version)`.
+3. **Custom appendix sections**: preserve verbatim, placed in the `## Project Customizations (preserved)` section appended at the end of the agent file (see 5.4).
 4. **Tables in Inputs/Outputs**: if the user has added rows, keep them. If CAST has rows the user's file lacks, add them. Never remove a row the user added.
-5. **Decisions Log**: always preserve every existing entry — populated rows move to the agent's section in `artifacts/AGENT_STATE.md` (see 5.7). Add a new row noting the CAST adoption: `<date> | Adopted CAST template | N/A | Structure now matches canonical CAST <version> |`. For `<version>`, use the version from this skill's frontmatter (`metadata.version` at the top of SKILL.md). Never hard-code a version number in this row.
+5. **Decisions Log**: always preserve every existing entry — populated rows move to the agent's section in `artifacts/AGENT_STATE.md` (see 5.7). Then add a new row to that agent's **Decision Log section in `artifacts/AGENT_STATE.md`** (not to the agent file — post-1.2 agent files carry no log tables) noting the CAST adoption: `<date> | Adopted CAST template | N/A | Structure now matches canonical CAST <version> |`. For `<version>`, use the version from this skill's frontmatter (`metadata.version` at the top of SKILL.md). Never hard-code a version number in this row.
 
 ## CLAUDE.md
 

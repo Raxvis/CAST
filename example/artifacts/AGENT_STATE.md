@@ -13,7 +13,8 @@ Live working state for every agent. Agents read their own section on activation 
 | Task | Milestone | Status | Notes |
 |---|---|---|---|
 | Milestone 1 definition + task breakdown (T-1 – T-5) | M1 | Complete | `milestone-1-task-crud.md`, `-tasks.md` |
-| Milestone 1 validation against acceptance criteria | M1 | Complete | All criteria met; completion record written 2026-04-10 |
+| Milestone 1 validation against acceptance criteria | M1 | Complete | Validation record `milestone-1-task-crud-validation.md` (Approved with Notes); completion record written 2026-04-10 (Complete with Deferrals) |
+| Deferred re-triage at M1 completion checkpoint | M1 | Complete | BUG-002 held Deferred into M2; re-triage again at M2 `/agent-plan` Stage 1 |
 
 ### Review Queue
 
@@ -26,6 +27,7 @@ Live working state for every agent. Agents read their own section on activation 
 | Date | Decision | Rationale | Impact |
 |---|---|---|---|
 | 2026-04-10 | Defer BUG-002 to Milestone 2 | Does not affect correctness of normal flows; usability papercut | M2 gains an error-signaling task (`done`/`delete` on missing ID) |
+| 2026-04-10 | Hold BUG-002 Deferred at the M1 completion re-triage | Rationale unchanged since triage the same day; fix pairs naturally with the M2 error-signaling task | M1 closes as "Complete with Deferrals"; BUG-002 stays open in `BUGS.md` pending M2 Stage 1 re-triage |
 | 2026-04-10 | Close BUG-001 at milestone sign-off | Condition 3 remediation verified by fresh-install test | First-run path covered by regression checklist items 1–2 |
 
 ### Future Work
@@ -80,6 +82,7 @@ _Index of every architecture document produced, with its status._
 | Task | Milestone | Status | Notes |
 |---|---|---|---|
 | Milestone 1 UI spec (command surfaces) | M1 | Complete | `artifacts/ui-specs/ui-milestone-1.md` |
+| Milestone 1 UX review (implemented command surface) | M1 | Complete | `artifacts/reviews/ux-review-milestone-1.md` — APPROVED WITH NOTES (BUG-002 noted) |
 
 ### Screen Specifications
 
@@ -388,8 +391,10 @@ _All new files created by Coder. Supports Architecture review and documentation.
 
 | Document | Triggered By | Action (Created / Updated) | Status | Date | Notes |
 |---|---|---|---|---|---|
-| `CLAUDE.md` Common Pitfalls + Persistence sections | Task-completion checkpoint (T-3) | Updated | Done | 2026-04-09 | First-run migration behaviour documented from BUG-001 |
-| `docs/` sweep for M1 close | Milestone-completion checkpoint | Updated | Done | 2026-04-10 | Drained the `docs:` queue in `STANDUP.md`; no items remained |
+| `docs/GLOSSARY.md` (migration runner, WAL mode, `schema_version`) + `CLAUDE.md` Domain-Specific Patterns (stdout/stderr + exit codes) | Task-completion checkpoint (T-1) | Updated | Done | 2026-04-09 | Drained 2 `docs` entries queued during the planning session (architect, ui) |
+| `CLAUDE.md` Common Pitfalls + Persistence sections | Task-completion checkpoint (T-3) | Updated | Done | 2026-04-09 | Drained 1 `docs` entry (coder); first-run migration behaviour documented from BUG-001 |
+| `CLAUDE.md` Architecture section (`src/cli.ts` dispatch flow) | Task-completion checkpoint (T-5) | Updated | Done | 2026-04-10 | Drained 1 `docs` entry (coder) |
+| `docs/` sweep for M1 close | Milestone-completion checkpoint | Verified | Done | 2026-04-10 | Milestone drain of the `docs` queue in `STANDUP.md`: no pending entries remained (all 4 ✅ marks applied at task checkpoints) |
 
 ### Decisions Log
 
@@ -434,6 +439,7 @@ _All new files created by Coder. Supports Architecture review and documentation.
 | Task | Status | Notes |
 |---|---|---|
 | M1 process check at milestone close | Complete | No violations; all handoffs followed the loop |
+| M1 retrospective | Complete | `artifacts/reviews/retrospective-milestone-1.md` — metrics filled from the tasks-file Summary, this file's validator tables, the arch/UI revision histories, and the `STANDUP.md` session dates |
 
 ### Conflicts
 

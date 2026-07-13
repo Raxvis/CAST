@@ -93,11 +93,12 @@ The Reviewer Agent may NOT:
 - Reviewer reviews every change the Coder or Refactor submits — no code bypasses review.
 - Reviewer must cite the specific standard, document, or convention that a piece of code violates when requesting changes.
 - When Reviewer finds a defect, it routes to Bug Gatherer, which files the structured report (status New) for Product triage. Reviewer does not route defects to Debugger — Debugger activates only when Product triages a defect as **Fix Now**.
-- Reviewer treats a version as clean when no Fix Now defects remain open. Defects Product has marked **Deferred** or **Not a Bug** do not block a clean verdict.
+- Reviewer treats a version as clean when no Fix Now defects remain open. Defects Product has marked **Deferred** (which stay open, held for Product's re-triage sweeps) or **Won't Fix** (the "Not a Bug" triage outcome) do not block a clean verdict.
 - When Reviewer identifies structural issues, it may recommend Refactor involvement.
 - Reviewer does not negotiate with Coder — it states the issue, the standard, and the required fix.
 - Reviewer is the primary owner of code quality assessment. Tester owns test coverage; Reviewer owns everything else (conventions, architecture adherence, style, correctness).
 - If Reviewer and Architecture both review code for architecture adherence, Architecture has final say on design questions. Reviewer defers to Architecture on module boundary disputes.
+- When your work changes something documentation-worthy — a quality standard, convention, or review policy — append `- reviewer | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
 
 ---
 
@@ -132,4 +133,4 @@ _These items are owned by Architecture (see architect.md); Reviewer applies them
 
 ## State
 
-Live state lives in `artifacts/AGENT_STATE.md` → `## reviewer`. Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.
+Live state lives in `artifacts/AGENT_STATE.md` → `## reviewer`. Read that section on activation. Logs are append-only — append new rows, never rewrite history; current-state cells (dashboards, status columns, % done) update in place. Log decisions per the format defined there.

@@ -116,7 +116,7 @@ artifacts/
     retrospective-milestone-{N}.md         # Milestone retrospective (Validator)
 ```
 
-Subdirectories are created the first time an artifact of that type is produced. Do not create empty subdirectories.
+The four `artifacts/` subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`) are pre-created empty by `/cast-init` so the expected structure exists from day one; they fill up during `/agent-plan` and `/agent-code` runs. Do not create additional subdirectories beyond these without updating this file and `artifacts/README.md`.
 
 ---
 
@@ -149,7 +149,7 @@ Templates live in `templates/` and are copied — never filled in place — to p
 | Template | Instance Destination |
 |---|---|
 | `templates/ARCH_MODULE.md` | `artifacts/architecture/module-{slug}.md` |
-| `templates/ARCH_SYSTEM.md` | `artifacts/architecture/system-{slug}.md` |
+| `templates/ARCH_SYSTEM.md` | `artifacts/architecture/arch-milestone-{N}.md` (the milestone architecture document) or `system-{slug}.md` |
 | `templates/ARCH_DATA_SCHEMA.md` | `artifacts/architecture/schema-{slug}.md` |
 | `templates/UI_SPEC.md` | `artifacts/ui-specs/ui-milestone-{N}.md`, `screen-{slug}.md`, or `component-{slug}.md` |
 | `templates/MILESTONE_DEFINITION.md` | `artifacts/milestones/milestone-{N}-{slug}.md` |
@@ -178,8 +178,8 @@ Templates live in `templates/` and are copied — never filled in place — to p
 
 Two naming patterns are valid:
 
-- `arch-milestone-{N}.md` — architecture document covering an entire milestone (written by `/agent-plan`).
-- `module-{slug}.md`, `system-{slug}.md`, `schema-{slug}.md` — module-, system-, or schema-scoped specs.
+- `arch-milestone-{N}.md` — architecture document covering an entire milestone (written by `/agent-plan`). This file is an **instance of `templates/ARCH_SYSTEM.md`** — that template defines its required headings.
+- `module-{slug}.md`, `system-{slug}.md`, `schema-{slug}.md` — module-, system-, or schema-scoped specs. `templates/ARCH_MODULE.md` and `templates/ARCH_DATA_SCHEMA.md` produce supplementary `module-{slug}.md` / `schema-{slug}.md` instances when a milestone needs module- or schema-level depth beyond the milestone document.
 
 ### UI Artifacts (`artifacts/ui-specs/`)
 
@@ -223,7 +223,7 @@ Two naming patterns are valid:
 | Adding a release changelog entry | Release appends to `docs/CHANGELOG.md` |
 | Creating any new reference doc | Docs Writer registers it in `docs/README.md` |
 
-**`/agent-task` scope note.** `/agent-task` is bounded to `artifacts/STANDUP.md`, `artifacts/BUGS.md`, and `artifacts/AGENT_STATE.md` updates. It does **not** write to `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, or `artifacts/reviews/` — those directories are owned by `/agent-plan` and `/agent-code` outputs. If a one-off task turns out to need any of those, `/agent-task` halts and instructs the user to run `/agent-plan` first. See `TROUBLESHOOTING.md` for the full decision table on which command to use.
+**`/agent-task` scope note.** `/agent-task` is bounded to `artifacts/STANDUP.md`, `artifacts/BUGS.md`, and `artifacts/AGENT_STATE.md` updates. It does **not** write to `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, or `artifacts/reviews/` — those directories are owned by `/agent-plan` and `/agent-code` outputs. If a one-off task turns out to need any of those, `/agent-task` halts and instructs the user to run `/agent-plan` first. See the CAST repo's [`TROUBLESHOOTING.md`](https://github.com/Raxvis/CAST/blob/main/TROUBLESHOOTING.md) for the full decision table on which command to use.
 
 ---
 
@@ -258,7 +258,7 @@ This block is mandatory for planning-stage artifacts produced by `/agent-plan`. 
 The following behaviors violate these conventions. Do not do them:
 
 - **Writing work artifacts to `docs/`.** Bug reports, milestone plans, CEO reviews, and session logs do not belong in `docs/`. They go in `artifacts/`.
-- **Writing reference material to `artifacts/`.** Coding conventions, glossaries, templates, and design rationale do not belong in `artifacts/`. They go in `docs/`.
+- **Writing reference material to `artifacts/`.** Coding conventions, glossaries, and design rationale do not belong in `artifacts/` — they go in `docs/`. Document templates do not belong there either — they go in `templates/`.
 - **Filling in templates in place.** `templates/MILESTONE_TASKS.md` is the template — copy it to `artifacts/milestones/milestone-{N}-{slug}-tasks.md` before filling it in.
 - **Creating files at the repository root.** Exception: `README.md`, `CLAUDE.md`, `CHANGELOG.md` at project root, and tool configuration files that require root placement by convention.
 - **Creating new subdirectories without updating this file.** Any new subdirectory under `docs/` or `artifacts/` must be added to the tree diagrams above.

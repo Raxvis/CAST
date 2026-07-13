@@ -7,7 +7,7 @@ Crawl the project and map everything relevant. Use Read, Glob, and Grep. Build a
 - Does `CLAUDE.md` exist at the project root? Read it. Note its section list and any custom content. If its CAST section carries an `Adopted with CAST v<X.Y.Z>` line, record that version — this is the **canonical version stamp** written at install time, and the value SKILL.md's Upgrades rule compares against this skill's `metadata.version`.
 - Is the project a git repository (`git rev-parse --is-inside-work-tree`)? If not, flag it in the inventory — Phase 5's preflight and rollback path depend on git (see SKILL.md safety rule 8).
 - Does `.claude/agents/` exist? List every file. For each, parse YAML frontmatter and note `name`, `description`, `model`.
-- Does `.claude/skills/` exist? List every skill directory. Note the skill name (directory name) and summarize the first 30 lines of each `SKILL.md`. If `agent-plan/`, `agent-code/`, or `agent-task/` are present, this is a prior CAST 1.x install — treat these as existing counterparts for update-in-place, and if `CLAUDE.md` carries no version stamp (older installs predate it), fall back to any version a SKILL.md records.
+- Does `.claude/skills/` exist? List every skill directory. Note the skill name (directory name) and summarize the first 30 lines of each `SKILL.md`. If `agent-plan/`, `agent-code/`, or `agent-task/` are present, this is a prior CAST 1.x install — treat these as existing counterparts for update-in-place. If `CLAUDE.md` carries no version stamp (older installs predate it), inventory the install as "no version found" — that is accurate: installed pipeline skills carry no version field, so there is nothing else to read.
 - Does `.claude/commands/` exist? List every file. Note the command name (filename minus `.md`) and summarize the first 30 lines of each. If `agent-plan.md`, `agent-code.md`, or `agent-task.md` are present, this is a pre-1.0 CAST install — the three pipelines were commands before they became skills. Flag them for the skills migration path in `execution.md`.
 - Does `.claude/settings.json` exist? Note its structure (permissions, hooks, env).
 
@@ -91,6 +91,7 @@ Detect workspace layouts before settling the metadata above: `pnpm-workspace.yam
 - **Default to a root-level install.** CAST installs once at the repository root — one `CLAUDE.md`, one `.claude/`, one `docs/`/`templates/`/`artifacts/` — not per package. Only deviate if the user explicitly asks for a package-scoped install.
 - **Prefer workspace-wide values** for the metadata placeholders: the root manifest's `name` for `[PROJECT_NAME]`, workspace-wide commands (`pnpm -r test`, `cargo test --workspace`, `go test ./...`) for `[TEST_CMD]`/`[BUILD_CMD]`, and so on.
 - **Turn manifest ambiguity into Phase 3 Ask items.** When the root manifest lacks a value and multiple packages could supply it (which package's name is `[PROJECT_NAME]`? whose framework is `[FRAMEWORK]`? which test command is canonical?), do not pick one silently — record each ambiguity in the inventory's open questions and surface it as an Ask in the Phase 3 plan, listing the candidate packages.
+- **Sweep the workspace members for nested Claude Code config.** The 1.1 checks cover only the repository root; in a workspace, also glob each member package (bounded to the member directories detected above — e.g. `packages/*/.claude/**`, `apps/*/.claude/**`, and `<member>/CLAUDE.md` for every member) for per-package `.claude/` directories (agents, skills, commands, settings) and nested `CLAUDE.md` files. Inventory each hit like its root-level counterpart in 1.1. Any nested config found becomes a **Phase 3 Ask item** — consolidate it into the root install or leave it in place per package — never silently absorb or ignore it.
 - Record the workspace tool and member-package list in the inventory. Multiple languages across packages usually mean project type **Mixed**.
 
 Detect project type:
@@ -120,7 +121,7 @@ Read the top of the existing `README.md` for the project's one-sentence pitch. I
 
 Write your findings to `artifacts/adoption-inventory.md` (create the directory if needed, but note in Phase 3 that this directory may later be renamed if you propose moving it).
 
-**Prior adoption records**: if any `artifacts/adoption-inventory.md`, `adoption-plan.md`, or `adoption-report.md` already exists from an earlier run, do not silently overwrite it — those files are the audit trail of the earlier install. Archive each one first by renaming it with a date suffix (e.g. `adoption-report-2026-07-11.md`, using the prior file's generation date); in interactive mode you may instead ask the user to confirm an overwrite.
+**Prior adoption records**: if any `artifacts/adoption-inventory.md`, `adoption-plan.md`, or `adoption-report.md` already exists from an earlier run, do not silently overwrite it — those files are the audit trail of the earlier install. **First check for an interrupted run**: a pre-existing `adoption-plan.md` whose progress ledger has UNCHECKED entries is a **resume candidate, not an archive candidate** — do not archive or rename it. Preserve it in place (and note the interrupted run in the inventory) so the resume path in `execution.md` 5.1 can cross-check its ledger checkmarks. Only archive plan files whose ledger is fully checked (a completed prior run) or that predate the ledger format entirely. Archive each qualifying file by renaming it with a date suffix (e.g. `adoption-report-2026-07-11.md`, using the prior file's generation date); in interactive mode you may instead ask the user to confirm an overwrite.
 
 Use this structure:
 
@@ -157,7 +158,7 @@ Generated: <ISO date>
 - **Persistence layer**: <detected or "none detected">
 - **State / navigation libraries**: <detected or "—">
 - **Target platforms**: <detected>
-- **Workspace / monorepo**: <none | tool + member packages, with any manifest ambiguities flagged as open questions>
+- **Workspace / monorepo**: <none | tool + member packages, with any manifest ambiguities flagged as open questions; list any nested per-package `.claude/` dirs or `CLAUDE.md` files found by the member sweep — each is a Phase 3 Ask item>
 
 ## Source structure
 - Top-level directories: <list>

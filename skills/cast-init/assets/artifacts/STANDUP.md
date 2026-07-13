@@ -58,12 +58,14 @@ Example session section:
 ```
 ### 2026-04-09 — agent-code — milestone-2-search-ui
 
-- product | progress | M2-T01 validated against acceptance criteria; Status set to Complete
-- docs-writer | progress | Drained 2 docs entries
-- coder | docs | docs/CODE_PATTERNS.md needs the new debounce pattern documented ✅
 - reviewer | loop | Task M2-T01: loop 2/[MAX_LOOP_COUNT]
+- coder | docs | docs/CODE_PATTERNS.md needs the new debounce pattern documented ✅
+- product | progress | M2-T01 validated against acceptance criteria; Status set to Complete
+- docs-writer | progress | Drained 1 docs entry
 - tester | blocker | Task M2-T02 blocked: fixture server port collision in CI
 ```
+
+Entries under a session heading are appended in the order they happen (oldest first). In the example: the loop counter and the queued docs entry are written during task M2-T01, Product validates, Docs Writer drains the one pending `docs` entry at the task-completion checkpoint (marking it ✅ — the drained count matches the ✅ entries), then Tester hits a blocker on M2-T02.
 
 ---
 

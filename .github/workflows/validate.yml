@@ -44,17 +44,63 @@ jobs:
 
       - name: Agent frontmatter matches the canonical roster
         run: |
+          roster=skills/cast-init/references/roster.md
           fail=0
           for f in skills/cast-init/assets/agents/*.md; do
             [ "$(basename "$f")" = "README.md" ] && continue
             name=$(awk '/^name:/{print $2; exit}' "$f")
             desc=$(awk -F'description: ' '/^description:/{print $2; exit}' "$f" | tr -d '"')
-            grep -qF "| \`$name\` |" skills/cast-init/references/roster.md || { echo "$name missing from roster.md"; fail=1; }
-            grep -qF "$desc" skills/cast-init/references/roster.md || { echo "$name description drifted from roster.md"; fail=1; }
+            # An empty extraction (e.g. a future `>-` folded description) would make
+            # grep -qF "" pass forever — fail loudly instead.
+            [ -n "$name" ] || { echo "$f: could not extract frontmatter name"; fail=1; continue; }
+            [ -n "$desc" ] || { echo "$f: could not extract a single-line description (folded '>-' style? roster check needs it inline)"; fail=1; continue; }
+            # Row-scope to the canonical roster table (rows start "| <n> |") so alias
+            # tables don't match, and require the description in the SAME row as the
+            # agent's name — swapped descriptions must fail.
+            row=$(grep -E '^\| [0-9]+ \|' "$roster" | grep -F "| \`$name\` |" || true)
+            [ -n "$row" ] || { echo "$name missing from roster.md's canonical roster table"; fail=1; continue; }
+            printf '%s\n' "$row" | grep -qF "$desc" || { echo "$name description drifted from its roster.md row"; fail=1; }
           done
           count=$(ls skills/cast-init/assets/agents/*.md | grep -cv README.md)
           echo "agent files: $count"
           [ "$count" -eq 15 ] || { echo "expected 15 agents, found $count"; fail=1; }
+          exit $fail
+
+      - name: Payload READMEs agree with the canonical roster (names, tiers, skills)
+        run: |
+          # The 1.2.2 stale-routing bug lived in a payload README table, which no
+          # check covered. Keep assets/agents/README.md and assets/skills/README.md
+          # consistent with references/roster.md — everything is derived at run time
+          # and matched on names/tiers (table cells), not prose, so reflow is safe.
+          roster=skills/cast-init/references/roster.md
+          agents_readme=skills/cast-init/assets/agents/README.md
+          skills_readme=skills/cast-init/assets/skills/README.md
+          fail=0
+          # (1) agents/README.md must list every agent with a tier that appears in
+          #     roster.md's Tier column for that agent (roster may list several,
+          #     e.g. "2 / 4"; the README shows the primary as "T2").
+          for f in skills/cast-init/assets/agents/*.md; do
+            [ "$(basename "$f")" = "README.md" ] && continue
+            name=$(basename "$f" .md)
+            row=$(grep -F "| \`$name.md\` |" "$agents_readme" || true)
+            [ -n "$row" ] || { echo "$name.md has no roster row in $agents_readme"; fail=1; continue; }
+            tier=$(printf '%s\n' "$row" | awk -F'|' '{gsub(/[ T]/,"",$4); print $4; exit}')
+            [ -n "$tier" ] || { echo "$name row in $agents_readme has an empty Tier cell"; fail=1; continue; }
+            roster_tiers=$(grep -E '^\| [0-9]+ \|' "$roster" | grep -F "| \`$name\` |" | awk -F'|' '{gsub(/ /,"",$4); print $4; exit}')
+            [ -n "$roster_tiers" ] || { echo "$name missing from $roster roster table"; fail=1; continue; }
+            case "/$roster_tiers/" in
+              *"/$tier/"*) ;;
+              *) echo "$name: tier T$tier in $agents_readme not among roster.md tiers '$roster_tiers'"; fail=1 ;;
+            esac
+          done
+          # (2) skills/README.md's pipeline table must have a row for each shipped
+          #     pipeline skill, naming both the directory and the /skill invocation.
+          for d in skills/cast-init/assets/skills/*/; do
+            s=$(basename "$d")
+            grep -E '^\|' "$skills_readme" | grep -F "\`$s/\`" | grep -qF "/$s" \
+              || { echo "$skills_readme pipeline table has no row naming $s/ and /$s"; fail=1; }
+          done
+          [ "$fail" -eq 0 ] && echo "payload READMEs agree with the roster"
           exit $fail
 
       - name: Payload and example contain no pre-1.0 references
@@ -73,7 +119,10 @@ jobs:
 
       - name: Plugin manifests pass the real validator (claude plugin validate)
         run: |
-          npm install -g @anthropic-ai/claude-code
+          # Pinned to the version verified locally (claude --version). Bump this
+          # deliberately — an unpinned install lets a bad upstream release break CI
+          # for unrelated changes, and this is the slowest step in the job.
+          npm install -g @anthropic-ai/claude-code@2.1.207
           claude plugin validate .
 
       - name: Every README placeholder-table token exists in the payload
@@ -92,6 +141,69 @@ jobs:
             grep -rqF "[$tok]" skills/cast-init/assets/ || { echo "README table documents [$tok] but it appears nowhere in the payload"; fail=1; }
           done
           [ "$fail" -eq 0 ] && echo "all README-table tokens are live"
+          exit $fail
+
+      - name: Every payload token is documented in README's table (reverse token lint)
+        run: |
+          # Reverse direction of the check above: every [UPPER_SNAKE] token in the
+          # payload must appear in README's placeholder table, UNLESS it is a per-use
+          # sub-template token — one an agent fills in each time a form or skeleton
+          # is used (bug reports, milestone forms, doc skeletons like PRD/GLOSSARY),
+          # rather than a stable project fact /cast-init substitutes at install time.
+          # The allowlist below is that per-use set. When this check flags a new
+          # token, decide which it is: stable project fact -> add a row to README's
+          # placeholder table; per-use fill-in -> add it here (keep sorted).
+          # Regenerate the candidate list with:
+          #   comm -23 <(grep -rhoE '\[[A-Z][A-Z0-9_]+\]' skills/cast-init/assets/ | tr -d '[]' | sort -u) \
+          #            <(grep -oE '\| `\[[A-Z][A-Z0-9_]*\]`' README.md | grep -oE '[A-Z][A-Z0-9_]*' | sort -u)
+          allow="
+            ABBR_1 ABBR_2 ABBR_3 ABBR_4 ABBR_5 ACCESSIBILITY_STANDARD ACTION ACTION_1 ACTION_2
+            ACTION_OR_RULE_CHANGE ACTUAL_APPROACH ACTUAL_DURATION AGENT ANDROID ANY_TYPE ASSET_CATEGORY
+            ASSET_NAME AUDIT_DATE AUTHOR BENEFIT BUSINESS_OUTCOME CAST CHANGE_SUMMARY CHECK_1 CHECK_2
+            CHECK_3 CHECK_NAME_1 CHECK_NAME_2 CHECK_NAME_3 COLOR_CONSTANT COMMAND COMPONENT_CATEGORY
+            COMPONENT_NAME_1 COMPONENT_NAME_2 COMPONENT_NAME_3 COMPONENT_OR_SCREEN_NAME COMPONENT_PATH
+            CONCEPT_TITLE CONSTANT CONSTANT_NAME CORRECT_BEHAVIOR COST COVERAGE_OUTPUT_DIRECTORY
+            CRASH_REPORTER CURRENT_VERSION CUSTOM_METRIC DATE DECIMAL_PLACES DECISION_TITLE DEFAULT
+            DEFAULT_SAVE_FUNCTION DEFAULT_VALUE DESCRIPTION DETAIL DIFFERENCE_AND_REASON_IF_SIGNIFICANT
+            DOC_REFERENCE DOMAIN_NOT_FOUND DOMAIN_SPECIFIC DURATION ELEMENT EPSILON ESTIMATED_EFFORT
+            EXAMPLE_CONSTANT
+            EXAMPLE_MODULE_NAME EXPECTED_ERROR_MESSAGE FAMILY FEATURE_AREA FEATURE_AREA_1
+            FEATURE_AREA_2 FEATURE_NAME FEATURE_OR_AREA_1 FEATURE_OR_AREA_2 FIELD_NAME FILE_1 FILE_2
+            FILE_PATTERN FILTER_FLAG FINAL_STATE FIXED_TIMESTAMP FORMAT FULL_TERM_1 FULL_TERM_2
+            FULL_TERM_3 FULL_TERM_4 FULL_TERM_5 HEADER_HEIGHT HEX HOME HOOK_CATEGORY HOOK_PATH
+            HOW_MEASURED ID_TYPE INCORRECT_BEHAVIOR INITIAL_STATE INVALID_CONDITION IOS ISSUE_1 ISSUE_2
+            ITEM_1 ITEM_2 ITEM_3 ITEM_TITLE KEY_BEHAVIOR KEY_DIFFERENTIATOR LEVEL LIMIT
+            LIST_AGENTS_ACTIVE_THIS_MILESTONE LIST_KEY_BEHAVIORS_TESTED LIST_TESTS M1_NAME M2_NAME
+            M3_NAME M4_NAME M5_NAME MAX_RETRY_COUNT MEASURABLE_BEHAVIOR MEMBER METRIC_1 METRIC_2
+            MILESTONE_1 MILESTONE_2 MILESTONE_3 MILESTONE_NAME MILESTONE_OR_DATE MIN_ANDROID_VERSION
+            MIN_IOS_VERSION MINIMUM_SPEC_DEVICE MISSING_INPUT_CONDITION MOBILE_FRAMEWORK MODULE
+            MODULE_1 MODULE_2 MODULE_3 MODULE_4 MODULE_5 MODULE_A MODULE_B MODULE_C MODULE_CONSTANT
+            MODULE_NAME NAME NOTE NOTES OPERATION_NAME OS_LIST OTHER_TERM PARTICIPANT_ROLES
+            PATH_OR_NONE PATH_TO_ARCH_DOC PATH_TO_MILESTONE_DOC PATH_TO_TASKS_DOC
+            PERFORMANCE_METRIC PERSISTENCE PERSISTENCE_MODULE_PATH PILLAR_1 PILLAR_2 PILLAR_3
+            PLACEHOLDER PLATFORM PLATFORM_A PLATFORM_B POST_LAUNCH_ITEM_1
+            POST_LAUNCH_ITEM_2 POST_LAUNCH_ITEM_3 POST_LAUNCH_ITEM_4 PRIMARY_USER_SEGMENT PRINCIPLE_1
+            PRINCIPLE_2 PRINCIPLE_3 PRODUCT_TYPE PURE_LOGIC_CATEGORY PURE_LOGIC_PATH QUESTION RATE
+            REASON REQUIREMENTS_REFERENCE RETRY_DELAY REVENUE ROOT_CAUSE ROUTES ROUTES_FILE
+            SAFE_DEFAULT_VALUE SCHEMA SCHEMA_NAME SCREEN SCREEN_NAME SCREEN_OR_COMPONENT_NAME SIZE
+            SOLUTION_DESCRIPTION SOURCE_ROOT SPACING_CONSTANT SPACING_UNIT SPEC_NAME_OR_LINK
+            SPEC_SECTION SPECIFIED_APPROACH STATE_A STATE_B STATE_C STATE_LAYER STATE_STORE_CATEGORY
+            STATUS_TYPE STORAGE_KEY STORE_PATH SUPPORTING_TYPE SYSTEM SYSTEM_NAME TARGET
+            TARGET_PLATFORM_LIST TASK_NAME TASK_OR_ISSUE_NAME TASK_REFERENCE TERM TERM_NAME
+            TEST_DESCRIPTION_PATTERN TEST_DIRECTORY TEST_FILE_EXTENSION TEST_ROOT TEST_WATCH_CMD
+            THEME_FILE THEME_KEY TIME TIMEOUT_MS TYPE UNKNOWN_TYPE USE_LOOP_HOOK USER_NEED USER_TYPE
+            UTILITY_CATEGORY UTILITY_PATH VALIDATOR VALUE VALUE_A VALUE_B VALUE_C VERSION VERSION_1
+            VERSION_2 VERSION_OR_MILESTONE VERSIONING_SCHEME WEB WEIGHT
+          "
+          allow_flat=" $(printf '%s' "$allow" | tr '\n' ' ') "
+          fail=0
+          for tok in $(grep -rhoE '\[[A-Z][A-Z0-9_]+\]' skills/cast-init/assets/ | tr -d '[]' | sort -u); do
+            grep -qF "| \`[$tok]\`" README.md && continue
+            case "$allow_flat" in *" $tok "*) continue ;; esac
+            echo "payload token [$tok] is neither in README's placeholder table nor the per-use allowlist"
+            fail=1
+          done
+          [ "$fail" -eq 0 ] && echo "reverse token lint clean"
           exit $fail
 
       - name: Example fixture contains no placeholder tokens
@@ -145,25 +257,48 @@ jobs:
 
       - name: Example instances carry their template's required level-2 headings
         run: |
-          # Each fixture artifact must contain every "## X (required)" heading of the
-          # template it instantiates (marker suffix stripped; extra sections are fine).
-          # Required headings are read from the template files at run time.
+          # Instance→template pairs are DERIVED from example/artifacts/** filename
+          # patterns at run time: every fixture artifact must match a known pattern
+          # (unrecognized files fail loudly, so new example files can't dodge the
+          # check), and each matched instance must contain every "## X (required)"
+          # heading of its template (marker suffix stripped; extra sections fine).
           fail=0
-          pairs="example/artifacts/milestones/milestone-1-task-crud.md:MILESTONE_DEFINITION.md
-          example/artifacts/milestones/milestone-1-task-crud-tasks.md:MILESTONE_TASKS.md
-          example/artifacts/milestones/milestone-1-task-crud-completion.md:MILESTONE_COMPLETION.md
-          example/artifacts/architecture/arch-milestone-1.md:ARCH_SYSTEM.md
-          example/artifacts/ui-specs/ui-milestone-1.md:UI_SPEC.md
-          example/artifacts/reviews/ceo-review-milestone-1.md:CEO_REVIEW.md"
-          while IFS=: read -r inst tmpl; do
-            inst=$(echo "$inst" | sed 's/^ *//'); [ -z "$inst" ] && continue
-            t="skills/cast-init/assets/templates/$tmpl"
-            [ -f "$inst" ] || { echo "missing instance: $inst"; fail=1; continue; }
-            [ -f "$t" ] || { echo "missing template: $t"; fail=1; continue; }
+          check_headings() {
+            inst=$1; tmpl="skills/cast-init/assets/templates/$2"
+            if [ ! -f "$tmpl" ]; then echo "missing template: $tmpl (needed by $inst)"; fail=1; return; fi
             while IFS= read -r req; do
-              grep -qxF "$req" "$inst" || { echo "$inst is missing required section: '$req' (from $tmpl)"; fail=1; }
-            done < <(grep -E '^## .*\(required\)' "$t" | sed 's/ (required)$//')
-          done <<< "$pairs"
+              grep -qxF "$req" "$inst" || { echo "$inst is missing required section: '$req' (from $2)"; fail=1; }
+            done < <(grep -E '^## .*\(required\)' "$tmpl" | sed 's/ (required)$//')
+          }
+          while IFS= read -r f; do
+            case "$(basename "$f")" in
+              AGENT_STATE.md|BUGS.md|STANDUP.md) ;;  # seed instances, covered by their own checks
+              milestone-*-tasks.md)      check_headings "$f" MILESTONE_TASKS.md ;;
+              milestone-*-completion.md) check_headings "$f" MILESTONE_COMPLETION.md ;;
+              milestone-*-validation.md) check_headings "$f" MILESTONE_VALIDATION.md ;;
+              arch-milestone-*.md)       check_headings "$f" ARCH_SYSTEM.md ;;
+              ui-milestone-*.md)         check_headings "$f" UI_SPEC.md ;;
+              ceo-review-*.md)           check_headings "$f" CEO_REVIEW.md ;;
+              ux-review-*.md)            check_headings "$f" UX_REVIEW.md ;;
+              retrospective-*.md)        check_headings "$f" MILESTONE_RETROSPECTIVE.md ;;
+              security-review-*.md|performance-review-*.md) ;;  # planning reviews carry no template contract
+              milestone-*.md)            check_headings "$f" MILESTONE_DEFINITION.md ;;
+              *) echo "unrecognized example artifact: $f — add a filename pattern here or fix the filename"; fail=1 ;;
+            esac
+          done < <(find example/artifacts -type f -name '*.md' | sort)
+          # Completeness: a milestone with a completion record must also carry its
+          # validation record and retrospective, and — when UI-flagged (a UI spec
+          # exists for it) — a UX review. All derived from the files present.
+          for c in example/artifacts/milestones/*-completion.md; do
+            [ -e "$c" ] || continue
+            stem=${c%-completion.md}
+            n=$(basename "$stem" | sed -E 's/^milestone-([0-9]+).*/\1/')
+            [ -f "${stem}-validation.md" ] || { echo "completed milestone lacks its validation record: ${stem}-validation.md"; fail=1; }
+            [ -f "example/artifacts/reviews/retrospective-milestone-$n.md" ] || { echo "completed milestone lacks its retrospective: example/artifacts/reviews/retrospective-milestone-$n.md"; fail=1; }
+            if [ -f "example/artifacts/ui-specs/ui-milestone-$n.md" ]; then
+              [ -f "example/artifacts/reviews/ux-review-milestone-$n.md" ] || { echo "UI-flagged completed milestone lacks its UX review: example/artifacts/reviews/ux-review-milestone-$n.md"; fail=1; }
+            fi
+          done
           [ "$fail" -eq 0 ] && echo "all example instances match their template contracts"
           exit $fail
 

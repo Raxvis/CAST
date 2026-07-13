@@ -8,13 +8,16 @@
   HOW TO CUSTOMIZE:
   - Replace [MILESTONE_NAME] with the milestone under review.
   - Fill in every Inputs Reviewed path — all six inputs are mandatory; write "None"
-    only when a review stage produced no findings file.
-  - Work through all six checklist sections. Do not skip any.
+    only when a review stage produced no findings file. Exception: the UI Spec row
+    reads "N/A — no ui agent installed" when the project has no ui agent (Stage 2b
+    was skipped).
+  - Work through all six checklist sections. Do not skip any. Section 3 accepts
+    "N/A — no ui agent installed" as its content in no-ui projects.
   - Record Revision Requests when returning REVISION REQUIRED, and Approval Conditions
     (with a Verified By owner) when returning APPROVED WITH CONDITIONS.
-  - Issue exactly one of the three verdicts verbatim: APPROVED / APPROVED WITH
-    CONDITIONS / REVISION REQUIRED — the /agent-plan and /agent-code skills key on
-    these strings.
+  - Record the verdict as the single `**Verdict**:` line in the Verdict section, with
+    exactly one of the three strings verbatim: APPROVED / APPROVED WITH CONDITIONS /
+    REVISION REQUIRED — the /agent-plan and /agent-code skills parse that line.
   - Instance destination: artifacts/reviews/ceo-review-milestone-{N}.md. Never fill
     this template in place.
   - Sections marked (required) must be present and non-empty in every instance;
@@ -41,7 +44,7 @@
 - Milestone: [PATH_TO_MILESTONE_DOC]
 - Task Breakdown: [PATH_TO_TASKS_DOC]
 - Architecture: [PATH_TO_ARCH_DOC]
-- UI Spec: [PATH_TO_UI_SPEC]
+- UI Spec: [PATH_TO_UI_SPEC — or "N/A — no ui agent installed" for no-ui projects]
 - Security Findings: [PATH_OR_NONE]
 - Performance Findings: [PATH_OR_NONE]
 
@@ -74,6 +77,8 @@ On any re-review, read the `## Revision History` table at the top of every input
 ---
 
 ## 3. UI & User Experience (required)
+
+_If the project installed no `ui` agent, write "N/A — no ui agent installed" as this section's Notes and leave the checklist unchecked — the section must still be present._
 
 - [ ] UI spec covers every screen or component the milestone introduces.
 - [ ] Interaction states (default, pressed, disabled, loading, error, empty) are specified.
@@ -133,8 +138,12 @@ On any re-review, read the `## Revision History` table at the top of every input
 
 ## Verdict (required)
 
-- [ ] **APPROVED** — Milestone may proceed to the engineering stage. No outstanding revisions.
-- [ ] **APPROVED WITH CONDITIONS** — Milestone may proceed. Coder must satisfy the Approval Conditions above; Reviewer and Product verify on completion.
-- [ ] **REVISION REQUIRED** — Milestone returned to the named agents. See Revision Requests. Re-review after revisions.
+**Verdict**: <APPROVED | APPROVED WITH CONDITIONS | REVISION REQUIRED>
+
+Write exactly one of the three values on the line above — `/agent-plan` and `/agent-code` parse the `**Verdict**:` line. Meaning of each value:
+
+- **APPROVED** — Milestone may proceed to the engineering stage. No outstanding revisions.
+- **APPROVED WITH CONDITIONS** — Milestone may proceed. Coder must satisfy the Approval Conditions above; Reviewer and Product verify on completion.
+- **REVISION REQUIRED** — Milestone returned to the named agents. See Revision Requests. Re-review after revisions.
 
 **Verdict Notes**:

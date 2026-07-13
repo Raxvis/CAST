@@ -119,12 +119,13 @@ Every UI artifact written under `artifacts/ui-specs/` must include the `## Revis
 - Coder must ask UI before deviating from a specification for any reason other than technical impossibility.
 - UI escalates conflicts with Product to Validator.
 - UI may review screen implementations independently of Product's task validation — but Product's sign-off is final.
+- When your work changes something documentation-worthy — a style-guide token, component contract, interaction convention, or user-facing behavior — append `- ui | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
 
 ---
 
 ## State
 
-Live state lives in `artifacts/AGENT_STATE.md` → `## ui` (Current Work, Screen Specifications index, Decisions Log, UX Playtesting Feedback, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.
+Live state lives in `artifacts/AGENT_STATE.md` → `## ui` (Current Work, Screen Specifications index, Decisions Log, UX Playtesting Feedback, Future Work). Read that section on activation. Logs are append-only — append new rows, never rewrite history; current-state cells (dashboards, status columns, % done) update in place. Log decisions per the format defined there.
 
 ---
 

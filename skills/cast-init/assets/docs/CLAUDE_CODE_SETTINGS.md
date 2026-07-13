@@ -139,4 +139,4 @@ If a command in the `allow` list still prompts, your pattern probably doesn't ma
 
 ---
 
-_See also: the CAST template's `TROUBLESHOOTING.md` for common settings-related failure modes, and the official Claude Code settings documentation for the full field reference._
+_See also: the CAST repo's [`TROUBLESHOOTING.md`](https://github.com/Raxvis/CAST/blob/main/TROUBLESHOOTING.md) for common settings-related failure modes, and the official Claude Code settings documentation for the full field reference._

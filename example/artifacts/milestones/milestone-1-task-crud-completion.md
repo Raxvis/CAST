@@ -51,13 +51,19 @@ M2. The Vitest suite is green with 42 tests passing.
 |---|------|---------------------|----------|
 | 1 | BUG-002: `done <id>` silently succeeds when the given id does not exist | Discovered during Product validation after freeze; low severity; not a blocker for M1's acceptance criteria. Fix belongs alongside a broader "id-not-found" helper in the data layer. | M2 |
 
+Deferred is a held-open state, not terminal. Product re-triaged BUG-002 at the
+milestone-completion checkpoint on 2026-04-10 and held it Deferred into M2 with an
+updated rationale; it stays open in `artifacts/BUGS.md` and is re-triaged again at
+the M2 `/agent-plan` Stage 1. This deferral is why the Header Status above reads
+"Complete with Deferrals".
+
 ---
 
 ## CEO Approval Conditions — Verification Status
 
 | # | Condition | Verified By | Status | Evidence |
 |---|-----------|-------------|--------|----------|
-| 1 | All SQL queries must use parameterized bindings (no string concatenation into SQL). | Reviewer | Verified | Code review of `src/db/*`, `src/commands/*` — all statements use `db.prepare(...).run(...)` with bound parameters. See `artifacts/reviews/code-review-milestone-1.md`. |
+| 1 | All SQL queries must use parameterized bindings (no string concatenation into SQL). | Reviewer | Verified | Code review of `src/db/*`, `src/commands/*` — all statements use `db.prepare(...).run(...)` with bound parameters. Verified at every merge; see the reviewer section of `artifacts/AGENT_STATE.md`. |
 | 2 | SQLite WAL mode enabled in the migration; index created on the `completed` column. | Reviewer | Verified | `src/db/migrations.ts` sets `PRAGMA journal_mode = WAL` and creates `idx_tasks_completed`. Runtime check in test suite confirms both. |
 | 3 | `list` must handle a missing database file by running migrations on first invocation rather than throwing. | Product | Verified | Manual test on a clean machine: removed `~/.acme-todo/tasks.db`, ran `acme-todo list`, got an empty list with exit 0. Regression test added in `src/commands/list.test.ts`. |
 
@@ -90,7 +96,7 @@ Breakdown:
 
 | ID | Description | Severity | Owner | Tracked In |
 |----|-------------|----------|-------|------------|
-| BUG-002 | `done <id>` silently succeeds when the given id does not exist; should print an error and exit non-zero. | Low | Coder | `artifacts/bugs.md`, deferred to M2 |
+| BUG-002 | `done <id>` silently succeeds when the given id does not exist; should print an error and exit non-zero. Re-triaged by Product at milestone completion and held Deferred into M2. | Low | Coder | `artifacts/BUGS.md` (Status: Deferred — open, held) |
 
 BUG-001 (`list` crashed with "no such table: tasks" on first invocation) was fixed in-milestone
 via CEO Condition 3 and is **closed**.
@@ -127,7 +133,7 @@ via CEO Condition 3 and is **closed**.
 |---|--------|-------|
 | 1 | Fix BUG-002: `done <id>` must error non-zero when the id does not exist. Add the previously-skipped Vitest case. | Coder |
 | 2 | Add "error on missing id" as a standard acceptance criterion for every id-based mutation command. | Product |
-| 3 | Document filesystem prerequisites (DB parent dir creation) in `artifacts/architecture.md` §4. | Docs Writer |
+| 3 | Document filesystem prerequisites (DB parent dir creation) in the M2 architecture document's data-layer section (carry-over from `artifacts/architecture/arch-milestone-1.md` §4). | Docs Writer |
 
 ---
 
@@ -143,10 +149,12 @@ via CEO Condition 3 and is **closed**.
 
 - **Milestone Definition**: `artifacts/milestones/milestone-1-task-crud.md`
 - **Task Breakdown**: `artifacts/milestones/milestone-1-task-crud-tasks.md`
+- **Validation Report**: `artifacts/milestones/milestone-1-task-crud-validation.md`
 - **CEO Review**: `artifacts/reviews/ceo-review-milestone-1.md`
-- **Code Review**: `artifacts/reviews/code-review-milestone-1.md`
-- **Bug Log**: `artifacts/bugs.md`
-- **Architecture**: `artifacts/architecture.md`
+- **UX Review**: `artifacts/reviews/ux-review-milestone-1.md`
+- **Retrospective**: `artifacts/reviews/retrospective-milestone-1.md`
+- **Bug Log**: `artifacts/BUGS.md`
+- **Architecture**: `artifacts/architecture/arch-milestone-1.md`
 
 ---
 

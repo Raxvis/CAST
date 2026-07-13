@@ -42,7 +42,7 @@ The orchestrating skill reads the task's input artifacts (task definition, archi
 
 ## Environment Issue rule
 
-If tests fail due to environment rather than code, Tester flags the failure as "Environment Issue" instead of failing the gate on the code. In `/agent-code`, the Validator escalation protocol applies (Validator pauses the test gate until infrastructure is resolved) and Coder is not blocked from continuing other work. In `/agent-task`, there is no Validator in the loop — the user decides whether to continue.
+If tests fail due to environment rather than code, Tester flags the failure as "Environment Issue" instead of failing the gate on the code. In `/agent-code`, the orchestrating skill invokes the **validator** agent mid-loop; Validator pauses the test gate and escalates the infrastructure problem to the user, and Coder is not blocked from continuing other work. In `/agent-task`, no Validator is invoked — the user decides whether to continue.
 
 ---
 
@@ -52,6 +52,7 @@ Launch the **coder** agent to:
 
 - Read the task's inputs supplied by the orchestrating skill (task definition or description, plus any planning artifacts).
 - Implement the task in production code, following the conventions in `CLAUDE.md`, `docs/CODE_PATTERNS.md`, and `docs/FILE_CONVENTIONS.md`.
+- If the change alters something documentation-worthy (APIs, commands, config, conventions, user-facing behavior), append a `- coder | docs | <note>` entry to the current session in `artifacts/STANDUP.md` per its Entry Grammar — this queue is what Docs Writer drains at the task- and milestone-completion checkpoints.
 - Complete the Pre-Handoff Checklist before handing off.
 
 ## Step 2 — Tester
@@ -70,6 +71,8 @@ After Tester passes, launch the **reviewer** agent to:
 - Classify every finding as a **Defect** (incorrect behaviour, broken functionality, violated contract) or an **Issue** (structural problem, convention violation, maintainability concern).
 - If there are no findings, proceed to Step 4.
 
+Within Step 3 (including the routing below), when a finding or its resolution changes something documentation-worthy (APIs, commands, config, conventions, user-facing behavior), the resolving agent appends a `- <agent> | docs | <note>` entry to the current session in `artifacts/STANDUP.md` — Docs Writer drains these at the completion checkpoints.
+
 ### Step 3a — Defects → Bug Gatherer → Product → Debugger
 
 For every Reviewer finding classified as a **Defect**:
@@ -77,10 +80,10 @@ For every Reviewer finding classified as a **Defect**:
 1. Launch the **bug-gatherer** agent to file the finding as a structured bug report in `artifacts/BUGS.md` (status New), using the canonical entry format at the top of that file.
 2. Hand the filed report to the **product** agent for triage. Product sets the final severity and issues one of three triage outcomes:
    - **Fix Now** — launch the **debugger** agent to investigate the root cause and update the existing record with the investigation fields (status In Progress). The defect then returns to Coder (loop back to Step 1) with Debugger's root-cause analysis attached.
-   - **Defer** — the report stays open in `artifacts/BUGS.md` with status Deferred. Deferral is allowed only if the defect does not violate the task's acceptance criteria; the task proceeds without looping.
-   - **Not a Bug** — the report is closed with a rationale recorded in `artifacts/BUGS.md`; the task proceeds without looping.
+   - **Defer** — the report stays **open** in `artifacts/BUGS.md` with status Deferred. Deferred is a held-open state, not terminal: Product re-triages every Deferred bug at the `/agent-code` milestone-completion checkpoint and at `/agent-plan` Stage 1. Deferral is allowed only if the defect does not violate the task's acceptance criteria; the task proceeds without looping.
+   - **Not a Bug** — Product sets the status to Won't Fix (terminal) with a rationale recorded in the `artifacts/BUGS.md` entry; the task proceeds without looping.
 
-Only **Fix Now** defects send the task back through the loop. Deferred and Not-a-Bug reports never block the task.
+Only **Fix Now** defects send the task back through the loop. Deferred and Won't Fix reports never block the task.
 
 ### Step 3b — Issues → Refactor → Tester → Reviewer
 
@@ -89,13 +92,13 @@ For every Reviewer finding classified as an **Issue**:
 1. Launch the **refactor** agent to restructure the code without changing behaviour, citing the architectural principle or quality standard that justifies the change. Refactor's handoff names the tests to re-run for the affected modules.
 2. After Refactor hands off, **Tester re-runs first** (targeted set, per the test gate rule), then return to **Reviewer** (loop back to Step 3) to confirm the issue is resolved.
 
-Step 3a and Step 3b may run in parallel when the findings are independent. A task does not advance to Step 4 until the Reviewer has approved a clean version — **clean means no open Fix Now defects and no unresolved Issues**. Open Deferred and closed Not-a-Bug reports do not count against a clean version.
+Step 3a and Step 3b may run in parallel when the findings are independent. A task does not advance to Step 4 until the Reviewer has approved a clean version — **clean means no open Fix Now defects and no unresolved Issues**. Open Deferred and Won't Fix reports do not count against a clean version.
 
 (Tester failures are not Defects in this sense — they route back to Coder directly at Step 2, without Bug Gatherer or triage.)
 
 ## Step 4 — Product Validation
 
-After Reviewer approves, launch the **product** agent to validate the task against its acceptance criteria (in `/agent-code`, the task definition's criteria, using the Task Validation Checklist in `templates/MILESTONE_VALIDATION.md`; in `/agent-task`, the task description itself serves as the acceptance criteria). If any criterion is not met, return to Coder (loop back to Step 1) with the cited criterion.
+After Reviewer approves, launch the **product** agent to validate the task against its acceptance criteria. In `/agent-code`, Product validates against the task definition's criteria, applying the Task Validation Checklist in `templates/MILESTONE_VALIDATION.md` as the *criteria*; the outcome is recorded as the task's Status in the milestone tasks file plus a `progress` entry in `artifacts/STANDUP.md` — no per-task validation document is produced (the validation *document* is milestone-grain only, written at the milestone-completion checkpoint). In `/agent-task`, the task description itself serves as the acceptance criteria. If any criterion is not met, return to Coder (loop back to Step 1) with the cited criterion.
 
 ---
 

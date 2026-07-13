@@ -28,7 +28,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `low`. Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`. Cost fallback: `claude-haiku-4-5` (see that file).
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. Document only what actually changed, nothing speculative — keep entries concise and scoped strictly to what the triggering agent changed; required documentation sections are mandatory.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. Document only what actually changed, nothing speculative — keep entries concise and scoped strictly to what the triggering agent changed; the checkpoint drain protocol in this file (drain the `docs` queue, mark drained entries with ✅) is mandatory.
 
 ---
 
@@ -114,4 +114,4 @@ The Docs Writer Agent may NOT:
 
 ## State
 
-Live state lives in `artifacts/AGENT_STATE.md` → `## docs-writer` (Current Work, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.
+Live state lives in `artifacts/AGENT_STATE.md` → `## docs-writer` (Current Work, Decisions Log, Future Work). Read that section on activation. Logs are append-only — append new rows, never rewrite history; current-state cells (dashboards, status columns, % done) update in place. Log decisions per the format defined there.

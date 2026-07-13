@@ -11,7 +11,7 @@ description: >-
   produces the migration plan without changing files.
 license: MIT
 metadata:
-  version: "1.3.0"
+  version: "1.4.0"
   source: "https://github.com/Raxvis/CAST"
 ---
 
@@ -34,11 +34,11 @@ All template files are read from `CAST_SOURCE` with the Read tool. No files are 
 
 - **Full adoption** (default) — run Phases 1 through 7. The user reviews and approves the plan before execution.
 - **Dry run** — run Phases 1 through 3 only. Produce the inventory and migration plan, then stop. Useful for scoping a migration without committing to changes. The user must explicitly request this mode.
-- **Unattended** — for non-interactive sessions (CI, headless runs). Valid only when the invocation explicitly pre-approves the plan AND pre-supplies the answers the gates would ask for (project type, pitch, test command, agent opt-outs). When both are present, treat the Phase 1 and Phase 4 gates as satisfied, record every auto-approved decision verbatim in the Phase 7 report, and never exercise a Delete action — downgrade Deletes to flagged TODOs, since destructive actions require a live approval. Any Ask item the pre-supplied answers do not resolve (including novel Asks that arise mid-run) downgrades to **Preserve** plus a TODO in the Phase 7 report — never guess an answer. If a Phase 6 validation check fails, do not prompt: halt and write a failed-adoption report per `references/validation.md`. A non-interactive invocation *without* explicit pre-approval runs as a dry run.
+- **Unattended** — for non-interactive sessions (CI, headless runs). Valid only when the invocation explicitly pre-approves the plan AND pre-supplies the answers the gates would ask for (project type, pitch, test command, agent opt-outs). When both are present, treat the Phase 1 and Phase 4 gates as satisfied, record every auto-approved decision verbatim in the Phase 7 report, and never exercise a Delete action — downgrade Deletes to flagged TODOs, since destructive actions require a live approval. Any Ask item the pre-supplied answers do not resolve (including novel Asks that arise mid-run) downgrades to **Preserve** plus a TODO in the Phase 7 report — never guess an answer. If a Phase 6 validation check fails, do not prompt: halt and write a failed-adoption report per `references/validation.md`. A non-interactive invocation *without* explicit pre-approval runs as a dry run; in any non-interactive dry run the Phase 1 confirmation gate is waived — proceed automatically through Phases 1–3 and stop after writing the plan (no one can answer the gate, and Phases 1–3 write only the adoption files).
 
 If the user has not specified a mode, assume full adoption.
 
-**Upgrades.** If Phase 1 finds an existing CAST install that records a version — the canonical stamp is the `Adopted with CAST v<X.Y.Z>` line in the target's `CLAUDE.md` CAST section (see `references/discovery.md` 1.1) — compare it against this skill's `metadata.version` before planning: if they are equal, report "already at <version>" and stop (offer a forced re-run if the user suspects drift); if the installed version is *newer* than this skill, warn that the local cast-init copy is stale and suggest `npx skills update` (or `/plugin marketplace update`) before proceeding. A **forced re-run** repeats all seven phases treating the same-version install as upgradeable: CAST-owned files and sections are overwritten from the current payload while user content and custom sections are preserved, exactly per the normal Update-in-place rules in `references/execution.md` — it refreshes drifted CAST content, never wholesale-resets the project.
+**Upgrades.** If Phase 1 finds an existing CAST install that records a version — the canonical stamp is the `Adopted with CAST v<X.Y.Z>` line in the target's `CLAUDE.md` CAST section (see `references/discovery.md` 1.1) — compare it against this skill's `metadata.version` before planning: if they are equal **and the prior run completed** — `artifacts/adoption-report.md` exists and the ledger in `artifacts/adoption-plan.md` is fully checked — report "already at <version>" and stop (offer a forced re-run if the user suspects drift). If the versions are equal but either completion signal is missing, the stamp landed but the run died before finishing (the stamp is written at execution 5.8, ahead of 5.9 and Phases 6–7): treat it as an interrupted run and enter the resume path in `references/execution.md` 5.1 instead of stopping; if the installed version is *newer* than this skill, warn that the local cast-init copy is stale and suggest `npx skills update` (or `/plugin marketplace update`) before proceeding. A **forced re-run** repeats all seven phases treating the same-version install as upgradeable: CAST-owned files and sections are overwritten from the current payload while user content and custom sections are preserved, exactly per the normal Update-in-place rules in `references/execution.md` — it refreshes drifted CAST content, never wholesale-resets the project.
 
 ## Role and canonical structure
 
@@ -80,13 +80,13 @@ Crawl the project and map everything relevant using Read, Glob, and Grep. Follow
 - **1.3 Documentation state** — map existing docs to CAST reference docs by content, not filename
 - **1.4 Project metadata** — tech stack, commands, project type (frontend / backend / CLI / library / data / mobile / mixed), and workspace/monorepo layout detected from manifests
 - **1.5 Source code structure** — source layout, naming conventions, test patterns, CI config
-- **1.6 The inventory** — archive any prior run's `adoption-*.md` files (date suffix, or confirmed overwrite in interactive mode), then write findings to `artifacts/adoption-inventory.md` using the template in the reference file
+- **1.6 The inventory** — archive any *completed* prior run's `adoption-*.md` files (date suffix, or confirmed overwrite in interactive mode). A pre-existing `adoption-plan.md` with unchecked ledger entries is a resume candidate, not an archive candidate — preserve it for the resume path in `references/execution.md` 5.1. Then write findings to `artifacts/adoption-inventory.md` using the template in the reference file
 
 **Stop after writing the inventory** and present it to the user:
 
 > I've finished Phase 1 (Discovery). The inventory is written to `artifacts/adoption-inventory.md`. Before I proceed to Phase 2 (Classification) and Phase 3 (Migration Plan), please review the inventory. Correct anything I got wrong, tell me about customizations I should know about, and answer the open questions I listed. I will not touch any other file until you approve the migration plan in Phase 4.
 
-Wait for explicit confirmation before proceeding to Phase 2.
+Wait for explicit confirmation before proceeding to Phase 2. (Exception: in a non-interactive dry run this gate is waived — see Modes; continue straight through Phases 2–3 and stop after writing the plan.)
 
 ## Phase 2 — Classification
 
@@ -157,7 +157,7 @@ Once approval is given, **record every Phase 4 resolution into `artifacts/adopti
 
 ## Phase 5 — Execution
 
-Once the plan is approved, execute the actions in a safe order, reporting progress as you go. **Read `references/execution.md` before writing any file** — it contains the full install mechanics and the customization-preservation rules, including the global rule that `<!-- TEMPLATE INSTRUCTIONS -->` blocks and placeholder-pointer comments are stripped from every installed file (the eight `templates/*` skeletons excepted). Execute its sections in order:
+Once the plan is approved, execute the actions in a safe order, reporting progress as you go. **Read `references/execution.md` before writing any file** — it contains the full install mechanics and the customization-preservation rules, including the global rule that `<!-- TEMPLATE INSTRUCTIONS -->` blocks and placeholder-pointer comments are stripped from every installed file (the eleven `templates/*` skeletons excepted). Execute its sections in order:
 
 1. **5.1 Preflight**
 2. **5.1a Fast path for pure-Create actions**
@@ -175,15 +175,17 @@ As each executed action completes, check it off in `artifacts/adoption-plan.md` 
 
 ## Phase 6 — Validation
 
-Run every check in `references/validation.md`:
+Run every check in `references/validation.md` — the numbers below match its check numbers:
 
-1. Placeholder scan (expected sub-template tokens like `[DATE]` are fine; real unfilled placeholders are not).
-2. All 15 agents exist with frontmatter matching the canonical roles (Tier 5 absences and a `ui` absence on a backend/CLI-only project require a recorded opt-out; other Tier 1–4 absences are hard failures).
-3. The pipeline skills the user chose to keep exist at `.claude/skills/<name>/SKILL.md` with valid frontmatter, and no superseded pre-1.0 command files remain.
-4. The docs/artifacts split is clean in both directions.
-5. Every agent file has valid `name`/`description`/`model` frontmatter.
-6. No installed file outside `templates/` carries a `<!-- TEMPLATE INSTRUCTIONS -->` block.
-7. UI opt-out consistency: the `ui` agent and the UI templates (`templates/UI_SPEC.md`, `templates/UX_REVIEW.md`) are installed together or skipped together.
+1. **Placeholder scan** — scoped to the files the plan touched, excluding cast-init's own payload directory; expected sub-template tokens like `[DATE]` are fine, real unfilled placeholders are not.
+2. **All 15 agents exist** with frontmatter matching the canonical roles (Tier 5 absences and a `ui` absence on a backend/CLI-only project require a recorded opt-out; other Tier 1–4 absences are hard failures).
+3. **Pipeline skills** — the skills the user chose to keep exist at `.claude/skills/<name>/SKILL.md` with valid frontmatter, and no superseded pre-1.0 command files remain (in unattended mode, a leftover whose Delete was downgraded to a recorded TODO passes).
+3a. **Artifacts scaffold and installed docs** — `artifacts/BUGS.md`, `STANDUP.md`, `AGENT_STATE.md` exist, and `docs/PIPELINE_LOOP.md` exists whenever `agent-code` or `agent-task` is installed.
+4. **docs/artifacts split** is clean in both directions.
+5. **Agent frontmatter** — every agent file has valid `name`/`description`/`model` frontmatter (description ≤ 300 characters).
+6. **Template scaffolding stripped** — no installed file outside `templates/` carries a `<!-- TEMPLATE INSTRUCTIONS -->` block.
+7. **Topic-doc pairing, imports, and version stamp** — required topic-doc pairs installed together, every Memory Imports line uses bare `@path` syntax and resolves, and `CLAUDE.md` carries exactly one `Adopted with CAST v<X.Y.Z>` line matching this skill's `metadata.version`.
+8. **UI opt-out consistency** — the `ui` agent and the UI templates (`templates/UI_SPEC.md`, `templates/UX_REVIEW.md`) are installed together or skipped together.
 
 If any validation check fails, report it and ask the user how to proceed before writing the Phase 7 report — in unattended mode, do not prompt: halt and write a failed-adoption report per `references/validation.md`. Do not silently mask failures.
 

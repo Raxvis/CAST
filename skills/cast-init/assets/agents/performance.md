@@ -29,7 +29,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`. Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. Report every bottleneck with estimated impact and confidence — never self-filter to only the biggest wins; the CEO review does the weighing. Require a measurement or profile trace before proposing any optimization — the profiling steps in this file are mandatory.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. Report every bottleneck with estimated impact and confidence — never self-filter to only the biggest wins; the CEO review does the weighing. Require a measurement or profile trace before proposing any optimization — the performance-review finding requirements and budget checks in this file (Templates section) are mandatory.
 
 ---
 
@@ -77,6 +77,7 @@ The Performance Agent may NOT:
 | Coder | New code that may affect performance-critical paths |
 | Tester | Performance test results and benchmarks |
 | User | Direct requests for performance analysis of specific areas |
+| CEO | Revision requests from the planning review (REVISION REQUIRED verdicts naming Performance) |
 
 ---
 
@@ -119,9 +120,10 @@ Budget-violating findings block the milestone until remediated or rolled into a 
 - Performance recommendations include expected impact (quantified where possible).
 - Performance coordinates with Tester to define and run performance benchmarks.
 - When performance issues require code changes, Performance routes to Coder or Refactor.
+- When your work changes something documentation-worthy — a performance budget, configuration, convention, or user-facing behavior — append `- performance | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
 
 ---
 
 ## State
 
-Live state lives in `artifacts/AGENT_STATE.md` → `## performance` (Performance Budget Tracking — the canonical live tracking table, Current Work findings, Decisions Log, Future Work). Read that section on activation; append new rows and update the budget table's Current/Status columns, never rewrite history. Log decisions per the format defined there.
+Live state lives in `artifacts/AGENT_STATE.md` → `## performance` (Performance Budget Tracking — the canonical live tracking table, Current Work findings, Decisions Log, Future Work). Read that section on activation. Logs are append-only — append new rows, never rewrite history; current-state cells (the budget table's Current/Status columns, dashboards, status columns, % done) update in place. Log decisions per the format defined there.

@@ -6,10 +6,24 @@ name: Release
 # annotated tag, and publishes the GitHub Release from the top CHANGELOG entry.
 # The manual checklist in CLAUDE.md remains the documented fallback.
 #
+# Self-heal: if a previous run pushed the tag but died before (or during) the
+# `gh release create` step, the next run detects "tag exists but Release doesn't"
+# and publishes the missing Release at the existing tag — it never re-pushes the
+# tag. Only when tag AND Release both exist does the run skip as a true no-op.
+#
 # A second job (tag-integrity) runs on manually pushed v* tags and verifies the
 # tag matches plugin.json and the CHANGELOG top entry at that commit. Tags pushed
 # by this workflow's own GITHUB_TOKEN do not re-trigger workflows (GitHub's
 # recursion guard), which is fine — those tags are verified before creation.
+#
+# Two accepted divergences from the manual checklist in CLAUDE.md:
+#   1. The tag targets $GITHUB_SHA (the head of the push), not "the bump commit".
+#      These are the same commit only when the version-bump commit is the head of
+#      its push — so never push follow-up commits in the same push as a bump.
+#   2. `--latest` is passed unconditionally. This workflow only triggers on main,
+#      where every release IS the latest; patch releases of a non-current minor
+#      (cut from a maintenance branch) must use the manual checklist and omit
+#      `--latest`.
 
 on:
   push:
@@ -18,6 +32,13 @@ on:
 
 permissions:
   contents: write
+
+# Two near-simultaneous pushes to main would otherwise race the tag-existence
+# check and both try to tag/release. Queue them instead; never cancel a release
+# run in progress.
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   tag-and-release:
@@ -28,23 +49,36 @@ jobs:
         with:
           fetch-depth: 0 # full history so existing tags are visible
 
-      - name: Read plugin.json version and check for an existing tag
+      - name: Read plugin.json version, check for an existing tag and Release
         id: ver
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           version=$(node -e "console.log(JSON.parse(require('fs').readFileSync('.claude-plugin/plugin.json','utf8')).version)")
           echo "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo "plugin.json version '$version' is not plain semver"; exit 1; }
           echo "version=$version" >> "$GITHUB_OUTPUT"
           git fetch --tags --force --quiet
           if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
-            echo "Tag v$version already exists — nothing to release (re-run guard)."
-            echo "exists=true" >> "$GITHUB_OUTPUT"
+            # Tag exists. Skip only if the Release exists too; otherwise a prior
+            # run died between the tag push and `gh release create` — self-heal
+            # by publishing the missing Release at the existing tag.
+            if gh release view "v$version" >/dev/null 2>&1; then
+              echo "Tag v$version and its GitHub Release both exist — nothing to release (re-run guard)."
+              echo "need_tag=false" >> "$GITHUB_OUTPUT"
+              echo "need_release=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "Tag v$version exists but its GitHub Release is MISSING — self-healing (publishing the Release, not re-pushing the tag)."
+              echo "need_tag=false" >> "$GITHUB_OUTPUT"
+              echo "need_release=true" >> "$GITHUB_OUTPUT"
+            fi
           else
             echo "Tag v$version does not exist yet — releasing."
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "need_tag=true" >> "$GITHUB_OUTPUT"
+            echo "need_release=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Verify the four synchronized version locations agree
-        if: steps.ver.outputs.exists == 'false'
+        if: steps.ver.outputs.need_release == 'true'
         env:
           VERSION: ${{ steps.ver.outputs.version }}
         run: |
@@ -64,21 +98,37 @@ jobs:
           fi
 
       - name: Create and push the annotated tag
-        if: steps.ver.outputs.exists == 'false'
+        # Skipped in self-heal mode (tag already exists) — the tag is never re-pushed.
+        if: steps.ver.outputs.need_tag == 'true'
         env:
           VERSION: ${{ steps.ver.outputs.version }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Accepted divergence from CLAUDE.md's "tag the bump commit": GITHUB_SHA
+          # is the head of the push. Identical only when the bump commit is pushed
+          # as the head of its push — the policy requires exactly that.
           git tag -a "v$VERSION" -m "CAST v$VERSION" "$GITHUB_SHA"
           git push origin "v$VERSION"
 
       - name: Publish the GitHub Release from the top CHANGELOG entry
-        if: steps.ver.outputs.exists == 'false'
+        if: steps.ver.outputs.need_release == 'true'
         env:
           VERSION: ${{ steps.ver.outputs.version }}
           GH_TOKEN: ${{ github.token }}
         run: |
+          # Anchor: the notes below are extracted positionally (top entry), so first
+          # assert the top "## [" heading really is $VERSION's. Defends against a
+          # future "## [Unreleased]" (or any stray) section shipping as release notes.
+          first_heading=$(grep -m1 '^## \[' CHANGELOG.md)
+          case "$first_heading" in
+            *"[$VERSION]"*) echo "Top CHANGELOG heading matches v$VERSION: $first_heading" ;;
+            *)
+              echo "FATAL: top CHANGELOG heading is '$first_heading', not the [$VERSION] entry."
+              echo "Refusing to publish mismatched release notes — fix CHANGELOG.md ordering first."
+              exit 1
+              ;;
+          esac
           # Extract everything from the first "## [" heading up to (not including)
           # the second, dropping the heading line itself. Never use the single-range
           # awk pattern (awk '/^## \[X\]/,/^## \[/') — the heading matches both ends
@@ -89,6 +139,10 @@ jobs:
             exit 1
           fi
           echo "--- release notes ---"; cat notes.md; echo "---------------------"
+          # Accepted divergence from CLAUDE.md's checklist: --latest is unconditional
+          # here because this workflow only runs on main, where every release is the
+          # latest. Old-minor patch releases (maintenance branches) go through the
+          # manual checklist and omit --latest.
           gh release create "v$VERSION" \
             --title "CAST v$VERSION" \
             --notes-file notes.md \

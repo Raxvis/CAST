@@ -98,7 +98,7 @@ This skill orchestrates a mini engineering pipeline by executing the canonical e
 
 Before any work begins:
 
-1. Read `CLAUDE.md`, `docs/CODE_PATTERNS.md`, `docs/FILE_CONVENTIONS.md`, and any topic-specific reference doc (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) that applies to the project. Mobile projects typically need both `docs/FRONTEND.md` and `docs/MOBILE.md`.
+1. `CLAUDE.md` and `docs/CODE_PATTERNS.md` are already in context via the session's memory imports (root `CLAUDE.md` → Memory Imports) — do **not** re-read them. Read only what the task needs beyond that: `docs/FILE_CONVENTIONS.md`, and any topic-specific reference doc (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) that applies to the project and is not already imported. Mobile projects typically need both `docs/FRONTEND.md` and `docs/MOBILE.md`.
 2. Read `artifacts/BUGS.md` if the task description references a bug ID.
 3. Read any files named in the task description.
 4. **Scope check.** If the task description implies an architectural change, a new module, a new screen, a new endpoint, or a cross-cutting change, **stop and instruct the user to run `/agent-plan` instead**. Do not attempt to inline architect or UI work into a one-off task. A helpful response: "This task introduces <specific scope>, which needs a planning stage. Run `/agent-plan \"<feature description>\"` first, then `/agent-code` to implement."
@@ -123,7 +123,7 @@ After the task passes Product validation:
 1. Run `[TEST_CMD]` one final time to confirm everything still passes.
 2. Append an entry to `artifacts/STANDUP.md` using that file's Entry Grammar: a session heading `### YYYY-MM-DD — agent-task — <task summary>` (if this run has not added one yet) and a `- product | progress | <task summary, any bug ID resolved>` line.
 3. **Docs Writer.** Invoke the **docs-writer** agent to drain the `docs` entries from `artifacts/STANDUP.md` (entries of the form `- <agent> | docs | <note>` — see that file's Entry Grammar). Docs Writer marks each drained entry with ✅.
-4. If the task resolved a bug filed in `artifacts/BUGS.md`, update the bug's status (→ Fixed, with the resolution fields — Commit, Files Changed, Regression Notes — filled in).
+4. If the task resolved a bug filed in `artifacts/BUGS.md`, advance its status per that file's field-ownership table (which is canonical): Coder already set the status to **Fixed** at fix time, filling in the resolution fields (Commit, Files Changed, Regression Notes) — verify this happened and have Coder backfill it if not. Now that Tester has passed and Product has validated, **Product** advances the status **Verified** → **Closed**.
 5. Summarize what changed, what tests were affected, and any follow-up items or deferred scope.
 
 ### Error Handling

@@ -122,12 +122,13 @@ Document usage rules:
 - Architecture reviews Coder's Pre-Handoff Checklist items related to code structure.
 - Architecture-adherence review items live in reviewer.md's Review Checklist; Architecture owns their content and updates them there.
 - Architecture escalates conflicts with Product to Validator.
+- When your work changes something documentation-worthy — an API, module boundary, data schema, convention, or dependency decision — append `- architect | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
 
 ---
 
 ## State
 
-Live state lives in `artifacts/AGENT_STATE.md` → `## architect` (Current Work, Architecture Documents index, Decisions Log, Technical Validation Feedback, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there — the architect section uses the five-column variant with Alternatives Considered.
+Live state lives in `artifacts/AGENT_STATE.md` → `## architect` (Current Work, Architecture Documents index, Decisions Log, Technical Validation Feedback, Future Work). Read that section on activation. Logs are append-only — append new rows, never rewrite history; current-state cells (dashboards, status columns, % done) update in place. Log decisions per the format defined there — the architect section uses the five-column variant with Alternatives Considered.
 
 ---
 

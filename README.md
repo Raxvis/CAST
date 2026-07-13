@@ -10,7 +10,7 @@
 
 > **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three pipeline skills, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v1.3.0-blue)
+![Template version](https://img.shields.io/badge/template-v1.4.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
 
@@ -35,11 +35,18 @@ Engineering stage — /agent-code
                                      └──  Issue   →  Refactor  →  Tester  →  Reviewer (loop)
                                                                       │
                                                                       ▼
-                                                                    Product
-                                                                   validates
+                                                               Product validates
                                                                       │
                                                                       ▼
-                                                                     done
+                                          task checkpoint: docs drain (Docs Writer) + outcome
+                                          record (Validator)
+                                                                      │
+                                             ... every task Complete or Deferred? ...
+                                                                      ▼
+                                          milestone checkpoint: Deferred re-triage (Product)
+                                          →  completion + validation records (Product)
+                                          →  UX review (UI, UI-flagged milestones only)
+                                          →  retrospective (Validator)
 
 
 One-off task — /agent-task  (no planning stage, for small self-contained changes)
@@ -55,7 +62,7 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 - **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v1.3.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v1.4.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
@@ -99,8 +106,9 @@ This works for greenfield projects, existing projects with no agentic workflow, 
 
 **Next steps after adoption:**
 
-1. Walk through [`docs/FIRST_RUN.md`](skills/cast-init/assets/docs/FIRST_RUN.md) (installed to your project's `docs/`) for the interactive checklist (`/agents`, `/agent-plan` dry run, optional per-agent smoke probes).
-2. Commit the populated template as your first commit.
+1. Restart the session so the installed agents and pipeline skills register.
+2. Walk through [`docs/FIRST_RUN.md`](skills/cast-init/assets/docs/FIRST_RUN.md) (installed to your project's `docs/`) for the interactive checklist (`/agents`, `/agent-plan` dry run, optional per-agent smoke probes).
+3. Commit the populated template as your first commit.
 
 ### Keeping CAST up to date
 
@@ -168,7 +176,7 @@ Each subdirectory defines one pipeline skill that orchestrates a multi-agent wor
 
 Reference material only. These are not agent definitions and not work artifacts — they are shared knowledge that multiple agents and human contributors reference: domain rules, quality standards, coding conventions, and reusable document templates. Agents must read from `docs/` but must not write work artifacts to `docs/`.
 
-**Topic-specific reference docs.** Four files in `docs/` are scoped to a project type rather than being universal: `FRONTEND.md`, `BACKEND.md`, `CLI.md`, and `MOBILE.md`. Keep the one(s) that match your project and delete the rest. The shipped `root/CLAUDE.md` is agnostic and has commented `@import` lines for all four — uncomment the relevant line(s) after install so the right patterns get loaded into session context.
+**Topic-specific reference docs.** Four files in `docs/` are scoped to a project type rather than being universal: `FRONTEND.md`, `BACKEND.md`, `CLI.md`, and `MOBILE.md`. Keep the one(s) that match your project and delete the rest. The shipped `root/CLAUDE.md` is agnostic and names all four as inert backticked paths in its import block — a Claude Code import only fires as a bare `@path` line, so after install copy the relevant one(s) out as bare lines (e.g. `@docs/BACKEND.md`) to load those patterns into session context.
 
 - **`docs/FRONTEND.md`** — user-facing visual interfaces (web, mobile, desktop GUI, game UI). Covers navigation, state management, UI components, performance, input handling, platform differences.
 - **`docs/BACKEND.md`** — API servers, background workers, data pipelines. Covers request boundaries, persistence, error handling and HTTP status codes, auth, middleware, observability, background jobs.
@@ -188,7 +196,7 @@ Work artifacts produced by the agents during `/agent-plan` and `/agent-code`: mi
 Project-specific content in every template file is marked with `[UPPER_SNAKE_CASE]` tokens — things like `[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[TEST_CMD]`. The `/cast-init` skill detects project values and substitutes them during install; any remaining unfilled tokens are reported in the adoption report for you to fill in by hand. The skill also strips the `<!-- TEMPLATE INSTRUCTIONS -->` comment blocks (repo documentation) from every file it installs — only the `templates/` skeletons keep theirs, since those blocks instruct the agents that instantiate them.
 
 <details>
-<summary><strong>Full placeholder reference</strong> (10 categories, ~40 tokens) — expand if you're populating files manually or writing a values file</summary>
+<summary><strong>Full placeholder reference</strong> (10 categories, 40+ tokens) — expand if you're populating files manually or writing a values file</summary>
 
 ### Identity
 
@@ -224,6 +232,7 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 | `[DEV_SERVER_CMD]` | Command to start the local development server | the project's start/watch command |
 | `[TYPE_CHECK_CMD]` | Command to run the static type checker without emitting output | the project's type-check command |
 | `[TEST_CMD]` | Command to execute the full test suite | the project's test command |
+| `[TEST_COVERAGE_CMD]` | Command to run the test suite with coverage reporting — the coverage targets in `docs/TEST_FRAMEWORK.md` are measured against its output | the project's coverage command |
 | `[BUILD_CMD]` | Command to produce a production build artifact | the project's build command |
 
 ### Domain
@@ -263,6 +272,7 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 | Placeholder | Description | Example value |
 |---|---|---|
 | `[TARGET_PLATFORMS]` | Comma-separated list of deployment targets | web, iOS, Android, desktop |
+| `[PLATFORM_LIST]` | Comma-separated list of platforms the project supports — used by the bug report form's Platform field in `artifacts/BUGS.md` and the PRD's compatibility requirements | iOS, Android, Web |
 | `[MIN_TOUCH_TARGET]` | Minimum interactive element size for touch interfaces | any size specification in platform units |
 
 ### Performance
@@ -270,6 +280,7 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 | Placeholder | Description | Example value |
 |---|---|---|
 | `[STARTUP_METRIC]` | Maximum acceptable app startup time | 2s |
+| `[TICK_INTERVAL_MS]` | Update loop tick interval in milliseconds — the cadence the core loop runs at in `docs/CODE_PATTERNS.md`; `[TICK_METRIC]` budgets each tick's duration | 100 |
 | `[TICK_METRIC]` | Maximum acceptable update loop duration | 16ms |
 | `[RENDER_METRIC]` | Maximum acceptable frame render time | 16ms |
 | `[MEMORY_METRIC]` | Maximum acceptable memory usage | 200MB |
@@ -309,7 +320,7 @@ A common source of confusion: this repo is a **template**, not a framework. Sett
 - **The pipeline skills are orchestration scripts written in Markdown.** `/agent-plan` and `/agent-code` tell Claude Code to invoke a specific sequence of subagents. They are not compiled, not executable, and not testable outside Claude Code. Reading them is reading their full behavior.
 - **The workflow is Claude Code-specific.** Copilot CLI, Gemini CLI, Cursor, and other AI tools do not honor `.claude/agents/`. Porting the template to another tool requires manual adaptation — read each agent file as a prompt and invoke it however that tool supports role prompts. (The `SKILL.md` format itself is portable across a growing set of agents, but the subagent roster and orchestration are Claude Code conventions.)
 - **No code is written by installing this template.** You get a directory layout, agent role files, pipeline skill definitions, document templates, and empty work-artifact scaffolding. Your first real output appears after you run `/agent-plan` on a feature.
-- **Templates contain nested placeholders.** Some files (bug report forms, milestone validation records) include their own fill-in-per-use placeholders like `[DATE]`, `[REPRODUCTION_STEPS]`, `[TASK_NAME]`. These are not bugs in your customization — they are deliberate sub-templates filled in each time the form is used.
+- **Templates contain nested placeholders.** Some files (bug report forms, milestone validation records) include their own fill-in-per-use placeholders like `[DATE]`, `[MILESTONE_NAME]`, `[TASK_NAME]`. These are not bugs in your customization — they are deliberate sub-templates filled in each time the form is used.
 
 Common problems you may hit during adoption or first use — a pipeline skill not recognized, subagent not delegating, `features/` references after upgrade, CEO returning REVISION REQUIRED — are covered in [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md). Skim it before filing a new issue.
 
@@ -320,21 +331,10 @@ Before installing, browse [`example/`](example/) to see exactly what a real popu
 - A fully substituted `CLAUDE.md` with no `[PLACEHOLDER]` tokens ([`example/CLAUDE.md`](example/CLAUDE.md))
 - A populated PRD, concept, and glossary ([`example/docs/`](example/docs/))
 - A complete planning run for Milestone 1: milestone definition, task breakdown, architecture document, UI spec, security review, performance review, and CEO verdict ([`example/artifacts/`](example/artifacts/))
-- A milestone completion report, an active bug tracker with one fixed bug and one open deferred bug, and a three-day session log
+- The full engineering wrap-up for that milestone: completion and validation records, the UX review, and the Validator retrospective
+- An active bug tracker with one fixed bug and one Deferred (held-open) bug, and a session log following the canonical `STANDUP.md` entry grammar
 
 The example deliberately omits `.claude/` (those files are unchanged copies of the template agents and pipeline skills) and `src/` (this is a planning fixture, not a real build). The start-here file is [`example/README.md`](example/README.md).
-
----
-
-## Quick Start
-
-1. In your target project: `npx skills add Raxvis/CAST` (or `/plugin marketplace add Raxvis/CAST` + `/plugin install cast@cast`).
-2. Open (or restart) Claude Code inside the project directory.
-3. Run: `/cast-init`
-4. Claude crawls your project, proposes a migration plan, and waits for your approval.
-5. After approval, Claude installs agents, pipeline skills, docs, artifacts, and `CLAUDE.md` — substituting detected project values.
-6. Restart the session, then walk through your project's `docs/FIRST_RUN.md` to verify everything loaded correctly.
-7. Commit the populated template as your first commit.
 
 ---
 
@@ -377,19 +377,21 @@ With agent files in `.claude/agents/`, Claude Code can invoke them in three ways
 | Skill | Purpose |
 |---|---|
 | `/agent-plan <feature>` | Run the Planning Stage end-to-end. Product → Architecture + UI → Security + Performance → CEO. Produces planning documents and a CEO verdict. No code is written. |
-| `/agent-code <milestone-or-task>` | Run the Engineering Stage for a CEO-approved milestone. Coder → Tester → Reviewer, with Defects routed through Bug Gatherer → Product (triage) → Debugger and Issues routed through Refactor → Tester → Reviewer. |
+| `/agent-code <milestone-or-task>` | Run the Engineering Stage for a CEO-approved milestone. Coder → Tester → Reviewer, with Defects routed through Bug Gatherer → Product (triage) → Debugger and Issues routed through Refactor → Tester → Reviewer, then Product validation. After every task it drains the `docs` queue (Docs Writer) and records the outcome (Validator); when every task is Complete or Deferred, the milestone checkpoint runs Deferred re-triage, the completion and validation records, the UX review (UI-flagged milestones), and the retrospective. |
 | `/agent-task <task description>` | Run a mini engineering pipeline for a single one-off task without requiring a milestone or CEO verdict. Coder → Tester → Reviewer, with the same Defect/Issue routing as `/agent-code`. Use for bug fixes, typos, small refactors, and dependency bumps — NOT for new modules or cross-cutting changes. |
 
 ### Inter-Agent Handoff
 
 Agents communicate through shared documents. When one agent completes work, the next agent reads the updated files:
 
-- **`artifacts/AGENT_STATE.md`** holds every agent's live working state (Current Work tables, decision logs) in one file, one section per agent — agent definition files are immutable and carry only a pointer to their section.
+- **`artifacts/AGENT_STATE.md`** holds every agent's live working state (Current Work tables, decision logs) in one file, one section per agent — agent definition files are immutable and carry only a pointer to their section. Validator records task and milestone outcomes here at every checkpoint.
 - **`docs/PIPELINE_LOOP.md`** is the canonical engineering-loop contract (per-task sequence, Defect/Issue routing, loop-counter and test-gate rules) that both `/agent-code` and `/agent-task` execute.
-- **`artifacts/BUGS.md`** is the shared bug tracker (Bug Gatherer files, Product triages, Debugger investigates, Coder fixes).
+- **`artifacts/STANDUP.md`** is the rolling session log with one canonical Entry Grammar: each run opens a `### YYYY-MM-DD — <skill> — <milestone/task>` session heading, and every entry under it is a `- <agent> | <type> | <note>` line. Any agent with documentation fallout appends a `- <agent> | docs | <note>` entry; Docs Writer drains those entries (marking them ✅) at the task- and milestone-completion checkpoints.
+- **`artifacts/BUGS.md`** is the shared bug tracker (Bug Gatherer files, Product triages, Debugger investigates, Coder fixes). Deferred is a held-open state, not a terminal one — the terminal states are Closed, Won't Fix, Duplicate, and Cannot Reproduce — and Product re-triages every Deferred item at milestone completion and at the next `/agent-plan` Stage 1.
 - **Planning architecture documents** at `artifacts/architecture/arch-milestone-{N}.md` are the contract between Architect and Coder for a specific milestone. Templates live at `templates/ARCH_MODULE.md`, `templates/ARCH_SYSTEM.md`, and `templates/ARCH_DATA_SCHEMA.md`.
-- **Planning UI specifications** at `artifacts/ui-specs/ui-milestone-{N}.md` are the contract between UI and Coder. Template lives at `templates/UI_SPEC.md`.
-- **CEO planning verdicts** at `artifacts/reviews/ceo-review-milestone-{N}.md` gate entry into the engineering stage. Template lives at `templates/CEO_REVIEW.md`.
+- **Planning UI specifications** at `artifacts/ui-specs/ui-milestone-{N}.md` are the contract between UI and Coder. Template lives at `templates/UI_SPEC.md`. Produced only when the `ui` agent is installed — a backend/CLI project that opted out of `ui` runs both pipelines without a UI spec, and `/agent-code` does not demand one.
+- **CEO planning verdicts** at `artifacts/reviews/ceo-review-milestone-{N}.md` gate entry into the engineering stage via a single `**Verdict**: <APPROVED | APPROVED WITH CONDITIONS | REVISION REQUIRED>` line that `/agent-code` Pre-Flight parses; on APPROVED WITH CONDITIONS the conditions are backfilled into the tasks file's CEO Approval Conditions table. Template lives at `templates/CEO_REVIEW.md`.
+- **Milestone-completion records**: Product writes the completion record (Status `Complete`, or `Complete with Deferrals` when Deferred items survive re-triage) and the validation record under `artifacts/milestones/`; UI writes the UX review for UI-flagged milestones and Validator writes the retrospective, both under `artifacts/reviews/` (templates `UX_REVIEW.md` and `MILESTONE_RETROSPECTIVE.md`).
 
 ### Minimum Viable Agent Set
 
@@ -427,10 +429,14 @@ If you do not want a CEO planning gate, **delete both `/agent-plan` and `/agent-
 
 ### Optional based on project type
 
-- **Release** — Projects with formal release processes
-- **Refactor** — Projects with technical debt concerns
-- **Bug Gatherer** — Projects with external bug reporters
-- **Validator** — Large teams or complex multi-agent workflows
+Only two agents are truly optional by project type — both are still installed by default, so opting out is an explicit choice during `/cast-init`:
+
+- **Release** — keep for any project that ships formal releases or maintains `docs/CHANGELOG.md`; drop only for scratch projects that never cut a release.
+- **Validator** — keep for any project running `/agent-plan` or `/agent-code`; drop only for a strict single-developer workflow with no agent-vs-agent escalation.
+
+One conditional opt-out: **UI** (Tier 4) becomes optional for backend/CLI-only projects with no user interface. The opt-out is explicit during `/cast-init` (the UI templates are skipped together with the agent), `/agent-plan` then skips its UI design stage, and `/agent-code` does not require a UI spec when no `ui` agent is installed.
+
+**Refactor and Bug Gatherer are not optional** if you keep any pipeline skill — they are the Tier 3 Defect/Issue routing targets that Reviewer hands off to. They only come out if you delete all three pipelines and run the agents ad-hoc.
 
 ---
 

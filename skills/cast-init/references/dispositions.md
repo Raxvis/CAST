@@ -26,6 +26,7 @@ For each CAST reference doc and document template, determine the disposition fro
 | `templates/MILESTONE_TASKS.md` | **Always install** — consumed by /agent-plan Stage 1 | Same |
 | `templates/MILESTONE_COMPLETION.md` | **Always install** | Same |
 | `templates/MILESTONE_VALIDATION.md` | **Always install** | Same |
+| `templates/MILESTONE_RETROSPECTIVE.md` | **Always install** — consumed by the Validator at milestone completion; installs verbatim like the other `templates/*` skeletons | Same |
 | `templates/ARCH_MODULE.md` | **Always install** — consumed by /agent-plan Stage 2a | Same |
 | `templates/ARCH_SYSTEM.md` | **Always install** | Same |
 | `templates/ARCH_DATA_SCHEMA.md` | **Always install** | Same |

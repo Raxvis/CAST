@@ -97,6 +97,8 @@ The Debugger Agent may NOT:
 - For every non-trivial bug, Debugger provides at least two alternative solution approaches with trade-offs.
 - When a bug suggests a systemic design issue, Debugger escalates to Architecture with a detailed analysis.
 - Debugger coordinates with Bug Gatherer to ensure no duplicate entries and consistent formatting.
+- When an investigation cannot reproduce the defect with all available information, Debugger sets the report's status to **Cannot Reproduce** — this status is Debugger's to set, after investigation (the field-ownership table in `artifacts/BUGS.md` is canonical).
+- When your work changes something documentation-worthy — an API, command, configuration, convention, or user-facing behavior — append `- debugger | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
 
 ---
 
@@ -124,7 +126,7 @@ When Debugger completes investigation, the Bug Report's status changes from "Tri
 
 `New` (Bug Gatherer files) → `Triaged` (Product assigns severity/priority) → `In Progress` (Debugger investigates, Coder/Refactor fixes) → `Fixed` (fix submitted) → `Verified` (Tester confirms fix) → `Closed` (Product signs off)
 
-Additional statuses: `Cannot Reproduce` (Debugger or Bug Gatherer), `Duplicate` (Bug Gatherer), `Won't Fix` (Product), `Deferred` (Product)
+Additional statuses: `Cannot Reproduce` (set by Debugger after investigation), `Duplicate` (set by Bug Gatherer at filing time), `Won't Fix` (Product — including "Not a Bug" triage outcomes, recorded with rationale), `Deferred` (Product — an **open** held state, re-triaged by Product at milestone completion and next-milestone planning). Terminal states are `Closed`, `Won't Fix`, `Duplicate`, and `Cannot Reproduce`. The field-ownership table at the top of `artifacts/BUGS.md` is canonical.
 
 The bug entry stays in place in `artifacts/BUGS.md` throughout — update the existing record's fields and Status; entries are never moved between file sections, and no new report is filed for an existing bug.
 
@@ -132,4 +134,4 @@ The bug entry stays in place in `artifacts/BUGS.md` throughout — update the ex
 
 ## State
 
-Live state lives in `artifacts/AGENT_STATE.md` → `## debugger` (Current Work investigations, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.
+Live state lives in `artifacts/AGENT_STATE.md` → `## debugger` (Current Work investigations, Decisions Log, Future Work). Read that section on activation. Logs are append-only — append new rows, never rewrite history; current-state cells (dashboards, status columns, % done) update in place. Log decisions per the format defined there.

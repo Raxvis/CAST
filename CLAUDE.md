@@ -26,7 +26,7 @@ This is a hard rule enforced across the template: **`docs/` is documentation, `t
 
 ## Placeholder Convention
 
-All project-specific content uses `[UPPER_SNAKE_CASE]` tokens in square brackets. Categories: Identity (`[PROJECT_NAME]`, `[PROJECT_TYPE]`, `[CAST_VERSION]` — the latter auto-stamped by `/cast-init` from its own version), Tech (`[FRAMEWORK]`, `[LANGUAGE]`), Commands (`[DEV_SERVER_CMD]`, `[TEST_CMD]`), Domain (`[DOMAIN_ENTITY]`, `[CORE_MECHANIC]`), Platform (`[TARGET_PLATFORMS]`), Project Structure (`[LOGIC_DIR]`, `[COMPONENTS_DIR]`), Conventions (`[LOWER_CASE_CONVENTION]`), Persistence (`[SAVE_KEY]`), Performance (`[STARTUP_METRIC]`), Process (`[SESSION_TYPE]`, `[MAX_LOOP_COUNT]`). Every token documented in README's placeholder table must appear somewhere under `skills/cast-init/assets/` — CI enforces this. Per-agent AI models are pre-configured in each agent file's YAML frontmatter and are not placeholders.
+All project-specific content uses `[UPPER_SNAKE_CASE]` tokens in square brackets. Categories: Identity (`[PROJECT_NAME]`, `[PROJECT_TYPE]`, `[CAST_VERSION]` — the latter auto-stamped by `/cast-init` from its own version), Tech (`[FRAMEWORK]`, `[LANGUAGE]`), Commands (`[DEV_SERVER_CMD]`, `[TEST_CMD]`), Domain (`[DOMAIN_ENTITY]`, `[CORE_MECHANIC]`), Platform (`[TARGET_PLATFORMS]`), Project Structure (`[LOGIC_DIR]`, `[COMPONENTS_DIR]`), Conventions (`[LOWER_CASE_CONVENTION]`), Persistence (`[SAVE_KEY]`), Performance (`[STARTUP_METRIC]`), Process (`[SESSION_TYPE]`, `[MAX_LOOP_COUNT]`). CI enforces the token/table sync in both directions: every token in README's placeholder table must appear somewhere under `skills/cast-init/assets/`, and every payload token must appear in the table unless it is on the per-use allowlist in `validate.yml` (sub-template tokens like `[DATE]` that agents fill each time a form is used). Per-agent AI models are pre-configured in each agent file's YAML frontmatter and are not placeholders.
 
 When editing templates, preserve placeholder tokens — do not replace them with concrete values unless adapting the template for a specific project.
 
@@ -44,7 +44,7 @@ When editing templates, preserve placeholder tokens — do not replace them with
 
 ## Key Files
 
-- `README.md` — Master index with full placeholder reference table and quick start guide
+- `README.md` — Master index with full placeholder reference table and install guide
 - `skills/cast-init/SKILL.md` — The `/cast-init` adoption workflow (replaced `PROMPT.md` in v1.0.0); detailed phase docs live beside it in `references/`
 - `.claude-plugin/plugin.json` — Plugin manifest; carries one of the four synchronized version fields
 - `skills/cast-init/assets/root/CLAUDE.md` — The CLAUDE.md template that gets placed in target projects (heavily parameterized)
@@ -60,13 +60,20 @@ When editing templates, preserve placeholder tokens — do not replace them with
 - Agent files include YAML frontmatter (`name`, `description`) for Claude Code subagent registration; they are self-contained and removing one does not break others
 - Keep `skills/cast-init/SKILL.md` under 500 lines — move detail into `skills/cast-init/references/` (progressive disclosure)
 - Payload pipeline skills (`assets/skills/<name>/SKILL.md`) must keep frontmatter `name` equal to the directory name, and their `[PLACEHOLDER]` tokens intact
-- `assets/root/CLAUDE.md` contains `@import` directives at the bottom referencing docs that should be loaded as context
+- `assets/root/CLAUDE.md` ends with an import block: bare `@docs/<FILE>.md` lines load docs into session context (only `@docs/CODE_PATTERNS.md` is always-on; `@docs/PRD.md` is added once populated), while backticked paths listed there are deliberately inert — a Claude Code import only fires as a bare `@path` line
 
 ## Release and Tagging Policy
 
 Whenever the template version is bumped, the new version must be tagged and released on GitHub at the same time the commit is pushed. This is a hard rule, not a preference — `plugin.json` and the SKILL.md metadata carry the template version, and downstream users rely on GitHub tags to pin a known-good revision (skill installs via `npx skills update` are content-hash based, but the plugin route and humans pin by tag). A push without a corresponding tag leaves the canonical version floating and breaks reproducible installs.
 
 **Automation:** `.github/workflows/release.yml` automates checklist steps 5–6. On every push to `main` it reads `.claude-plugin/plugin.json`; if no `v<version>` tag exists yet, it verifies the four synchronized locations agree (failing loudly on mismatch), creates the annotated tag, and publishes the GitHub Release from the top `CHANGELOG.md` section. A second job triggered by `v*` tag pushes verifies tag/version/CHANGELOG integrity. The manual checklist below remains the fallback if the workflow is unavailable — and step 7 (verify) should be run either way.
+
+The workflow **self-heals** the one plausible partial failure: if a prior run pushed the tag but died before the Release was published, the next run on `main` (a re-run of the workflow, or any push) detects "tag exists but Release doesn't", re-verifies the four locations, and publishes the missing Release at the existing tag without re-pushing the tag. It skips as a no-op only when tag **and** Release both exist.
+
+Two accepted divergences between the workflow and the manual checklist:
+
+1. **The workflow tags the push head (`GITHUB_SHA`), not "the bump commit".** These coincide only when the version-bump commit is the last commit of its push — so never push the bump commit together with follow-up commits in the same push. Bump, push, then push anything else separately.
+2. **The workflow passes `--latest` unconditionally.** It only triggers on `main`, where every release is the latest, so this is correct there. A patch release of a non-current minor (cut from a maintenance branch) must be tagged and released via the manual checklist, omitting `--latest`.
 
 Known quirk: when `release.yml` itself pushes the tag, the `tag-integrity` job does NOT fire — GitHub suppresses workflow triggers from events created with `GITHUB_TOKEN` (recursion guard). This is expected; the integrity job exists to check *manually* pushed tags. Absence of a `tag-integrity` run after an automated release is not a failure — `gh release view v<NEW>` is the verification that matters.
 

@@ -219,23 +219,30 @@ The project uses a strict split between reference material, document templates, 
 
 When in doubt, read `docs/FILE_CONVENTIONS.md` and `artifacts/README.md`.
 
+This structure and the agent workflow were installed by CAST
+(https://github.com/Raxvis/CAST).
+Adopted with CAST v1.4.0
+
 ## Memory Imports
 
 These documents are loaded into Claude Code's context at every session start.
 They provide the baseline context all agents need. The list is kept lean —
 every import is paid in every session. The Directory Conventions section above
 already covers where files live; agents read the detailed reference docs on
-demand by path.
+demand by path (the planning stage reads `docs/PRD.md` on demand regardless of
+whether it is imported here).
 
-<!-- Core context (Claude Code memory-import syntax: a bare @path per line) -->
+<!-- Core context — keep this. In a real install the always-on core import is
+     a bare "@docs/CODE_PATTERNS.md" line; this fixture omits that doc for
+     brevity (see README.md → Deliberate Omissions), so the line is not active
+     here. For a CLI project like this one, the topic-specific import would be
+     "@docs/CLI.md" (also omitted from the fixture). -->
+
+<!-- docs/PRD.md ships as a placeholder skeleton and stays gated (import left
+     inert) until it contains real project content — importing a skeleton pays
+     for hundreds of placeholder lines per session. Acme Todo's PRD is
+     populated (v0.1.0, Approved), so its import is active: -->
 @docs/PRD.md
-
-<!-- Fixture note: this example ships only PRD.md, CONCEPT.md, and GLOSSARY.md
-     under docs/ (see README.md → Deliberate Omissions), so only PRD.md is
-     imported above. A real populated project would also import its conventions
-     doc and its project-type reference doc here — for a CLI project like this
-     one, add lines reading "@docs/CODE_PATTERNS.md" and "@docs/CLI.md"
-     (without the quotes). -->
 
 <!-- On-demand reference — agents read these by path when a task calls for them
      (coder/docs-writer: FILE_CONVENTIONS; coder/reviewer: ERROR_HANDLING; tester:

@@ -22,9 +22,14 @@ See `CLAUDE.md` for the full project overview and `docs/PRD.md` for requirements
 2. The CEO verdict was **APPROVED WITH CONDITIONS** (three conditions covering
    parameterized SQL, WAL mode plus an index on `completed`, and migration
    on first invocation).
-3. `/agent-code` ran on 2026-04-09, implementing tasks T-1 through T-5.
-4. Milestone 1 was marked complete on 2026-04-10. Two bugs were filed along
-   the way (see `artifacts/BUGS.md`).
+3. `/agent-code` ran on 2026-04-09 and 2026-04-10, implementing tasks T-1
+   through T-5. Two bugs were filed along the way (see `artifacts/BUGS.md`).
+4. The milestone-completion checkpoint fired on 2026-04-10: Product re-triaged
+   the Deferred BUG-002 (held Deferred into M2 — Deferred is an open, held
+   state, not terminal) and wrote the completion record ("Complete with
+   Deferrals") and the milestone validation record; the UI agent reviewed the
+   implemented command surface (UX review, APPROVED WITH NOTES); Docs Writer
+   drained the `docs` queue; and Validator wrote the milestone retrospective.
 
 ## Where to Start Reading
 
@@ -35,18 +40,36 @@ Read these in order for the clearest picture:
 3. **`artifacts/milestones/milestone-1-task-crud.md`** — the M1 plan.
 4. **`artifacts/reviews/ceo-review-milestone-1.md`** — the APPROVED WITH
    CONDITIONS verdict and the three conditions that shaped implementation.
-5. **`artifacts/BUGS.md`** — BUG-001 (closed during M1) and BUG-002 (deferred),
-   in the canonical single-list schema with per-stage field ownership.
-6. **`artifacts/AGENT_STATE.md`** — every agent's live working state after
+5. **`artifacts/BUGS.md`** — BUG-001 (closed during M1) and BUG-002 (Deferred —
+   an open, held state re-triaged by Product at milestone completion), in the
+   canonical single-list schema with per-stage field ownership.
+6. **`artifacts/milestones/milestone-1-task-crud-validation.md`** — Product's
+   milestone-grain validation record (Approved with Notes), and its companion
+   completion report (`-completion.md`, "Complete with Deferrals").
+7. **`artifacts/reviews/ux-review-milestone-1.md`** — the UI agent's review of
+   the implemented command surface against the approved spec.
+8. **`artifacts/reviews/retrospective-milestone-1.md`** — the Validator's
+   retrospective, with every metric filled from a recorded fixture source.
+9. **`artifacts/AGENT_STATE.md`** — every agent's live working state after
    Milestone 1 closed: current work, decision logs, and the validator's
    dashboards, one section per agent.
-7. **`artifacts/STANDUP.md`** — the rolling session log across the three days.
+10. **`artifacts/STANDUP.md`** — the rolling session log across the three days,
+    written in the canonical Entry Grammar (typed one-liner entries under
+    dated session headings, with loop counters and the ✅-marked Docs Writer
+    queue).
 
 ## Directory Layout
 
-- `CLAUDE.md` — populated project root context
+- `CLAUDE.md` — populated project root context, stamped `Adopted with CAST v1.4.0`
 - `docs/` — PRD, CONCEPT, GLOSSARY (only these; see Deliberate Omissions below)
-- `artifacts/` — all live milestone work, reviews, bugs, agent state, and session log
+- `artifacts/` — all live milestone work:
+  - `AGENT_STATE.md`, `BUGS.md`, `STANDUP.md` — the three live state files
+  - `milestones/` — milestone definition, task breakdown, completion report,
+    and validation record for M1
+  - `architecture/arch-milestone-1.md` and `ui-specs/ui-milestone-1.md` — the
+    approved design specs
+  - `reviews/` — security, performance, and CEO planning reviews, plus the
+    milestone-completion UX review and retrospective
 
 ## Deliberate Omissions
 

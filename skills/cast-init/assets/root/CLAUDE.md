@@ -171,13 +171,13 @@ Adopted with CAST v[CAST_VERSION]
 These documents are loaded into Claude Code's context at every session start. They
 provide the baseline context all agents need. Keep this list lean — every import is
 paid in every session. The Directory Conventions section above already covers where
-files live; agents read the detailed reference docs on demand by path.
+files live; agents read the detailed reference docs on demand by path (the planning
+stage reads `docs/PRD.md` on demand regardless of whether it is imported here).
 
-<!-- Core context — keep these -->
-@docs/PRD.md
+<!-- Core context — keep this -->
 @docs/CODE_PATTERNS.md
 
-<!-- Topic-specific context — add a bare import line (like the two above) for the
+<!-- Topic-specific context — add a bare import line (like the one above) for the
      one(s) that match your project type, and ignore the rest. These files ship with
      the template and can be edited freely: `@docs/FRONTEND.md`, `@docs/BACKEND.md`,
      `@docs/CLI.md`, `@docs/MOBILE.md`. Paths in backticks here are inert — an import
@@ -189,5 +189,6 @@ files live; agents read the detailed reference docs on demand by path.
      line only if your sessions repeatedly need one unprompted:
      `@docs/FILE_CONVENTIONS.md`, `@docs/ERROR_HANDLING.md` -->
 
-<!-- Add once they contain real project content:
-     `@docs/CONCEPT.md`, `@docs/ADDITIONAL.md`, `@docs/GLOSSARY.md` -->
+<!-- Add once they contain real project content (at install time these are placeholder
+     skeletons — importing them pays for hundreds of skeleton lines per session):
+     `@docs/PRD.md`, `@docs/CONCEPT.md`, `@docs/ADDITIONAL.md`, `@docs/GLOSSARY.md` -->

@@ -10,6 +10,10 @@
   - Replace [AUTHOR] with the name or role of the person writing the report.
   - Fill in the Delivered section with all features and changes completed in this milestone.
   - List deferred items that were originally planned but moved to a future milestone.
+  - Header Status: use "Complete with Deferrals" when any task or bug is still Deferred
+    after Product's re-triage at the milestone-completion checkpoint, and list every such
+    item under Known Issues. Deferred is a held-open state — those items are re-triaged
+    again at the next /agent-plan Stage 1, not forgotten.
   - Capture lessons learned to improve future milestone planning and execution.
   - Copy this template to `artifacts/milestones/milestone-{N}-{slug}-completion.md` for each milestone.
   - Sections marked (required) must be present and non-empty in every instance;
@@ -20,6 +24,12 @@
 
 # [PROJECT_NAME] — [MILESTONE_NAME] Completion Report
 
+## Revision History (required)
+
+| # | Date | Agent | Reason |
+|---|---|---|---|
+| v1 | [YYYY-MM-DD] | product | Initial version |
+
 ---
 
 ## Header (required)
@@ -29,7 +39,7 @@
 | **Milestone** | [MILESTONE_NAME] |
 | **Completion Date** | [YYYY-MM-DD] |
 | **Author** | [AUTHOR] |
-| **Status** | Complete / Complete with Deferrals |
+| **Status** | Complete / Complete with Deferrals — use "Complete with Deferrals" when any task or bug remains Deferred after re-triage; list each under Known Issues |
 
 ---
 
@@ -66,7 +76,7 @@ _If nothing was deferred, replace this table with "Nothing deferred."_
 
 ## Known Issues (required)
 
-Issues discovered during this milestone that remain open.
+Issues discovered during this milestone that remain open — including every task or bug still **Deferred** after Product's re-triage (these make the Header Status "Complete with Deferrals").
 
 | ID | Description | Severity | Owner | Tracked In |
 |----|-------------|----------|-------|------------|

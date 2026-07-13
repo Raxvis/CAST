@@ -1,63 +1,105 @@
-# Acme Todo — Daily Session Log
+# Acme Todo — Session Log
 
 ---
 
 ## Purpose
 
-This file serves as a lightweight continuity log. Before starting each session, read the most recent entry. After each session, add a new entry at the top of the Log section.
+This file serves as a lightweight continuity log. Before starting each session, read the most recent session section. During and after each session, append entries using the Entry Grammar below.
 
 ---
 
-## Entry Template
+## Entry Grammar
 
-Copy this block and fill it in at the start (or end) of each session:
+This is the **single canonical format** for everything written to this file. All producers — `/agent-plan` stage checkpoints, `/agent-code` and `/agent-task` completion entries, the loop counters from `docs/PIPELINE_LOOP.md`, and the Docs Writer queue — use it.
+
+**Session sections** are added newest-first at the top of the Log, headed:
 
 ```
-### [YYYY-MM-DD] Session
-
-**Last session**: [Summary of what was completed in the previous session.]
-**This session**: [What is planned or was accomplished in this session.]
-**Blockers**: [Any blockers encountered or expected, or "None".]
-**Active agents**: [List all agents, assistants, or team members active this session.]
+### YYYY-MM-DD — <skill> — <milestone/task>
 ```
+
+where `<skill>` is the pipeline skill running (`agent-plan`, `agent-code`, or `agent-task`) and `<milestone/task>` identifies the work (e.g., `milestone-1-task-crud` or a one-off task summary).
+
+**Entries** under a session heading are typed one-liners:
+
+```
+- <agent> | <type> | <note>
+```
+
+`<agent>` is the agent (or orchestrating skill) writing the entry. `<type>` is one of:
+
+| Type | Meaning | Note format |
+|---|---|---|
+| `progress` | Work completed — a stage finished, a task validated, an artifact written | Free text; name the artifact path where applicable |
+| `loop` | Engineering-loop cycle counter (see `docs/PIPELINE_LOOP.md`) | `Task <id>: loop <k>/3` |
+| `docs` | Documentation work queued for Docs Writer | Free text naming the doc and the needed change |
+| `decision` | A decision worth surfacing beyond the agent's own Decisions Log | Free text |
+| `blocker` | A blocker encountered (or resolved) | Free text; name the blocking dependency or agent |
+
+**The Docs Writer queue** is the set of `docs` entries not yet marked as drained. Docs Writer drains the queue at task- and milestone-completion checkpoints and marks each drained entry by appending ✅ to its line. An entry without ✅ is still pending.
+
+Entries under a session heading are appended in the order they happen (oldest first). The Milestone 1 sessions below are a worked example: `docs` entries are queued by the agent that spots the documentation need, and each Docs Writer drain entry names the checkpoint and a count that matches the ✅ marks it just added.
 
 ---
 
 ## Log
 
-### 2026-04-10 Session — Milestone 1 Completion
+### 2026-04-10 — agent-code — milestone-1-task-crud
 
-**Last session**: Ran `/agent-code M1` and completed T-1 through T-4. T-1 landed the schema, migration runner, WAL mode, and `idx_tasks_completed` index — CEO Approval Condition 2 verified by Reviewer at merge. T-2 `add` and T-4 `done`/`delete` landed cleanly. T-3 `list` discovered BUG-001 (missing DB file on first run) and fixed it inline by wiring `ensureMigrations()` into the command entry path — this is exactly CEO Approval Condition 3. CEO Approval Condition 1 (parameterized queries) verified by Reviewer at every merge.
+- coder | progress | T-5 complete: argv parser in `src/cli.ts`, entrypoint wiring in `src/index.ts`, `--help` output
+- reviewer | loop | Task T-5: loop 1/3
+- tester | progress | Full-suite gate: 42 tests passing, 100% line coverage on `src/commands/`
+- reviewer | progress | T-5 approved — no findings
+- coder | docs | CLAUDE.md Architecture section needs the final `src/cli.ts` dispatch flow documented ✅
+- bug-gatherer | progress | BUG-002 filed in `artifacts/BUGS.md` (initial severity Low): `done <id>` silently succeeds on a non-existent task ID, found during manual smoke testing
+- product | decision | BUG-002 triaged Low and set Deferred — does not affect correctness of normal flows; fix pairs with an M2 error-signaling task
+- product | progress | T-5 validated against acceptance criteria; Status set to Complete — all five tasks Complete
+- docs-writer | progress | Drained 1 docs entry at the T-5 task-completion checkpoint
+- product | progress | Milestone-completion checkpoint: all three CEO Approval Conditions Verified (1 and 2 by Reviewer, 3 by Product)
+- product | decision | Deferred re-triage at the milestone-completion checkpoint: BUG-002 held Deferred into M2 with updated rationale; re-triaged again at M2 `/agent-plan` Stage 1
+- product | progress | Completion record written: `artifacts/milestones/milestone-1-task-crud-completion.md` — Status: Complete with Deferrals (BUG-002 under Known Issues)
+- product | progress | Validation record written: `artifacts/milestones/milestone-1-task-crud-validation.md` — Approved with Notes
+- ui | progress | UX review written: `artifacts/reviews/ux-review-milestone-1.md` — APPROVED WITH NOTES (BUG-002 noted)
+- docs-writer | progress | Milestone-completion drain: no pending docs entries remained
+- validator | progress | Retrospective written: `artifacts/reviews/retrospective-milestone-1.md`; AGENT_STATE dashboards updated
+- agent-code | progress | Run complete: M1 closed — 5/5 tasks Complete, 42 tests passing, all CEO Approval Conditions Verified, BUG-002 held Deferred
 
-**This session**: Completed T-5 (CLI argument parser wiring in `src/cli.ts` and `src/index.ts`). Ran the full test suite: 42 tests passing, 100% line coverage on `src/commands/`. Ran manual smoke tests across macOS and a Linux VM. During manual testing, noticed `acme done 999` on a non-existent task ID silently succeeds with exit 0 — filed as BUG-002, triaged Low with Product, deferred to Milestone 2 because it does not affect correctness of normal flows. All three CEO Approval Conditions now verified (1 and 2 by Reviewer, 3 by Product). Wrote `artifacts/milestones/milestone-1-task-crud-completion.md` and closed Milestone 1.
+### 2026-04-09 — agent-code — milestone-1-task-crud
 
-**Blockers**: None.
+- coder | progress | T-1 complete: `Task` type, SQLite schema, idempotent migration runner with WAL mode and `idx_tasks_completed`
+- reviewer | loop | Task T-1: loop 1/3
+- reviewer | progress | T-1 approved at merge; Approval Condition 2 checked (WAL pragma and index present in the migration)
+- product | progress | T-1 validated against acceptance criteria; Status set to Complete
+- docs-writer | progress | Drained 2 docs entries at the T-1 task-completion checkpoint (both queued during planning)
+- coder | progress | T-2 complete: `add` command using `.prepare().run(params)` bindings per Approval Condition 1
+- reviewer | loop | Task T-2: loop 1/3
+- product | progress | T-2 validated against acceptance criteria; Status set to Complete
+- coder | blocker | T-3 first-run crash on a fresh install: `SqliteError: no such table: tasks` when `list` runs before any other command
+- reviewer | progress | T-3 finding classified as a Defect → routed to Bug Gatherer
+- bug-gatherer | progress | BUG-001 filed in `artifacts/BUGS.md` (initial severity High)
+- product | progress | BUG-001 triaged fix-now (final severity High) — first-run experience is a milestone acceptance criterion
+- debugger | progress | BUG-001 root cause: migrations only ran on the `add` path; recommended per-command `ensureMigrations()` (option b of three)
+- coder | progress | BUG-001 fixed (`a8f3d12`): `ensureMigrations()` wired into every command entry path — the exact remediation Approval Condition 3 demanded
+- reviewer | loop | Task T-3: loop 2/3
+- tester | progress | T-3 suite green, including the new fresh-install first-run regression test
+- product | progress | T-3 validated; Approval Condition 3 remediation confirmed; Status set to Complete
+- coder | docs | CLAUDE.md Common Pitfalls + Persistence sections need the first-run migration behaviour from BUG-001 ✅
+- docs-writer | progress | Drained 1 docs entry at the T-3 task-completion checkpoint
+- coder | progress | T-4 complete: `done` and `delete` commands with parameterized statements
+- reviewer | loop | Task T-4: loop 1/3
+- product | progress | T-4 validated against acceptance criteria; Status set to Complete — T-5 remains for the next session
 
-**Active agents**: Coder, Tester, Reviewer, Product, Bug Gatherer, Docs Writer.
+### 2026-04-08 — agent-plan — milestone-1-task-crud
 
----
-
-### 2026-04-09 Session — Milestone 1 Implementation
-
-**Last session**: Ran `/agent-plan` for Milestone 1. Product, Architecture, UI, Security, and Performance all completed their planning outputs. CEO returned APPROVED WITH CONDITIONS with three Approval Conditions covering parameterized queries, WAL mode + index, and missing-DB-on-first-run error handling.
-
-**This session**: Ran `/agent-code M1`. Completed T-1 (Task type, SQLite schema, migration runner) — the migration adds `PRAGMA journal_mode = WAL;` and `CREATE INDEX idx_tasks_completed ON tasks(completed);`, both checked by Reviewer against CEO Approval Condition 2 at merge. Completed T-2 (`add` command) using `.prepare().run(params)` bindings per CEO Approval Condition 1. Started T-3 (`list` command) and immediately discovered BUG-001 on a fresh install: running `acme list` before any other command crashes with `SqliteError: no such table: tasks`. Fixed inline by extracting `ensureMigrations()` into `src/db/connection.ts` and calling it at the top of every command handler. Product confirmed this satisfies CEO Approval Condition 3 and marked the condition verified. Completed T-4 (`done` and `delete` commands). T-5 deferred to tomorrow's session.
-
-**Blockers**: None. BUG-001 was discovered and resolved within the same session.
-
-**Active agents**: Coder, Tester, Reviewer, Debugger, Product, Bug Gatherer.
-
----
-
-### 2026-04-08 Session — Milestone 1 Planning
-
-**Last session**: None — project kickoff.
-
-**This session**: Ran `/agent-plan` with feature "Basic task CRUD with SQLite persistence". Product authored `artifacts/milestones/milestone-1-task-crud.md` with the five-task breakdown (T-1 through T-5) and acceptance criteria. Architect produced `artifacts/architecture/arch-milestone-1.md` defining the `src/db/`, `src/commands/`, and `src/cli.ts` module layout and the initial SQLite schema. UI produced `artifacts/ui-specs/ui-milestone-1.md` covering every command surface, exit code, and error message. Security filed two findings (one Critical — SQL injection risk across command handlers; one Medium — unvalidated `ACME_TODO_DB` env var). Performance filed two findings (both remediation-trivial — WAL mode not enabled, missing index on `completed`). CEO reviewed the full packet and returned **APPROVED WITH CONDITIONS** with three conditions: parameterized queries (verified by Reviewer), WAL mode + index (verified by Reviewer), and `list` handling a missing DB file via migration-on-first-invocation (verified by Product). No revision requests — all findings resolved via inline remediations rather than document rework.
-
-**Blockers**: None.
-
-**Active agents**: Product, Architect, UI, Security, Performance, CEO, Docs Writer.
+- product | progress | Stage 1 complete: `artifacts/milestones/milestone-1-task-crud.md` and `-tasks.md` (T-1 through T-5) written
+- architect | progress | Stage 2a complete: `artifacts/architecture/arch-milestone-1.md` — `src/db/`, `src/commands/`, `src/cli.ts` module layout and initial SQLite schema
+- architect | docs | docs/GLOSSARY.md needs entries for the migration runner, WAL mode, and `schema_version` ✅
+- ui | progress | Stage 2b complete: `artifacts/ui-specs/ui-milestone-1.md` — every command surface, exit code, and error message
+- ui | docs | CLAUDE.md Domain-Specific Patterns needs the stdout/stderr and exit-code contract recorded ✅
+- security | progress | Stage 3 complete: 2 findings (1 Critical — SQL injection risk across command handlers; 1 Medium — unvalidated `ACME_TODO_DB` env var) in `artifacts/reviews/security-review-milestone-1.md`
+- performance | progress | Stage 3 complete: 2 findings (WAL mode not enabled; missing index on `completed`) in `artifacts/reviews/performance-review-milestone-1.md`
+- ceo | decision | Verdict: APPROVED WITH CONDITIONS — three conditions (parameterized SQL; WAL + index; migration on first invocation) in `artifacts/reviews/ceo-review-milestone-1.md`; no revision requests
+- ceo | progress | Stage 4 complete: engineering may begin
 
 ---
 
@@ -67,9 +109,9 @@ Copy this block and fill it in at the start (or end) of each session:
 |----------|---------|
 | `BUGS.md` | Active bug tracker — reference when reporting blockers |
 | `AGENT_STATE.md` | Live per-agent working state — each agent reads its own section on activation |
-| `artifacts/milestones/milestone-1-task-crud.md` | Current milestone task breakdown — reference for planned work |
-| `artifacts/milestones/milestone-1-task-crud-completion.md` | Milestone 1 acceptance record — reference when validating completed work |
-| `artifacts/reviews/ceo-review-milestone-1.md` | Planning sign-off and Approval Conditions |
+| `milestones/milestone-1-task-crud-tasks.md` | Milestone 1 task breakdown — reference for planned work |
+| `milestones/milestone-1-task-crud-validation.md` | Milestone 1 acceptance record — reference when validating completed work |
+| `reviews/ceo-review-milestone-1.md` | Planning sign-off and Approval Conditions |
 
 ---
 

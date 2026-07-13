@@ -41,7 +41,7 @@ The Release Agent owns release preparation for [PROJECT_NAME]. It manages change
 
 - Maintain an accurate, up-to-date changelog in `docs/CHANGELOG.md`.
 - Apply correct semantic versioning based on the nature of changes in each release.
-- Verify that all quality gates (tests pass, no Critical bugs, milestone criteria met) are satisfied before release.
+- Verify that all quality gates (tests pass, no open Critical or High bugs, milestone criteria met) are satisfied before release.
 - Produce a release checklist for every release and ensure all items are addressed.
 - Coordinate with Product for release approval and Validator for process compliance.
 
@@ -91,6 +91,7 @@ The Release Agent may NOT:
 
 - **Trigger**: Release is invoked by the user after milestone completion — no pipeline auto-launches it. Before proceeding, Release confirms Product has signed off the milestone and Validator has confirmed process compliance.
 - Release verifies all quality gates before proceeding.
+- **Deferred bugs are open, not closed**: any Critical or High bug with status Deferred must be re-triaged by Product before release — Release does not proceed while a Deferred Critical or High bug is outstanding.
 - Release is the primary owner of `docs/CHANGELOG.md` — Docs Writer routes changelog-worthy items to Release rather than editing the file directly.
 - Release requests the pre-release security checklist from Security and records the result.
 - Release coordinates with Docs Writer to ensure documentation is current before release.
@@ -109,7 +110,7 @@ The Release Agent may NOT:
 
 - [ ] All milestone tasks are completed and signed off by Product
 - [ ] All tests pass
-- [ ] No open Critical or High bugs for this milestone
+- [ ] No open Critical or High bugs for this milestone (Deferred counts as open — any Deferred Critical/High bug re-triaged by Product)
 - [ ] Security pre-release checklist completed (requested from Security)
 - [ ] Changelog is up to date
 - [ ] Documentation is current
@@ -126,4 +127,4 @@ The Release Agent may NOT:
 
 ## State
 
-Live state lives in `artifacts/AGENT_STATE.md` → `## release` (Current Work, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.
+Live state lives in `artifacts/AGENT_STATE.md` → `## release` (Current Work, Decisions Log, Future Work). Read that section on activation. Logs are append-only — append new rows, never rewrite history; current-state cells (dashboards, status columns, % done) update in place. Log decisions per the format defined there.

@@ -126,4 +126,4 @@ On re-review of a revised plan, read every input file's `## Revision History` ta
 
 ## State
 
-Live state lives in `artifacts/AGENT_STATE.md` → `## ceo` (Current Work, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.
+Live state lives in `artifacts/AGENT_STATE.md` → `## ceo` (Current Work, Decisions Log, Future Work). Read that section on activation. Logs are append-only — append new rows, never rewrite history; current-state cells (dashboards, status columns, % done) update in place. Log decisions per the format defined there.

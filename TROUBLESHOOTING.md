@@ -56,7 +56,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## My installed files still contain `[PLACEHOLDER]` tokens
 
-**Cause.** `/cast-init` substitutes every placeholder it can detect (tech stack, commands, platforms, directory roles) or that you answered during planning, but some tokens are undetectable domain values (`[DOMAIN_ENTITY]`, `[SAVE_KEY]`, …) and some are deliberate: per-use sub-template tokens (`[DATE]`, `[REPRODUCTION_STEPS]`, `[MILESTONE_NAME]`) are filled by agents each time a form or template is used and are supposed to remain.
+**Cause.** `/cast-init` substitutes every placeholder it can detect (tech stack, commands, platforms, directory roles) or that you answered during planning, but some tokens are undetectable domain values (`[DOMAIN_ENTITY]`, `[SAVE_KEY]`, …) and some are deliberate: per-use sub-template tokens (`[DATE]`, `[TASK_NAME]`, `[MILESTONE_NAME]`) are filled by agents each time a form or template is used and are supposed to remain.
 
 **Fix.**
 1. Open `artifacts/adoption-report.md` — the "Remaining TODOs" section lists every real unfilled placeholder from your install; per-use tokens are not defects.
@@ -70,6 +70,17 @@ Common problems adopting or running this template, with the most likely cause an
 **Cause.** Adoption requires a clean git tree before Phase 5 (safety rule). A run that was interrupted mid-execution leaves its own half-written files uncommitted, which would block a naive re-run against its own output.
 
 **Fix.** Re-run `/cast-init` and say you want to resume. Preflight recognizes two resume cases: dirty files that match the prior run's `artifacts/adoption-plan.md` actions (it re-verifies each against the plan instead of demanding a stash), and a leftover `.cast-stage/` directory from a permission-blocked run (it offers to complete the move). Only files the plan does not account for still require a commit or stash — that's your work, not the adoption's.
+
+---
+
+## `/cast-init` reports "already at <version>" — is that right?
+
+**Cause.** `/cast-init` compares the `Adopted with CAST v<X.Y.Z>` stamp in your `CLAUDE.md` against its own `metadata.version`, and when they are equal it stops instead of re-running a no-op upgrade. That short-circuit is correct **only when the prior run actually finished** — `artifacts/adoption-report.md` exists and every entry in the `artifacts/adoption-plan.md` ledger is checked off.
+
+**Fix.**
+1. If both completion signals are present, the report is accurate: you are current. Nothing to do. (`npx skills update` / `/plugin marketplace update` first if you expected a newer version.)
+2. If the report is missing or the ledger has unchecked entries, the previous run died *after* writing the version stamp but before finishing (the stamp lands ahead of validation and the report). `/cast-init` detects this on its own and enters the resume path instead of stopping — if you are seeing a hard stop in this state, your cast-init copy predates v1.4.0; update it.
+3. If you suspect the installed files have drifted from the payload (manual edits, partial merges), ask for a **forced re-run** — it repeats all seven phases, refreshing CAST-owned content while preserving your customizations.
 
 ---
 
@@ -114,7 +125,32 @@ Common problems adopting or running this template, with the most likely cause an
 **Fix.**
 1. Run `/agent-plan <milestone>` first. The planning stage ends with a CEO verdict written to that path.
 2. If the CEO issued **REVISION REQUIRED**, the planning stage is not complete. Address the Revision Requests (named by agent in the review document), re-run the affected stage, and re-run the CEO review.
-3. If you are trying to run engineering for a milestone that was planned manually (not via `/agent-plan`), you have two options: either run `/agent-plan` to produce the CEO review file retroactively, or hand-create `artifacts/reviews/ceo-review-milestone-{N}.md` with an APPROVED verdict. The pipeline only checks that the file exists and the verdict string is present.
+3. If you are trying to run engineering for a milestone that was planned manually (not via `/agent-plan`), you have two options: either run `/agent-plan` to produce the CEO review file retroactively, or hand-create `artifacts/reviews/ceo-review-milestone-{N}.md` from `templates/CEO_REVIEW.md` with its single `**Verdict**: APPROVED` line filled in. Pre-Flight parses that one line — there is exactly one verdict string in the file (the old three-checkbox verdict block is gone), so don't leave all three options in place.
+4. Note what Pre-Flight does beyond the existence check: it reads the verdict from the `**Verdict**:` line, and on **APPROVED WITH CONDITIONS** it cross-checks the CEO Approval Conditions table in the milestone's tasks file — backfilling it from the CEO review if missing or stale — so the conditions follow every task through implementation and review. A hand-created review with conditions should list them explicitly.
+
+---
+
+## I have no `ui` agent — will `/agent-plan` and `/agent-code` still run?
+
+**Cause.** Backend and CLI-only projects can opt out of the `ui` agent during `/cast-init` (the UI templates are skipped together with it). Before v1.4.0, `/agent-code` Pre-Flight unconditionally required `artifacts/ui-specs/ui-milestone-{N}.md`, so opted-out projects dead-ended between the two pipelines.
+
+**Fix.** Nothing to work around on a current install — the opt-out is wired through end to end:
+1. `/agent-plan` skips its UI design stage when `.claude/agents/ui.md` is absent, so no UI spec is produced and the CEO review's UI section is marked not applicable.
+2. `/agent-code` Pre-Flight requires the UI spec **only when the `ui` agent is installed**. A UI spec absent because there is no `ui` agent is not a missing artifact; Coder and Reviewer simply run without a UI specification, and the milestone-completion UX review is skipped.
+3. If `/agent-code` still stops for a missing UI spec on a no-ui project, your installed pipeline skills predate v1.4.0 — update the cast-init skill and re-run `/cast-init` to refresh them.
+4. The opt-out is all-or-nothing per install: never delete `.claude/agents/ui.md` while keeping UI-flagged tasks in a milestone, and never install the UI templates without the agent.
+
+---
+
+## I interrupted `/agent-code` mid-milestone — how do I resume?
+
+**Cause.** A session died (or you stopped it) partway through a milestone. This is a designed-for case, not an error: the task-completion checkpoint writes each finished task's **Status** back to `artifacts/milestones/milestone-{N}-{slug}-tasks.md`, so the tasks file is the resume ledger.
+
+**Fix.**
+1. Re-run `/agent-code <milestone>`. Task Selection skips every task whose Status is already Complete or Deferred and picks up at the first remaining task — finished work is not redone.
+2. Do not hand-mark tasks Complete to "help" the resume; only tasks that actually passed Product validation carry that status. If the interruption hit mid-task, that task's Status is unchanged and the whole per-task loop re-runs for it, which is correct.
+3. The resumed run reuses the existing `### YYYY-MM-DD — agent-code — …` session heading in `artifacts/STANDUP.md` for the same milestone and date rather than opening a duplicate.
+4. When the last task lands, the milestone-completion checkpoint (Deferred re-triage, completion and validation records, UX review, retrospective) fires normally — it keys off "every task Complete or Deferred", not off an unbroken session.
 
 ---
 
@@ -155,7 +191,7 @@ Common problems adopting or running this template, with the most likely cause an
 **Fix.**
 1. Use `/agent-plan` and `/agent-code` as the canonical entry points. They exist specifically to sequence the agents correctly.
 2. If you must invoke an agent directly, give it the prior agent's output as input ("Here is the architecture document at `artifacts/architecture/arch-milestone-3.md`; implement task T-4.").
-3. Escalate conflicts per the repo's `skills/cast-init/assets/agents/README.md` → Conflict Resolution Priority: Product > Architecture > UI > Validator. The Validator agent arbitrates process conflicts; Product has final say on scope.
+3. Escalate conflicts per the repo's `skills/cast-init/assets/agents/README.md` → Conflict Resolution Priority: **Product > Architecture > UI**. The Validator agent arbitrates the dispute by applying that hierarchy — it does not sit in the hierarchy and does not override anyone; Product has final say on scope.
 
 ---
 
@@ -164,10 +200,10 @@ Common problems adopting or running this template, with the most likely cause an
 **Cause.** The CEO applies a cross-cutting review against Security, Performance, Architecture, UI, and milestone scope. If any of those have open Critical findings, scope contradictions, or budget violations, the verdict will keep coming back as REVISION REQUIRED until resolved.
 
 **Fix.**
-1. Open `artifacts/reviews/ceo-review-milestone-{N}.md` and read the "Revision Requests" table. Every revision is addressed to a specific agent with a cited section.
-2. Re-run only the affected planning stage: if Security flagged a Critical issue, re-run Stage 2a (Architecture) to revise the design, then Stage 3a (Security) to confirm remediation.
+1. Open `artifacts/reviews/ceo-review-milestone-{N}.md` and read the "Revision Requests" table (the verdict itself is the single `**Verdict**:` line). Every revision is addressed to a specific agent with a cited section.
+2. Re-run only the affected planning stage — but note a revised architecture re-passes Stage 3 (both Security and Performance) before the CEO sees it again, so the CEO never re-reviews against stale findings.
 3. Only then re-run Stage 4 (CEO). The CEO does not rewrite plans; it reviews them.
-4. If you disagree with a CEO revision, escalate per the conflict resolution hierarchy — the CEO does not override Product on business intent, and a Product override routes through Validator.
+4. If you disagree with a CEO revision, escalate per the conflict resolution hierarchy (Product > Architecture > UI) — Validator arbitrates but does not override, and the CEO does not override Product on business intent.
 
 ---
 
@@ -179,7 +215,8 @@ Common problems adopting or running this template, with the most likely cause an
 1. Confirm the file is at the project root: `ls CLAUDE.md` should show it in the top-level directory.
 2. Restart your Claude Code session.
 3. If your project has nested subdirectories you work in, note that Claude Code loads `CLAUDE.md` from the root of the currently-open directory. Opening a subdirectory will not pick up the root `CLAUDE.md`.
-4. For large projects, consider splitting `CLAUDE.md` into the root file plus `@import` directives pointing at reference material in `docs/`. This is what `root/CLAUDE.md` does by default.
+4. For large projects, split `CLAUDE.md` into the root file plus bare `@docs/<FILE>.md` import lines pointing at reference material. An import only fires as a bare `@path` line at the start of a line — there is no `@import` keyword, and a path wrapped in backticks or inside a comment is inert. This is what the shipped `root/CLAUDE.md` does: `@docs/CODE_PATTERNS.md` is the one always-on import (plus `@docs/PRD.md` once the PRD has real content), and the topic docs (`FRONTEND`/`BACKEND`/`CLI`/`MOBILE`) are listed as inert backticked paths you copy out as bare lines to activate.
+5. If a doc you "imported" is not in context, check for exactly that mistake: the line reads `` `@docs/FRONTEND.md` `` (backticks — inert) instead of `@docs/FRONTEND.md` (bare — fires).
 
 ---
 
@@ -192,4 +229,17 @@ Common problems adopting or running this template, with the most likely cause an
 2. Grep for any references to the old path and update them.
 3. Update `agents/docs-writer.md` and the responsible agent's file if the source of the error is a stale path reference there.
 4. Re-read `docs/FILE_CONVENTIONS.md` → The Core Rule. If you are writing a template document or coding convention, it belongs in `docs/`. If you are writing a milestone plan, bug report, review, or session log, it belongs in `artifacts/`. The pipeline skills enforce this; direct agent invocation does not.
+
+---
+
+## The `v<version>` tag exists on GitHub but there is no Release
+
+*(CAST repo maintainers only — this is about releasing CAST itself, not about installed projects.)*
+
+**Cause.** `.github/workflows/release.yml` pushes the tag first, then publishes the GitHub Release. If the run died between those two steps (API hiccup, cancelled run), the tag exists without its Release. The tag and the Release are separate artifacts; downstream tooling needs both.
+
+**Fix.**
+1. Re-run the failed workflow run from the GitHub Actions tab (or just push the next commit to `main`). The workflow self-heals: when the tag already exists it checks `gh release view v<version>`, and if the Release is missing it re-verifies the four synchronized version locations and publishes the Release at the existing tag — it never re-pushes the tag.
+2. It skips as a no-op only when the tag **and** the Release both exist, so a re-run on a healthy state is always safe.
+3. If the workflow is unavailable, publish manually per `CLAUDE.md` → Release and Tagging Policy step 6 (`gh release create v<version> …` with notes extracted from the top `CHANGELOG.md` entry). Do not delete and re-push the tag — consumers may already have fetched it.
 

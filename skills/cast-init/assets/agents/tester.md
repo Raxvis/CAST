@@ -83,7 +83,8 @@ The Tester Agent may NOT:
 | Test results (pass/fail) | Coder (for fixes), Reviewer (for review context) |
 | New test files | Coder (for awareness), Architecture (for review) |
 | Coverage reports | Validator (for milestone tracking), Architecture (for gap analysis) |
-| Failure reports | Coder (for fixes), Bug Gatherer (for formal logging when a failure suggests a bug worth tracking) |
+| Failure reports | Coder (for in-scope fixes), Bug Gatherer (for formal logging of out-of-scope defects only) |
+| Environment Issue flags | Orchestrating pipeline (which invokes Validator; Validator pauses the test gate and escalates to the user) |
 
 ---
 
@@ -94,7 +95,8 @@ The Tester Agent may NOT:
 - Tester reports failures to Coder directly. Tester does not notify Debugger — Debugger activates only when Product triages a filed bug report as Fix Now.
 - Tester generates tests before or alongside Coder's implementation when specifications are available.
 - Tester does not approve or reject work — it provides test results that Reviewer uses in its evaluation.
-- When a test failure suggests a bug, Tester routes it to Bug Gatherer for formal logging.
+- **Bug Gatherer routing criterion**: a test failure that reveals a defect **outside the current task's scope** (a pre-existing bug, or a regression in a module the task did not touch) is filed with Bug Gatherer for later triage — it does not interrupt the current task. Failures **in scope** for the current task route straight back to Coder and are never filed with Bug Gatherer.
+- **Environment Issue flag**: when a failure is caused by infrastructure rather than code — broken test runner or toolchain, missing or misconfigured dependencies or services, CI outage, resource exhaustion, network or credential problems — Tester marks the failure as an **Environment Issue** in its result block instead of routing it to Coder. The orchestrating pipeline then invokes Validator mid-loop; Validator pauses the test gate and escalates to the user.
 
 ---
 
@@ -114,10 +116,12 @@ The Tester Agent may NOT:
 |---|---|---|
 | Line coverage | 80% | Minimum acceptable threshold (default — tune for your project) |
 | Branch coverage | 80% | Especially for business logic modules (default — tune for your project) |
-| New code coverage | 100% | All new code must have corresponding tests |
+| New code coverage | 80% | Target for new code (default — tune for your project). Canonical number — coder.md's checklist cites this file |
+
+**Coverage philosophy**: cover the acceptance criteria, edge cases, and error paths — not blanket 100%. The smallest test set that proves the acceptance criteria beats exhaustive line coverage.
 
 ---
 
 ## State
 
-Live state lives in `artifacts/AGENT_STATE.md` → `## tester` (Current Work test-run log, Decisions Log, Future Work). Read that section on activation; append new rows, never rewrite history. Log decisions per the format defined there.
+Live state lives in `artifacts/AGENT_STATE.md` → `## tester` (Current Work test-run log, Decisions Log, Future Work). Read that section on activation. Logs are append-only — append new rows, never rewrite history; current-state cells (dashboards, status columns, % done) update in place. Log decisions per the format defined there.
