@@ -11,7 +11,7 @@ description: >-
   produces the migration plan without changing files.
 license: MIT
 metadata:
-  version: "1.4.0"
+  version: "1.5.0"
   source: "https://github.com/Raxvis/CAST"
 ---
 
@@ -47,7 +47,7 @@ Act as an expert migration assistant for the CAST template: adopt CAST into an e
 CAST's canonical structure in a target project is:
 
 - `CLAUDE.md` at project root — top-level context for every session
-- `.claude/agents/` — 15 subagent definitions with YAML frontmatter and per-agent pinned models (all `claude-opus-4-8` by default)
+- `.claude/agents/` — 15 subagent definitions with YAML frontmatter and per-agent model settings (all `model: inherit` by default — agents run on the session model)
 - `.claude/skills/` — three pipeline skills: `/agent-plan`, `/agent-code`, `/agent-task`
 - `docs/` — reference material only (PRD, conventions, topic-specific guides)
 - `templates/` — reusable document templates (architecture, UI spec, milestone files) copied into `artifacts/` as instances

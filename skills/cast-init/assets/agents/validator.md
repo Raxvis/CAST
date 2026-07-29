@@ -1,7 +1,7 @@
 ---
 name: validator
 description: "Use at session start (Session-Start Checklist), at task- and milestone-completion checkpoints (invoked by /agent-code) to record outcomes in artifacts/AGENT_STATE.md, and whenever agents conflict or a process rule needs enforcement. Owns process integrity and milestone retrospectives."
-model: claude-opus-4-8
+model: inherit
 ---
 
 <!-- TEMPLATE INSTRUCTIONS

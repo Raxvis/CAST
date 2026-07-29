@@ -161,7 +161,7 @@ Keep `.claude/skills/cast-init` installed — it is the upgrade mechanism (`npx 
 
 ## What this checklist does NOT cover
 
-- **Per-agent model access.** If your Anthropic account does not have access to `claude-opus-4-8`, the agents will fail when invoked. The static smoke test cannot detect this — you find out when `/agent-plan` halts. Fix: override the `model:` line in each agent file to a model you have access to (`claude-opus-4-7` and `claude-opus-4-6` are the supported alternatives — see `docs/MODEL_OPTIMIZATION.md` for the per-model notes).
+- **Per-agent model access.** Agents default to `model: inherit` and run on the session model, so they work with whatever model your account already serves. If you pin an agent to a model your account cannot access (e.g. `claude-opus-4-8`), it will fail when invoked — the static smoke test cannot detect this; you find out when `/agent-plan` halts. Fix: set the `model:` line back to `inherit` or to a model you have access to (see `docs/MODEL_OPTIMIZATION.md` for the per-model notes).
 - **Project-specific conventions.** This checklist verifies the template is wired up; it does not verify that your `CLAUDE.md`, `PRD.md`, or code conventions are accurate for your project. That is the user's responsibility.
 - **Full end-to-end run of a real milestone.** For that, run `/agent-plan` with a real feature description and follow it through `/agent-code`.
 

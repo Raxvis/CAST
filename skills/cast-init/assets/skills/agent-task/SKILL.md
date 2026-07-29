@@ -80,7 +80,7 @@ If in doubt, run `/agent-plan` first. The planning gate exists because ad-hoc ch
 
 ## Model Compatibility
 
-Each stage runs on the model pinned in that agent's file (default: `claude-opus-4-8`; `claude-opus-4-7` and `claude-opus-4-6` are supported — full profiles and upgrade paths in `docs/MODEL_OPTIMIZATION.md`). Orchestration notes by executing model:
+Each stage runs on the model set in that agent's file (default: `inherit` — the session model; the Claude Opus 4.x family is the optimized target, with `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` supported — full profiles and upgrade paths in `docs/MODEL_OPTIMIZATION.md`). Orchestration notes by executing model:
 
 - **Opus 4.8 / 4.7** — these models delegate conservatively; execute the pipeline stages exactly as written rather than folding them into direct work.
 - **Opus 4.6** — this model over-delegates; invoke only the agents this pipeline names, and honor the bail-out rule above instead of spawning planning agents ad hoc.

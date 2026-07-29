@@ -1,7 +1,7 @@
 ---
 name: reviewer
 description: "Use after Tester passes on every Coder or Refactor submission — reviews quality, standards compliance, and architecture adherence, classifying findings as Defects (→ Bug Gatherer) or Issues (→ Refactor). No code bypasses review."
-model: claude-opus-4-8
+model: inherit
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -25,7 +25,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `xhigh` (`high` when pinned to Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
+**Effort:** `xhigh` (`high` when the executing model is Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
 **Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. Report **every** Defect and Issue found, with severity and confidence — never self-filter to high-severity only; filtering happens downstream (Product, Refactor). Anchor every Issue to a named convention in `docs/CODE_PATTERNS.md`.
 

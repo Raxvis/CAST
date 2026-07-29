@@ -10,7 +10,7 @@
 
 > **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three pipeline skills, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v1.4.0-blue)
+![Template version](https://img.shields.io/badge/template-v1.5.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
 
@@ -56,13 +56,13 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 
 **What you get out of the box:**
 
-- **15 specialist subagents** pinned to `claude-opus-4-8`, with per-agent recommended reasoning effort matched to the workload (planning and engineering at high/xhigh, utility at low).
+- **15 specialist subagents** defaulting to `model: inherit` — each runs on the session model — with per-agent recommended reasoning effort matched to the workload (planning and engineering at high/xhigh, utility at low).
 - **Three pipeline skills** — `/agent-plan`, `/agent-code`, `/agent-task` — as plain Markdown orchestration scripts Claude Code discovers at session start.
 - **A hard `docs/` / `templates/` / `artifacts/` split** — `docs/` holds reference material (requirements, conventions), `templates/` holds reusable document skeletons, and `artifacts/` holds live work (plans, reviews, bugs, session logs). The CEO gate, placeholder check, and smoke test all enforce the split.
 - **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v1.4.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v1.5.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
@@ -294,7 +294,7 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 
 ### Agents
 
-Each agent file has its model hard-coded in the YAML frontmatter — there is no `[AI_MODEL]` placeholder. Every agent is pinned to `claude-opus-4-8` and optimized for the Claude Opus 4.x family (`claude-opus-4-7` and `claude-opus-4-6` are supported executing models); workload differentiation comes from the recommended reasoning effort stated in each agent's **Model Configuration** section rather than model tier. Edit the `model:` line in an individual agent file if you need to override, and see `docs/MODEL_OPTIMIZATION.md` for per-model behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists.
+Each agent file has its model set in the YAML frontmatter — there is no `[AI_MODEL]` placeholder. Every agent defaults to `model: inherit`, running on whatever model the invoking session uses, and is optimized for the Claude Opus 4.x family (`claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` are the supported executing models); workload differentiation comes from the recommended reasoning effort stated in each agent's **Model Configuration** section rather than model tier. Edit the `model:` line in an individual agent file if you need an explicit pin, and see `docs/MODEL_OPTIMIZATION.md` for per-model behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists.
 
 | Placeholder | Description | Example value |
 |---|---|---|
@@ -310,7 +310,7 @@ Before installing, confirm the following:
 
 - **Claude Code CLI installed and authenticated.** This template is built for Claude Code specifically. The pipeline skills (`/agent-plan`, `/agent-code`) and subagent auto-discovery rely on Claude Code's `.claude/skills/` and `.claude/agents/` conventions. Other AI coding assistants do not read these files. Install and sign in to Claude Code before continuing.
 - **A target project directory.** Either a new empty git repo or an existing project where you want to introduce the agent workflow. The template does not create the project for you.
-- **An Anthropic account with access to the Claude Opus 4.x family.** All agents are pinned to `claude-opus-4-8` by default; `claude-opus-4-7` and `claude-opus-4-6` are supported alternatives (all three are priced identically). You can override the `model:` line in an individual agent file if you need a different pin — `docs/MODEL_OPTIMIZATION.md` covers the per-model behavior differences and upgrade paths.
+- **An Anthropic account with access to the Claude Opus 4.x family.** All agents default to `model: inherit` and run on the session model; the Opus 4.x family is the optimized target (`claude-opus-4-8` recommended; `claude-opus-4-7` and `claude-opus-4-6` are supported — all three are priced identically). You can set the `model:` line in an individual agent file if you need an explicit pin — `docs/MODEL_OPTIMIZATION.md` covers the per-model behavior differences and upgrade paths.
 
 ## Known Limitations
 

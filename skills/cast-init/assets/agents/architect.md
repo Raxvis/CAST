@@ -1,7 +1,7 @@
 ---
 name: architect
 description: "Use during /agent-plan after Product publishes a milestone definition, and whenever Coder raises a design question, a new dependency is proposed, or Security/Performance findings require remediation. Owns system design, module boundaries, and data schemas."
-model: claude-opus-4-8
+model: inherit
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -30,7 +30,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `xhigh` (`high` when pinned to Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
+**Effort:** `xhigh` (`high` when the executing model is Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
 **Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. Produce the simplest architecture that meets the requirements — no speculative abstractions or future-proofing; the document-reading steps in this file are mandatory. For minor structural choices, pick a reasonable default and record it in the Decisions Log instead of asking.
 

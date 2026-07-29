@@ -1,7 +1,7 @@
 ---
 name: ceo
 description: "Use as the final planning-stage gate once Product, Architecture, UI, Security, and Performance have all completed their milestone outputs — issues APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED before engineering begins."
-model: claude-opus-4-8
+model: inherit
 ---
 
 <!-- TEMPLATE INSTRUCTIONS

@@ -1,7 +1,7 @@
 ---
 name: product
 description: "Use at the start of /agent-plan to define milestone goals and acceptance criteria, when validating completed work against those criteria, and when triaging bug reports (Fix Now / Defer / Not a Bug). Owns requirements and final sign-off."
-model: claude-opus-4-8
+model: inherit
 ---
 
 <!-- TEMPLATE INSTRUCTIONS

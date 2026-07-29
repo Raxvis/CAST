@@ -1,7 +1,7 @@
 ---
 name: security
 description: "Use after Architecture publishes or revises a design document, approves a new dependency, or changes a data schema; also on direct user request or when Release requests the pre-release security checklist. Audits for vulnerabilities with Critical/High/Medium/Low/Informational findings."
-model: claude-opus-4-8
+model: inherit
 ---
 
 <!-- TEMPLATE INSTRUCTIONS

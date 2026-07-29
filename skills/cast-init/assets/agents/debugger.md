@@ -1,7 +1,7 @@
 ---
 name: debugger
 description: "Use when Product triages a defect as Fix Now — investigates root cause and appends findings to the existing triaged bug report for Coder or Refactor. Never files new reports."
-model: claude-opus-4-8
+model: inherit
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -28,7 +28,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `xhigh` (`high` when pinned to Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
+**Effort:** `xhigh` (`high` when the executing model is Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
 **Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. Require root-cause and reproduction evidence before proposing a fix or declaring a defect resolved — "did not reproduce this run" is not "fixed".
 

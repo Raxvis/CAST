@@ -9,11 +9,12 @@ HOW TO CUSTOMIZE:
 4. Update the Documentation Placement table to match your actual folder/file conventions.
 
 Per-agent AI models are pre-configured in each agent file's YAML frontmatter and are
-not placeholders. Every agent is pinned to claude-opus-4-8 (the Claude Opus 4.x family
-is the optimized target; claude-opus-4-7 and claude-opus-4-6 are supported executing
+not placeholders. Every agent defaults to model: inherit — it runs on whatever model
+the invoking session uses (the Claude Opus 4.x family is the optimized target;
+claude-opus-4-8, claude-opus-4-7, and claude-opus-4-6 are the supported executing
 models with per-model notes in each agent's "Model Configuration" section). Role
-differentiation comes from recommended reasoning effort, not model tier. Override the
-model: line in an individual agent file if you need a different pin — see
+differentiation comes from recommended reasoning effort, not model tier. Set the
+model: line in an individual agent file if you need an explicit pin — see
 docs/MODEL_OPTIMIZATION.md for behavior profiles and upgrade paths.
 -->
 
@@ -23,7 +24,7 @@ docs/MODEL_OPTIMIZATION.md for behavior profiles and upgrade paths.
 
 This directory contains the working documentation for each specialized agent that assists in developing [PROJECT_NAME]. Each agent owns a domain, maintains its own decisions log, and hands off work to other agents via structured outputs.
 
-Every agent runs on the Claude Opus 4.x family, pinned to `claude-opus-4-8` by default in its YAML frontmatter; workload differentiation comes from recommended reasoning effort (`xhigh` for Architect, Coder, Reviewer, and Debugger; `high` for Product, UI, Security, Performance, CEO, Tester, and Refactor; `low` for the utility roles — Bug Gatherer, Docs Writer, Release, and Validator). Opus 4.7 and Opus 4.6 are supported executing models — each agent file carries a compact **Model Configuration** section (effort plus its binding behavioral rules), and `docs/MODEL_OPTIMIZATION.md` holds the full behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists.
+Every agent's YAML frontmatter defaults to `model: inherit`, so each agent runs on the model of the invoking session; workload differentiation comes from recommended reasoning effort (`xhigh` for Architect, Coder, Reviewer, and Debugger; `high` for Product, UI, Security, Performance, CEO, Tester, and Refactor; `low` for the utility roles — Bug Gatherer, Docs Writer, Release, and Validator). The Claude Opus 4.x family is the optimized target — Opus 4.8, 4.7, and 4.6 are the supported executing models — and each agent file carries a compact **Model Configuration** section (effort plus its binding behavioral rules), while `docs/MODEL_OPTIMIZATION.md` holds the full behavior profiles, the 4.6 → 4.7 → 4.8 upgrade checklists, and how to pin an explicit model when you need one.
 
 ---
 

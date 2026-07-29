@@ -1,7 +1,7 @@
 ---
 name: tester
 description: "Use PROACTIVELY after every Coder change — automated test gate. Also runs after every Refactor handoff; tests must pass before Reviewer runs. Failures route back to Coder."
-model: claude-opus-4-8
+model: inherit
 ---
 
 <!-- TEMPLATE INSTRUCTIONS

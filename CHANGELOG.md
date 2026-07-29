@@ -8,6 +8,20 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [1.5.0] — 2026-07-29
+
+Agents now inherit the session model instead of pinning Opus.
+
+### Changed
+
+- **All 15 agent frontmatter pins replaced with `model: inherit`.** Agents run on whatever model the invoking session uses instead of being hard-pinned to `claude-opus-4-8`. The Claude Opus 4.x family remains the optimized target (`claude-opus-4-8` recommended; `claude-opus-4-7` and `claude-opus-4-6` supported executing models), and role differentiation still comes from recommended reasoning effort. Explicit per-agent pins remain supported as user overrides.
+- **Documentation updated to the inherit-by-default policy** — root `README.md` (what-you-get list, Agents placeholder section, prerequisites), `agents/README.md`, the three pipeline skills' Model Compatibility sections and `skills/README.md`, `docs/MODEL_OPTIMIZATION.md` (intro, ladder status, Default Roster Assignment table, effort notes, upgrade paths, verification steps), `docs/FIRST_RUN.md`'s model-access caveat, the adoption skill's canonical structure description, and the roster reference (Model column and summary line). The four `xhigh` agents' effort notes now say "when the executing model is Opus 4.6" rather than "when pinned".
+- **Phase 6 validation (check 5)** now accepts `inherit` as the default frontmatter model, with explicit model IDs treated as user-approved overrides.
+
+### Migration
+
+- Existing installs: in each `.claude/agents/*.md`, change the frontmatter `model:` line to `inherit` (or keep an explicit pin if you rely on one for reproducibility or model-access reasons). Re-running `/cast-init` after updating applies this automatically.
+
 ## [1.4.0] — 2026-07-12
 
 Second-pass hardening: a fresh four-track review of v1.3.0 found 40 issues — including two hard blockers introduced by 1.3.0 itself — and all are fixed here. Headlines: fresh adoptions validate again (the 120-char description cap), backend/CLI projects can actually run the pipelines (the UI opt-out deadlock), the retrospective template now installs, the Docs Writer queue has producers, the Deferred lifecycle is defined end-to-end, and the release workflow self-heals. The `IMPROVEMENTS.md` tracking file was removed at release since every item was resolved.

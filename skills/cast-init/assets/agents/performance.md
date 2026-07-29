@@ -1,7 +1,7 @@
 ---
 name: performance
 description: "Use after Architecture publishes or revises a design document — reviews the plan against performance budgets, identifies bottlenecks, and files findings for the CEO gate."
-model: claude-opus-4-8
+model: inherit
 ---
 
 <!-- TEMPLATE INSTRUCTIONS

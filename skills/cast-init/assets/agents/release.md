@@ -1,7 +1,7 @@
 ---
 name: release
 description: "Use when the user requests a release after milestone completion — changelog, versioning, and build verification. Not auto-launched by any pipeline. Primary owner of docs/CHANGELOG.md."
-model: claude-opus-4-8
+model: inherit
 ---
 
 <!-- TEMPLATE INSTRUCTIONS

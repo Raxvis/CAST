@@ -1,7 +1,7 @@
 ---
 name: ui
 description: "Use during /agent-plan after Product publishes a milestone definition (in parallel with Architecture) to produce screen specs, and at /agent-code milestone completion for the UX review of milestones with UI-flagged tasks. Owns visual design and the style guide."
-model: claude-opus-4-8
+model: inherit
 ---
 
 <!-- TEMPLATE INSTRUCTIONS

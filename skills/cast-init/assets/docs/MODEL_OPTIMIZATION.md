@@ -12,12 +12,13 @@
   - If your organization restricts model access, update the Default Roster Assignment table to
     match the models you can actually serve, then apply the matching behavior profile notes.
   - When Anthropic ships a newer model, add it to the ladder, write its behavior profile, and
-    add an upgrade-path section — then bump each agent's frontmatter pin.
+    add an upgrade-path section — then switch the session model (or update each agent's
+    frontmatter pin, if you pinned explicitly).
 -->
 
 # [PROJECT_NAME] — Agent Model Optimization Guide
 
-This document is the single source of truth for which Claude model each CAST agent runs on, how the supported models differ in behavior, and how to move the roster between them. Each agent file carries only a compact **Model Configuration** section — the frontmatter `model:` pin, a one-line recommended effort, and a short **Rules (all models)** block holding that role's binding behavioral constraints (no subagents, structured-output handoffs, silence-is-not-a-clean-report for review roles, plus role-specific discipline). The model ladder table, effort rules (`xhigh` requires Opus 4.7+), per-model behavior profiles, and upgrade checklists live only in this file — a model change never requires editing per-agent sections, just the frontmatter pin (and effort substitution when pinning 4.6).
+This document is the single source of truth for which Claude model each CAST agent runs on, how the supported models differ in behavior, and how to move the roster between them. Each agent file carries only a compact **Model Configuration** section — the frontmatter `model:` setting (default `inherit`, meaning the agent runs on the session model), a one-line recommended effort, and a short **Rules (all models)** block holding that role's binding behavioral constraints (no subagents, structured-output handoffs, silence-is-not-a-clean-report for review roles, plus role-specific discipline). The model ladder table, effort rules (`xhigh` requires Opus 4.7+), per-model behavior profiles, and upgrade checklists live only in this file — a model change never requires editing per-agent sections: switch the session model (or the frontmatter pin, if you set one), substituting effort when running 4.6.
 
 ---
 
@@ -27,7 +28,7 @@ All CAST agents target the **Claude Opus 4.x family**. The three supported model
 
 | Model | ID | Status | Key capability notes |
 |---|---|---|---|
-| Claude Opus 4.8 | `claude-opus-4-8` | **Default — recommended** | Most capable Opus tier. Best long-horizon agentic execution, code review, debugging, and writing. Supports effort `low`–`xhigh`–`max`, fast mode, high-resolution vision, mid-session system messages. |
+| Claude Opus 4.8 | `claude-opus-4-8` | **Recommended** | Most capable Opus tier. Best long-horizon agentic execution, code review, debugging, and writing. Supports effort `low`–`xhigh`–`max`, fast mode, high-resolution vision, mid-session system messages. |
 | Claude Opus 4.7 | `claude-opus-4-7` | Supported | Previous generation. Most literal instruction-follower; terse, precise. Supports effort `xhigh` and fast mode (fast mode on 4.7 is deprecated — 4.8 is the durable fast tier). |
 | Claude Opus 4.6 | `claude-opus-4-6` | Minimum supported | Oldest supported pin. No `xhigh` effort (use `high`). No fast mode. Uses the pre-4.7 tokenizer (same text ≈ fewer tokens than 4.7/4.8). |
 
@@ -37,27 +38,27 @@ Do not pin models older than Opus 4.6 — the agent prompts in this template ass
 
 ## Default Roster Assignment
 
-Every agent's YAML frontmatter pins `model: claude-opus-4-8`. Differentiation between roles now comes from **reasoning effort**, not model tier (the pre-v0.11.0 template used Opus 4.6 / Sonnet 4.6 / Haiku 4.5 tiers; see Upgrade Paths below if you are migrating an older install).
+Every agent's YAML frontmatter sets `model: inherit` — each agent runs on the model of the invoking session, with the Claude Opus 4.x family as the optimized target. Differentiation between roles comes from **reasoning effort**, not model tier (the pre-v0.11.0 template used Opus 4.6 / Sonnet 4.6 / Haiku 4.5 tiers; see Upgrade Paths below if you are migrating an older install).
 
 | Agent | Default model | Recommended effort | Why |
 |---|---|---|---|
-| Product | `claude-opus-4-8` | `high` | Requirements synthesis and acceptance-criteria validation. |
-| Architect | `claude-opus-4-8` | `xhigh` | Hardest design reasoning in the pipeline. |
-| UI | `claude-opus-4-8` | `high` | Spec authoring anchored to concrete style-guide tokens. |
-| Security | `claude-opus-4-8` | `high` | Coverage-first vulnerability review. |
-| Performance | `claude-opus-4-8` | `high` | Measurement-anchored bottleneck review. |
-| CEO | `claude-opus-4-8` | `high` | Multi-document synthesis and gating verdict. |
-| Coder | `claude-opus-4-8` | `xhigh` | Best coding/agentic setting on Opus 4.7+. |
-| Tester | `claude-opus-4-8` | `high` | Test generation and faithful failure reporting. |
-| Reviewer | `claude-opus-4-8` | `xhigh` | Recall-critical bug finding. |
-| Debugger | `claude-opus-4-8` | `xhigh` | Root-cause analysis, intermittent failures. |
-| Refactor | `claude-opus-4-8` | `high` | Behavior-preserving, tightly scoped changes. |
-| Bug Gatherer | `claude-opus-4-8` | `low` | Mechanical, structured intake. |
-| Docs Writer | `claude-opus-4-8` | `low` | Scoped documentation updates. |
-| Release | `claude-opus-4-8` | `low` | Checklist execution. |
-| Validator | `claude-opus-4-8` | `low` | Rule enforcement against written process. |
+| Product | `inherit` | `high` | Requirements synthesis and acceptance-criteria validation. |
+| Architect | `inherit` | `xhigh` | Hardest design reasoning in the pipeline. |
+| UI | `inherit` | `high` | Spec authoring anchored to concrete style-guide tokens. |
+| Security | `inherit` | `high` | Coverage-first vulnerability review. |
+| Performance | `inherit` | `high` | Measurement-anchored bottleneck review. |
+| CEO | `inherit` | `high` | Multi-document synthesis and gating verdict. |
+| Coder | `inherit` | `xhigh` | Best coding/agentic setting on Opus 4.7+. |
+| Tester | `inherit` | `high` | Test generation and faithful failure reporting. |
+| Reviewer | `inherit` | `xhigh` | Recall-critical bug finding. |
+| Debugger | `inherit` | `xhigh` | Root-cause analysis, intermittent failures. |
+| Refactor | `inherit` | `high` | Behavior-preserving, tightly scoped changes. |
+| Bug Gatherer | `inherit` | `low` | Mechanical, structured intake. |
+| Docs Writer | `inherit` | `low` | Scoped documentation updates. |
+| Release | `inherit` | `low` | Checklist execution. |
+| Validator | `inherit` | `low` | Rule enforcement against written process. |
 
-**Effort notes:** `xhigh` requires Opus 4.7 or newer — when pinning an agent to `claude-opus-4-6`, substitute `high`. In Claude Code, effort follows session settings; when driving agents via the Claude API or Agent SDK, set `output_config: {effort: "..."}` per request.
+**Effort notes:** `xhigh` requires Opus 4.7 or newer — when the executing model is Opus 4.6 (session model or explicit pin), substitute `high`. In Claude Code, effort follows session settings; when driving agents via the Claude API or Agent SDK, set `output_config: {effort: "..."}` per request.
 
 **Cost fallback:** the four utility agents (Bug Gatherer, Docs Writer, Release, Validator) were pinned to `claude-haiku-4-5` before v0.11.0 and still run acceptably there. If cost or latency on utility work matters more than judgment, re-pin them to `claude-haiku-4-5` ($1 / $5 per MTok) — everything else in this guide assumes the Opus family.
 
@@ -98,7 +99,7 @@ Each supported model executes the same agent definitions differently. The per-ag
 
 ### Opus 4.6 → Opus 4.7
 
-1. **Frontmatter:** change `model: claude-opus-4-6` → `model: claude-opus-4-7` in each agent file.
+1. **Model:** switch the session model to Opus 4.7 (agents default to `model: inherit`); if you pinned explicitly, change `model: claude-opus-4-6` → `model: claude-opus-4-7` in each agent file.
 2. **Effort:** stages previously capped at `high` can move to `xhigh` (Coder, Reviewer, Debugger, Architect).
 3. **Prompts — add explicit triggering.** 4.7 under-reaches for tools and subagents where 4.6 over-reached. Verify every tool use and delegation the pipeline depends on is stated imperatively ("run the test suite now", "invoke the debugger agent"), not implied.
 4. **Prompts — expect terser output.** If handoff documents come back thin, mark required sections as mandatory rather than lengthening instructions.
@@ -107,7 +108,7 @@ Each supported model executes the same agent definitions differently. The per-ag
 
 ### Opus 4.7 → Opus 4.8
 
-1. **Frontmatter:** change the pin to `model: claude-opus-4-8`. There are no new API breaking changes — this is an ID swap plus prompt re-tuning.
+1. **Model:** switch the session model to Opus 4.8 (agents default to `model: inherit`); if you pinned explicitly, change the pin to `model: claude-opus-4-8`. There are no new API breaking changes — this is a model swap plus prompt re-tuning.
 2. **Remove forced-progress scaffolding** ("after every N tool calls, summarize") — 4.8 narrates on its own.
 3. **Add small-decision autonomy.** 4.8 asks more often; agent prompts should say "for minor choices, pick a reasonable option and note it; ask only for scope changes or destructive actions." (CAST agents ship with this in their Model Configuration notes.)
 4. **Re-check style prompts** written to counter 4.7's terseness — 4.8 is warmer and less hedged by default.
@@ -130,7 +131,7 @@ Legitimate reasons to pin `claude-opus-4-7` or `claude-opus-4-6`: platform/model
 
 After re-pinning any agent:
 
-1. `grep -n "^model:" .claude/agents/*.md` — every agent shows the intended pin; no `inherit` leftovers unless deliberate.
+1. `grep -n "^model:" .claude/agents/*.md` — every agent shows `model: inherit` (the default) or the intended explicit pin; no stale model IDs left over from a previous pin.
 2. Run `/agents` in Claude Code and confirm each agent registers with the expected model.
-3. Run one cheap smoke stage (e.g. `/agent-task` on a trivial fix) and confirm the executing model in the session output matches the pin.
+3. Run one cheap smoke stage (e.g. `/agent-task` on a trivial fix) and confirm the executing model in the session output matches the intended model (the session model under `inherit`, or the pin).
 4. Record the change in `docs/DESIGN_RATIONALE.md` (which models, why, date) so mid-milestone reproducibility questions have an answer.

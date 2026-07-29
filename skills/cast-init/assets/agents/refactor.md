@@ -1,7 +1,7 @@
 ---
 name: refactor
 description: "Use when Reviewer classifies a finding as an Issue, when Tester flags a structural quality problem, or on direct user request for structural cleanup — behavior-preserving restructuring, then hands back to Tester and Reviewer."
-model: claude-opus-4-8
+model: inherit
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
