@@ -56,8 +56,11 @@ artifacts/
 
   one-off/                         # /agent-task work (no milestone)
     task-{slug}.md                 # One-off task file (same shape as milestone task files)
+    archive/                       # Complete one-off task files (moved by Validator at
+                                   #   milestone-completion checkpoints)
     bugs/
-      bug-{XXX}-{slug}.md          # Bugs filed from one-off work
+      bug-{XXX}-{slug}.md          # Bugs filed from one-off work (never archived — the
+                                   #   BUGS.md index points at them)
 ```
 
 Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-created for them). `/cast-init` scaffolds only the root files and the `one-off/` directory.

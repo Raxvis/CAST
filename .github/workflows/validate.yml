@@ -319,6 +319,14 @@ jobs:
           count=$(printf '%s\n' "$distinct" | grep -c .)
           echo "model pins found: $distinct ($count distinct)"
           [ "$count" -eq 1 ] || { echo "agent model pins are not identical"; fail=1; }
+          # Every agent declares a tools: list, and none includes Task — the
+          # "do not spawn subagents" rule is enforced by the toolset itself.
+          for f in skills/cast-init/assets/agents/*.md; do
+            [ "$(basename "$f")" = "README.md" ] && continue
+            t=$(awk '/^tools:/{sub(/^tools: */,""); print; exit}' "$f")
+            [ -n "$t" ] || { echo "$f: missing tools: frontmatter line"; fail=1; continue; }
+            echo "$t" | grep -qw Task && { echo "$f: tools list includes Task (subagent spawning must stay disabled)"; fail=1; }
+          done
           exit $fail
 
       - name: No stale pipeline-routing orders (docs/PIPELINE_LOOP.md is canonical)
@@ -361,6 +369,40 @@ jobs:
             echo "example BUGS.md uses pre-1.2 status vocabulary:"; echo "$stale"; exit 1
           fi
           echo "clean"
+
+      - name: Example task and bug state consistency
+        run: |
+          # The structure makes these invariants statically checkable: task Status
+          # values are legal enums, the Task Index and tasks/ agree bidirectionally,
+          # and the BUGS.md index Status column matches each per-bug file's Status.
+          fail=0
+          enum='Not Started|In Progress|Blocked|Complete|Deferred'
+          for f in example/artifacts/milestone-*/tasks/task-*.md example/artifacts/one-off/task-*.md; do
+            [ -e "$f" ] || continue
+            st=$(grep -m1 -oE '\| \*\*Status\*\* \| [^|]+' "$f" | sed 's/| \*\*Status\*\* | //; s/ *$//')
+            echo "$st" | grep -qxE "$enum" || { echo "$f: Status '$st' is not a legal enum value"; fail=1; }
+          done
+          for r in example/artifacts/milestone-*/README.md; do
+            mdir=$(dirname "$r")
+            while IFS= read -r p; do
+              [ -f "$mdir/$p" ] || { echo "$r: Task Index references missing file $p"; fail=1; }
+            done < <(grep -oE '`tasks/task-[^`]+`' "$r" | tr -d '`')
+            for tf in "$mdir"/tasks/task-*.md; do
+              [ -e "$tf" ] || continue
+              base="tasks/$(basename "$tf")"
+              grep -q "\`$base\`" "$r" || { echo "$r: Task Index has no row for $base"; fail=1; }
+            done
+          done
+          while IFS='|' read -r _ id title sev status file _; do
+            id=$(echo "$id" | xargs); status=$(echo "$status" | xargs); file=$(echo "$file" | tr -d '\` ')
+            case "$id" in BUG-*) ;; *) continue ;; esac
+            bf="example/artifacts/$file"
+            [ -f "$bf" ] || { echo "BUGS.md index: file not found: $bf"; fail=1; continue; }
+            fst=$(grep -m1 -oE "\*\*Status\*\*: [A-Za-z' ]+" "$bf" | sed "s/\*\*Status\*\*: //; s/ *$//")
+            [ "$fst" = "$status" ] || { echo "$bf: file Status '$fst' != index Status '$status'"; fail=1; }
+          done < example/artifacts/BUGS.md
+          [ "$fail" -eq 0 ] && echo "task/bug state consistent"
+          exit $fail
 
       - name: Example fixture includes the 1.2 state files
         run: |

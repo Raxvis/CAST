@@ -28,6 +28,9 @@
   - Handoff Log: append-only, newest last. Every stage transition appends exactly one
     entry in the fixed format. No narrative recaps — max 10 lines per entry; anything
     longer belongs in the artifact the entry points to (bug file, review file, code).
+    Exception: Reviewer entries and Tester failure entries add one line per
+    finding/failure beyond the fixed fields — for those stages this log IS the
+    canonical record; never drop findings to fit the cap.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted.
 -->

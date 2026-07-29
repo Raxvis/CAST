@@ -17,7 +17,8 @@ After execution:
    - No files under `artifacts/` should be templates (no "HOW TO CUSTOMIZE" comment blocks in milestone directories or `artifacts/one-off/`).
    - No v1 by-type directories (`artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, `artifacts/reviews/`) should remain after an approved pre-2.0 migration.
 5. **Verify YAML frontmatter on every agent file**:
-   - Each agent has `name:`, `description:`, `model:` in the frontmatter
+   - Each agent has `name:`, `description:`, `model:`, and `tools:` in the frontmatter
+   - The `tools:` list omits `Task` (the no-subagents rule is enforced by the toolset, not just prose); extensions the user approved (e.g. MCP tools) are fine
    - Description length ≤ 300 characters (the canonical trigger-first descriptions run roughly 170–260 characters; anything over 300 is likely an unconverted prose paragraph, not a description)
    - Model is `inherit` (default) or an explicit pin the user approved — right-sized aliases like `opus` on `ceo`, `sonnet` on `coder`, or `haiku` on a utility agent (see `roster.md` → "Right-sizing models"), or full model IDs such as `claude-opus-4-8` / `claude-sonnet-5` / `claude-haiku-4-5`
 6. **Verify template scaffolding was stripped**: `grep -rln 'TEMPLATE INSTRUCTIONS' --exclude-dir=cast-init .claude/ docs/ artifacts/ CLAUDE.md templates/README.md` must return nothing. (As in check 1, `--exclude-dir=cast-init` keeps a project-local cast-init install's own payload — which legitimately carries template-instruction blocks — out of the scan.) Only the template skeletons under `templates/` (every `templates/*` file except `README.md`) may carry `<!-- TEMPLATE INSTRUCTIONS -->` blocks (they install verbatim). Any hit elsewhere means the install-time strip rule in `execution.md` was skipped for that file.

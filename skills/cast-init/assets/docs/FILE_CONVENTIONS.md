@@ -116,8 +116,10 @@ artifacts/
 
   one-off/                                 # /agent-task work
     task-{slug}.md
+    archive/                               # Complete one-off task files (Validator moves
+                                           #   them here at milestone checkpoints)
     bugs/
-      bug-{XXX}-{slug}.md
+      bug-{XXX}-{slug}.md                  # Never archived — the BUGS.md index points here
 ```
 
 Milestone directories are created by `/agent-plan` Stage 1 (with `reviews/`, `tasks/`, and `bugs/` created as their first files are written); `/cast-init` pre-creates only the root files and `one-off/`. Do not create additional subdirectories beyond these without updating this file and `artifacts/README.md`.

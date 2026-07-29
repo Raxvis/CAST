@@ -2,6 +2,7 @@
 name: docs-writer
 description: "Use only at task- or milestone-completion checkpoints to drain the docs queue in artifacts/STANDUP.md, or on direct user request for documentation updates. Owns docs/ reference material."
 model: inherit
+tools: Read, Grep, Glob, Edit, Write
 ---
 
 <!-- TEMPLATE INSTRUCTIONS

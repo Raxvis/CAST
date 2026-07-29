@@ -2,6 +2,7 @@
 name: ui
 description: "Use during /agent-plan after Product publishes a milestone definition (in parallel with Architecture) to produce screen specs, and at /agent-code milestone completion for the UX review of milestones with UI-flagged tasks. Owns visual design and the style guide."
 model: inherit
+tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -35,7 +36,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`. Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. After writing the UI spec, update each affected task file's Context Manifest with the specific sections (by anchor) that task needs — the manifest, not the whole spec, is what engineering agents read. Anchor every visual rule to a named style-guide token with concrete values — never leave visual decisions to model defaults or adjectives; on open-ended briefs, request distinct direction proposals before committing to one.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. After writing (or revising) the UI spec, return a Manifest Rows block in your report — for each affected task, the specific sections (by anchor) that task needs; the orchestrator applies the rows to the task files (Stage 2c) so parallel stages never edit the same file. The manifest, not the whole spec, is what engineering agents read. Anchor every visual rule to a named style-guide token with concrete values — never leave visual decisions to model defaults or adjectives; on open-ended briefs, request distinct direction proposals before committing to one.
 
 ---
 

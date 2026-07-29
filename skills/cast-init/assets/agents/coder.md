@@ -2,6 +2,7 @@
 name: coder
 description: "Use to implement each task in /agent-code or /agent-task, and whenever a test failure, review change request, Fix Now defect, or Product rejection returns work. Writes all production code, then submits to Tester."
 model: inherit
+tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -28,7 +29,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `xhigh` (`high` when the executing model is Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Follow the Handoff Protocol in `docs/PIPELINE_LOOP.md`: read only the task file, its Context Manifest, and the latest handoff entry's "Read next", then append one capped Handoff Log entry to the task file — no narrative recap. Make only the changes the task directly requests — no extra helpers, abstractions, or defensive handling for scenarios that cannot happen. For minor choices (naming, defaults), pick a reasonable option and note it in the handoff instead of asking.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Follow the Handoff Protocol in `docs/PIPELINE_LOOP.md`: read only the task file, its Context Manifest, and the latest handoff entry's "Read next", then append one capped Handoff Log entry to the task file and reply to the orchestrator with a single routing line (the entry is the report, not the reply) — no narrative recap. Make only the changes the task directly requests — no extra helpers, abstractions, or defensive handling for scenarios that cannot happen. For minor choices (naming, defaults), pick a reasonable option and note it in the handoff instead of asking.
 
 ---
 

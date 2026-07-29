@@ -8,8 +8,14 @@ HOW TO CUSTOMIZE:
 3. Update the ASCII diagram to reflect any changes to the agent lineup.
 4. Update the Documentation Placement table to match your actual folder/file conventions.
 
-Per-agent AI models are pre-configured in each agent file's YAML frontmatter and are
-not placeholders. Every agent defaults to model: inherit — it runs on whatever model
+Per-agent AI models and tool lists are pre-configured in each agent file's YAML
+frontmatter and are not placeholders. The tools: line is deliberate enforcement —
+every list omits the Task tool, which makes the "do not spawn subagents" rule a
+hard guarantee rather than an instruction. An omitted tool is simply unavailable to
+that agent (no error — the capability just doesn't exist for it), and an explicit
+list also excludes MCP-provided tools, so extend an agent's tools: line if your
+project's agents need MCP tools or capabilities beyond the shipped set.
+Every agent defaults to model: inherit — it runs on whatever model
 the invoking session uses (the Claude Opus 4.x family is the optimized target;
 claude-opus-4-8, claude-opus-4-7, and claude-opus-4-6 are the supported executing
 models with per-model notes in each agent's "Model Configuration" section). Role
@@ -246,6 +252,7 @@ Run per task within the approved milestone:
    - **Issues** — route to **Refactor**. Refactor hands off back to **Tester** and **Reviewer** until the issue is resolved.
 4. **Product** validates the finished task against its acceptance criteria. On rejection, work returns to Coder.
 5. **Docs Writer** (invoked by `/agent-code` at the task- and milestone-completion checkpoints) drains the `docs` queue in `artifacts/STANDUP.md` and marks drained entries with ✅.
+   - Independent tasks (disjoint dependencies and file lists) may run their loops **in parallel** — up to 3 at a time, with shared-root writes serialized by the orchestrator. See `/agent-code` → Parallel Task Execution for the guardrails.
 6. **Validator** (invoked by `/agent-code` at the task-completion checkpoint) records the outcome in `artifacts/AGENT_STATE.md`.
 7. After every task in the milestone is complete: **UI** performs the milestone UX review (only for milestones containing UI-flagged tasks, written to `artifacts/milestone-{N}-{slug}/reviews/ux.md`), and **Validator** (invoked by `/agent-code` at the milestone-completion checkpoint) records the milestone outcome in `artifacts/AGENT_STATE.md` and runs the milestone retrospective (`artifacts/milestone-{N}-{slug}/reviews/retrospective.md`). **Product** re-triages all Deferred bugs in `artifacts/BUGS.md` at this checkpoint — Deferred is an open held state, not terminal. **Release** is then invoked by the user — not auto-launched by any pipeline — to prepare changelog, versioning, and build verification.
 

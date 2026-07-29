@@ -2,6 +2,7 @@
 name: refactor
 description: "Use when Reviewer classifies a finding as an Issue, when Tester flags a structural quality problem, or on direct user request for structural cleanup — behavior-preserving restructuring, then hands back to Tester and Reviewer."
 model: inherit
+tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -27,7 +28,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`. Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Follow the Handoff Protocol in `docs/PIPELINE_LOOP.md`: read only the task file, its Context Manifest, and the latest handoff entry's "Read next", then append one capped Handoff Log entry to the task file — no narrative recap. Apply behavior-preserving changes within the flagged Issue only — choose the simplest structure that resolves it, introduce no new abstractions beyond the scope of the flagged Issue (extracting shared logic to resolve flagged duplication is in scope), and surface adjacent cleanups as notes rather than applying them.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Follow the Handoff Protocol in `docs/PIPELINE_LOOP.md`: read only the task file, its Context Manifest, and the latest handoff entry's "Read next", then append one capped Handoff Log entry to the task file and reply to the orchestrator with a single routing line (the entry is the report, not the reply) — no narrative recap. Apply behavior-preserving changes within the flagged Issue only — choose the simplest structure that resolves it, introduce no new abstractions beyond the scope of the flagged Issue (extracting shared logic to resolve flagged duplication is in scope), and surface adjacent cleanups as notes rather than applying them.
 
 ---
 

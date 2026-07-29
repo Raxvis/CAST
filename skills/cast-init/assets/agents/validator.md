@@ -2,6 +2,7 @@
 name: validator
 description: "Use at session start (Session-Start Checklist), at task- and milestone-completion checkpoints (invoked by /agent-code) to record outcomes in artifacts/AGENT_STATE.md, and whenever agents conflict or a process rule needs enforcement. Owns process integrity and milestone retrospectives."
 model: inherit
+tools: Read, Grep, Glob, Edit, Write
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -51,6 +52,7 @@ The Validator Agent owns the process. It does not write code, design screens, or
 - Detect and resolve conflicts between agents before they block progress.
 - Maintain an accurate Agent Status Dashboard at all times.
 - Run a milestone retrospective at the end of every milestone.
+- At the milestone-completion checkpoint, archive one-off hygiene: move every `artifacts/one-off/task-{slug}.md` with Status Complete into `artifacts/one-off/archive/` (bug files stay in place — index rows point at them).
 - Flag process violations when agents skip required steps.
 
 ---
@@ -127,6 +129,7 @@ _Run at the beginning of every working session._
 - [ ] Review the Process Violations log — confirm all violations have a resolution or owner.
 - [ ] Confirm Architecture has an Approved document for every module Coder will touch this session.
 - [ ] Confirm UI has an Approved spec for every screen Coder will touch this session.
+- [ ] Spot-check the bug index: each row's Status in `artifacts/BUGS.md` matches the Status field in its per-bug file. On a mismatch, the bug file wins — correct the index row and log a process violation.
 
 ---
 

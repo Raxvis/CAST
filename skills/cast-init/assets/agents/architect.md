@@ -2,6 +2,7 @@
 name: architect
 description: "Use during /agent-plan after Product publishes a milestone definition, and whenever Coder raises a design question, a new dependency is proposed, or Security/Performance findings require remediation. Owns system design, module boundaries, and data schemas."
 model: inherit
+tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -32,7 +33,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `xhigh` (`high` when the executing model is Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. After writing a design document, update each affected task file's Context Manifest with the specific sections (by anchor) that task needs — the manifest, not the whole document, is what engineering agents read. Produce the simplest architecture that meets the requirements — no speculative abstractions or future-proofing; the document-reading steps in this file are mandatory. For minor structural choices, pick a reasonable default and record it in the Decisions Log instead of asking.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. After writing (or revising) a design document, return a Manifest Rows block in your report — for each affected task, the specific sections (by anchor) that task needs; the orchestrator applies the rows to the task files (Stage 2c) so parallel stages never edit the same file. The manifest, not the whole document, is what engineering agents read. Produce the simplest architecture that meets the requirements — no speculative abstractions or future-proofing; the document-reading steps in this file are mandatory. For minor structural choices, pick a reasonable default and record it in the Decisions Log instead of asking.
 
 ---
 

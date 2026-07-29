@@ -2,6 +2,7 @@
 name: bug-gatherer
 description: "Use whenever a defect surfaces — Reviewer defect classifications, Tester failures worth tracking, Security findings, or user reports — files the structured report (status New) for Product triage. Single entry point for all bugs."
 model: inherit
+tools: Read, Grep, Glob, Edit, Write
 ---
 
 <!-- TEMPLATE INSTRUCTIONS

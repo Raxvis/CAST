@@ -61,6 +61,8 @@ This skill orchestrates the **Planning Stage** of the agent workflow. It runs th
 
 **Pass inputs forward.** Each stage's "Input to pass" means include the content in the agent's invocation — read each artifact once as it is produced and hand it to the consuming stages. Do not make every agent independently re-open files the orchestrator has already read; an agent re-reads a file itself only when it needs sections that were not supplied.
 
+**Stage replies are routing metadata.** Per the Handoff Protocol (`docs/PIPELINE_LOOP.md`), each stage's final report is a short completion notice (artifact written, one-line outcome) — plus, for Stages 2a/2b, the per-task manifest-rows block described below. Do not relay or summarize document contents between stages; the documents on disk are the record.
+
 **Milestone numbering.** Unless the invocation input names an existing milestone to re-plan, allocate `{N}` as the highest `milestone-{N}-*` directory number already present under `artifacts/` plus one (`1` if there are none). Allocate it once, before Stage 1; Stage 1 creates the milestone directory `artifacts/milestone-{N}-{slug}/` and every artifact of the run is written inside it.
 
 **Stage checkpoints.** At the start of the run, add a session heading `### YYYY-MM-DD — agent-plan — milestone-{N}-{slug}` to `artifacts/STANDUP.md`. After each stage completes, append a checkpoint entry under it using that file's Entry Grammar, e.g. `- architect | progress | Stage 2a complete: artifacts/milestone-{N}-{slug}/architecture.md`. These checkpoints are what let an interrupted planning run resume at the right stage. Planning stages may also enqueue documentation work in their checkpoint entries: when a stage's output changes something documentation-worthy (APIs, commands, config, conventions, user-facing behavior), append a `- <agent> | docs | <note>` entry under the session heading — Docs Writer drains these at the next `/agent-code` or `/agent-task` completion checkpoint.
@@ -90,7 +92,7 @@ After Product completes, launch the **architect** agent to:
 1. Read the milestone README and task files from Stage 1.
 2. Produce the architecture document at `artifacts/milestone-{N}-{slug}/architecture.md` as an **instance of `templates/ARCH_SYSTEM.md`** — that template defines the milestone architecture document's required headings. When the milestone needs module- or schema-level depth beyond it, additionally instantiate `templates/ARCH_MODULE.md` and/or `templates/ARCH_DATA_SCHEMA.md` as `artifacts/milestone-{N}-{slug}/arch-{slug}.md`, and link them from the milestone document.
 3. Define module boundaries, data schemas, cross-module contracts, and data flows.
-4. **Update each affected task file's Context Manifest** with the specific `architecture.md` sections (by anchor) that task needs, and set its `Needs Arch Doc` field to Done with the link. The manifest, not the whole document, is what engineering agents will read.
+4. **Return a Manifest Rows block** in its completion report: for each affected task, the specific `architecture.md` sections (by anchor) that task needs and why — one proposed Context Manifest row per line, in the manifest's table format. Do **not** edit the task files directly: Stage 2b runs in parallel and edits to the same files would collide; the orchestrator applies both agents' rows in Stage 2c.
 5. Reference prior milestones' architecture documents (`artifacts/milestone-*/architecture.md`) for consistency and name any new dependencies in the Decisions Log.
 
 Input to pass: the milestone README and task files from Stage 1.
@@ -103,14 +105,22 @@ In parallel with Architecture, launch the **ui** agent to:
 2. Read the task files from Stage 1 — the per-task `Needs UI Spec` flags identify every screen the milestone introduces.
 3. Produce the UI specification at `artifacts/milestone-{N}-{slug}/ui.md` using the template in `templates/UI_SPEC.md`.
 4. Define screen layouts, component structure, interaction states, and accessibility notes.
-5. **Update each affected task file's Context Manifest** with the specific `ui.md` sections (by anchor) that task needs, and set its `Needs UI Spec` field to Done with the link.
+5. **Return a Manifest Rows block** in its completion report: for each affected task, the specific `ui.md` sections (by anchor) that task needs and why — one proposed Context Manifest row per line. Do **not** edit the task files directly (Stage 2a runs in parallel; the orchestrator applies both agents' rows in Stage 2c).
 6. Reference prior milestones' UI specs (`artifacts/milestone-*/ui.md`) for consistency.
 
 Input to pass: the milestone README and the task files from Stage 1 (the `Needs UI Spec` flags live in each task file's Header). Coordinate state-shape questions with the architect agent if they arise.
 
 If the project installed no `ui` agent (a backend/CLI adoption that opted out of the UI role), skip this stage entirely and note the skip in the stage checkpoint entry (`- agent-plan | progress | Stage 2b skipped: no ui agent installed`); downstream stages then run without a UI specification.
 
-**Stage trigger:** Stage 3 (both 3a and 3b) starts only after **both** Architecture (Stage 2a) and UI (Stage 2b) have completed — Stage 3b's input includes the UI spec. (If Stage 2b was skipped because no `ui` agent is installed, Stage 3 starts when Architecture completes.)
+### Stage 2c — Manifest application (orchestrator)
+
+After both Stage 2a and Stage 2b complete (or 2a alone in a no-ui run), the orchestrator applies the returned Manifest Rows blocks to the task files — no agent launch needed:
+
+1. For each task, append the rows from Architecture's and UI's blocks to that task file's Context Manifest table.
+2. Set each affected task's `Needs Arch Doc` / `Needs UI Spec` Header field to Done with the link.
+3. This single-writer step exists because 2a and 2b run in parallel — two agents editing the same task files concurrently would silently lose rows. All task-file manifest writes during planning go through this step.
+
+**Stage trigger:** Stage 3 (both 3a and 3b) starts only after Stage 2c has applied the manifest rows — Stage 3b's input includes the UI spec. (If Stage 2b was skipped because no `ui` agent is installed, Stage 3 starts when Architecture completes and 2c applies Architecture's rows alone.)
 
 ### Stage 3a — Security
 
@@ -154,6 +164,8 @@ Input to pass: all artifacts from Stages 1–3, and the template `templates/CEO_
 ### Revision Handling
 
 When an agent revises a file during a re-run of an earlier stage (for example, the Architect rewriting the milestone's `architecture.md` to address a CEO Revision Request), the revision happens **in place** — the existing file is overwritten. Full historical diffs are preserved by git, not by filename churn.
+
+**Revised design docs invalidate manifests.** A revision to `architecture.md`, `ui.md`, or a supplemental design doc can move or remove the section anchors that task-file Context Manifests cite — and a stale anchor silently defeats the minimal-context contract. On every such revision, the revising agent re-checks each of its returned manifest rows against the new document and returns corrected rows in its completion report; the orchestrator re-runs the Stage 2c application for the affected tasks before any downstream stage reads them.
 
 Every planning-stage artifact includes a `## Revision History` section at the top of the file, directly under the title and above the body. Each revision adds an entry to the top of that table (most recent first):
 
