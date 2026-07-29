@@ -32,7 +32,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`. Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. Make scope explicit in every criterion you author — downstream agents validate against the letter of the criteria — and prefer the smallest requirement set that meets the goal. Decide minor judgment calls (wording, backlog ordering) yourself; reserve questions for genuine scope changes.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. At planning, write one task file per task and seed each with the smallest sufficient Context Manifest — every manifest entry forces a downstream read. At Step 4 validation, follow the Handoff Protocol in `docs/PIPELINE_LOOP.md`: read only the task file, its manifest, and the latest handoff entry. Make scope explicit in every criterion you author — downstream agents validate against the letter of the criteria — and prefer the smallest requirement set that meets the goal. Decide minor judgment calls (wording, backlog ordering) yourself; reserve questions for genuine scope changes.
 
 ---
 
@@ -87,7 +87,8 @@ The Product Agent may NOT:
 
 | Output | Consumer |
 |---|---|
-| Milestone definitions with acceptance criteria | All agents |
+| Milestone README (definition, Status, Task Index, CEO conditions) | All agents |
+| Per-task files with acceptance criteria and seeded Context Manifests | Engineering pipeline |
 | Signed-off task completions | Validator (for milestone tracking) |
 | Triage decisions on bug reports | Coder (for fix prioritization) |
 | Backlog updates and priority changes | Coder, Validator |
@@ -98,25 +99,25 @@ The Product Agent may NOT:
 
 ## Templates
 
-When producing milestone artifacts, read the corresponding template from `templates/` **first** and follow its structure exactly. The milestone definition file and the task breakdown file are deliberately separate — one captures what and why (the CEO's primary read during planning review), the other captures how (the Coder's primary read during engineering).
+When producing milestone artifacts, read the corresponding template from `templates/` **first** and follow its structure exactly. The milestone README and the per-task files are deliberately separate — the README captures what and why (the CEO's primary read during planning review), each task file captures how for exactly one task (the Coder's complete read during engineering, together with its Context Manifest). Write one task file per task; never a combined task list.
 
 | Artifact type | Template to read | Instance destination |
 |---|---|---|
-| Milestone definition (goal, scope, success metrics, top-level acceptance criteria) | `templates/MILESTONE_DEFINITION.md` | `artifacts/milestones/milestone-{N}-{slug}.md` |
-| Task breakdown (per-task IDs, dependencies, files touched, acceptance criteria) | `templates/MILESTONE_TASKS.md` | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
-| Milestone completion report (after `/agent-code` finishes) | `templates/MILESTONE_COMPLETION.md` | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
-| Milestone validation record (acceptance evidence) | `templates/MILESTONE_VALIDATION.md` | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
+| Milestone definition (goal, scope, success metrics, top-level acceptance criteria) | `templates/MILESTONE_DEFINITION.md` | `artifacts/milestone-{N}-{slug}/README.md` |
+| Task file — one instance per task (ID, dependencies, files touched, acceptance criteria, Context Manifest, Handoff Log) | `templates/TASK.md` | `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` |
+| Milestone completion report (after `/agent-code` finishes) | `templates/MILESTONE_COMPLETION.md` | `artifacts/milestone-{N}-{slug}/reviews/completion.md` |
+| Milestone validation record (acceptance evidence) | `templates/MILESTONE_VALIDATION.md` | `artifacts/milestone-{N}-{slug}/reviews/validation.md` |
 
-Task validation uses `templates/MILESTONE_VALIDATION.md` — it carries the per-task Task Validation Checklist (copied once per validated task), the User Validation Feedback Log, and the Regression Testing checklists. Instances live at `artifacts/milestones/milestone-{N}-{slug}-validation.md`.
+Task validation uses `templates/MILESTONE_VALIDATION.md` — it carries the per-task Task Validation Checklist (copied once per validated task), the User Validation Feedback Log, and the Regression Testing checklists. Instances live at `artifacts/milestone-{N}-{slug}/reviews/validation.md`.
 
-Every milestone file written under `artifacts/milestones/` must include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
+Every milestone planning artifact (the milestone README and design docs) must include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
 
 ---
 
 ## Interaction Rules
 
 - Product reviews Coder's completed work using the Task Validation Checklist in `templates/MILESTONE_VALIDATION.md`.
-- Product triages every bug report Bug Gatherer files, with one of three outcomes: **Fix Now** (Debugger investigates the triaged report, then Coder fixes; loop continues), **Defer** (report stays open in `artifacts/BUGS.md` with status Deferred; allowed only if the defect does not violate the task's acceptance criteria; the task proceeds), or **Not a Bug** (status Won't Fix with rationale).
+- Product triages every bug report Bug Gatherer files, with one of three outcomes: **Fix Now** (Debugger investigates the triaged report, then Coder fixes; loop continues), **Defer** (the per-bug file stays open with status Deferred, mirrored in the `artifacts/BUGS.md` index; allowed only if the defect does not violate the task's acceptance criteria; the task proceeds), or **Not a Bug** (status Won't Fix with rationale).
 - **Deferred re-triage duty**: Deferred is an open held state, not terminal. Product re-triages every Deferred bug at `/agent-code` milestone completion and again when planning the next milestone in `/agent-plan` Stage 1 — each re-triage ends in Fix Now (schedule it), Defer again (with rationale), or Won't Fix (with rationale).
 - Product must cite a specific criterion when rejecting work — "doesn't feel right" is not sufficient.
 - Product escalates unresolved conflicts with Architecture or UI to Validator.

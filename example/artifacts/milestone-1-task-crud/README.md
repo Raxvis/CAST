@@ -1,12 +1,13 @@
 # Acme Todo — M1: Task CRUD + SQLite Persistence
 
-**Status**: Planning approved (CEO: APPROVED WITH CONDITIONS)
+**Status**: Complete (CEO: APPROVED WITH CONDITIONS 2026-04-08; completed 2026-04-10)
 
 ## Revision History
 
 | Rev | Date | Agent | Change |
 |-----|------|-------|--------|
 | v1 | 2026-04-08 | product | Initial milestone definition |
+| v2 | 2026-04-10 | product | Status set Complete at milestone sign-off |
 
 ---
 
@@ -91,7 +92,7 @@ loop available.
 |---|---|---|
 | Dependency | `better-sqlite3` (native module) | Pinned in `package.json`; prebuilt binaries verified for Node 20+ on macOS/Linux/Windows |
 | Dependency | Node.js 20+ and pnpm on the developer machine | Documented in `CLAUDE.md` Build & Test |
-| Dependency | Architecture data-layer section and UI spec output formats | Both approved 2026-04-08: `artifacts/architecture/arch-milestone-1.md`, `artifacts/ui-specs/ui-milestone-1.md` |
+| Dependency | Architecture data-layer section and UI spec output formats | Both approved 2026-04-08: `architecture.md`, `ui.md` |
 | Risk | SQLite file locking with concurrent shells on Windows | WAL mode (CEO Condition 2) allows read-while-write; accepted for a single-user CLI |
 | Risk | First-run crash when the DB file does not exist yet | Migrations run on every invocation (CEO Condition 3); covered by regression tests |
 
@@ -114,21 +115,36 @@ No internal milestone dependencies — this is the first implementation mileston
 
 ---
 
+## Task Index
+
+_One row per task file under `tasks/`. No status column — task status lives ONLY in each task file's Header._
+
+| Task ID | Task Name | File | Dependencies |
+|---------|-----------|------|--------------|
+| T-1 | Task type, schema, migration runner | `tasks/task-01-data-layer.md` | None |
+| T-2 | `add` command | `tasks/task-02-add-command.md` | T-1 |
+| T-3 | `list` command | `tasks/task-03-list-command.md` | T-1 |
+| T-4 | `done` + `delete` commands | `tasks/task-04-done-delete-commands.md` | T-1 |
+| T-5 | CLI argument parser wiring | `tasks/task-05-cli-parser.md` | T-2, T-3, T-4 |
+
+Dependency graph: T-1 blocks T-2/T-3/T-4 (parallel), which all block T-5.
+
+---
+
 ## CEO Approval Conditions
 
-The CEO approved this milestone with three conditions. All three must be verified
-before the milestone can be marked Complete.
+The CEO approved this milestone with three conditions (APPROVED WITH CONDITIONS,
+2026-04-08). Coder tracked each condition during engineering; Reviewer and Product
+verified at completion. Tasks a condition names carry a `../README.md § CEO Approval
+Conditions` row in their Context Manifest.
 
-1. **Security** — All SQL queries must use parameterized bindings (no string
-   concatenation into SQL). Verified by Reviewer during code review.
-2. **Performance** — SQLite WAL mode must be enabled in the migration, and an
-   index must be created on the `completed` column. Verified by Reviewer inspecting
-   the migration.
-3. **Error handling** — `list` must handle a missing database file by running
-   migrations on first invocation rather than throwing an error. Verified by
-   Product during validation.
+| Condition | Source | Status |
+|-----------|--------|--------|
+| 1. All SQL queries use parameterized bindings — no string concatenation into SQL (Security) | `reviews/ceo.md` | Verified (Reviewer, 2026-04-10) |
+| 2. WAL mode enabled in the migration + index on the `completed` column (Performance) | `reviews/ceo.md` | Verified (Reviewer, 2026-04-10) |
+| 3. `list` handles a missing database file by running migrations on first invocation (Error handling) | `reviews/ceo.md` | Verified (Product, 2026-04-10) |
 
-See `artifacts/reviews/ceo-review-milestone-1.md` for the full verdict.
+See `reviews/ceo.md` for the full verdict.
 
 ---
 
@@ -147,12 +163,12 @@ See `artifacts/reviews/ceo-review-milestone-1.md` for the full verdict.
 
 ## References
 
-- **Task Breakdown**: `artifacts/milestones/milestone-1-task-crud-tasks.md`
-- **CEO Review**: `artifacts/reviews/ceo-review-milestone-1.md`
-- **Architecture**: `artifacts/architecture/arch-milestone-1.md`
-- **UI Spec**: `artifacts/ui-specs/ui-milestone-1.md`
+- **Task files**: `tasks/`
+- **CEO Review**: `reviews/ceo.md`
+- **Architecture**: `architecture.md`
+- **UI Spec**: `ui.md`
 - **PRD**: `docs/PRD.md`
 
 ---
 
-_Last updated: 2026-04-08_
+_Last updated: 2026-04-10_

@@ -26,7 +26,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`. Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap; emit the full result block even when everything passes — silence is not a clean report. Report every failing or flaky case with its output — never summarize failures away. Write the smallest test set that proves the acceptance criteria.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Follow the Handoff Protocol in `docs/PIPELINE_LOOP.md`: read only the task file, its Context Manifest, and the latest handoff entry's "Read next", then append one capped Handoff Log entry to the task file — no narrative recap; emit the full result block even when everything passes — silence is not a clean report. Report every failing or flaky case with its output — never summarize failures away. Write the smallest test set that proves the acceptance criteria.
 
 ---
 

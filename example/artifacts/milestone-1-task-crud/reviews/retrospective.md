@@ -18,7 +18,7 @@
 
 ## Estimated vs Actual Effort
 
-- **Estimated**: ~1.5 engineer-days — from the "Estimated Effort" field in the milestone definition (`artifacts/milestones/milestone-1-task-crud.md`)
+- **Estimated**: ~1.5 engineer-days — from the "Estimated Effort" field in the milestone definition (`artifacts/milestone-1-task-crud/README.md`)
 - **Actual**: 3 sessions across 3 calendar days, 2026-04-08 to 2026-04-10 — from the session dates for this milestone in `artifacts/STANDUP.md` (first to last session)
 - **Delta**: The engineering work itself (2026-04-09 and 2026-04-10) matched the ~1.5-day estimate; the third calendar day is the planning session, which the estimate deliberately excluded. The only unplanned engineering cost was the BUG-001 fix in T-3, which stayed inside the same session (loop 2/3, no escalation).
 
@@ -57,13 +57,13 @@ _Fill each metric from its recorded source (validator.md → Metric Sources) —
 
 | Metric | Value | Source |
 |---|---|---|
-| Tasks planned | 5 | Summary table in `artifacts/milestones/milestone-1-task-crud-tasks.md` |
-| Tasks completed | 5 | Summary table in `artifacts/milestones/milestone-1-task-crud-tasks.md` |
-| Tasks rejected by Product | 0 | Summary table in `artifacts/milestones/milestone-1-task-crud-tasks.md` — average rejections per task: 0 |
+| Tasks planned | 5 | Summary table in `artifacts/milestone-1-task-crud/tasks/` |
+| Tasks completed | 5 | Summary table in `artifacts/milestone-1-task-crud/tasks/` |
+| Tasks rejected by Product | 0 | Summary table in `artifacts/milestone-1-task-crud/tasks/` — average rejections per task: 0 |
 | Process violations | 0 | Process Violations table in `artifacts/AGENT_STATE.md` → `## validator` |
 | Conflicts escalated to Validator | 0 | Conflicts table in `artifacts/AGENT_STATE.md` → `## validator` |
-| Architecture doc revisions | 1 | `## Revision History` table in `artifacts/architecture/arch-milestone-1.md` |
-| UI spec revisions | 1 | `## Revision History` table in `artifacts/ui-specs/ui-milestone-1.md` |
+| Architecture doc revisions | 1 | `## Revision History` table in `artifacts/milestone-1-task-crud/architecture.md` |
+| UI spec revisions | 1 | `## Revision History` table in `artifacts/milestone-1-task-crud/ui.md` |
 
 ---
 

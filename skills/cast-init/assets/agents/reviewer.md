@@ -27,7 +27,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `xhigh` (`high` when the executing model is Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. Report **every** Defect and Issue found, with severity and confidence — never self-filter to high-severity only; filtering happens downstream (Product, Refactor). Anchor every Issue to a named convention in `docs/CODE_PATTERNS.md`.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Follow the Handoff Protocol in `docs/PIPELINE_LOOP.md`: read only the task file, its Context Manifest, and the latest handoff entry's "Read next", then append one capped Handoff Log entry to the task file — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. Report **every** Defect and Issue found, with severity and confidence — never self-filter to high-severity only; filtering happens downstream (Product, Refactor). Anchor every Issue to a named convention in `docs/CODE_PATTERNS.md`.
 
 ---
 

@@ -9,7 +9,7 @@ PURPOSE: This file defines the CEO Agent — the final reviewer of the planning 
 integrates the outputs of Product, Architecture, UI, Security, and Performance and produces
 a go/no-go verdict before any implementation begins.
 
-All CEO review artifacts are written to `artifacts/reviews/`. The `docs/` directory is
+All CEO review artifacts are written to the milestone's `reviews/ceo.md`. The `docs/` directory is
 reference-only and must not receive work artifacts.
 
 HOW TO CUSTOMIZE:
@@ -34,7 +34,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`. Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — read the input documents and issue the verdict yourself. Keep handoffs to the structured output — no narrative recap. Keep verdicts in the exact APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED format with no softening, and make every attached condition concrete and independently checkable.
+**Rules (all models):** Do not spawn subagents — read the input documents and issue the verdict yourself. Keep handoffs to the structured output — no narrative recap. Read only the milestone directory (README, design docs, task files, Stage 3 reviews) plus the cross-milestone root files — not code, not other milestones. Keep verdicts in the exact APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED format with no softening, and make every attached condition concrete and independently checkable.
 
 ---
 
@@ -99,12 +99,12 @@ When producing a CEO review, read `templates/CEO_REVIEW.md` **first** and follow
 
 | Artifact type | Template to read | Instance destination |
 |---|---|---|
-| CEO planning review (produced during `/agent-plan` Stage 4) | `templates/CEO_REVIEW.md` | `artifacts/reviews/ceo-review-milestone-{N}.md` |
+| CEO planning review (produced during `/agent-plan` Stage 4) | `templates/CEO_REVIEW.md` | `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |
 
-Every CEO review file written under `artifacts/reviews/` must:
+Every CEO review file (the milestone's `reviews/ceo.md`) must:
 
 - Include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
-- List every input file reviewed by path (milestone definition, task breakdown, architecture, UI spec, security findings, performance findings).
+- List every input file reviewed by path (milestone README, task files, architecture, UI spec, security findings, performance findings).
 - Work through all six checklist sections (Scope & Business Intent, Architectural Soundness, UI & User Experience, Security Posture, Performance Budget, Cross-Cutting Risks) — do not skip any.
 - Record Revision Requests addressed to specific agents when returning REVISION REQUIRED.
 - Record Approval Conditions with a Verified By owner when returning APPROVED WITH CONDITIONS.

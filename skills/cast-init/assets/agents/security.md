@@ -28,7 +28,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`. Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. Report **every** finding with severity and confidence — never self-filter to high-severity only; the CEO review does the weighing. Require a concrete attack scenario per finding, framed as defensive remediation. The Severity Levels and the review-scope requirements in this file (Templates section) are mandatory, not suggestions.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. Read only the milestone README, the architecture document, and supplemental arch docs — not task files, not code. Report **every** finding with severity and confidence — never self-filter to high-severity only; the CEO review does the weighing. Require a concrete attack scenario per finding, framed as defensive remediation. The Severity Levels and the review-scope requirements in this file (Templates section) are mandatory, not suggestions.
 
 ---
 
@@ -103,9 +103,9 @@ Security findings do not use a `templates/*.md` skeleton — the finding format 
 
 | Artifact type | Format reference | Instance destination |
 |---|---|---|
-| Security review (produced during `/agent-plan` Stage 3a) | This file: Severity Levels + finding format below | `artifacts/reviews/security-review-milestone-{N}.md` |
+| Security review (produced during `/agent-plan` Stage 3a) | This file: Severity Levels + finding format below | `artifacts/milestone-{N}-{slug}/reviews/security.md` |
 
-Every security review file written under `artifacts/reviews/` must:
+Every security review file (the milestone's `reviews/security.md`) must:
 
 - Include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
 - Cite the specific vulnerability category (OWASP item or equivalent) for each finding.
@@ -136,7 +136,7 @@ Critical and High findings block the milestone until remediated or rolled into a
 | **Low** | Minor hardening opportunity | Fix when convenient |
 | **Informational** | Best practice recommendation | Record in the security review document only — never filed as a bug |
 
-Critical, High, Medium, and Low map directly onto the four-level bug schema in `artifacts/BUGS.md` and are filed with Bug Gatherer. Informational findings have no bug filing path: they live in the security review document, and documentation-relevant ones are queued as a `docs` entry in `artifacts/STANDUP.md`.
+Critical, High, Medium, and Low map directly onto the four-level severity scale in `artifacts/BUGS.md` and are filed with Bug Gatherer (who creates the per-bug file and index row). Informational findings have no bug filing path: they live in the security review document, and documentation-relevant ones are queued as a `docs` entry in `artifacts/STANDUP.md`.
 
 ---
 

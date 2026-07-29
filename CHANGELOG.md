@@ -8,6 +8,36 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [2.0.0] — 2026-07-29
+
+**Breaking restructure of how agents hand off work and where artifacts live.** Artifacts are now grouped by milestone instead of by type, every task and every bug is its own isolated file, and agent-to-agent handoffs follow a minimal-context protocol: each stage reads only its task file's Context Manifest and appends one capped Handoff Log entry. Existing installs need the migration below.
+
+### Changed
+
+- **`artifacts/` is grouped by milestone.** The v1 by-type directories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`) are gone. Each milestone owns one directory: `artifacts/milestone-{N}-{slug}/` containing `README.md` (the milestone's highest-order document: definition, Status, Task Index, CEO Approval Conditions), `architecture.md`, `ui.md`, supplemental `arch-{slug}.md` / `ui-{slug}.md` docs, `reviews/{security,performance,ceo,ux,validation,completion,retrospective}.md`, `tasks/` and `bugs/`. Cross-milestone state (BUGS.md index, STANDUP.md, AGENT_STATE.md) stays at the artifacts root; `/agent-task` work lands under `artifacts/one-off/`. Milestone directories are created by `/agent-plan` Stage 1 — `/cast-init` no longer pre-creates by-type subdirectories.
+- **One file per task.** The single `-tasks.md` breakdown is replaced by `tasks/task-{T}-{slug}.md`, one instance of the new `templates/TASK.md` per task — self-contained with description, dependencies, acceptance criteria, a **Context Manifest** (the complete read set for the task, seeded by Product and extended with section anchors by Architect and UI), and an append-only **Handoff Log**. Task status lives ONLY in the task file's Header; the milestone README's Task Index deliberately has no status column, ending v1's dual-write bookkeeping. `templates/MILESTONE_TASKS.md` is renamed/rewritten as `templates/TASK.md`.
+- **One file per bug.** Bugs are standalone files (`templates/BUG_REPORT.md` instances) filed beside the work that surfaced them (`milestone-{N}-{slug}/bugs/BUG-{XXX}-{slug}.md` or `one-off/bugs/`); `artifacts/BUGS.md` becomes the global index — ID assignment, one status line per bug, lifecycle and field-ownership rules, and the Tester-owned regression checklist.
+- **Minimal-context Handoff Protocol** (new section in `docs/PIPELINE_LOOP.md`, binding on every agent and both engineering pipelines): the task file is the handoff medium; a stage's read set is closed (its agent definition + the task file + the manifest entries + the latest handoff entry's "Read next" — nothing else); handoff entries are capped fixed-format blocks (Outcome / Files touched / Read next / Open items, max 10 lines, no narrative); findings live in their canonical artifact with only pointers in the entry. The v1 pass-forward rule is superseded. Agent rule blocks, `/agent-plan` stages (Architect and UI now write manifest section-references per task), `/agent-code` (stages receive the task file path, Task Selection reads only task Headers), and `/agent-task` (creates its task file under `one-off/`) are all rewritten to the protocol. CEO Approval Conditions move from the tasks file to the milestone README, referenced from affected tasks' manifests.
+- **`docs/FILE_CONVENTIONS.md`, `artifacts/README.md`, agent files, payload docs, and both READMEs** rewritten to the new layout and naming rules (fixed in-directory filenames; `task-{T}-{slug}.md`; `BUG-{XXX}-{slug}.md`).
+- **CI** (`validate.yml`): the example structural check derives instance→template pairs from the new path patterns (including `TASK.md` and `BUG_REPORT.md` contracts), the path-split lint recognizes v2 instance patterns, and the completeness check walks milestone directories.
+- **Example fixture** restructured to `example/artifacts/milestone-1-task-crud/` with five worked task files (task-03 demonstrates the full defect loop through its Handoff Log) and two per-bug files.
+
+### Added
+
+- **`templates/TASK.md`** — the single-task template (Context Manifest + Handoff Log).
+- **`templates/BUG_REPORT.md`** — the single-bug template (Report / Investigation / Resolution / Notes).
+- **`/cast-init` v1→v2 artifact migration**: discovery detects the pre-2.0 by-type layout, Phase 3 proposes a per-file `git mv` mapping (with the `-tasks.md` split and `BUGS.md` index conversion flagged as explicit content transformations for user approval), execution performs it, and validation checks no by-type directories remain.
+
+### Removed
+
+- `templates/MILESTONE_TASKS.md` (superseded by `templates/TASK.md`).
+- The pre-created `artifacts/{milestones,architecture,ui-specs,reviews}/` scaffold directories and the combined-breakdown, combined-bug-log formats.
+
+### Migration
+
+- **Existing installs:** update the cast-init skill (`npx skills update` or `/plugin marketplace update`), then re-run `/cast-init` — the adoption plan will propose the by-type → by-milestone migration (file moves, task-file split, bug-index conversion) for your approval and update every installed agent, skill, and doc. Manual equivalent: apply the mapping table in `skills/cast-init/references/dispositions.md` → "Artifacts directory".
+- **In-flight milestones:** finish the current milestone on v1 before migrating, or migrate and hand-split its `-tasks.md` — the pipelines no longer read the combined breakdown.
+
 ## [1.5.0] — 2026-07-29
 
 Agents now inherit the session model instead of pinning Opus.

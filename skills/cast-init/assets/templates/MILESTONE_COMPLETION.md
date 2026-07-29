@@ -15,7 +15,7 @@
     item under Known Issues. Deferred is a held-open state — those items are re-triaged
     again at the next /agent-plan Stage 1, not forgotten.
   - Capture lessons learned to improve future milestone planning and execution.
-  - Copy this template to `artifacts/milestones/milestone-{N}-{slug}-completion.md` for each milestone.
+  - Copy this template to `artifacts/milestone-{N}-{slug}/reviews/completion.md` for each milestone.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. Reviewer and Product check required sections.
 -->
@@ -108,8 +108,8 @@ _If no known issues, replace this table with "No known issues."_
 
 ## References (required)
 
-- **Task Breakdown**: `artifacts/milestones/milestone-{N}-{slug}-tasks.md`
-- **Validation Report**: `artifacts/milestones/milestone-{N}-{slug}-validation.md`
+- **Task files**: `artifacts/milestone-{N}-{slug}/tasks/`
+- **Validation Report**: `artifacts/milestone-{N}-{slug}/reviews/validation.md`
 
 ---
 

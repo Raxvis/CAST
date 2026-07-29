@@ -29,7 +29,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`. Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. Report every bottleneck with estimated impact and confidence — never self-filter to only the biggest wins; the CEO review does the weighing. Require a measurement or profile trace before proposing any optimization — the performance-review finding requirements and budget checks in this file (Templates section) are mandatory.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. Read only the milestone README, the architecture document, and supplemental arch docs — not task files, not code. Report every bottleneck with estimated impact and confidence — never self-filter to only the biggest wins; the CEO review does the weighing. Require a measurement or profile trace before proposing any optimization — the performance-review finding requirements and budget checks in this file (Templates section) are mandatory.
 
 ---
 
@@ -99,9 +99,9 @@ Performance findings do not use a `templates/*.md` skeleton — the finding requ
 
 | Artifact type | Format reference | Instance destination |
 |---|---|---|
-| Performance review (produced during `/agent-plan` Stage 3b) | Finding requirements below + budget table in `artifacts/AGENT_STATE.md` → `## performance` | `artifacts/reviews/performance-review-milestone-{N}.md` |
+| Performance review (produced during `/agent-plan` Stage 3b) | Finding requirements below + budget table in `artifacts/AGENT_STATE.md` → `## performance` | `artifacts/milestone-{N}-{slug}/reviews/performance.md` |
 
-Every performance review file written under `artifacts/reviews/` must:
+Every performance review file (the milestone's `reviews/performance.md`) must:
 
 - Include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
 - Cite the specific performance budget or metric affected (startup time, tick duration, render time, memory, storage).

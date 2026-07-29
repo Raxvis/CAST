@@ -17,7 +17,7 @@ This is **CAST — Claude Agent Staged Team**, a multi-agent AI-assisted develop
   - **`skills/`** — Pipeline skill definitions (`/agent-plan`, `/agent-code`, `/agent-task`) that orchestrate the planning and engineering stages of the agent workflow plus a mini pipeline for one-off tasks. Installed to `.claude/skills/` in the target project. Each SKILL.md's frontmatter `name` must equal its directory name
   - **`docs/`** — **Reference material only.** Requirements, conventions, and design rationale (PRD, code patterns, file conventions, glossary, etc.). Never receives work artifacts.
   - **`templates/`** — **Document templates only.** Reusable skeletons (architecture templates, UI spec template, milestone templates) that agents copy into `artifacts/` as instances. Never filled in place.
-  - **`artifacts/`** — **Work artifacts only.** Milestone plans, per-milestone architecture and UI specs, security/performance/CEO reviews, bug reports, and the session log. Everything produced by `/agent-plan` and `/agent-code` lands here.
+  - **`artifacts/`** — **Work artifacts only, grouped by milestone.** Each `milestone-{N}-{slug}/` directory holds one milestone's README (definition), `architecture.md`, `ui.md`, `reviews/`, per-task files (`tasks/task-{T}-{slug}.md` — one isolated file per task, carrying a Context Manifest and Handoff Log), and per-bug files (`bugs/`). Cross-milestone state (BUGS.md index, STANDUP.md, AGENT_STATE.md) lives at the root; `/agent-task` work goes under `one-off/`. Everything produced by the pipelines lands here.
 - **`example/`** — Populated "Acme Todo" fixture. Repo-only; deliberately outside the skill directory so it is never installed
 
 ## The docs/templates/artifacts Split

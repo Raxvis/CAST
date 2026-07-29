@@ -235,7 +235,7 @@ const [HEADER_HEIGHT] = [Platform].select({
 - `docs/FILE_CONVENTIONS.md` — where components, screens, hooks, and styles live in the
   repository.
 - `templates/UI_SPEC.md` — the template for documenting a single screen or component.
-- `artifacts/ui-specs/` — the active UI spec instances produced per milestone by the UI
+- `artifacts/milestone-{N}-{slug}/ui.md` (and supplemental `ui-{slug}.md` specs) — the active UI spec instances produced per milestone by the UI
   agent. Always check here before implementing a screen.
 
 ---

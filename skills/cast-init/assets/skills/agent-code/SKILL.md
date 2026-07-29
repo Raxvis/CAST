@@ -5,7 +5,7 @@ description: >-
   Reviewer, with Defects routed through Bug Gatherer → Product triage → Debugger and
   Issues through Refactor → Tester → Reviewer, then Product validation. Use when the user asks
   to implement an approved milestone or invokes /agent-code. Requires an existing CEO
-  verdict in artifacts/reviews/.
+  verdict in the milestone directory's reviews/ceo.md.
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -74,32 +74,32 @@ This skill orchestrates the **Engineering Stage** of the agent workflow. It requ
 
 Before any task begins:
 
-1. Verify the planning artifacts exist under `artifacts/`:
-   - `artifacts/milestones/milestone-{N}-{slug}.md`
-   - `artifacts/milestones/milestone-{N}-{slug}-tasks.md`
-   - `artifacts/architecture/arch-milestone-{N}.md`
-   - `artifacts/ui-specs/ui-milestone-{N}.md` — required only when the `ui` agent is installed (check for `.claude/agents/ui.md`); no-ui projects proceed without it
-   - `artifacts/reviews/ceo-review-milestone-{N}.md`
+1. Verify the milestone directory `artifacts/milestone-{N}-{slug}/` exists and contains:
+   - `README.md` — the milestone definition, Task Index, and CEO Approval Conditions
+   - `tasks/` with one `task-{T}-{slug}.md` file per Task Index row
+   - `architecture.md`
+   - `ui.md` — required only when the `ui` agent is installed (check for `.claude/agents/ui.md`); no-ui projects proceed without it
+   - `reviews/ceo.md`
 2. Read the CEO review and read the verdict from its single `**Verdict**:` line (defined by `templates/CEO_REVIEW.md`); confirm it is APPROVED or APPROVED WITH CONDITIONS. If the verdict is REVISION REQUIRED, or a genuinely required planning artifact from step 1 is missing, stop and instruct the user to run `/agent-plan <milestone>` first. A UI spec absent because no `ui` agent is installed is not a missing artifact — do not stop for it; downstream stages then run without a UI specification.
-3. If APPROVED WITH CONDITIONS, read the Approval Conditions from the **CEO Approval Conditions** table in `artifacts/milestones/milestone-{N}-{slug}-tasks.md` (backfilled by Product at the end of `/agent-plan`). Cross-check the table against the CEO review itself; if the table is missing or stale, extract the conditions from the CEO review and backfill the table before proceeding. The conditions must be addressed as part of implementation and verified during Reviewer / Product validation.
+3. If APPROVED WITH CONDITIONS, read the Approval Conditions from the **CEO Approval Conditions** table in the milestone README (backfilled by Product at the end of `/agent-plan`). Cross-check the table against the CEO review itself; if the table is missing or stale, extract the conditions from the CEO review, backfill the README table, and add the `../README.md § CEO Approval Conditions` manifest row to every task file a condition names, before proceeding. The conditions must be addressed as part of implementation and verified during Reviewer / Product validation.
 4. Open the run's session in `artifacts/STANDUP.md`: add a session heading `### YYYY-MM-DD — agent-code — milestone-{N}-{slug}` at the top of the Log, per that file's Entry Grammar, **before any entries are written**. (On a resumed run, reuse the existing heading for this milestone and date instead of adding a duplicate.) Every `loop`, `docs`, `blocker`, and `progress` entry this run writes goes under this heading.
 
 ### Task Selection
 
-1. Read the task breakdown in `artifacts/milestones/milestone-{N}-{slug}-tasks.md`.
-2. **Skip any task whose Status is already Complete or Deferred.** The task-completion checkpoint below writes Status back to the task breakdown, so a re-invocation after an interruption resumes from the first remaining task instead of redoing finished work. Deferred tasks are not worked — they stay held until Product re-triages them at the milestone-completion checkpoint or at the next `/agent-plan` Stage 1.
+1. Read the Task Index in the milestone README, then read only the **Header** of each task file under `tasks/` (Status and Dependencies) — not the task bodies.
+2. **Skip any task whose Status is already Complete or Deferred.** The task-completion checkpoint below writes Status into the task file's Header, so a re-invocation after an interruption resumes from the first remaining task instead of redoing finished work. Deferred tasks are not worked — they stay held until Product re-triages them at the milestone-completion checkpoint or at the next `/agent-plan` Stage 1.
 3. If the invocation input specifies a single task, work on only that task.
-4. Otherwise, work through tasks in dependency order, respecting each task's **Dependencies** field (defined in `templates/MILESTONE_TASKS.md`).
+4. Otherwise, work through tasks in dependency order, respecting each task's **Dependencies** field (defined in `templates/TASK.md`).
 
 ### Per-Task Loop
 
 For each task, execute the engineering loop defined in `docs/PIPELINE_LOOP.md` — Coder → Tester → Reviewer (with the Defect and Issue routing) → Product validation — including its loop-counter rules, test-gate rule, and Environment Issue rule. The loop doc is the single canonical statement of that sequence; do not improvise routing.
 
-Inputs specific to this skill, passed into the loop per the loop doc's pass-forward rule (read once in Pre-Flight/Task Selection, supply the content to each stage — don't have each agent re-open the same files):
+Inputs specific to this skill, governed by the loop doc's **Handoff Protocol** — each stage invocation carries the task file path; the task file's Context Manifest and Handoff Log carry everything else:
 
-- **Coder (Step 1)** receives the task definition from the task breakdown, the architecture document (`artifacts/architecture/arch-milestone-{N}.md`), the UI specification (`artifacts/ui-specs/ui-milestone-{N}.md`; omitted in no-ui projects — see Pre-Flight), and any Approval Conditions read in Pre-Flight (from the tasks file's CEO Approval Conditions table), and follows the conventions in `CLAUDE.md`, `docs/CODE_PATTERNS.md`, and `docs/FILE_CONVENTIONS.md`.
-- **Reviewer (Step 3)** receives the same architecture document, UI specification (when one exists), and Approval Conditions, and reviews against them plus project conventions.
-- **Product validation (Step 4)** validates against the task's acceptance criteria, applying the Task Validation Checklist in `templates/MILESTONE_VALIDATION.md` as the *criteria*. The outcome is recorded as the task's Status in the tasks file plus a `progress` entry in `artifacts/STANDUP.md` — no per-task validation document is produced; the validation *document* is written once, at the milestone-completion checkpoint.
+- **Every stage** receives the task file path (`artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md`) and reads only that file, its Context Manifest entries, and the latest handoff entry's "Read next". Do not pass whole design documents into stages — the manifest cites the sections each task needs; a stage that finds the manifest insufficient adds the missing reference and notes it in its handoff entry.
+- **Coder (Step 1)** additionally honors any Approval Conditions the task's manifest points at (`../README.md § CEO Approval Conditions`).
+- **Product validation (Step 4)** validates against the task file's acceptance criteria, applying the Task Validation Checklist in `templates/MILESTONE_VALIDATION.md` as the *criteria*. The outcome is recorded as the task file's Status (Header) plus a `progress` entry in `artifacts/STANDUP.md` — no per-task validation document is produced; the validation *document* is written once, at the milestone-completion checkpoint.
 
 ### Completion
 
@@ -107,22 +107,22 @@ Inputs specific to this skill, passed into the loop per the loop doc's pass-forw
 
 Run this checkpoint each time a task passes Product validation — including single-task invocations:
 
-1. **Status writeback.** Mark the task's **Status** as Complete in `artifacts/milestones/milestone-{N}-{slug}-tasks.md` — both the Summary table row and the task's own field table. When every task in the breakdown is Complete or Deferred, set the Header **Status** field to Complete as well. This writeback is what makes the skill resumable (see Task Selection).
+1. **Status writeback.** Mark the task's **Status** as Complete in its own file's Header — the single place task status lives (the README's Task Index deliberately has no status column). This writeback is what makes the skill resumable (see Task Selection).
 2. **Docs Writer.** Invoke the **docs-writer** agent to drain the `docs` entries from `artifacts/STANDUP.md` (entries of the form `- <agent> | docs | <note>` — see that file's Entry Grammar). Docs Writer marks each drained entry with ✅.
 3. **Validator.** Invoke the **validator** agent to record the task outcome in `artifacts/AGENT_STATE.md` (Agent Status Dashboard and Milestone Progress tables in its section).
 
 #### Milestone-completion checkpoint
 
-This checkpoint fires when every task in the breakdown is Complete or Deferred:
+This checkpoint fires when every task file under `tasks/` has Status Complete or Deferred:
 
 1. Run `[TEST_CMD]` one final time to confirm everything still passes.
-2. **Deferred re-triage.** Launch the **product** agent to re-triage every Deferred bug in `artifacts/BUGS.md` and every Deferred task in the breakdown. Deferred is a held-open state, not terminal (see `artifacts/BUGS.md` → Bug Lifecycle): each item is either scheduled (pulled into follow-up work or the next milestone plan), re-deferred with an updated rationale, or closed as Won't Fix with a rationale.
-3. Launch the **product** agent to write the milestone completion record at `artifacts/milestones/milestone-{N}-{slug}-completion.md` using `templates/MILESTONE_COMPLETION.md`, and the milestone validation record at `artifacts/milestones/milestone-{N}-{slug}-validation.md` using `templates/MILESTONE_VALIDATION.md`. Product — not the orchestrator — writes both records (they are Product's artifacts; see `artifacts/README.md`). The completion record's Status is **Complete with Deferrals** when any task or bug remains Deferred after re-triage, with every such item listed under its Known Issues section; otherwise **Complete**.
-4. **UX review.** If the milestone contains UI-flagged tasks (any task with **Needs UI Spec** = Yes or Done), launch the **ui** agent once to review the implemented screens against `artifacts/ui-specs/ui-milestone-{N}.md` and write `artifacts/reviews/ux-review-milestone-{N}.md` using `templates/UX_REVIEW.md`. Skip this step for milestones with no UI-flagged tasks.
+2. **Deferred re-triage.** Launch the **product** agent to re-triage every Deferred bug in the `artifacts/BUGS.md` index and every Deferred task file. Deferred is a held-open state, not terminal (see `artifacts/BUGS.md` → Bug Lifecycle): each item is either scheduled (pulled into follow-up work or the next milestone plan), re-deferred with an updated rationale, or closed as Won't Fix with a rationale.
+3. Launch the **product** agent to write the milestone completion record at `artifacts/milestone-{N}-{slug}/reviews/completion.md` using `templates/MILESTONE_COMPLETION.md`, and the milestone validation record at `artifacts/milestone-{N}-{slug}/reviews/validation.md` using `templates/MILESTONE_VALIDATION.md`. Product — not the orchestrator — writes both records (they are Product's artifacts; see `artifacts/README.md`). The completion record's Status is **Complete with Deferrals** when any task or bug remains Deferred after re-triage, with every such item listed under its Known Issues section; otherwise **Complete**. Product mirrors that Status into the milestone README's Header.
+4. **UX review.** If the milestone contains UI-flagged tasks (any task with **Needs UI Spec** = Yes or Done), launch the **ui** agent once to review the implemented screens against `artifacts/milestone-{N}-{slug}/ui.md` and write `artifacts/milestone-{N}-{slug}/reviews/ux.md` using `templates/UX_REVIEW.md`. Skip this step for milestones with no UI-flagged tasks.
 5. **Docs Writer.** Invoke the **docs-writer** agent to drain any remaining `docs` entries from `artifacts/STANDUP.md` (per its Entry Grammar; drained entries are marked ✅).
-6. **Validator.** Invoke the **validator** agent to record the milestone outcome in `artifacts/AGENT_STATE.md` and write the milestone retrospective at `artifacts/reviews/retrospective-milestone-{N}.md` using `templates/MILESTONE_RETROSPECTIVE.md`.
+6. **Validator.** Invoke the **validator** agent to record the milestone outcome in `artifacts/AGENT_STATE.md` and write the milestone retrospective at `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` using `templates/MILESTONE_RETROSPECTIVE.md`.
 7. Append a final entry to `artifacts/STANDUP.md` summarizing the run, using that file's Entry Grammar.
-8. Summarize what was implemented, test results, any defects filed in `artifacts/BUGS.md` (including any still Deferred after re-triage), and the status of every Approval Condition from the CEO.
+8. Summarize what was implemented, test results, any defects filed (per-bug files under `bugs/`, indexed in `artifacts/BUGS.md`, including any still Deferred after re-triage), and the status of every Approval Condition from the CEO.
 9. Suggest next steps — additional tasks, a release (the **release** agent is user-invoked after milestone completion; this skill does not launch it), or a new planning run via `/agent-plan`.
 
 ### Error Handling

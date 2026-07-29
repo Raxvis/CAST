@@ -13,12 +13,12 @@
 **Date**: 2026-04-08
 **Reviewer**: CEO Agent (claude-opus-4-8, `/agent-plan` Stage 4)
 **Inputs Reviewed**:
-- Milestone: `artifacts/milestones/milestone-1-task-crud.md`
-- Task Breakdown: `artifacts/milestones/milestone-1-task-crud-tasks.md`
-- Architecture: `artifacts/architecture/arch-milestone-1.md`
-- UI Spec: `artifacts/ui-specs/ui-milestone-1.md`
-- Security Findings: `artifacts/reviews/security-review-milestone-1.md`
-- Performance Findings: `artifacts/reviews/performance-review-milestone-1.md`
+- Milestone: `artifacts/milestone-1-task-crud/README.md`
+- Task Breakdown: `artifacts/milestone-1-task-crud/tasks/`
+- Architecture: `artifacts/milestone-1-task-crud/architecture.md`
+- UI Spec: `artifacts/milestone-1-task-crud/ui.md`
+- Security Findings: `artifacts/milestone-1-task-crud/reviews/security.md`
+- Performance Findings: `artifacts/milestone-1-task-crud/reviews/performance.md`
 
 **Review Cycle**: v1 — first review of this plan; no prior Revision Requests to re-verify.
 

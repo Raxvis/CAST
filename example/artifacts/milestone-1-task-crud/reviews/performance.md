@@ -13,8 +13,8 @@
 **Date**: 2026-04-08
 **Stage**: `/agent-plan` Stage 3b
 **Inputs Reviewed**:
-- Milestone: `artifacts/milestones/milestone-1-task-crud.md`
-- Architecture: `artifacts/architecture/arch-milestone-1.md`
+- Milestone: `artifacts/milestone-1-task-crud/README.md`
+- Architecture: `artifacts/milestone-1-task-crud/architecture.md`
 
 ---
 
@@ -26,7 +26,7 @@ Two findings filed against the Milestone 1 architecture. One Medium (WAL mode no
 
 ## Performance Budget Tracking
 
-_Targets defined by Architecture in `artifacts/architecture/arch-milestone-1.md` → Performance Budgets. Performance Agent owns Current and Status._
+_Targets defined by Architecture in `artifacts/milestone-1-task-crud/architecture.md` → Performance Budgets. Performance Agent owns Current and Status._
 
 | Metric | Target | Current | Status | Notes |
 |---|---|---|---|---|

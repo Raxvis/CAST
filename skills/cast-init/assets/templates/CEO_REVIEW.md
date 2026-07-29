@@ -18,7 +18,7 @@
   - Record the verdict as the single `**Verdict**:` line in the Verdict section, with
     exactly one of the three strings verbatim: APPROVED / APPROVED WITH CONDITIONS /
     REVISION REQUIRED — the /agent-plan and /agent-code skills parse that line.
-  - Instance destination: artifacts/reviews/ceo-review-milestone-{N}.md. Never fill
+  - Instance destination: artifacts/milestone-{N}-{slug}/reviews/ceo.md. Never fill
     this template in place.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.

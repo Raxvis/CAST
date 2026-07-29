@@ -80,7 +80,7 @@ _No sessions recorded yet. Add the first session section using the Entry Grammar
 | Document | Purpose |
 |----------|---------|
 | `BUGS.md` | Active bug tracker — reference when reporting blockers |
-| `../templates/MILESTONE_TASKS.md` | Milestone task breakdown template — reference for planned work |
+| `../templates/TASK.md` | Single-task file template — reference for planned work |
 | `milestones/milestone-{N}-{slug}-validation.md` | Milestone acceptance record — reference when validating completed work |
 
 ---

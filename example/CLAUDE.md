@@ -211,17 +211,21 @@ The project uses a strict split between reference material, document templates, 
 - **`templates/`** - reusable document skeletons (architecture, UI spec,
   milestone files). Agents copy them into `artifacts/` as instances; never
   filled in place.
-- **`artifacts/`** - all live work: milestone plans, per-milestone architecture
-  and review outputs, bug reports (`artifacts/BUGS.md`), the rolling
-  session log (`artifacts/STANDUP.md`), and every agent's live working state
-  (`artifacts/AGENT_STATE.md`). Everything produced by `/agent-plan`
-  and `/agent-code` lands here.
+- **`artifacts/`** - all live work, grouped by milestone: each
+  `milestone-{N}-{slug}/` directory holds that milestone's README (definition),
+  `architecture.md`, `ui.md`, `reviews/`, one file per task under `tasks/`
+  (each with its Context Manifest and Handoff Log), and one file per bug under
+  `bugs/`. Cross-milestone state lives at the root: the bug index
+  (`artifacts/BUGS.md`), the rolling session log (`artifacts/STANDUP.md`), and
+  every agent's live working state (`artifacts/AGENT_STATE.md`). One-off
+  `/agent-task` work goes under `artifacts/one-off/`. Everything produced by
+  the pipelines lands here.
 
 When in doubt, read `docs/FILE_CONVENTIONS.md` and `artifacts/README.md`.
 
 This structure and the agent workflow were installed by CAST
 (https://github.com/Raxvis/CAST).
-Adopted with CAST v1.4.0
+Adopted with CAST v2.0.0
 
 ## Memory Imports
 

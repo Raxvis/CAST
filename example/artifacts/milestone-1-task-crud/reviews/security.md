@@ -13,9 +13,9 @@
 **Date**: 2026-04-08
 **Stage**: `/agent-plan` Stage 3a
 **Inputs Reviewed**:
-- Milestone: `artifacts/milestones/milestone-1-task-crud.md`
-- Architecture: `artifacts/architecture/arch-milestone-1.md`
-- UI Spec: `artifacts/ui-specs/ui-milestone-1.md`
+- Milestone: `artifacts/milestone-1-task-crud/README.md`
+- Architecture: `artifacts/milestone-1-task-crud/architecture.md`
+- UI Spec: `artifacts/milestone-1-task-crud/ui.md`
 
 ---
 

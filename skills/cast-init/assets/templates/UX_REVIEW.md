@@ -8,12 +8,12 @@
   HOW TO CUSTOMIZE:
   - Replace [SCREEN_OR_COMPONENT_NAME] with the screen or component under review; a
     milestone with several screens repeats the per-screen sections within the one instance.
-  - Reference the approved spec instance in artifacts/ui-specs/, not the template.
+  - Reference the approved spec instance (the milestone's ui.md), not the template.
   - Work through every section; check items only after verifying them against the
     running implementation.
   - For CLI projects, read the layout-oriented items against terminal output (alignment,
     color usage, truncation, exit-state messaging) rather than pixels.
-  - Instance destination: artifacts/reviews/ux-review-milestone-{N}.md — one instance per
+  - Instance destination: artifacts/milestone-{N}-{slug}/reviews/ux.md — one instance per
     milestone. Never fill this template in place.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. Reviewer and Product check required sections.

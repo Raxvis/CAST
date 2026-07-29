@@ -14,7 +14,8 @@ After execution:
    - `docs/PIPELINE_LOOP.md` must exist whenever `agent-code` or `agent-task` is installed — both skills execute the loop it defines.
 4. **Verify the docs/artifacts split**:
    - No files under `docs/` should contain the strings "# Milestone" in an H1 heading or "BUG-" at the start of a line (those would be work artifacts that leaked into reference).
-   - No files under `artifacts/` should be templates (no "HOW TO CUSTOMIZE" comment blocks in `artifacts/milestones/` or similar).
+   - No files under `artifacts/` should be templates (no "HOW TO CUSTOMIZE" comment blocks in milestone directories or `artifacts/one-off/`).
+   - No v1 by-type directories (`artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, `artifacts/reviews/`) should remain after an approved pre-2.0 migration.
 5. **Verify YAML frontmatter on every agent file**:
    - Each agent has `name:`, `description:`, `model:` in the frontmatter
    - Description length ≤ 300 characters (the canonical trigger-first descriptions run roughly 170–260 characters; anything over 300 is likely an unconverted prose paragraph, not a description)

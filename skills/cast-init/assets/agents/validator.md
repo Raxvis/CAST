@@ -173,9 +173,9 @@ At the end of each milestone, Validator runs the retrospective: read `templates/
 
 | Artifact type | Template to read | Instance destination |
 |---|---|---|
-| Milestone retrospective (produced at `/agent-code` milestone completion) | `templates/MILESTONE_RETROSPECTIVE.md` | `artifacts/reviews/retrospective-milestone-{N}.md` |
+| Milestone retrospective (produced at `/agent-code` milestone completion) | `templates/MILESTONE_RETROSPECTIVE.md` | `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` |
 
-Every retrospective written under `artifacts/reviews/` must include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts — the template carries it; fill it in starting at v1 and add a row on every subsequent revision.
+Every retrospective (the milestone's `reviews/retrospective.md`) must include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts — the template carries it; fill it in starting at v1 and add a row on every subsequent revision.
 
 ### Metric Sources
 
@@ -183,12 +183,12 @@ Every metric in the retrospective maps to a recorded source. Fill from these —
 
 | Retrospective field | Source |
 |---|---|
-| Tasks planned / completed / rejected | Summary table in the milestone tasks file (`artifacts/milestones/milestone-{N}-{slug}-tasks.md`) |
+| Tasks planned / completed / rejected | Task Index in the milestone README (planned) plus Status fields and Handoff Logs across `tasks/task-*.md` (completed / rejected) |
 | Process violations | Process Violations table in `artifacts/AGENT_STATE.md` → `## validator` |
 | Conflicts escalated to Validator | Conflicts table in `artifacts/AGENT_STATE.md` → `## validator` |
-| Architecture doc revisions | `## Revision History` table in `artifacts/architecture/arch-milestone-{N}.md` |
-| UI spec revisions | `## Revision History` table in `artifacts/ui-specs/ui-milestone-{N}.md` |
-| Estimated effort | "Estimated Effort" field in the milestone definition (`artifacts/milestones/milestone-{N}-{slug}.md`) |
+| Architecture doc revisions | `## Revision History` table in `artifacts/milestone-{N}-{slug}/architecture.md` |
+| UI spec revisions | `## Revision History` table in `artifacts/milestone-{N}-{slug}/ui.md` |
+| Estimated effort | "Estimated Effort" field in the milestone definition (`artifacts/milestone-{N}-{slug}/README.md`) |
 | Actual duration | Session dates for this milestone in `artifacts/STANDUP.md` (first to last session) |
 
 ---

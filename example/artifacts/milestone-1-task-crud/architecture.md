@@ -358,7 +358,7 @@ The Performance Agent owns the live Current/Status tracking for these targets in
 
 ## CEO Verdict
 
-Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-1.md`: **APPROVED WITH CONDITIONS** (2026-04-08). Conditions 1–3 (traceability table above) were verified by Reviewer and Product before M1 sign-off on 2026-04-10.
+Gated by the CEO planning review — see `artifacts/milestone-1-task-crud/reviews/ceo.md`: **APPROVED WITH CONDITIONS** (2026-04-08). Conditions 1–3 (traceability table above) were verified by Reviewer and Product before M1 sign-off on 2026-04-10.
 
 ---
 

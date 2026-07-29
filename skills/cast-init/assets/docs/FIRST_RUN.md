@@ -69,13 +69,13 @@ With your session still open, run:
 /agent-plan "Print a hello-world message when the app starts"
 ```
 
-**Verify:** the Product agent kicks off. You should see it begin writing a milestone definition to `artifacts/milestones/milestone-1-*.md`.
+**Verify:** the Product agent kicks off. You should see it create `artifacts/milestone-1-<slug>/` and begin writing the milestone README there.
 
-You can interrupt the planning run as soon as Product starts writing — you are not trying to produce a real milestone, you are just confirming the command routing works. If Product writes anything at all into `artifacts/milestones/`, Steps 1–3 are confirmed and the pipeline is wired up correctly.
+You can interrupt the planning run as soon as Product starts writing — you are not trying to produce a real milestone, you are just confirming the command routing works. If Product writes anything at all into a new `artifacts/milestone-1-*/` directory, Steps 1–3 are confirmed and the pipeline is wired up correctly.
 
 **If Product never writes a file:** the Product agent is not loading. Check `.claude/agents/product.md` for frontmatter issues, or re-run `/agents` to confirm Product is listed.
 
-**If `/agent-plan` halts with a "missing template" error:** your `templates/` directory is missing `MILESTONE_TASKS.md` or another planning template that the pipeline references. Re-run `/cast-init` to reinstall `templates/`.
+**If `/agent-plan` halts with a "missing template" error:** your `templates/` directory is missing `TASK.md` or another planning template that the pipeline references. Re-run `/cast-init` to reinstall `templates/`.
 
 ---
 
@@ -98,11 +98,10 @@ For a lighter-weight verification that the engineering pipeline is working:
 If you ran Step 4 or Step 5, a few files are now in `artifacts/`. Delete them before your real work begins:
 
 ```
-rm -f artifacts/milestones/milestone-1-*
-rm -f artifacts/architecture/arch-milestone-1*
-rm -f artifacts/ui-specs/ui-milestone-1*
-rm -f artifacts/reviews/*-review-milestone-1*
+rm -rf artifacts/milestone-1-*
 ```
+
+(Everything a planning run writes — reviews included — lives inside that one milestone directory.)
 
 Or use the completion-report template to keep a record of the first run if you want a historical marker.
 

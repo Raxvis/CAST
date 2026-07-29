@@ -7,7 +7,7 @@
   HOW TO CUSTOMIZE:
   - Replace [MILESTONE_NAME] with the specific milestone being retrospected.
   - Fill in every section. Do not skip sections even if they are "nothing to note".
-  - Copy this template to `artifacts/reviews/retrospective-milestone-{N}.md` for each
+  - Copy this template to `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` for each
     milestone. Never fill this template in place.
   - Every section in this template is required and must be non-empty in every instance.
     Validator checks all sections.
@@ -37,7 +37,7 @@
 
 ## Estimated vs Actual Effort (required)
 
-- **Estimated**: [ESTIMATED_EFFORT] — from the "Estimated Effort" field in the milestone definition (`artifacts/milestones/milestone-{N}-{slug}.md`)
+- **Estimated**: [ESTIMATED_EFFORT] — from the "Estimated Effort" field in the milestone definition (`artifacts/milestone-{N}-{slug}/README.md`)
 - **Actual**: [ACTUAL_DURATION] — from the session dates for this milestone in `artifacts/STANDUP.md` (first to last session)
 - **Delta**: [DIFFERENCE_AND_REASON_IF_SIGNIFICANT]
 
@@ -80,13 +80,13 @@ _Fill each metric from its recorded source (validator.md → Metric Sources) —
 
 | Metric | Value | Source |
 |---|---|---|
-| Tasks planned | [N] | Summary table in `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
-| Tasks completed | [N] | Summary table in `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
-| Tasks rejected by Product | [N] | Summary table in `artifacts/milestones/milestone-{N}-{slug}-tasks.md` — note average rejections per task |
+| Tasks planned | [N] | Task Index in `artifacts/milestone-{N}-{slug}/README.md` (count of task files) |
+| Tasks completed | [N] | Status fields across `artifacts/milestone-{N}-{slug}/tasks/task-*.md` |
+| Tasks rejected by Product | [N] | Handoff Logs across `artifacts/milestone-{N}-{slug}/tasks/task-*.md` (Product → Coder return entries) — note average rejections per task |
 | Process violations | [N] | Process Violations table in `artifacts/AGENT_STATE.md` → `## validator` |
 | Conflicts escalated to Validator | [N] | Conflicts table in `artifacts/AGENT_STATE.md` → `## validator` |
-| Architecture doc revisions | [N] | `## Revision History` table in `artifacts/architecture/arch-milestone-{N}.md` |
-| UI spec revisions | [N] | `## Revision History` table in `artifacts/ui-specs/ui-milestone-{N}.md` |
+| Architecture doc revisions | [N] | `## Revision History` table in `artifacts/milestone-{N}-{slug}/architecture.md` |
+| UI spec revisions | [N] | `## Revision History` table in `artifacts/milestone-{N}-{slug}/ui.md` |
 
 ---
 

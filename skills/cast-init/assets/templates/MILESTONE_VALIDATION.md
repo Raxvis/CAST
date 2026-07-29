@@ -7,7 +7,7 @@
            The "Task Validation Checklist" section also serves a second, lighter use:
            during /agent-code Step 4 (Product validation) Product applies it to each task
            as *criteria* only — the per-task outcome is recorded as the task's Status in
-           the milestone tasks file plus a `progress` entry in artifacts/STANDUP.md, and
+           the task file's Header plus a `progress` entry in artifacts/STANDUP.md, and
            NO per-task document is created. (/agent-task validates against the task
            description instead and does not use this template.)
 
@@ -26,7 +26,7 @@
   - Update Known Issues with any bugs or gaps discovered during validation.
   - Set the final Validation Status to one of: Approved / Approved with Notes / Changes Requested.
   - Reference any linked milestone task documents in the Completion Reports section.
-  - Instance destination: artifacts/milestones/milestone-{N}-{slug}-validation.md.
+  - Instance destination: artifacts/milestone-{N}-{slug}/reviews/validation.md.
     Never fill this template in place.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. Reviewer and Product check required sections.
@@ -63,7 +63,7 @@
 
 ## Task Validation Checklist (required)
 
-_Duplicate this section for each task validated by the Product Agent. Fill in every field. Do not skip sections. (This section also defines the criteria Product applies per task at Step 4 mid-milestone — there, the outcome goes into the tasks file's Status plus a STANDUP `progress` entry; no per-task document is produced.)_
+_Duplicate this section for each task validated by the Product Agent. Fill in every field. Do not skip sections. (This section also defines the criteria Product applies per task at Step 4 mid-milestone — there, the outcome goes into the task file's Status field plus a STANDUP `progress` entry; no per-task document is produced.)_
 
 ### Task Validation: [TASK_NAME]
 
@@ -252,7 +252,7 @@ _Issues that will prevent subsequent milestones from starting or proceeding._
 
 Links or references to related task breakdown documents for this milestone:
 
-- [MILESTONE_TASKS.md or equivalent] — [brief description]
+- [Task files under `tasks/`, or equivalent] — [brief description]
 
 ---
 

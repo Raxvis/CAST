@@ -54,7 +54,7 @@ The per-file read-merge-write procedure in 5.4–5.8 remains **required** for ev
 
 ## 5.2 — Create directories
 
-Create any missing directories: `.claude/agents/`, `.claude/skills/`, `docs/`, `templates/`, `artifacts/`, `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, `artifacts/reviews/`.
+Create any missing directories: `.claude/agents/`, `.claude/skills/`, `docs/`, `templates/`, `artifacts/`, `artifacts/one-off/`. (Milestone directories are created by `/agent-plan`, never by the installer.)
 
 ## 5.3 — Handle directory renames
 
@@ -124,7 +124,7 @@ For each CAST reference doc and document template in the plan:
 2. For **Rename + Update**: read the existing file first, preserve all non-template content (e.g., an existing PRD with real requirements) as the body, update only the header and any CAST-specific framing.
 3. For **Update in place**: same as Rename + Update but without moving the file.
 4. Always install `docs/FILE_CONVENTIONS.md` — it's load-bearing for the docs/templates/artifacts split enforcement.
-5. The `templates/*` skeletons (architecture, UI spec, milestone, milestone-retrospective, CEO review, and UX review templates — every `templates/*` file except `README.md`, eleven skeletons in all) install verbatim into the project's top-level `templates/` directory. Create the directory if it does not exist. `templates/README.md` also installs, but as documentation — with placeholder substitution and the scaffolding strip applied, per its disposition row.
+5. The `templates/*` skeletons (architecture, UI spec, milestone, task, bug-report, milestone-retrospective, CEO review, and UX review templates — every `templates/*` file except `README.md`, twelve skeletons in all) install verbatim into the project's top-level `templates/` directory. Create the directory if it does not exist. `templates/README.md` also installs, but as documentation — with placeholder substitution and the scaffolding strip applied, per its disposition row.
 6. In installed README files (`docs/README.md`, `templates/README.md`, `artifacts/README.md`), replace any `[YYYY-MM-DD]` "Last updated" token with the install date.
 
 ## 5.7 — Install artifacts scaffold
@@ -132,7 +132,7 @@ For each CAST reference doc and document template in the plan:
 1. Read `BUGS.md`, `STANDUP.md`, `AGENT_STATE.md`, `README.md` from `<CAST_SOURCE>/artifacts/`.
 2. Substitute placeholders.
 3. Write to `artifacts/`. If a file already exists with user content, preserve it — merge only if the user explicitly approved.
-4. Ensure all four subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`) exist. Do not populate them — they fill up during `/agent-plan` and `/agent-code` runs.
+4. Ensure `artifacts/one-off/` exists. Do not pre-create milestone directories — `/agent-plan` Stage 1 creates each `artifacts/milestone-{N}-{slug}/`. If the plan approved a pre-2.0 by-type layout migration (see `dispositions.md` → Artifacts directory), execute it here: per-file `git mv` into the milestone directories, the `-tasks.md` → per-task-file split, and the `BUGS.md` → index + per-bug-file conversion, exactly as planned.
 5. **State migration rule**: if an existing pre-1.2 agent file carries populated state tables (Current Work, Decisions Log, Directives Queue, dashboards, etc.), move the populated rows into the matching `artifacts/AGENT_STATE.md` section during the update, then install the slimmed agent definition. Empty `_(empty)_` tables are simply dropped from the agent file — the empty schemas already exist in `AGENT_STATE.md`.
 
 ## 5.8 — Install CLAUDE.md

@@ -57,11 +57,11 @@ Entries under a session heading are appended in the order they happen (oldest fi
 - docs-writer | progress | Drained 1 docs entry at the T-5 task-completion checkpoint
 - product | progress | Milestone-completion checkpoint: all three CEO Approval Conditions Verified (1 and 2 by Reviewer, 3 by Product)
 - product | decision | Deferred re-triage at the milestone-completion checkpoint: BUG-002 held Deferred into M2 with updated rationale; re-triaged again at M2 `/agent-plan` Stage 1
-- product | progress | Completion record written: `artifacts/milestones/milestone-1-task-crud-completion.md` — Status: Complete with Deferrals (BUG-002 under Known Issues)
-- product | progress | Validation record written: `artifacts/milestones/milestone-1-task-crud-validation.md` — Approved with Notes
-- ui | progress | UX review written: `artifacts/reviews/ux-review-milestone-1.md` — APPROVED WITH NOTES (BUG-002 noted)
+- product | progress | Completion record written: `artifacts/milestone-1-task-crud/reviews/completion.md` — Status: Complete with Deferrals (BUG-002 under Known Issues)
+- product | progress | Validation record written: `artifacts/milestone-1-task-crud/reviews/validation.md` — Approved with Notes
+- ui | progress | UX review written: `artifacts/milestone-1-task-crud/reviews/ux.md` — APPROVED WITH NOTES (BUG-002 noted)
 - docs-writer | progress | Milestone-completion drain: no pending docs entries remained
-- validator | progress | Retrospective written: `artifacts/reviews/retrospective-milestone-1.md`; AGENT_STATE dashboards updated
+- validator | progress | Retrospective written: `artifacts/milestone-1-task-crud/reviews/retrospective.md`; AGENT_STATE dashboards updated
 - agent-code | progress | Run complete: M1 closed — 5/5 tasks Complete, 42 tests passing, all CEO Approval Conditions Verified, BUG-002 held Deferred
 
 ### 2026-04-09 — agent-code — milestone-1-task-crud
@@ -91,14 +91,14 @@ Entries under a session heading are appended in the order they happen (oldest fi
 
 ### 2026-04-08 — agent-plan — milestone-1-task-crud
 
-- product | progress | Stage 1 complete: `artifacts/milestones/milestone-1-task-crud.md` and `-tasks.md` (T-1 through T-5) written
-- architect | progress | Stage 2a complete: `artifacts/architecture/arch-milestone-1.md` — `src/db/`, `src/commands/`, `src/cli.ts` module layout and initial SQLite schema
+- product | progress | Stage 1 complete: `artifacts/milestone-1-task-crud/README.md` and five task files (`tasks/task-01…05-*.md`) written
+- architect | progress | Stage 2a complete: `artifacts/milestone-1-task-crud/architecture.md` — `src/db/`, `src/commands/`, `src/cli.ts` module layout and initial SQLite schema
 - architect | docs | docs/GLOSSARY.md needs entries for the migration runner, WAL mode, and `schema_version` ✅
-- ui | progress | Stage 2b complete: `artifacts/ui-specs/ui-milestone-1.md` — every command surface, exit code, and error message
+- ui | progress | Stage 2b complete: `artifacts/milestone-1-task-crud/ui.md` — every command surface, exit code, and error message
 - ui | docs | CLAUDE.md Domain-Specific Patterns needs the stdout/stderr and exit-code contract recorded ✅
-- security | progress | Stage 3 complete: 2 findings (1 Critical — SQL injection risk across command handlers; 1 Medium — unvalidated `ACME_TODO_DB` env var) in `artifacts/reviews/security-review-milestone-1.md`
-- performance | progress | Stage 3 complete: 2 findings (WAL mode not enabled; missing index on `completed`) in `artifacts/reviews/performance-review-milestone-1.md`
-- ceo | decision | Verdict: APPROVED WITH CONDITIONS — three conditions (parameterized SQL; WAL + index; migration on first invocation) in `artifacts/reviews/ceo-review-milestone-1.md`; no revision requests
+- security | progress | Stage 3 complete: 2 findings (1 Critical — SQL injection risk across command handlers; 1 Medium — unvalidated `ACME_TODO_DB` env var) in `artifacts/milestone-1-task-crud/reviews/security.md`
+- performance | progress | Stage 3 complete: 2 findings (WAL mode not enabled; missing index on `completed`) in `artifacts/milestone-1-task-crud/reviews/performance.md`
+- ceo | decision | Verdict: APPROVED WITH CONDITIONS — three conditions (parameterized SQL; WAL + index; migration on first invocation) in `artifacts/milestone-1-task-crud/reviews/ceo.md`; no revision requests
 - ceo | progress | Stage 4 complete: engineering may begin
 
 ---
@@ -109,9 +109,9 @@ Entries under a session heading are appended in the order they happen (oldest fi
 |----------|---------|
 | `BUGS.md` | Active bug tracker — reference when reporting blockers |
 | `AGENT_STATE.md` | Live per-agent working state — each agent reads its own section on activation |
-| `milestones/milestone-1-task-crud-tasks.md` | Milestone 1 task breakdown — reference for planned work |
+| `milestone-1-task-crud/tasks/` | Milestone 1 per-task files — reference for planned work |
 | `milestones/milestone-1-task-crud-validation.md` | Milestone 1 acceptance record — reference when validating completed work |
-| `reviews/ceo-review-milestone-1.md` | Planning sign-off and Approval Conditions |
+| `milestone-1-task-crud/reviews/ceo.md` | Planning sign-off and Approval Conditions |
 
 ---
 

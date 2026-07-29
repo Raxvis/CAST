@@ -31,7 +31,7 @@ The project has **three top-level directories** for non-code content. The split 
 |---|---|---|
 | `docs/` | **Reference material only.** Describes *how the project works*. | Requirements, conventions, design rationale, glossaries, quality standards. |
 | `templates/` | **Document templates only.** Skeletons copied to produce work. | Architecture, UI spec, and milestone templates. Read and copied, never filled in place. |
-| `artifacts/` | **Work artifacts only.** Instances of *actual work*. | Milestone plans, per-milestone architecture and UI specs, security/performance/CEO reviews, bug reports, session logs, completion records. |
+| `artifacts/` | **Work artifacts only.** Instances of *actual work*, grouped by milestone. | One directory per milestone (definition, design specs, reviews, per-task files, per-bug files), plus cross-milestone logs (bug index, session log, agent state). |
 
 When deciding where a file belongs, ask:
 
@@ -73,8 +73,9 @@ templates/
   ARCH_SYSTEM.md                 # System architecture template
   ARCH_DATA_SCHEMA.md            # Data schema template
   UI_SPEC.md                     # UI specification template
-  MILESTONE_DEFINITION.md        # Milestone definition template
-  MILESTONE_TASKS.md             # Milestone task breakdown template
+  MILESTONE_DEFINITION.md        # Milestone README template (the milestone's highest-order doc)
+  TASK.md                        # Single-task file template (one instance per task)
+  BUG_REPORT.md                  # Single-bug file template (one instance per bug)
   MILESTONE_COMPLETION.md        # Milestone completion report template
   MILESTONE_VALIDATION.md        # Task validation / milestone acceptance template
   CEO_REVIEW.md                  # CEO planning-review template
@@ -89,34 +90,37 @@ Templates are copied — never filled in place — to produce instances under `a
 ```
 artifacts/
   README.md                                # Work directory index
-  BUGS.md                                  # Active bug tracker (instance, not template)
+  BUGS.md                                  # Global bug INDEX (one line per bug → its file)
   STANDUP.md                               # Rolling session progress log
   AGENT_STATE.md                           # Live working state for every agent
 
-  milestones/
-    milestone-{N}-{slug}.md                # Milestone definition
-    milestone-{N}-{slug}-tasks.md          # Task breakdown for that milestone
-    milestone-{N}-{slug}-completion.md     # Completion report (written after /agent-code)
-    milestone-{N}-{slug}-validation.md     # Acceptance record
+  milestone-{N}-{slug}/                    # One directory per milestone
+    README.md                              # Milestone definition (highest-order doc: goal,
+                                           #   Status, Task Index, CEO Approval Conditions)
+    architecture.md                        # Milestone architecture document
+    ui.md                                  # Milestone UI spec (UI milestones only)
+    arch-{slug}.md                         # Supplemental module/system/schema docs
+    ui-{slug}.md                           # Supplemental screen/component specs
+    reviews/
+      security.md
+      performance.md
+      ceo.md                               # CEO planning verdict
+      ux.md                                # UX review (/agent-code milestone completion)
+      validation.md                        # Acceptance record
+      completion.md                        # Completion report
+      retrospective.md                     # Milestone retrospective (Validator)
+    tasks/
+      task-{T}-{slug}.md                   # ONE FILE PER TASK (Context Manifest + Handoff Log)
+    bugs/
+      BUG-{XXX}-{slug}.md                  # ONE FILE PER BUG found during this milestone
 
-  architecture/
-    arch-milestone-{N}.md                  # Milestone-specific architecture document
-    module-{slug}.md                       # Module-level architecture specs
-
-  ui-specs/
-    ui-milestone-{N}.md                    # Milestone-specific UI spec
-    screen-{slug}.md                       # Screen-level UI specs
-    component-{slug}.md                    # Component-level UI specs
-
-  reviews/
-    security-review-milestone-{N}.md
-    performance-review-milestone-{N}.md
-    ceo-review-milestone-{N}.md
-    ux-review-milestone-{N}.md             # UX review (/agent-code milestone completion)
-    retrospective-milestone-{N}.md         # Milestone retrospective (Validator)
+  one-off/                                 # /agent-task work
+    task-{slug}.md
+    bugs/
+      BUG-{XXX}-{slug}.md
 ```
 
-The four `artifacts/` subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`) are pre-created empty by `/cast-init` so the expected structure exists from day one; they fill up during `/agent-plan` and `/agent-code` runs. Do not create additional subdirectories beyond these without updating this file and `artifacts/README.md`.
+Milestone directories are created by `/agent-plan` Stage 1 (with `reviews/`, `tasks/`, and `bugs/` created as their first files are written); `/cast-init` pre-creates only the root files and `one-off/`. Do not create additional subdirectories beyond these without updating this file and `artifacts/README.md`.
 
 ---
 
@@ -148,57 +152,37 @@ Templates live in `templates/` and are copied — never filled in place — to p
 
 | Template | Instance Destination |
 |---|---|
-| `templates/ARCH_MODULE.md` | `artifacts/architecture/module-{slug}.md` |
-| `templates/ARCH_SYSTEM.md` | `artifacts/architecture/arch-milestone-{N}.md` (the milestone architecture document) or `system-{slug}.md` |
-| `templates/ARCH_DATA_SCHEMA.md` | `artifacts/architecture/schema-{slug}.md` |
-| `templates/UI_SPEC.md` | `artifacts/ui-specs/ui-milestone-{N}.md`, `screen-{slug}.md`, or `component-{slug}.md` |
-| `templates/MILESTONE_DEFINITION.md` | `artifacts/milestones/milestone-{N}-{slug}.md` |
-| `templates/MILESTONE_TASKS.md` | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
-| `templates/MILESTONE_COMPLETION.md` | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
-| `templates/MILESTONE_VALIDATION.md` | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
-| `templates/CEO_REVIEW.md` | `artifacts/reviews/ceo-review-milestone-{N}.md` |
-| `templates/UX_REVIEW.md` | `artifacts/reviews/ux-review-milestone-{N}.md` |
-| `templates/MILESTONE_RETROSPECTIVE.md` | `artifacts/reviews/retrospective-milestone-{N}.md` |
+| `templates/MILESTONE_DEFINITION.md` | `artifacts/milestone-{N}-{slug}/README.md` |
+| `templates/TASK.md` | `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` (one per task), or `artifacts/one-off/task-{slug}.md` |
+| `templates/BUG_REPORT.md` | `artifacts/milestone-{N}-{slug}/bugs/BUG-{XXX}-{slug}.md` (one per bug), or `artifacts/one-off/bugs/BUG-{XXX}-{slug}.md` |
+| `templates/ARCH_MODULE.md` | `artifacts/milestone-{N}-{slug}/arch-{slug}.md` |
+| `templates/ARCH_SYSTEM.md` | `artifacts/milestone-{N}-{slug}/architecture.md` (the milestone architecture document) or `arch-{slug}.md` |
+| `templates/ARCH_DATA_SCHEMA.md` | `artifacts/milestone-{N}-{slug}/arch-{slug}.md` |
+| `templates/UI_SPEC.md` | `artifacts/milestone-{N}-{slug}/ui.md` (the milestone UI spec) or `ui-{slug}.md` |
+| `templates/MILESTONE_COMPLETION.md` | `artifacts/milestone-{N}-{slug}/reviews/completion.md` |
+| `templates/MILESTONE_VALIDATION.md` | `artifacts/milestone-{N}-{slug}/reviews/validation.md` |
+| `templates/CEO_REVIEW.md` | `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |
+| `templates/UX_REVIEW.md` | `artifacts/milestone-{N}-{slug}/reviews/ux.md` |
+| `templates/MILESTONE_RETROSPECTIVE.md` | `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` |
 
-### Milestone Artifacts (`artifacts/milestones/`)
+### Milestone Directories (`artifacts/milestone-{N}-{slug}/`)
 
-**Naming pattern:** `milestone-{N}-{slug}[-suffix].md`
+**Naming pattern:** `milestone-{N}-{slug}/`
 
 - `{N}` is the milestone number (e.g., `1`, `2`, `7`).
 - `{slug}` is a kebab-case short name (e.g., `user-auth`, `search-ui`).
-- `-suffix` is one of: `-tasks`, `-completion`, `-validation` (the base file with no suffix is the milestone definition).
 
-**Examples:**
-- `artifacts/milestones/milestone-1-user-auth.md`
-- `artifacts/milestones/milestone-1-user-auth-tasks.md`
-- `artifacts/milestones/milestone-1-user-auth-completion.md`
-- `artifacts/milestones/milestone-1-user-auth-validation.md`
+Inside the directory, filenames are fixed: `README.md` (definition), `architecture.md`, `ui.md`, `reviews/{security,performance,ceo,ux,validation,completion,retrospective}.md`. Supplemental design docs use `arch-{slug}.md` (instances of `templates/ARCH_MODULE.md` / `ARCH_DATA_SCHEMA.md` when a milestone needs module- or schema-level depth beyond `architecture.md`) and `ui-{slug}.md` (screen- or component-scoped specs). `architecture.md` is an **instance of `templates/ARCH_SYSTEM.md`** — that template defines its required headings.
 
-### Architecture Artifacts (`artifacts/architecture/`)
+### Task Files (`artifacts/milestone-{N}-{slug}/tasks/`)
 
-Two naming patterns are valid:
+**Naming pattern:** `task-{T}-{slug}.md` — `{T}` is the task's zero-padded ordinal within the milestone (e.g., `task-01-add-command.md`), `{slug}` a kebab-case short name. One-off tasks (`/agent-task`) use `artifacts/one-off/task-{slug}.md` with no ordinal.
 
-- `arch-milestone-{N}.md` — architecture document covering an entire milestone (written by `/agent-plan`). This file is an **instance of `templates/ARCH_SYSTEM.md`** — that template defines its required headings.
-- `module-{slug}.md`, `system-{slug}.md`, `schema-{slug}.md` — module-, system-, or schema-scoped specs. `templates/ARCH_MODULE.md` and `templates/ARCH_DATA_SCHEMA.md` produce supplementary `module-{slug}.md` / `schema-{slug}.md` instances when a milestone needs module- or schema-level depth beyond the milestone document.
+Each task file is an instance of `templates/TASK.md`: a self-contained unit of work carrying its own description, acceptance criteria, **Context Manifest** (the complete read set for the task), and **Handoff Log** (the append-only record every stage transition writes). Task status lives ONLY in the task file's Header — nowhere else.
 
-### UI Artifacts (`artifacts/ui-specs/`)
+### Bug Files (`artifacts/milestone-{N}-{slug}/bugs/` and `artifacts/one-off/bugs/`)
 
-Two naming patterns are valid:
-
-- `ui-milestone-{N}.md` — UI spec covering an entire milestone (written by `/agent-plan`).
-- `screen-{slug}.md`, `component-{slug}.md` — screen- or component-scoped specs.
-
-### Review Artifacts (`artifacts/reviews/`)
-
-**Naming patterns:**
-
-| Review Type | Pattern |
-|---|---|
-| Security | `security-review-milestone-{N}.md` |
-| Performance | `performance-review-milestone-{N}.md` |
-| CEO planning verdict | `ceo-review-milestone-{N}.md` |
-| UX review (`/agent-code` milestone completion, UI-flagged milestones only) | `ux-review-milestone-{N}.md` |
-| Milestone retrospective (Validator, `/agent-code` milestone completion) | `retrospective-milestone-{N}.md` |
+**Naming pattern:** `BUG-{XXX}-{slug}.md` — `{XXX}` is the project-wide sequential ID assigned via the index in `artifacts/BUGS.md`; `{slug}` a kebab-case short name. Each file is an instance of `templates/BUG_REPORT.md`, filed in the milestone (or `one-off/`) where the bug surfaced, and never moved.
 
 ---
 
@@ -206,16 +190,16 @@ Two naming patterns are valid:
 
 | Situation | Action |
 |---|---|
-| Planning a milestone | Product writes `artifacts/milestones/milestone-{N}-{slug}.md` + `-tasks.md` |
-| Documenting architecture for a milestone | Architect writes `artifacts/architecture/arch-milestone-{N}.md` |
-| Specifying UI for a milestone | UI writes `artifacts/ui-specs/ui-milestone-{N}.md` |
-| Filing security findings | Security writes `artifacts/reviews/security-review-milestone-{N}.md` |
-| Filing performance findings | Performance writes `artifacts/reviews/performance-review-milestone-{N}.md` |
-| Recording a CEO verdict | CEO writes `artifacts/reviews/ceo-review-milestone-{N}.md` |
-| Logging a bug | Bug Gatherer adds an entry to `artifacts/BUGS.md` |
-| Completing a milestone | Product writes `artifacts/milestones/milestone-{N}-{slug}-completion.md` and `-validation.md` |
-| Reviewing implemented UI at milestone completion | UI writes `artifacts/reviews/ux-review-milestone-{N}.md` (UI-flagged milestones only) |
-| Writing the milestone retrospective | Validator writes `artifacts/reviews/retrospective-milestone-{N}.md` |
+| Planning a milestone | Product creates `artifacts/milestone-{N}-{slug}/` and writes `README.md` + one `tasks/task-{T}-{slug}.md` per task |
+| Documenting architecture for a milestone | Architect writes `artifacts/milestone-{N}-{slug}/architecture.md` |
+| Specifying UI for a milestone | UI writes `artifacts/milestone-{N}-{slug}/ui.md` |
+| Filing security findings | Security writes `artifacts/milestone-{N}-{slug}/reviews/security.md` |
+| Filing performance findings | Performance writes `artifacts/milestone-{N}-{slug}/reviews/performance.md` |
+| Recording a CEO verdict | CEO writes `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |
+| Logging a bug | Bug Gatherer creates `bugs/BUG-{XXX}-{slug}.md` in the current milestone (or `artifacts/one-off/bugs/`) and adds its index row to `artifacts/BUGS.md` |
+| Completing a milestone | Product writes `artifacts/milestone-{N}-{slug}/reviews/completion.md` and `reviews/validation.md` |
+| Reviewing implemented UI at milestone completion | UI writes `artifacts/milestone-{N}-{slug}/reviews/ux.md` (UI-flagged milestones only) |
+| Writing the milestone retrospective | Validator writes `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` |
 | Recording session progress | Any agent appends to `artifacts/STANDUP.md` using its Entry Grammar (both `/agent-code` completion and `/agent-task` completion write entries here) |
 | Updating agent working state | Each agent appends to its own section in `artifacts/AGENT_STATE.md` |
 | Appending a `/agent-task` completion entry | Any agent appends to `artifacts/STANDUP.md` |
@@ -223,13 +207,13 @@ Two naming patterns are valid:
 | Adding a release changelog entry | Release appends to `docs/CHANGELOG.md` |
 | Creating any new reference doc | Docs Writer registers it in `docs/README.md` |
 
-**`/agent-task` scope note.** `/agent-task` is bounded to `artifacts/STANDUP.md`, `artifacts/BUGS.md`, and `artifacts/AGENT_STATE.md` updates. It does **not** write to `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, or `artifacts/reviews/` — those directories are owned by `/agent-plan` and `/agent-code` outputs. If a one-off task turns out to need any of those, `/agent-task` halts and instructs the user to run `/agent-plan` first. See the CAST repo's [`TROUBLESHOOTING.md`](https://github.com/Raxvis/CAST/blob/main/TROUBLESHOOTING.md) for the full decision table on which command to use.
+**`/agent-task` scope note.** `/agent-task` is bounded to `artifacts/one-off/` (its task file and any bug files), plus `artifacts/STANDUP.md`, `artifacts/BUGS.md`, and `artifacts/AGENT_STATE.md` updates. It does **not** write inside any `artifacts/milestone-{N}-{slug}/` directory — those are owned by `/agent-plan` and `/agent-code` outputs. If a one-off task turns out to need milestone-grade planning artifacts, `/agent-task` halts and instructs the user to run `/agent-plan` first. See the CAST repo's [`TROUBLESHOOTING.md`](https://github.com/Raxvis/CAST/blob/main/TROUBLESHOOTING.md) for the full decision table on which command to use.
 
 ---
 
 ## Revision History on Planning Artifacts
 
-Every planning-stage artifact under `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, and `artifacts/reviews/` begins with a `## Revision History` table directly under the title:
+Every planning-stage artifact in a milestone directory — the `README.md`, `architecture.md`, `ui.md`, supplemental `arch-{slug}.md` / `ui-{slug}.md` docs, and everything under `reviews/` — begins with a `## Revision History` table directly under the title:
 
 ```
 ## Revision History
@@ -249,7 +233,7 @@ Rules:
 - The body of the file is rewritten as needed; prior content is not preserved inline. Git history is the audit log.
 - The CEO reads this table first when re-reviewing a revised plan to identify which of its prior Revision Requests have been addressed.
 
-This block is mandatory for planning-stage artifacts produced by `/agent-plan`. It is **not** required for `artifacts/BUGS.md`, `artifacts/STANDUP.md`, or `artifacts/AGENT_STATE.md`, which are append-only running logs.
+This block is mandatory for planning-stage artifacts produced by `/agent-plan`. It is **not** required for task files (their Handoff Log is the audit trail), bug files (their Status field advances per the lifecycle), or `artifacts/BUGS.md`, `artifacts/STANDUP.md`, and `artifacts/AGENT_STATE.md`, which are append-only running logs.
 
 ---
 
@@ -259,7 +243,7 @@ The following behaviors violate these conventions. Do not do them:
 
 - **Writing work artifacts to `docs/`.** Bug reports, milestone plans, CEO reviews, and session logs do not belong in `docs/`. They go in `artifacts/`.
 - **Writing reference material to `artifacts/`.** Coding conventions, glossaries, and design rationale do not belong in `artifacts/` — they go in `docs/`. Document templates do not belong there either — they go in `templates/`.
-- **Filling in templates in place.** `templates/MILESTONE_TASKS.md` is the template — copy it to `artifacts/milestones/milestone-{N}-{slug}-tasks.md` before filling it in.
+- **Filling in templates in place.** `templates/TASK.md` is the template — copy it to `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` before filling it in.
 - **Creating files at the repository root.** Exception: `README.md`, `CLAUDE.md`, `CHANGELOG.md` at project root, and tool configuration files that require root placement by convention.
 - **Creating new subdirectories without updating this file.** Any new subdirectory under `docs/` or `artifacts/` must be added to the tree diagrams above.
 - **Using free-form naming.** All artifact names must follow the patterns in this document.
@@ -276,25 +260,24 @@ The following behaviors violate these conventions. Do not do them:
 | Reference docs | `docs/` | `UPPER_SNAKE_CASE.md` |
 | Document templates | `templates/` | `UPPER_SNAKE_CASE.md` |
 | Release changelog | `docs/CHANGELOG.md` | fixed |
-| Active bug tracker | `artifacts/BUGS.md` | fixed |
+| Global bug index | `artifacts/BUGS.md` | fixed |
 | Rolling session log | `artifacts/STANDUP.md` | fixed |
 | Agent working state | `artifacts/AGENT_STATE.md` | fixed |
-| Milestone definition | `artifacts/milestones/` | `milestone-{N}-{slug}.md` |
-| Milestone tasks | `artifacts/milestones/` | `milestone-{N}-{slug}-tasks.md` |
-| Milestone completion | `artifacts/milestones/` | `milestone-{N}-{slug}-completion.md` |
-| Milestone validation | `artifacts/milestones/` | `milestone-{N}-{slug}-validation.md` |
-| Milestone architecture | `artifacts/architecture/` | `arch-milestone-{N}.md` |
-| Module architecture | `artifacts/architecture/` | `module-{slug}.md` |
-| System architecture | `artifacts/architecture/` | `system-{slug}.md` |
-| Data schema | `artifacts/architecture/` | `schema-{slug}.md` |
-| Milestone UI spec | `artifacts/ui-specs/` | `ui-milestone-{N}.md` |
-| Screen spec | `artifacts/ui-specs/` | `screen-{slug}.md` |
-| Component spec | `artifacts/ui-specs/` | `component-{slug}.md` |
-| Security review | `artifacts/reviews/` | `security-review-milestone-{N}.md` |
-| Performance review | `artifacts/reviews/` | `performance-review-milestone-{N}.md` |
-| CEO review | `artifacts/reviews/` | `ceo-review-milestone-{N}.md` |
-| UX review | `artifacts/reviews/` | `ux-review-milestone-{N}.md` |
-| Milestone retrospective | `artifacts/reviews/` | `retrospective-milestone-{N}.md` |
+| Milestone definition | `artifacts/milestone-{N}-{slug}/` | `README.md` |
+| Task file (one per task) | `artifacts/milestone-{N}-{slug}/tasks/` | `task-{T}-{slug}.md` |
+| One-off task file | `artifacts/one-off/` | `task-{slug}.md` |
+| Milestone architecture | `artifacts/milestone-{N}-{slug}/` | `architecture.md` |
+| Supplemental arch doc (module/system/schema) | `artifacts/milestone-{N}-{slug}/` | `arch-{slug}.md` |
+| Milestone UI spec | `artifacts/milestone-{N}-{slug}/` | `ui.md` |
+| Supplemental UI spec (screen/component) | `artifacts/milestone-{N}-{slug}/` | `ui-{slug}.md` |
+| Bug file (one per bug) | `artifacts/milestone-{N}-{slug}/bugs/` or `artifacts/one-off/bugs/` | `BUG-{XXX}-{slug}.md` |
+| Security review | `artifacts/milestone-{N}-{slug}/reviews/` | `security.md` |
+| Performance review | `artifacts/milestone-{N}-{slug}/reviews/` | `performance.md` |
+| CEO review | `artifacts/milestone-{N}-{slug}/reviews/` | `ceo.md` |
+| UX review | `artifacts/milestone-{N}-{slug}/reviews/` | `ux.md` |
+| Milestone validation | `artifacts/milestone-{N}-{slug}/reviews/` | `validation.md` |
+| Milestone completion | `artifacts/milestone-{N}-{slug}/reviews/` | `completion.md` |
+| Milestone retrospective | `artifacts/milestone-{N}-{slug}/reviews/` | `retrospective.md` |
 
 ---
 
@@ -302,7 +285,7 @@ The following behaviors violate these conventions. Do not do them:
 
 The `docs/` vs `artifacts/` split exists for three reasons:
 
-1. **Predictability for agents.** An agent asked to file a bug report always knows the file goes in `artifacts/BUGS.md`; an agent asked to look up coding conventions always knows to read `docs/CODE_PATTERNS.md`. Ambiguity causes agents to guess, and guessing produces scattered outputs.
+1. **Predictability for agents.** An agent asked to file a bug report always knows the file goes in the current milestone's `bugs/` directory with an index row in `artifacts/BUGS.md`; an agent asked to look up coding conventions always knows to read `docs/CODE_PATTERNS.md`. Ambiguity causes agents to guess, and guessing produces scattered outputs. Grouping by milestone also bounds what any agent needs to look at: everything about a milestone is inside its one directory.
 
 2. **Clean diffs and reviews.** Reference material changes slowly and deliberately; work artifacts churn constantly. Separating them means diffs on `docs/` signal intentional policy changes, while diffs on `artifacts/` signal ordinary work progress. Reviewers can skim `docs/` changes carefully and `artifacts/` changes quickly.
 

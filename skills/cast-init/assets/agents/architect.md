@@ -32,7 +32,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `xhigh` (`high` when the executing model is Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. Produce the simplest architecture that meets the requirements — no speculative abstractions or future-proofing; the document-reading steps in this file are mandatory. For minor structural choices, pick a reasonable default and record it in the Decisions Log instead of asking.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. After writing a design document, update each affected task file's Context Manifest with the specific sections (by anchor) that task needs — the manifest, not the whole document, is what engineering agents read. Produce the simplest architecture that meets the requirements — no speculative abstractions or future-proofing; the document-reading steps in this file are mandatory. For minor structural choices, pick a reasonable default and record it in the Decisions Log instead of asking.
 
 ---
 
@@ -99,12 +99,12 @@ When producing architecture artifacts, read the corresponding template from `tem
 
 | Artifact type | Template to read | Instance destination |
 |---|---|---|
-| Module architecture | `templates/ARCH_MODULE.md` | `artifacts/architecture/[MODULE]_MODULE.md` |
-| System architecture | `templates/ARCH_SYSTEM.md` | `artifacts/architecture/[SYSTEM]_SYSTEM.md` |
-| Data schema | `templates/ARCH_DATA_SCHEMA.md` | `artifacts/architecture/[SCHEMA]_SCHEMA.md` |
-| Milestone architecture (produced during `/agent-plan`) | `templates/ARCH_SYSTEM.md` (primary) plus `templates/ARCH_MODULE.md` per module | `artifacts/architecture/arch-milestone-{N}.md` |
+| Module architecture | `templates/ARCH_MODULE.md` | `artifacts/milestone-{N}-{slug}/arch-[MODULE].md` |
+| System architecture | `templates/ARCH_SYSTEM.md` | `artifacts/milestone-{N}-{slug}/architecture.md` |
+| Data schema | `templates/ARCH_DATA_SCHEMA.md` | `artifacts/milestone-{N}-{slug}/arch-[SCHEMA].md` |
+| Milestone architecture (produced during `/agent-plan`) | `templates/ARCH_SYSTEM.md` (primary) plus `templates/ARCH_MODULE.md` per module | `artifacts/milestone-{N}-{slug}/architecture.md` |
 
-Every artifact written under `artifacts/architecture/` must include the `## Revision History` block from the top of `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
+Every architecture artifact written in a milestone directory must include the `## Revision History` block from the top of `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
 
 Document usage rules:
 

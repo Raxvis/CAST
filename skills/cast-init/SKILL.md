@@ -11,7 +11,7 @@ description: >-
   produces the migration plan without changing files.
 license: MIT
 metadata:
-  version: "1.5.0"
+  version: "2.0.0"
   source: "https://github.com/Raxvis/CAST"
 ---
 
@@ -50,8 +50,8 @@ CAST's canonical structure in a target project is:
 - `.claude/agents/` — 15 subagent definitions with YAML frontmatter and per-agent model settings (all `model: inherit` by default — agents run on the session model)
 - `.claude/skills/` — three pipeline skills: `/agent-plan`, `/agent-code`, `/agent-task`
 - `docs/` — reference material only (PRD, conventions, topic-specific guides)
-- `templates/` — reusable document templates (architecture, UI spec, milestone files) copied into `artifacts/` as instances
-- `artifacts/` — work artifacts only (milestone plans, reviews, bug reports, session logs)
+- `templates/` — reusable document templates (architecture, UI spec, milestone, task, and bug-report files) copied into `artifacts/` as instances
+- `artifacts/` — work artifacts only, **grouped by milestone**: one `milestone-{N}-{slug}/` directory per milestone (README, design docs, reviews/, one file per task under tasks/, one file per bug under bugs/), `one-off/` for /agent-task work, and cross-milestone logs (BUGS.md index, STANDUP.md, AGENT_STATE.md) at the root
 
 Two rules are load-bearing:
 

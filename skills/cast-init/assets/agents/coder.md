@@ -28,7 +28,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `xhigh` (`high` when the executing model is Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. Make only the changes the task directly requests — no extra helpers, abstractions, or defensive handling for scenarios that cannot happen. For minor choices (naming, defaults), pick a reasonable option and note it in the handoff instead of asking.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Follow the Handoff Protocol in `docs/PIPELINE_LOOP.md`: read only the task file, its Context Manifest, and the latest handoff entry's "Read next", then append one capped Handoff Log entry to the task file — no narrative recap. Make only the changes the task directly requests — no extra helpers, abstractions, or defensive handling for scenarios that cannot happen. For minor choices (naming, defaults), pick a reasonable option and note it in the handoff instead of asking.
 
 ---
 
@@ -69,7 +69,7 @@ The Coder Agent may NOT:
 
 | Source | Input |
 |---|---|
-| Product | Task definitions with acceptance criteria |
+| Product | The task file: description, acceptance criteria, Context Manifest |
 | Architecture | Approved architecture documents and code review feedback |
 | UI | Approved screen specifications |
 | Security | Security findings and remediation recommendations |
