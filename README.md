@@ -296,6 +296,8 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 
 Each agent file has its model set in the YAML frontmatter — there is no `[AI_MODEL]` placeholder. Every agent defaults to `model: inherit`, running on whatever model the invoking session uses, and is optimized for the Claude Opus 4.x family (`claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` are the supported executing models); workload differentiation comes from the recommended reasoning effort stated in each agent's **Model Configuration** section rather than model tier. Edit the `model:` line in an individual agent file if you need an explicit pin, and see `docs/MODEL_OPTIMIZATION.md` for per-model behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists.
 
+**Right-size models at install time.** `inherit` is the safe default, but per-agent pins are the roster's main cost lever, and `/cast-init` proposes an assignment during adoption. A sensible split: keep the judgment-heavy gates (CEO, Architect, Reviewer, Security) on the most capable model you have — e.g. `opus`, or a Fable/Mythos-class model if your account serves one; run the planning-and-implementation loop (Product, UI, Performance, Coder, Tester, Debugger, Refactor) on `sonnet`; and drop the utility roles (Bug Gatherer, Docs Writer, Release, Validator) to `haiku`, whose work is structured writing against templates. Claude Code accepts the `opus` / `sonnet` / `haiku` aliases or full model IDs in agent frontmatter.
+
 | Placeholder | Description | Example value |
 |---|---|---|
 | _(none — all per-agent models are set in YAML frontmatter)_ | | |

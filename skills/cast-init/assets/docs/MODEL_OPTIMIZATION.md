@@ -60,7 +60,7 @@ Every agent's YAML frontmatter sets `model: inherit` — each agent runs on the 
 
 **Effort notes:** `xhigh` requires Opus 4.7 or newer — when the executing model is Opus 4.6 (session model or explicit pin), substitute `high`. In Claude Code, effort follows session settings; when driving agents via the Claude API or Agent SDK, set `output_config: {effort: "..."}` per request.
 
-**Cost fallback:** the four utility agents (Bug Gatherer, Docs Writer, Release, Validator) were pinned to `claude-haiku-4-5` before v0.11.0 and still run acceptably there. If cost or latency on utility work matters more than judgment, re-pin them to `claude-haiku-4-5` ($1 / $5 per MTok) — everything else in this guide assumes the Opus family.
+**Right-sizing for cost:** `inherit` keeps every agent on the session model, but per-agent pins are the roster's main cost lever — match model capability to each role's workload. A sensible split: keep the judgment-heavy gates (CEO, Architect, Reviewer, Security) on the most capable model available (e.g. `claude-opus-4-8`, or a Fable/Mythos-class model if your account serves one); run the planning-and-implementation loop (Product, UI, Performance, Coder, Tester, Debugger, Refactor) on Sonnet (`claude-sonnet-5`); and pin the four utility agents (Bug Gatherer, Docs Writer, Release, Validator) to Haiku (`claude-haiku-4-5`, $1 / $5 per MTok) — their work is structured writing against templates and checklist execution. Claude Code also accepts the `opus` / `sonnet` / `haiku` aliases in agent frontmatter. The behavior profiles below cover the Opus family.
 
 ---
 

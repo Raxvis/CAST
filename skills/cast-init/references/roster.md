@@ -61,6 +61,16 @@ Use this table as the authoritative reference when comparing an existing project
 
 **One-line summary you can keep in context:** 15 agents, all on `model: inherit` (the session model) = 6 planning-tier at effort high/xhigh (product, architect, ui, security, performance, ceo) + 5 engineering-tier at effort high/xhigh (coder, tester, reviewer, debugger, refactor) + 4 utility-tier at effort low (bug-gatherer, docs-writer, release, validator). Every adoption must account for all 15, not just the 13 in Tiers 1–4.
 
+**Right-sizing models (cost optimization).** `model: inherit` is the safe default, but each agent's `model:` line can be pinned independently, and matching model capability to each role's workload is the roster's main cost lever. Every Phase 3 plan must include an Ask item proposing a right-sized assignment for the user to accept, adjust, or decline. A sensible starting split:
+
+| Workload | Agents | Suggested model |
+|---|---|---|
+| Judgment-heavy gates and design | `ceo`, `architect`, `reviewer`, `security` | The most capable model available — e.g. `opus` (or a Fable/Mythos-class model if the account serves one) |
+| Planning and implementation loop | `product`, `ui`, `performance`, `coder`, `tester`, `debugger`, `refactor` | `sonnet` — strong coding and spec writing at a fraction of the cost |
+| Structured utility work | `bug-gatherer`, `docs-writer`, `release`, `validator` | `haiku` — template-driven writing and checklist execution |
+
+Claude Code accepts the `opus` / `sonnet` / `haiku` aliases or full model IDs in agent frontmatter. Record accepted assignments in the plan as part of each agent's Create/Update action; any agent the user leaves undecided keeps `inherit`.
+
 ## Pipeline skills mapping
 
 The three CAST pipeline skills are `/agent-plan`, `/agent-code`, `/agent-task`. They install to `.claude/skills/<name>/SKILL.md`. For each, apply this decision:

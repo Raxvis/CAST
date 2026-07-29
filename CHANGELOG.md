@@ -16,7 +16,11 @@ Agents now inherit the session model instead of pinning Opus.
 
 - **All 15 agent frontmatter pins replaced with `model: inherit`.** Agents run on whatever model the invoking session uses instead of being hard-pinned to `claude-opus-4-8`. The Claude Opus 4.x family remains the optimized target (`claude-opus-4-8` recommended; `claude-opus-4-7` and `claude-opus-4-6` supported executing models), and role differentiation still comes from recommended reasoning effort. Explicit per-agent pins remain supported as user overrides.
 - **Documentation updated to the inherit-by-default policy** — root `README.md` (what-you-get list, Agents placeholder section, prerequisites), `agents/README.md`, the three pipeline skills' Model Compatibility sections and `skills/README.md`, `docs/MODEL_OPTIMIZATION.md` (intro, ladder status, Default Roster Assignment table, effort notes, upgrade paths, verification steps), `docs/FIRST_RUN.md`'s model-access caveat, the adoption skill's canonical structure description, and the roster reference (Model column and summary line). The four `xhigh` agents' effort notes now say "when the executing model is Opus 4.6" rather than "when pinned".
-- **Phase 6 validation (check 5)** now accepts `inherit` as the default frontmatter model, with explicit model IDs treated as user-approved overrides.
+- **Phase 6 validation (check 5)** now accepts `inherit` as the default frontmatter model, with explicit pins (model aliases or full IDs) treated as user-approved overrides.
+
+### Added
+
+- **Model right-sizing at install time.** The README, `agents/README.md`, `references/roster.md`, and `docs/MODEL_OPTIMIZATION.md` now recommend matching each agent's model to its workload to cost-optimize the roster — the most capable model (e.g. `opus`, or a Fable/Mythos-class model) on the judgment-heavy gates (CEO, Architect, Reviewer, Security), `sonnet` on the planning-and-implementation loop (Product, UI, Performance, Coder, Tester, Debugger, Refactor), and `haiku` on the utility roles (Bug Gatherer, Docs Writer, Release, Validator). `/cast-init` Phase 3 plans now include an Ask item proposing this assignment, and execution step 5.4 applies accepted pins to agent frontmatter during install.
 
 ### Migration
 
