@@ -233,7 +233,7 @@ jobs:
             fi
           done
           # (2) No instance-pattern path may appear under docs/ or templates/.
-          hits=$(grep -rnE '(docs|templates)/[A-Za-z0-9_{}./-]*(milestone-|task-[0-9{]|BUG-[0-9{]|ceo-review-|ux-review-|retrospective-)' skills/cast-init/assets/ || true)
+          hits=$(grep -rnE '(docs|templates)/[A-Za-z0-9_{}./-]*(milestone-|task-[0-9{]|bug-[0-9{]|ceo-review-|ux-review-|retrospective-)' skills/cast-init/assets/ || true)
           if [ -n "$hits" ]; then
             echo "Instance-pattern path under docs/ or templates/:"; echo "$hits"; fail=1
           fi
@@ -276,7 +276,7 @@ jobs:
               */milestone-*/README.md)             check_headings "$f" MILESTONE_DEFINITION.md ;;
               */milestone-*/tasks/task-*.md)       check_headings "$f" TASK.md ;;
               */one-off/task-*.md)                 check_headings "$f" TASK.md ;;
-              */bugs/BUG-*.md)                     check_headings "$f" BUG_REPORT.md ;;
+              */bugs/bug-*.md)                     check_headings "$f" BUG_REPORT.md ;;
               */milestone-*/architecture.md)       check_headings "$f" ARCH_SYSTEM.md ;;
               */milestone-*/arch-*.md) ;;          # supplemental module/schema docs carry no single contract
               */milestone-*/ui.md)                 check_headings "$f" UI_SPEC.md ;;

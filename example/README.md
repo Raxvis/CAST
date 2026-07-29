@@ -76,7 +76,7 @@ Read these in order for the clearest picture:
     - `architecture.md` and `ui.md` — the approved design specs
     - `tasks/task-01…05-*.md` — one isolated file per task, each with its
       Context Manifest and Handoff Log
-    - `bugs/BUG-001…002-*.md` — one file per bug filed during the milestone
+    - `bugs/bug-001…002-*.md` — one file per bug filed during the milestone
     - `reviews/` — security, performance, and CEO planning reviews, plus the
       milestone-completion UX review, validation and completion records, and
       the retrospective

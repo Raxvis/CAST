@@ -1,7 +1,7 @@
 <!-- TEMPLATE INSTRUCTIONS
   FILE: BUGS.md
   PURPOSE: Global bug INDEX for the project. Every bug lives in its own file
-           (milestone-{N}-{slug}/bugs/BUG-XXX-{slug}.md, or one-off/bugs/ for /agent-task
+           (milestone-{N}-{slug}/bugs/bug-XXX-{slug}.md, or one-off/bugs/ for /agent-task
            work); this file assigns IDs and tracks one line per bug so triage sweeps read
            one small file instead of every report. This file is also the SINGLE CANONICAL
            definition of the bug lifecycle, severity scale, and field ownership — agents
@@ -18,7 +18,7 @@
 
 # [PROJECT_NAME] — Bug Index
 
-Every bug is a standalone file created from `templates/BUG_REPORT.md` and filed beside the work that surfaced it: `artifacts/milestone-{N}-{slug}/bugs/BUG-XXX-{slug}.md` for pipeline work, `artifacts/one-off/bugs/BUG-XXX-{slug}.md` for `/agent-task` work. This file is the index: it assigns IDs and carries one status line per bug. Triage and re-triage sweeps read this index and open only the bug files they act on.
+Every bug is a standalone file created from `templates/BUG_REPORT.md` and filed beside the work that surfaced it: `artifacts/milestone-{N}-{slug}/bugs/bug-XXX-{slug}.md` for pipeline work, `artifacts/one-off/bugs/bug-XXX-{slug}.md` for `/agent-task` work. This file is the index: it assigns IDs and carries one status line per bug. Triage and re-triage sweeps read this index and open only the bug files they act on.
 
 ---
 

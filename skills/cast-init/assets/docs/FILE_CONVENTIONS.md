@@ -112,12 +112,12 @@ artifacts/
     tasks/
       task-{T}-{slug}.md                   # ONE FILE PER TASK (Context Manifest + Handoff Log)
     bugs/
-      BUG-{XXX}-{slug}.md                  # ONE FILE PER BUG found during this milestone
+      bug-{XXX}-{slug}.md                  # ONE FILE PER BUG found during this milestone
 
   one-off/                                 # /agent-task work
     task-{slug}.md
     bugs/
-      BUG-{XXX}-{slug}.md
+      bug-{XXX}-{slug}.md
 ```
 
 Milestone directories are created by `/agent-plan` Stage 1 (with `reviews/`, `tasks/`, and `bugs/` created as their first files are written); `/cast-init` pre-creates only the root files and `one-off/`. Do not create additional subdirectories beyond these without updating this file and `artifacts/README.md`.
@@ -154,7 +154,7 @@ Templates live in `templates/` and are copied — never filled in place — to p
 |---|---|
 | `templates/MILESTONE_DEFINITION.md` | `artifacts/milestone-{N}-{slug}/README.md` |
 | `templates/TASK.md` | `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` (one per task), or `artifacts/one-off/task-{slug}.md` |
-| `templates/BUG_REPORT.md` | `artifacts/milestone-{N}-{slug}/bugs/BUG-{XXX}-{slug}.md` (one per bug), or `artifacts/one-off/bugs/BUG-{XXX}-{slug}.md` |
+| `templates/BUG_REPORT.md` | `artifacts/milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` (one per bug), or `artifacts/one-off/bugs/bug-{XXX}-{slug}.md` |
 | `templates/ARCH_MODULE.md` | `artifacts/milestone-{N}-{slug}/arch-{slug}.md` |
 | `templates/ARCH_SYSTEM.md` | `artifacts/milestone-{N}-{slug}/architecture.md` (the milestone architecture document) or `arch-{slug}.md` |
 | `templates/ARCH_DATA_SCHEMA.md` | `artifacts/milestone-{N}-{slug}/arch-{slug}.md` |
@@ -182,7 +182,7 @@ Each task file is an instance of `templates/TASK.md`: a self-contained unit of w
 
 ### Bug Files (`artifacts/milestone-{N}-{slug}/bugs/` and `artifacts/one-off/bugs/`)
 
-**Naming pattern:** `BUG-{XXX}-{slug}.md` — `{XXX}` is the project-wide sequential ID assigned via the index in `artifacts/BUGS.md`; `{slug}` a kebab-case short name. Each file is an instance of `templates/BUG_REPORT.md`, filed in the milestone (or `one-off/`) where the bug surfaced, and never moved.
+**Naming pattern:** `bug-{XXX}-{slug}.md` — `{XXX}` is the project-wide sequential ID assigned via the index in `artifacts/BUGS.md`; `{slug}` a kebab-case short name. The filename is lowercase; the *identifier* stays uppercase in prose, headings, and the index (`BUG-001`) — same split as tasks (`T-1` in text, `task-01-{slug}.md` on disk). Each file is an instance of `templates/BUG_REPORT.md`, filed in the milestone (or `one-off/`) where the bug surfaced, and never moved.
 
 ---
 
@@ -196,7 +196,7 @@ Each task file is an instance of `templates/TASK.md`: a self-contained unit of w
 | Filing security findings | Security writes `artifacts/milestone-{N}-{slug}/reviews/security.md` |
 | Filing performance findings | Performance writes `artifacts/milestone-{N}-{slug}/reviews/performance.md` |
 | Recording a CEO verdict | CEO writes `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |
-| Logging a bug | Bug Gatherer creates `bugs/BUG-{XXX}-{slug}.md` in the current milestone (or `artifacts/one-off/bugs/`) and adds its index row to `artifacts/BUGS.md` |
+| Logging a bug | Bug Gatherer creates `bugs/bug-{XXX}-{slug}.md` in the current milestone (or `artifacts/one-off/bugs/`) and adds its index row to `artifacts/BUGS.md` |
 | Completing a milestone | Product writes `artifacts/milestone-{N}-{slug}/reviews/completion.md` and `reviews/validation.md` |
 | Reviewing implemented UI at milestone completion | UI writes `artifacts/milestone-{N}-{slug}/reviews/ux.md` (UI-flagged milestones only) |
 | Writing the milestone retrospective | Validator writes `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` |
@@ -259,6 +259,7 @@ The following behaviors violate these conventions. Do not do them:
 |---|---|---|
 | Reference docs | `docs/` | `UPPER_SNAKE_CASE.md` |
 | Document templates | `templates/` | `UPPER_SNAKE_CASE.md` |
+| _Case rule_ | — | UPPER_SNAKE is reserved for **system singletons** (reference docs, templates, the three artifacts-root state files — fixed files named at design time). **Instance files that multiply as work happens** (milestone dirs, task files, bug files, reviews, supplemental specs) are lowercase kebab-case. `README.md` / `CLAUDE.md` / `SKILL.md` follow their external conventions. |
 | Release changelog | `docs/CHANGELOG.md` | fixed |
 | Global bug index | `artifacts/BUGS.md` | fixed |
 | Rolling session log | `artifacts/STANDUP.md` | fixed |
@@ -270,7 +271,7 @@ The following behaviors violate these conventions. Do not do them:
 | Supplemental arch doc (module/system/schema) | `artifacts/milestone-{N}-{slug}/` | `arch-{slug}.md` |
 | Milestone UI spec | `artifacts/milestone-{N}-{slug}/` | `ui.md` |
 | Supplemental UI spec (screen/component) | `artifacts/milestone-{N}-{slug}/` | `ui-{slug}.md` |
-| Bug file (one per bug) | `artifacts/milestone-{N}-{slug}/bugs/` or `artifacts/one-off/bugs/` | `BUG-{XXX}-{slug}.md` |
+| Bug file (one per bug) | `artifacts/milestone-{N}-{slug}/bugs/` or `artifacts/one-off/bugs/` | `bug-{XXX}-{slug}.md` |
 | Security review | `artifacts/milestone-{N}-{slug}/reviews/` | `security.md` |
 | Performance review | `artifacts/milestone-{N}-{slug}/reviews/` | `performance.md` |
 | CEO review | `artifacts/milestone-{N}-{slug}/reviews/` | `ceo.md` |

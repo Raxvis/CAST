@@ -84,7 +84,7 @@ Within Step 3 (including the routing below), when a finding or its resolution ch
 
 For every Reviewer finding classified as a **Defect**:
 
-1. Launch the **bug-gatherer** agent to file the finding as a standalone bug file — `bugs/BUG-{XXX}-{slug}.md` beside the task (created from `templates/BUG_REPORT.md`, status New) — and add its row to the index in `artifacts/BUGS.md`. The bug file, not the handoff entry, carries the full report.
+1. Launch the **bug-gatherer** agent to file the finding as a standalone bug file — `bugs/bug-{XXX}-{slug}.md` beside the task (created from `templates/BUG_REPORT.md`, status New) — and add its row to the index in `artifacts/BUGS.md`. The bug file, not the handoff entry, carries the full report.
 2. Hand the filed report to the **product** agent for triage. Product sets the final severity and issues one of three triage outcomes:
    - **Fix Now** — launch the **debugger** agent to investigate the root cause and append the Investigation section to the bug file (status In Progress). The defect then returns to Coder (loop back to Step 1); Coder's read set gains the bug file via "Read next" in the handoff entry.
    - **Defer** — the bug file stays **open** with status Deferred. Deferred is a held-open state, not terminal: Product re-triages every Deferred bug at the `/agent-code` milestone-completion checkpoint and at `/agent-plan` Stage 1 (sweeping the index in `artifacts/BUGS.md`). Deferral is allowed only if the defect does not violate the task's acceptance criteria; the task proceeds without looping.

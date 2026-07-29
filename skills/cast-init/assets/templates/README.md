@@ -33,7 +33,7 @@ filled in place — copy first, then edit the copy.
 | `ARCH_SYSTEM.md` | Architect | `/agent-plan` Stage 2a | `artifacts/milestone-{N}-{slug}/architecture.md` (or `arch-{slug}.md` for supplemental docs) |
 | `ARCH_DATA_SCHEMA.md` | Architect | `/agent-plan` Stage 2a | `artifacts/milestone-{N}-{slug}/architecture.md` (or `arch-{slug}.md` for supplemental docs) |
 | `UI_SPEC.md` | UI | `/agent-plan` Stage 2b | `artifacts/milestone-{N}-{slug}/ui.md` (or `ui-{slug}.md` for supplemental screen/component specs) |
-| `BUG_REPORT.md` | Bug Gatherer | Any pipeline, when a defect is filed (one instance **per bug**) | `artifacts/milestone-{N}-{slug}/bugs/BUG-{XXX}-{slug}.md`, or `artifacts/one-off/bugs/BUG-{XXX}-{slug}.md`; indexed in `artifacts/BUGS.md` |
+| `BUG_REPORT.md` | Bug Gatherer | Any pipeline, when a defect is filed (one instance **per bug**) | `artifacts/milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md`, or `artifacts/one-off/bugs/bug-{XXX}-{slug}.md`; indexed in `artifacts/BUGS.md` |
 | `MILESTONE_COMPLETION.md` | Product | `/agent-code` milestone-completion checkpoint | `artifacts/milestone-{N}-{slug}/reviews/completion.md` |
 | `MILESTONE_VALIDATION.md` | Product | `/agent-code` milestone-completion checkpoint only (milestone acceptance record; its Task Validation Checklist doubles as the *criteria* Product applies per task at Step 4 — per-task outcomes go to the task file's Status plus a STANDUP `progress` entry, with no per-task document) | `artifacts/milestone-{N}-{slug}/reviews/validation.md` |
 | `CEO_REVIEW.md` | CEO | `/agent-plan` Stage 4 | `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |

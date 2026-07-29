@@ -52,12 +52,12 @@ artifacts/
       task-{T}-{slug}.md           # ONE FILE PER TASK — self-contained: description,
                                    #   acceptance criteria, Context Manifest, Handoff Log
     bugs/
-      BUG-{XXX}-{slug}.md          # ONE FILE PER BUG found during this milestone's work
+      bug-{XXX}-{slug}.md          # ONE FILE PER BUG found during this milestone's work
 
   one-off/                         # /agent-task work (no milestone)
     task-{slug}.md                 # One-off task file (same shape as milestone task files)
     bugs/
-      BUG-{XXX}-{slug}.md          # Bugs filed from one-off work
+      bug-{XXX}-{slug}.md          # Bugs filed from one-off work
 ```
 
 Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-created for them). `/cast-init` scaffolds only the root files and the `one-off/` directory.
@@ -83,7 +83,7 @@ Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-creat
 | Milestone validation record | `milestone-{N}-{slug}/reviews/validation.md` | Product (milestone completion) |
 | Milestone completion report | `milestone-{N}-{slug}/reviews/completion.md` | Product (milestone completion) |
 | Milestone retrospective | `milestone-{N}-{slug}/reviews/retrospective.md` | Validator (milestone completion) |
-| Per-bug report | `milestone-{N}-{slug}/bugs/BUG-{XXX}-{slug}.md` (or `one-off/bugs/` for `/agent-task` work) | Bug Gatherer files; Product, Debugger, Coder, Tester advance it |
+| Per-bug report | `milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` (or `one-off/bugs/` for `/agent-task` work) | Bug Gatherer files; Product, Debugger, Coder, Tester advance it |
 | Bug index (ID assignment, one-line status per bug, regression checklist) | `artifacts/BUGS.md` | Bug Gatherer adds rows; owners update status column |
 | One-off task file | `one-off/task-{slug}.md` | `/agent-task` |
 | Session progress log | Entries in `artifacts/STANDUP.md` | Any agent / user |

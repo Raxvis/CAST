@@ -73,22 +73,22 @@ on first invocation rather than throwing — this is the path BUG-001 surfaced.
 ### 3. bug-gatherer -> product — 2026-04-09
 
 - **Outcome**: Filed BUG-001 (severity High) with repro steps.
-- **Files touched**: `../bugs/BUG-001-list-first-run-crash.md`, `artifacts/BUGS.md` (index row)
-- **Read next**: `../bugs/BUG-001-list-first-run-crash.md`
+- **Files touched**: `../bugs/bug-001-list-first-run-crash.md`, `artifacts/BUGS.md` (index row)
+- **Read next**: `../bugs/bug-001-list-first-run-crash.md`
 - **Open items**: Awaiting triage
 
 ### 4. product -> debugger — 2026-04-09
 
 - **Outcome**: Triaged Fix Now — first-run experience violates CEO Condition 3.
-- **Files touched**: `../bugs/BUG-001-list-first-run-crash.md` (Severity final, status Triaged)
-- **Read next**: `../bugs/BUG-001-list-first-run-crash.md`
+- **Files touched**: `../bugs/bug-001-list-first-run-crash.md` (Severity final, status Triaged)
+- **Read next**: `../bugs/bug-001-list-first-run-crash.md`
 - **Open items**: None
 
 ### 5. debugger -> coder — 2026-04-09
 
 - **Outcome**: Root cause found (migration execution lived only in the `add` path); recommended extracting idempotent `ensureMigrations(db)` called at the top of every command entry path. Loop count set to 1.
-- **Files touched**: `../bugs/BUG-001-list-first-run-crash.md` (Investigation section, status In Progress)
-- **Read next**: `../bugs/BUG-001-list-first-run-crash.md` § Investigation
+- **Files touched**: `../bugs/bug-001-list-first-run-crash.md` (Investigation section, status In Progress)
+- **Read next**: `../bugs/bug-001-list-first-run-crash.md` § Investigation
 - **Open items**: None
 
 ### 6. coder -> tester — 2026-04-09
@@ -115,7 +115,7 @@ on first invocation rather than throwing — this is the path BUG-001 surfaced.
 ### 9. product — task complete — 2026-04-09
 
 - **Outcome**: All acceptance criteria met; Status set to Complete. BUG-001 advanced to Verified (Closed at milestone sign-off).
-- **Files touched**: This file (Header Status), `../bugs/BUG-001-list-first-run-crash.md`, `artifacts/BUGS.md` (index row)
+- **Files touched**: This file (Header Status), `../bugs/bug-001-list-first-run-crash.md`, `artifacts/BUGS.md` (index row)
 - **Read next**: —
 - **Open items**: None
 

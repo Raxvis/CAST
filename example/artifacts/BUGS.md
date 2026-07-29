@@ -1,6 +1,6 @@
 # Acme Todo — Bug Index
 
-Every bug is a standalone file created from `templates/BUG_REPORT.md` and filed beside the work that surfaced it: `artifacts/milestone-{N}-{slug}/bugs/BUG-XXX-{slug}.md` for pipeline work, `artifacts/one-off/bugs/BUG-XXX-{slug}.md` for `/agent-task` work. This file is the index: it assigns IDs and carries one status line per bug. Triage and re-triage sweeps read this index and open only the bug files they act on.
+Every bug is a standalone file created from `templates/BUG_REPORT.md` and filed beside the work that surfaced it: `artifacts/milestone-{N}-{slug}/bugs/bug-XXX-{slug}.md` for pipeline work, `artifacts/one-off/bugs/bug-XXX-{slug}.md` for `/agent-task` work. This file is the index: it assigns IDs and carries one status line per bug. Triage and re-triage sweeps read this index and open only the bug files they act on.
 
 ---
 
@@ -36,8 +36,8 @@ A bug file never moves between directories — it stays where it was filed and i
 
 | ID | Title | Severity (final) | Status | File |
 |---|---|---|---|---|
-| BUG-001 | `list` crashes with "no such table: tasks" on first invocation | High | Closed | `milestone-1-task-crud/bugs/BUG-001-list-first-run-crash.md` |
-| BUG-002 | `done <id>` silently succeeds on non-existent task ID | Low | Deferred | `milestone-1-task-crud/bugs/BUG-002-done-silent-success.md` |
+| BUG-001 | `list` crashes with "no such table: tasks" on first invocation | High | Closed | `milestone-1-task-crud/bugs/bug-001-list-first-run-crash.md` |
+| BUG-002 | `done <id>` silently succeeds on non-existent task ID | Low | Deferred | `milestone-1-task-crud/bugs/bug-002-done-silent-success.md` |
 
 ---
 

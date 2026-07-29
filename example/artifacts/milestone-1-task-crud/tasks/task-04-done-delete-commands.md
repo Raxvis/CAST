@@ -86,7 +86,7 @@ was filed during validation and is deferred to M2.
 ### 5. product — task complete — 2026-04-10
 
 - **Outcome**: All acceptance criteria met; Status set to Complete. During milestone smoke testing Bug Gatherer filed BUG-002 (`done` silent success on missing id) — triaged Low and Deferred to M2; does not violate this task's criteria.
-- **Files touched**: This file (Header Status), `../bugs/BUG-002-done-silent-success.md`, `artifacts/BUGS.md` (index row)
+- **Files touched**: This file (Header Status), `../bugs/bug-002-done-silent-success.md`, `artifacts/BUGS.md` (index row)
 - **Read next**: —
 - **Open items**: BUG-002 held Deferred (re-triage at M2 planning)
 

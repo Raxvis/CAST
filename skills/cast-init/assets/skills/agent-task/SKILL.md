@@ -115,7 +115,7 @@ Execute the engineering loop defined in `docs/PIPELINE_LOOP.md` — Coder → Te
 Deltas specific to this skill:
 
 - **Every stage** receives the one-off task file path; the Context Manifest and Handoff Log carry everything else — there is no milestone, architecture document, or UI spec.
-- **Bug Gatherer (Step 3a)** files defect findings as per-bug files under `artifacts/one-off/bugs/BUG-{XXX}-{slug}.md`, indexed in `artifacts/BUGS.md`.
+- **Bug Gatherer (Step 3a)** files defect findings as per-bug files under `artifacts/one-off/bugs/bug-{XXX}-{slug}.md`, indexed in `artifacts/BUGS.md`.
 - **Reviewer (Step 3)** reviews against project conventions, existing patterns in adjacent code, and any topic-specific doc that applies. If the Reviewer's findings reveal missing design context (e.g., "this change should not exist without a new architecture document" or "this introduces a pattern not used elsewhere"), **stop and instruct the user to run `/agent-plan` to introduce the missing context**. Do not attempt to retrofit design work into a one-off task.
 - **Product validation (Step 4)**: since `/agent-task` does not produce a milestone, the task description itself serves as the acceptance criteria. Product verifies:
   1. The change does what the task description said it would.

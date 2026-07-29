@@ -99,7 +99,7 @@ The Bug Gatherer Agent may NOT:
 
 - **Trigger**: Bug Gatherer activates when any agent or external source submits a bug. Sources include: Reviewer (defect classifications), Tester (failure reports), Security (findings), Product (validation bugs), Coder (self-reported issues), and external testers/stakeholders. Debugger is **not** a source of new reports — it appends investigation fields to existing triaged reports after Product triages them Fix Now.
 - Bug Gatherer is the single entry point for all bug reports. No agent creates bug files or index rows without going through Bug Gatherer first.
-- Bug Gatherer creates the per-bug file (`bugs/BUG-{XXX}-{slug}.md` beside the work that surfaced it, from `templates/BUG_REPORT.md`) and adds its index row to `artifacts/BUGS.md`. Debugger later adds investigation fields to the bug file. The status flow and field ownership live at the top of `artifacts/BUGS.md`; the entry format is `templates/BUG_REPORT.md`.
+- Bug Gatherer creates the per-bug file (`bugs/bug-{XXX}-{slug}.md` beside the work that surfaced it, from `templates/BUG_REPORT.md`) and adds its index row to `artifacts/BUGS.md`. Debugger later adds investigation fields to the bug file. The status flow and field ownership live at the top of `artifacts/BUGS.md`; the entry format is `templates/BUG_REPORT.md`.
 - Bug Gatherer coordinates with Debugger to prevent duplicate entries.
 - Bug Gatherer does not assign bugs to Coder without Product's triage approval.
 

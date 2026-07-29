@@ -340,7 +340,7 @@ The table below records **where each agent writes its work artifacts**. Template
 | Code review verdicts | Reviewer | `artifacts/AGENT_STATE.md` → `## reviewer` → Current Work | Submission / Source Agent / Date / Verdict / Notes |
 | Test results and coverage | Tester | `artifacts/AGENT_STATE.md` → `## tester` → Current Work | Change / Source Agent / Tests Run / Pass-Fail / Coverage Delta |
 | Bug investigations | Debugger | The per-bug file (Investigation section) | Bug ID / Source / Status / Assigned To / Notes |
-| Bug reports (initial) | Bug Gatherer | `milestone-{N}-{slug}/bugs/BUG-{XXX}-{slug}.md` (or `one-off/bugs/`) + index row in `artifacts/BUGS.md` | Entry format in `templates/BUG_REPORT.md` |
+| Bug reports (initial) | Bug Gatherer | `milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` (or `one-off/bugs/`) + index row in `artifacts/BUGS.md` | Entry format in `templates/BUG_REPORT.md` |
 | Security audit findings (planning) | Security | `artifacts/milestone-{N}-{slug}/reviews/security.md` | Finding / Severity / Module / Status / Notes |
 | Security findings index | Security | `artifacts/AGENT_STATE.md` → `## security` → Current Work | Finding / Severity / Module / Status / Notes |
 | Performance analysis (planning) | Performance | `artifacts/milestone-{N}-{slug}/reviews/performance.md` | Finding / Metric / Impact / Status / Notes |

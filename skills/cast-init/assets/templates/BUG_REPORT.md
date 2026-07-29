@@ -1,8 +1,8 @@
 <!-- TEMPLATE INSTRUCTIONS
   FILE: BUG_REPORT.md
   PURPOSE: Template for a SINGLE bug report file. One instance per bug:
-           artifacts/milestone-{N}-{slug}/bugs/BUG-{XXX}-{slug}.md for bugs found during
-           pipeline work, artifacts/one-off/bugs/BUG-{XXX}-{slug}.md for /agent-task work.
+           artifacts/milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md for bugs found during
+           pipeline work, artifacts/one-off/bugs/bug-{XXX}-{slug}.md for /agent-task work.
            Bug Gatherer creates the instance and adds a row to the global index in
            artifacts/BUGS.md, which also carries the canonical lifecycle, severity scale,
            and field-ownership rules — this template only defines the file's shape.

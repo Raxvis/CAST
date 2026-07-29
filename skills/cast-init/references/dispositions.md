@@ -71,7 +71,7 @@ If `artifacts/` already exists and contains CAST-shaped files, preserve as-is an
 | `ui-specs/screen-{slug}.md`, `component-{slug}.md` | `milestone-{N}-{slug}/ui-{slug}.md` (same attribution rule) |
 | `reviews/{security,performance,ceo,ux}-review-milestone-{N}.md` | `milestone-{N}-{slug}/reviews/{security,performance,ceo,ux}.md` |
 | `reviews/retrospective-milestone-{N}.md` | `milestone-{N}-{slug}/reviews/retrospective.md` |
-| `BUGS.md` bug entries | one `milestone-{N}-{slug}/bugs/BUG-{XXX}-{slug}.md` per entry (attributed by the entry's task/milestone reference; `one-off/bugs/` when unattributable), with `BUGS.md` rewritten as the v2 index |
+| `BUGS.md` bug entries | one `milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` per entry (attributed by the entry's task/milestone reference; `one-off/bugs/` when unattributable), with `BUGS.md` rewritten as the v2 index |
 
 Use `git mv` per file (preserve history); the `-tasks.md` split and `BUGS.md` conversion are content transformations — flag them as their own plan actions so the user approves them explicitly. Then update every stale path reference across `.claude/`, `docs/`, and the project README. **Ask the user before executing the migration.**
 
