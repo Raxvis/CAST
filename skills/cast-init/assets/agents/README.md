@@ -231,6 +231,8 @@ The workflow is split into two stages, each wrapped by a pipeline skill, plus a 
 - **Engineering Stage** — `/agent-code` — implements an approved milestone.
 - **One-Off Task** — `/agent-task` — runs a mini engineering pipeline for a single self-contained task without a milestone or planning artifacts.
 
+A fourth installed skill, `/cast-doctor`, is maintenance rather than a pipeline: it health-checks the CAST install and audits the docs, launching no agents itself — it routes documentation coverage gaps to **Docs Writer** through the STANDUP `docs` queue, and **Validator** surfaces its unresolved Error-severity findings at session start.
+
 ### Planning Stage Workflow (`/agent-plan`)
 
 1. **Product** defines the milestone goals, tasks, and acceptance criteria.
