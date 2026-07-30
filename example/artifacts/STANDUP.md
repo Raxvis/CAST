@@ -109,10 +109,10 @@ Entries under a session heading are appended in the order they happen (oldest fi
 
 | Document | Purpose |
 |----------|---------|
-| `BUGS.md` | Active bug tracker — reference when reporting blockers |
+| `BUGS.md` | Global bug index (one line per bug → its per-bug file) — reference when reporting blockers |
 | `AGENT_STATE.md` | Live per-agent working state — each agent reads its own section on activation |
 | `milestone-1-task-crud/tasks/` | Milestone 1 per-task files — reference for planned work |
-| `milestones/milestone-1-task-crud-validation.md` | Milestone 1 acceptance record — reference when validating completed work |
+| `milestone-1-task-crud/reviews/validation.md` | Milestone 1 acceptance record — reference when validating completed work |
 | `milestone-1-task-crud/reviews/ceo.md` | Planning sign-off and Approval Conditions |
 
 ---

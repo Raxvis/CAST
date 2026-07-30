@@ -81,9 +81,9 @@ _No sessions recorded yet. Add the first session section using the Entry Grammar
 
 | Document | Purpose |
 |----------|---------|
-| `BUGS.md` | Active bug tracker — reference when reporting blockers |
+| `BUGS.md` | Global bug index (one line per bug → its per-bug file) — reference when reporting blockers |
 | `../templates/TASK.md` | Single-task file template — reference for planned work |
-| `milestones/milestone-{N}-{slug}-validation.md` | Milestone acceptance record — reference when validating completed work |
+| `milestone-{N}-{slug}/reviews/validation.md` | Milestone acceptance record — reference when validating completed work |
 
 ---
 

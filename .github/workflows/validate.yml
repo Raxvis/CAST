@@ -350,6 +350,20 @@ jobs:
           fi
           echo "clean"
 
+      - name: No stale v1 artifact paths in payload or example
+        run: |
+          # v2.0.0 replaced the by-type layout: validation/completion records live at
+          # milestone-{N}-{slug}/reviews/*.md, and the combined -tasks.md breakdown is
+          # one task file per task. Any surviving v1-shaped path is drift. The
+          # references/ migration tables legitimately carry v1 paths (they map old →
+          # new), so this check scopes to the payload and example only.
+          hits=$(grep -rnE 'milestones/milestone-|milestone-[A-Za-z0-9{}-]+-(tasks|validation|completion)\.md|MILESTONE_TASKS' \
+            skills/cast-init/assets/ example/ || true)
+          if [ -n "$hits" ]; then
+            echo "Stale v1 artifact paths found:"; echo "$hits"; exit 1
+          fi
+          echo "clean"
+
       - name: Template level-2 headings carry (required)/(optional) markers
         run: |
           # Since 1.2.0 every template section states its contract. Level-3 headings are
