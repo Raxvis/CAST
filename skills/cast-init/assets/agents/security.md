@@ -1,6 +1,6 @@
 ---
 name: security
-description: "Use after Architecture publishes or revises a design document, approves a new dependency, or changes a data schema; at the milestone-completion checkpoint for security-flagged milestones (implementation-diff review); also on direct user request or when Release requests the pre-release security checklist. Audits for vulnerabilities with Critical/High/Medium/Low/Informational findings."
+description: "Use after Architecture publishes or revises a design document, approves a dependency, or changes a schema; at milestone completion for security-flagged milestones (implementation-diff review); or on user or Release request. Files Critical/High/Medium/Low/Informational findings."
 model: inherit
 tools: Read, Grep, Glob, Edit, Write, Bash, WebSearch, WebFetch
 ---
