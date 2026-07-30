@@ -84,3 +84,7 @@ _Targets defined by Architecture in `artifacts/milestone-1-task-crud/architectur
 - No hot paths beyond the four command handlers exist in Milestone 1. No rendering, no tick loop, no network I/O.
 - `better-sqlite3` is synchronous and already the correct choice for a short-lived CLI process; no async overhead to optimize.
 - Startup cost is dominated by `require('better-sqlite3')` and the one-time migration check. Both are out of scope for M1 optimization.
+
+---
+
+**Measured check required**: Yes — the architecture sets four budget rows for this milestone (command latency cold/warm, `list` latency at 1k rows, DB file size). `/agent-code` runs the measured check at the milestone-completion checkpoint (`reviews/performance-impl.md`).

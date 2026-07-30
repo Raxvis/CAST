@@ -12,12 +12,15 @@
   - Replace [MILESTONE_*] rows in the validator Milestone Progress table with your
     actual milestone names.
   - Agents append rows to their own section as they work — tables start `_(empty)_`.
-  - Do not rewrite or delete historical rows; this file is an append-only record.
+  - Do not rewrite or delete historical rows; this file is an append-only record. The one
+    sanctioned exception: at milestone-completion checkpoints, Validator relocates stale
+    closed rows verbatim to artifacts/archive/AGENT_STATE.md (validator.md → Archival
+    Duty) so this file stays bounded to the current milestone plus a tail.
 -->
 
 # [PROJECT_NAME] — Agent State
 
-Live working state for every agent. Agents read their own section on activation and append — never rewrite history. This file exists so agent definitions in `.claude/agents/` stay immutable and cheap to load.
+Live working state for every agent. Agents read their own section on activation and append — never rewrite history. This file exists so agent definitions in `.claude/agents/` stay immutable and cheap to load. To stay cheap, it is also bounded: at milestone completion, Validator moves stale closed rows verbatim to `artifacts/archive/AGENT_STATE.md` (see `validator.md` → Archival Duty) — full history stays greppable there.
 
 **Decisions Log format** — every agent logs decisions in its own section using `Date / Decision / Rationale / Impact`. Log when: accepting a non-standard approach, deviating from convention, choosing between alternatives, or establishing a precedent future work should follow. The architect section uses the extended five-column variant (`Date / Decision / Alternatives Considered / Rationale / Impact`) to capture architectural decision records.
 

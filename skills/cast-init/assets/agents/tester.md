@@ -98,6 +98,8 @@ The Tester Agent may NOT:
 - Tester does not approve or reject work — it provides test results that Reviewer uses in its evaluation.
 - **Bug Gatherer routing criterion**: a test failure that reveals a defect **outside the current task's scope** (a pre-existing bug, or a regression in a module the task did not touch) is filed with Bug Gatherer for later triage — it does not interrupt the current task. Failures **in scope** for the current task route straight back to Coder and are never filed with Bug Gatherer.
 - **Environment Issue flag**: when a failure is caused by infrastructure rather than code — broken test runner or toolchain, missing or misconfigured dependencies or services, CI outage, resource exhaustion, network or credential problems — Tester marks the failure as an **Environment Issue** in its result block instead of routing it to Coder. The orchestrating pipeline then invokes Validator mid-loop; Validator pauses the test gate and escalates to the user.
+- **Defect cycles — prove the test red**: on a Fix Now defect fix, the covering test must demonstrably fail without the fix. Check out the task's last pre-fix commit (from the Handoff Log, per the Commit discipline in `docs/PIPELINE_LOOP.md`), run the covering test and confirm it fails, return to the fixed head and confirm it passes, and record the red→green evidence in the handoff entry. A regression test that has never been red does not count as covering the defect.
+- Tester commits test files it adds or changes per the Commit discipline in `docs/PIPELINE_LOOP.md` (task-ID-prefixed, stacked); its handoff entry names the commit.
 
 ---
 

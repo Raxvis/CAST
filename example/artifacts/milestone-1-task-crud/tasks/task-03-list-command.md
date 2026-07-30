@@ -56,7 +56,7 @@ on first invocation rather than throwing — this is the path BUG-001 surfaced.
 
 ## Handoff Log
 
-### 1. product -> coder — 2026-04-09
+### 1. orchestrator -> coder — 2026-04-09
 
 - **Outcome**: Task released; dependency T-1 Complete.
 - **Files touched**: None
@@ -95,6 +95,7 @@ on first invocation rather than throwing — this is the path BUG-001 surfaced.
 
 - **Outcome**: `list` implemented and BUG-001 fixed (commit `a8f3d12`) — `ensureMigrations()` wired into all four command paths.
 - **Files touched**: `src/commands/list.ts`, `src/db/connection.ts`
+- **Commit**: `a8f3d12`
 - **Read next**: Manifest only — include the first-run migration case in the suite
 - **Open items**: None
 
@@ -102,6 +103,7 @@ on first invocation rather than throwing — this is the path BUG-001 surfaced.
 
 - **Outcome**: 7 tests added; `pnpm test` green including the fresh-machine first-run case. BUG-001 fix confirmed.
 - **Files touched**: `src/commands/list.test.ts`
+- **Commit**: `7c25d8e`
 - **Read next**: Manifest only
 - **Open items**: None
 

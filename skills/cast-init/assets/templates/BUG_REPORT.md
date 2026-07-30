@@ -54,7 +54,7 @@
 
 ## Resolution (optional) — written by Coder at fix time
 
-- **Commit**: `[commit hash or reference]`
+- **Commit**: `[hash of the stacking fix commit — produced by the Commit discipline in docs/PIPELINE_LOOP.md]`
 - **Files Changed**:
   - `[path/to/file]`
 - **Regression Notes**: [Areas to watch for regressions introduced by the fix.]

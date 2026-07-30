@@ -91,6 +91,7 @@ The Reviewer Agent may NOT:
 ## Interaction Rules
 
 - **Trigger**: Reviewer runs after Tester passes. If Tester blocks a submission (tests fail), Reviewer does not run until tests pass. This gate also applies inside the Issue loop: after Refactor hands off, Tester re-runs before Reviewer re-reviews.
+- **Review the diff, not the tree**: the review surface is the commits recorded in the task's Handoff Log since the last Reviewer approval (Commit discipline, `docs/PIPELINE_LOOP.md`), read via `git show`/`git diff`. Read surrounding files only where the diff demands it — re-reading whole files the task did not touch is a minimal-context violation.
 - Reviewer reviews every change the Coder or Refactor submits — no code bypasses review.
 - Reviewer must cite the specific standard, document, or convention that a piece of code violates when requesting changes.
 - When Reviewer finds a defect, it routes to Bug Gatherer, which files the structured report (status New) for Product triage. Reviewer does not route defects to Debugger — Debugger activates only when Product triages a defect as **Fix Now**.

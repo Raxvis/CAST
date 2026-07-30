@@ -58,7 +58,7 @@ and must enable WAL mode plus an index on `completed` to satisfy CEO Condition 2
 
 ## Handoff Log
 
-### 1. product -> coder — 2026-04-09
+### 1. orchestrator -> coder — 2026-04-09
 
 - **Outcome**: Task released for implementation; no dependencies.
 - **Files touched**: None
@@ -69,6 +69,7 @@ and must enable WAL mode plus an index on `completed` to satisfy CEO Condition 2
 
 - **Outcome**: Data layer implemented — `Task` type, schema DDL, idempotent `runMigrations` with WAL and `idx_tasks_completed`.
 - **Files touched**: `src/types/task.ts`, `src/db/schema.ts`, `src/db/migrations.ts`
+- **Commit**: `3f6c2a9`
 - **Read next**: Manifest only — cover `runMigrations` idempotency and the `ACME_TODO_DB` override
 - **Open items**: None
 
@@ -76,6 +77,7 @@ and must enable WAL mode plus an index on `completed` to satisfy CEO Condition 2
 
 - **Outcome**: 6 unit tests added; `pnpm test` green (idempotency, WAL pragma, index presence, env override).
 - **Files touched**: `src/db/migrations.test.ts`
+- **Commit**: `b7d41e0`
 - **Read next**: Manifest only
 - **Open items**: None
 

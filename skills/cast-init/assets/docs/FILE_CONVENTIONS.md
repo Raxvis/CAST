@@ -106,6 +106,10 @@ artifacts/
       performance.md
       ceo.md                               # CEO planning verdict
       ux.md                                # UX review (/agent-code milestone completion)
+      security-impl.md                     # Security implementation review (milestone
+                                           #   completion; security-flagged milestones only)
+      performance-impl.md                  # Measured performance check (milestone
+                                           #   completion; budget-flagged milestones only)
       validation.md                        # Acceptance record
       completion.md                        # Completion report
       retrospective.md                     # Milestone retrospective (Validator)
@@ -120,6 +124,10 @@ artifacts/
                                            #   them here at milestone checkpoints)
     bugs/
       bug-{XXX}-{slug}.md                  # Never archived — the BUGS.md index points here
+
+  archive/                                 # Overflow for the bounded root files: stale
+    STANDUP.md                             #   STANDUP sessions and AGENT_STATE rows,
+    AGENT_STATE.md                         #   relocated verbatim by Validator (Archival Duty)
 ```
 
 Milestone directories are created by `/agent-plan` Stage 1 (with `reviews/`, `tasks/`, and `bugs/` created as their first files are written); `/cast-init` pre-creates only the root files and `one-off/`. Do not create additional subdirectories beyond these without updating this file and `artifacts/README.md`.
@@ -174,7 +182,7 @@ Templates live in `templates/` and are copied — never filled in place — to p
 - `{N}` is the milestone number (e.g., `1`, `2`, `7`).
 - `{slug}` is a kebab-case short name (e.g., `user-auth`, `search-ui`).
 
-Inside the directory, filenames are fixed: `README.md` (definition), `architecture.md`, `ui.md`, `reviews/{security,performance,ceo,ux,validation,completion,retrospective}.md`. Supplemental design docs use `arch-{slug}.md` (instances of `templates/ARCH_MODULE.md` / `ARCH_DATA_SCHEMA.md` when a milestone needs module- or schema-level depth beyond `architecture.md`) and `ui-{slug}.md` (screen- or component-scoped specs). `architecture.md` is an **instance of `templates/ARCH_SYSTEM.md`** — that template defines its required headings.
+Inside the directory, filenames are fixed: `README.md` (definition), `architecture.md`, `ui.md`, `reviews/{security,performance,ceo,ux,security-impl,performance-impl,validation,completion,retrospective}.md` (the two `-impl` reviews exist only for milestones their planning reviews flagged). Supplemental design docs use `arch-{slug}.md` (instances of `templates/ARCH_MODULE.md` / `ARCH_DATA_SCHEMA.md` when a milestone needs module- or schema-level depth beyond `architecture.md`) and `ui-{slug}.md` (screen- or component-scoped specs). `architecture.md` is an **instance of `templates/ARCH_SYSTEM.md`** — that template defines its required headings.
 
 ### Task Files (`artifacts/milestone-{N}-{slug}/tasks/`)
 
@@ -201,6 +209,8 @@ Each task file is an instance of `templates/TASK.md`: a self-contained unit of w
 | Logging a bug | Bug Gatherer creates `bugs/bug-{XXX}-{slug}.md` in the current milestone (or `artifacts/one-off/bugs/`) and adds its index row to `artifacts/BUGS.md` |
 | Completing a milestone | Product writes `artifacts/milestone-{N}-{slug}/reviews/completion.md` and `reviews/validation.md` |
 | Reviewing implemented UI at milestone completion | UI writes `artifacts/milestone-{N}-{slug}/reviews/ux.md` (UI-flagged milestones only) |
+| Reviewing the implementation diff for security at milestone completion | Security writes `artifacts/milestone-{N}-{slug}/reviews/security-impl.md` (security-flagged milestones only) |
+| Measuring performance budgets at milestone completion | Performance writes `artifacts/milestone-{N}-{slug}/reviews/performance-impl.md` (budget-flagged milestones only) |
 | Writing the milestone retrospective | Validator writes `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` |
 | Recording session progress | Any agent appends to `artifacts/STANDUP.md` using its Entry Grammar (both `/agent-code` completion and `/agent-task` completion write entries here) |
 | Updating agent working state | Each agent appends to its own section in `artifacts/AGENT_STATE.md` |
@@ -278,6 +288,8 @@ The following behaviors violate these conventions. Do not do them:
 | Performance review | `artifacts/milestone-{N}-{slug}/reviews/` | `performance.md` |
 | CEO review | `artifacts/milestone-{N}-{slug}/reviews/` | `ceo.md` |
 | UX review | `artifacts/milestone-{N}-{slug}/reviews/` | `ux.md` |
+| Security implementation review | `artifacts/milestone-{N}-{slug}/reviews/` | `security-impl.md` |
+| Measured performance check | `artifacts/milestone-{N}-{slug}/reviews/` | `performance-impl.md` |
 | Milestone validation | `artifacts/milestone-{N}-{slug}/reviews/` | `validation.md` |
 | Milestone completion | `artifacts/milestone-{N}-{slug}/reviews/` | `completion.md` |
 | Milestone retrospective | `artifacts/milestone-{N}-{slug}/reviews/` | `retrospective.md` |

@@ -87,12 +87,15 @@ _Fill each metric from its recorded source (validator.md → Metric Sources) —
 | Conflicts escalated to Validator | [N] | Conflicts table in `artifacts/AGENT_STATE.md` → `## validator` |
 | Architecture doc revisions | [N] | `## Revision History` table in `artifacts/milestone-{N}-{slug}/architecture.md` |
 | UI spec revisions | [N] | `## Revision History` table in `artifacts/milestone-{N}-{slug}/ui.md` |
+| Manifest patches during engineering | [N] | Handoff Log entries across `artifacts/milestone-{N}-{slug}/tasks/task-*.md` noting a Context Manifest addition (the insufficient-manifest fallback in `docs/PIPELINE_LOOP.md` → Handoff Protocol). Each one is a planning defect the CEO gate missed — a high count is itself an improvement action |
 
 ---
 
 ## Actions for Next Milestone (required)
 
-| # | Action | Owner | Due |
-|---|---|---|---|
-| 1 | [ACTION_1] | [AGENT] | [MILESTONE_OR_DATE] |
-| 2 | [ACTION_2] | [AGENT] | [MILESTONE_OR_DATE] |
+_The Disposition column stays empty at retrospective time. Product fills it during the next `/agent-plan` Stage 1 (retrospective intake): every row gets either `Adopted → M{N}` (folded into that milestone's Cross-Cutting Concerns or a task) or `Declined — <reason>`. No row may be left undisposed at the next planning run._
+
+| # | Action | Owner | Due | Disposition |
+|---|---|---|---|---|
+| 1 | [ACTION_1] | [AGENT] | [MILESTONE_OR_DATE] | |
+| 2 | [ACTION_2] | [AGENT] | [MILESTONE_OR_DATE] | |

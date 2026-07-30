@@ -3,8 +3,9 @@ name: agent-plan
 description: >-
   Run the CAST Planning Stage end-to-end for a feature or milestone: Product →
   Architecture + UI → Security + Performance → CEO verdict. Use when the user asks to
-  plan a feature or milestone, or invokes /agent-plan. Produces planning documents
-  under artifacts/ and a CEO sign-off; writes no code.
+  plan a feature or milestone, or invokes /agent-plan. Supports a single-task light
+  mode (Product + Architecture + CEO only) for one-task features. Produces planning
+  documents under artifacts/ and a CEO sign-off; writes no code.
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -65,6 +66,21 @@ This skill orchestrates the **Planning Stage** of the agent workflow. It runs th
 
 **Milestone numbering.** Unless the invocation input names an existing milestone to re-plan, allocate `{N}` as the highest `milestone-{N}-*` directory number already present under `artifacts/` plus one (`1` if there are none). Allocate it once, before Stage 1; Stage 1 creates the milestone directory `artifacts/milestone-{N}-{slug}/` and every artifact of the run is written inside it.
 
+### Single-Task Mode (light)
+
+Between `/agent-task` (no design content at all) and a full planning run there is a real middle tier: one well-understood feature that needs a small number of genuine design decisions. Single-task mode plans it without full ceremony — the opinion stands (design work gets planned, engineering still requires a CEO verdict); only the ceremony scales with the work.
+
+**Entering the mode.** Run single-task mode when the user asks for it (e.g. `/agent-plan single: <feature>`), or when Stage 1 scoping concludes the work decomposes to exactly one task. If Stage 1 finds more than one task, or a new screen set, or cross-cutting change, continue in full mode — do not force a multi-task feature through the light path.
+
+**What changes:**
+
+- **Stages run:** Stage 1 (Product) → Stage 2a (Architecture) → Stage 2c → Stage 4 (CEO). Stages 2b (UI), 3a (Security), and 3b (Performance) are skipped by default.
+- **Stage 1** creates the milestone directory exactly as in full mode — same layout, so `/agent-code` consumes it unchanged — with exactly one task file. Every required README section is still present (lean is fine; absent is not). Stage 1 also sets the flags that pull skipped stages back in: **Needs UI Spec** = Yes on the task pulls in Stage 2b; security-sensitive scope (auth, input handling, new dependencies, sensitive data) pulls in Stage 3a; applicable performance budgets pull in Stage 3b. A pulled-in stage runs exactly as in full mode, including its completion-flag line.
+- **Stage 4 (CEO)** reviews as usual; the skipped stages' checklist sections and input rows read "N/A — single-task mode, stage not run" (permitted by `templates/CEO_REVIEW.md`). The verdict line, Approval Conditions, and the post-verdict Product backfill work identically.
+- **Downstream:** a skipped Security/Performance stage leaves no flag line in a review file (the file does not exist), so the `/agent-code` milestone-completion checkpoint skips the corresponding implementation review automatically.
+
+Record the mode in the Stage 1 checkpoint entry (`- agent-plan | progress | Stage 1 complete (single-task mode): ...`) so a resumed run knows which stages to expect.
+
 **Stage checkpoints.** At the start of the run, add a session heading `### YYYY-MM-DD — agent-plan — milestone-{N}-{slug}` to `artifacts/STANDUP.md`. After each stage completes, append a checkpoint entry under it using that file's Entry Grammar, e.g. `- architect | progress | Stage 2a complete: artifacts/milestone-{N}-{slug}/architecture.md`. These checkpoints are what let an interrupted planning run resume at the right stage. Planning stages may also enqueue documentation work in their checkpoint entries: when a stage's output changes something documentation-worthy (APIs, commands, config, conventions, user-facing behavior), append a `- <agent> | docs | <note>` entry under the session heading — Docs Writer drains these at the next `/agent-code` or `/agent-task` completion checkpoint.
 
 ### Stage 1 — Product
@@ -75,7 +91,8 @@ Launch the **product** agent to:
 2. Create the milestone directory `artifacts/milestone-{N}-{slug}/` and write the milestone README at `artifacts/milestone-{N}-{slug}/README.md` using `templates/MILESTONE_DEFINITION.md` as the template. This is the milestone's highest-order document: what it is and why it matters — goal, success metrics, in-scope, out-of-scope, top-level acceptance criteria, dependencies and risks, cross-cutting concerns — plus the Task Index (one row per task file; no status column) and the CEO Approval Conditions table (backfilled after Stage 4).
 3. Decompose the work into tasks and write **one task file per task** at `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` using `templates/TASK.md` — each file self-contained: ID, dependencies, description, files touched, per-task acceptance criteria, and a **seeded Context Manifest** naming the smallest read set the task needs (convention docs now; Architecture and UI append their section references in Stage 2). Every manifest entry forces a downstream read — keep them minimal.
 4. Review the Deferred backlog while defining the milestone: re-triage every Deferred bug in the `artifacts/BUGS.md` index and any Deferred task files from prior milestone directories (Status field in each task file's Header) — pull items into this milestone's scope, keep them Deferred with an updated rationale, or close them as Won't Fix with a rationale. Deferred is a held-open state, not terminal (see `artifacts/BUGS.md` → Bug Lifecycle).
-5. Reference existing context in `docs/PRD.md`, `docs/CONCEPT.md`, and `docs/GLOSSARY.md`.
+5. **Retrospective intake.** Read the previous milestone's `reviews/retrospective.md` (the highest-numbered milestone directory that has one; skip this step if none exists). For each row of its **Actions for Next Milestone** table that has no disposition yet, dispose of it: **adopt** it into this milestone's Cross-Cutting Concerns (or as a task), or **decline** it with a reason. Write the disposition into that retrospective's Actions table (Disposition column: `Adopted → M{N}` or `Declined — <reason>`). No open action may be left undisposed — this step is what makes retrospectives feed planning instead of being write-only.
+6. Reference existing context in `docs/PRD.md`, `docs/CONCEPT.md`, and `docs/GLOSSARY.md`.
 
 The README and the task files are deliberately separate: the README is the CEO's primary read during planning review; each task file is the Coder's **complete** read during engineering (together with its Context Manifest). Isolated task files mean an engineering stage never loads more than its one task.
 
@@ -84,6 +101,7 @@ Input to pass ("pass" means include the content in the agent's invocation — do
 - Output directory: `artifacts/milestone-{N}-{slug}/`
 - Templates: `templates/MILESTONE_DEFINITION.md` (for the README) and `templates/TASK.md` (one instance per task)
 - Deferred backlog: the Deferred rows in the `artifacts/BUGS.md` index and any Deferred task files in prior milestone directories (for the re-triage in step 4)
+- Prior retrospective: the previous milestone's `reviews/retrospective.md` (for the disposition duty in step 5), when one exists
 
 ### Stage 2a — Architecture
 
@@ -130,6 +148,7 @@ After both Architecture and UI have completed (the Stage 3 trigger above), launc
 2. Identify vulnerabilities, insecure patterns, and risky dependencies introduced by the milestone.
 3. File findings at `artifacts/milestone-{N}-{slug}/reviews/security.md` with severity, cited vulnerability category, and remediation recommendation.
 4. Any Critical finding blocks the milestone until remediated.
+5. End the review file with the single line `**Implementation review required**: Yes` or `**Implementation review required**: No` — Yes whenever the milestone touches authentication or authorization, input handling, new dependencies, or storage of sensitive data. Yes commits `/agent-code` to a security review of the implementation diff at the milestone-completion checkpoint (written to `reviews/security-impl.md`).
 
 Input to pass: the milestone definition and architecture document.
 
@@ -141,6 +160,7 @@ In parallel with Security, launch the **performance** agent to:
 2. Evaluate hot paths, state-update frequency, memory footprint, and rendering cost against the project performance budgets.
 3. File findings at `artifacts/milestone-{N}-{slug}/reviews/performance.md` with the specific budget or metric affected.
 4. Any finding that breaks a budget must be resolved or explicitly accepted by Product before CEO review.
+5. End the review file with the single line `**Measured check required**: Yes` or `**Measured check required**: No` — Yes whenever the plan sets performance budgets that apply to this milestone (architecture document → Performance Budget). Yes commits `/agent-code` to a measured check against those budgets at the milestone-completion checkpoint (written to `reviews/performance-impl.md`).
 
 Input to pass: the milestone definition, architecture document, and UI specification.
 

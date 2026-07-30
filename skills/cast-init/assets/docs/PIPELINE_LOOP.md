@@ -32,6 +32,27 @@ This is the pipeline's minimal-context contract. Every stage — in this loop an
 5. **Milestone-grain agents have milestone-grain read sets.** The closed read set above governs per-task stages. Stages that are milestone-scoped by role read what their role defines: CEO reads the milestone README, design docs, and Stage 3 reviews; milestone-completion stages read the task files' Headers and the artifacts their templates cite. Even these read only within the milestone's directory plus the cross-milestone root files.
 6. **The reply channel carries routing metadata only.** A stage's final report back to the orchestrator is a single line — `Handoff entry #<n> appended — <outcome>; next: <stage>` — because the Handoff Log entry, not the chat reply, is the report. The orchestrator routes on that line and never re-narrates, summarizes, or re-reads a stage's output into its own context. This is the other half of the minimal-context contract: capped reads going in, one-line replies coming out, so the orchestrator's context stays flat across a whole milestone.
 
+## Commit discipline
+
+Git is part of the loop's contract: every task leaves a commit trail keyed to its task ID, so bug reports can cite a real hash, Reviewer has a diff surface, and a bad task can be reverted independently.
+
+1. **Code-writing stages commit their own work.** Coder, Tester, and Refactor end every stage pass by committing the changes that pass made — that task's production code and test files only, nothing else. The commit message starts with the task ID: `M{N}-T{TT}: <summary>` (one-off tasks use their slug). This is safe under parallel execution because eligible tasks have disjoint Files lists.
+2. **Loop-back passes stack, never amend.** A fix or refactor pass adds a new commit on top of the task's earlier ones. Never amend or rebase mid-loop — the stacked history is the audit trail the Handoff Log points into.
+3. **The handoff entry names the commit.** A stage that committed adds a **Commit** field to its handoff entry (see `templates/TASK.md`). This is how the next stage — and the Reviewer's diff below — finds the code without re-reading whole files.
+4. **Reviewer reviews the diff, not the tree.** Step 3 reviews the commits recorded in the task's Handoff Log since the last Reviewer approval (on the first review, all of the task's commits) — `git show`/`git diff` over that range, plus surrounding context only where the diff demands it.
+5. **Bug fixes cite the fix commit.** When a Fix Now defect is fixed, Coder fills the bug file's Resolution → Commit field with the hash of the stacking fix commit.
+6. **Product validation closes the range.** When the task passes Step 4, its commit run is complete. Rolling back a bad task later means reverting the commits prefixed with its ID — no other task is touched.
+
+## Task-amendment rule
+
+When a stage discovers mid-task that the task's scope is wrong — the Files list is incomplete, an acceptance criterion is unachievable as written, the task is really two tasks — it neither silently expands scope (in parallel mode, a file-overlap hazard) nor escalates to a full re-plan. There is a defined middle path:
+
+1. The discovering stage pauses and appends a handoff entry (`<stage> → product`) whose Outcome states the proposed amendment and why.
+2. The orchestrator routes to **Product**, who owns scope. Product disposes of the proposal in one of three ways, appending its own handoff entry: **approve** (update the task file's Files list and/or acceptance criteria in place), **split** (create a new task file plus its Task Index row in the milestone README; the current task keeps its reduced scope), or **reject** (the task proceeds as written, with the reason in the entry).
+3. The loop resumes at the paused stage from Product's entry. Amendments do not increment the loop counter.
+
+The `/agent-plan` escalation remains for genuinely architectural discoveries — a new module, a schema change, cross-cutting design work. The amendment path is for scope corrections *within* the task's design envelope.
+
 ## Loop counter rules
 
 The loop may cycle. One full cycle is any return to Step 1 (Coder) or any Refactor→Tester→Reviewer round.
@@ -60,7 +81,8 @@ Launch the **coder** agent with the task file path to:
 - Read the task file and its Context Manifest (per the Handoff Protocol — nothing else). On a loop re-entry, start from the latest Handoff Log entry.
 - Implement the task in production code, following the conventions the manifest cites (at minimum `CLAUDE.md` and `docs/CODE_PATTERNS.md`).
 - If the change alters something documentation-worthy (APIs, commands, config, conventions, user-facing behavior), append a `- coder | docs | <note>` entry to the current session in `artifacts/STANDUP.md` per its Entry Grammar — this queue is what Docs Writer drains at the task- and milestone-completion checkpoints.
-- Complete the Pre-Handoff Checklist, then append its Handoff Log entry (coder → tester): what was implemented, files touched, which tests cover the change.
+- Commit the pass's changes per the Commit discipline (task-ID-prefixed message; loop-back passes stack). For a Fix Now defect fix, also fill the bug file's Resolution → Commit field with the new hash.
+- Complete the Pre-Handoff Checklist, then append its Handoff Log entry (coder → tester): what was implemented, files touched, the commit, which tests cover the change.
 
 ## Step 2 — Tester
 
@@ -68,14 +90,15 @@ After Coder hands off, launch the **tester** agent with the task file path to:
 
 - Write or update unit tests covering the changed code (the files named in Coder's handoff entry).
 - Run `[TEST_CMD]` to verify all tests pass (first cycle); on subsequent cycles within the loop, run the targeted set per the test gate rule.
+- **Defect cycles — prove the test red.** When the cycle is a Fix Now defect fix, the covering test must demonstrably fail without the fix: check out the task's last pre-fix commit (from the Handoff Log), run the covering test and confirm it fails, return to the fixed head and confirm it passes. A test written after the fix that has never been red proves little. Record the red→green evidence in the handoff entry.
 - If tests fail, append the failure summary to the Handoff Log (tester → coder, pointing at the failing tests) and loop back to Step 1.
-- On pass, append its Handoff Log entry (tester → reviewer): tests added/updated, suite result.
+- On pass, commit any test files this stage added or changed (Commit discipline), then append its Handoff Log entry (tester → reviewer): tests added/updated, suite result, the commit if one was made.
 
 ## Step 3 — Reviewer
 
 After Tester passes, launch the **reviewer** agent with the task file path to:
 
-- Review the changed code against the task file (description, acceptance criteria) and the manifest's convention and design references.
+- Review the **diff** — the commits recorded in the task's Handoff Log since the last Reviewer approval (per the Commit discipline), read via `git show`/`git diff` — against the task file (description, acceptance criteria) and the manifest's convention and design references. Read surrounding files only where the diff demands it; re-reading whole files the task did not touch is a minimal-context violation.
 - Classify every finding as a **Defect** (incorrect behaviour, broken functionality, violated contract) or an **Issue** (structural problem, convention violation, maintainability concern), and append its Handoff Log entry listing every finding with its classification.
 - If there are no findings, proceed to Step 4.
 
@@ -97,7 +120,7 @@ Only **Fix Now** defects send the task back through the loop. Deferred and Won't
 
 For every Reviewer finding classified as an **Issue**:
 
-1. Launch the **refactor** agent to restructure the code without changing behaviour, citing the architectural principle or quality standard that justifies the change. Refactor's handoff entry names the tests to re-run for the affected modules.
+1. Launch the **refactor** agent to restructure the code without changing behaviour, citing the architectural principle or quality standard that justifies the change. Refactor commits its pass (Commit discipline — stacked, task-ID-prefixed); its handoff entry names the commit and the tests to re-run for the affected modules.
 2. After Refactor hands off, **Tester re-runs first** (targeted set, per the test gate rule), then return to **Reviewer** (loop back to Step 3) to confirm the issue is resolved.
 
 Step 3a and Step 3b may run in parallel when the findings are independent. A task does not advance to Step 4 until the Reviewer has approved a clean version — **clean means no open Fix Now defects and no unresolved Issues**. Open Deferred and Won't Fix reports do not count against a clean version.

@@ -10,9 +10,12 @@
   - Fill in every Inputs Reviewed path — all six inputs are mandatory; write "None"
     only when a review stage produced no findings file. Exception: the UI Spec row
     reads "N/A — no ui agent installed" when the project has no ui agent (Stage 2b
-    was skipped).
+    was skipped), and in /agent-plan single-task mode a skipped stage's row reads
+    "N/A — single-task mode, stage not run".
   - Work through all six checklist sections. Do not skip any. Section 3 accepts
-    "N/A — no ui agent installed" as its content in no-ui projects.
+    "N/A — no ui agent installed" as its content in no-ui projects; in single-task
+    mode, Sections 3, 4, and 5 accept "N/A — single-task mode, stage not run" for
+    stages that were skipped (a flagged-in stage gets a real section).
   - Record Revision Requests when returning REVISION REQUIRED, and Approval Conditions
     (with a Verified By owner) when returning APPROVED WITH CONDITIONS.
   - Record the verdict as the single `**Verdict**:` line in the Verdict section, with
@@ -115,6 +118,7 @@ _If the project installed no `ui` agent, write "N/A — no ui agent installed" a
 - [ ] No architecture decision contradicts a Product acceptance criterion.
 - [ ] No security/performance finding invalidates a task in the milestone.
 - [ ] The milestone's tasks collectively satisfy every acceptance criterion.
+- [ ] Every task file's Context Manifest is complete and minimal — the task is executable from the task file plus its manifest alone, and no entry forces an unnecessary read. (A manifest an engineering agent must patch mid-loop is a planning defect this gate exists to catch.)
 
 **Notes**:
 

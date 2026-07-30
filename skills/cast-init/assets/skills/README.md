@@ -29,17 +29,18 @@ Claude Code auto-discovers any `<name>/SKILL.md` under `.claude/skills/` at sess
 
 | Directory | Skill | Purpose |
 |---|---|---|
-| `agent-plan/` | `/agent-plan <feature description>` | Runs the full Planning Stage: Product → Architecture + UI → Security + Performance → CEO. Produces a complete milestone directory (`artifacts/milestone-{N}-{slug}/`): the milestone README, one task file per task (each with a Context Manifest), architecture document, UI spec, reviews, and a CEO verdict. No code is written. |
+| `agent-plan/` | `/agent-plan <feature description>` | Runs the full Planning Stage: Product → Architecture + UI → Security + Performance → CEO. Produces a complete milestone directory (`artifacts/milestone-{N}-{slug}/`): the milestone README, one task file per task (each with a Context Manifest), architecture document, UI spec, reviews, and a CEO verdict. No code is written. **Single-task mode** (`/agent-plan single: <feature>`) plans a one-task feature with Product + Architecture + CEO only — same milestone layout, minimal ceremony. |
 | `agent-code/` | `/agent-code <milestone or task>` | Runs the Engineering Stage for a CEO-approved milestone: Coder → Tester → Reviewer → Product validation. Independent tasks (disjoint dependencies and file lists) run their loops in parallel, up to 3 at a time, with shared-state writes serialized by the orchestrator. Defect findings route through Bug Gatherer → Product triage → Debugger investigation. Issue findings route through Refactor → Tester → Reviewer loop. At task- and milestone-completion checkpoints it invokes Docs Writer (drains the `docs` queue in `artifacts/STANDUP.md`) and Validator (records outcomes in `artifacts/AGENT_STATE.md`; writes the milestone retrospective); at milestone completion it also runs the UX review for UI-flagged milestones. Release is not launched by any skill — the user invokes the release agent after milestone completion. |
-| `agent-task/` | `/agent-task <task description>` | Runs a mini engineering pipeline for a single one-off task without requiring a milestone, planning artifacts, or CEO verdict. Same Defect/Issue routing as `/agent-code` but no planning stage. Bails out and recommends `/agent-plan` if the task turns out to need architectural work. |
+| `agent-task/` | `/agent-task <task description>` | Runs a mini engineering pipeline for a single one-off task without requiring a milestone, planning artifacts, or CEO verdict. Same Defect/Issue routing as `/agent-code` but no planning stage. Bails out if the task turns out to need design work — recommending `/agent-plan` single-task mode for one design decision, the full run for cross-cutting scope. |
 
 ## When to use each skill
 
 Short version:
 
 - **New feature or milestone?** → `/agent-plan` then `/agent-code`
+- **One self-contained feature with a design decision or two?** → `/agent-plan single: <feature>` then `/agent-code`
 - **Bug fix, typo, small refactor, dependency bump?** → `/agent-task`
-- **Unsure?** → `/agent-plan` first. It is strictly safer to plan and not need it than to skip planning and discover you needed it mid-implementation.
+- **Unsure?** → `/agent-plan` first (single-task mode keeps the tax small). It is strictly safer to plan and not need it than to skip planning and discover you needed it mid-implementation.
 
 Longer version with a decision table: see the repo's `TROUBLESHOOTING.md` → "Which pipeline should I use?"
 

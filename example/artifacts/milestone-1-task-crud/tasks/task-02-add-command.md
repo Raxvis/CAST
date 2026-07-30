@@ -52,7 +52,7 @@ inserts a new row into `tasks` with `completed = 0`, `createdAt = new Date().toI
 
 ## Handoff Log
 
-### 1. product -> coder — 2026-04-09
+### 1. orchestrator -> coder — 2026-04-09
 
 - **Outcome**: Task released; dependency T-1 Complete.
 - **Files touched**: None
@@ -63,6 +63,7 @@ inserts a new row into `tasks` with `completed = 0`, `createdAt = new Date().toI
 
 - **Outcome**: `add` implemented with a prepared statement and bound parameters; prints new id.
 - **Files touched**: `src/commands/add.ts`
+- **Commit**: `5b82c7d`
 - **Read next**: Manifest only — cover happy path and missing-title error
 - **Open items**: None
 
@@ -70,6 +71,7 @@ inserts a new row into `tasks` with `completed = 0`, `createdAt = new Date().toI
 
 - **Outcome**: 4 tests added; `pnpm test` green (happy path, missing title, ISO `createdAt`, bound params).
 - **Files touched**: `src/commands/add.test.ts`
+- **Commit**: `e3a94f0`
 - **Read next**: Manifest only
 - **Open items**: None
 

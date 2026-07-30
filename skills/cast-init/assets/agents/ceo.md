@@ -106,7 +106,7 @@ Every CEO review file (the milestone's `reviews/ceo.md`) must:
 
 - Include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
 - List every input file reviewed by path (milestone README, task files, architecture, UI spec, security findings, performance findings).
-- Work through all six checklist sections (Scope & Business Intent, Architectural Soundness, UI & User Experience, Security Posture, Performance Budget, Cross-Cutting Risks) — do not skip any.
+- Work through all six checklist sections (Scope & Business Intent, Architectural Soundness, UI & User Experience, Security Posture, Performance Budget, Cross-Cutting Risks) — do not skip any. Cross-Cutting Risks includes the manifest gate: verify every task file's Context Manifest is complete and minimal — a manifest an engineering agent must patch mid-loop is a planning defect this review exists to catch (the retrospective counts those patches).
 - Record Revision Requests addressed to specific agents when returning REVISION REQUIRED.
 - Record Approval Conditions with a Verified By owner when returning APPROVED WITH CONDITIONS.
 - Issue one of the three verdicts verbatim: **APPROVED**, **APPROVED WITH CONDITIONS**, or **REVISION REQUIRED**.

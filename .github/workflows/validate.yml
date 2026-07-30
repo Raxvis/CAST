@@ -287,6 +287,7 @@ jobs:
               */reviews/validation.md)             check_headings "$f" MILESTONE_VALIDATION.md ;;
               */reviews/retrospective.md)          check_headings "$f" MILESTONE_RETROSPECTIVE.md ;;
               */reviews/security.md|*/reviews/performance.md) ;;  # planning reviews carry no template contract
+              */reviews/security-impl.md|*/reviews/performance-impl.md) ;;  # completion reviews: same agent-defined formats
               *) echo "unrecognized example artifact: $f — add a path pattern here or fix the filename"; fail=1 ;;
             esac
           done < <(find example/artifacts -type f -name '*.md' | sort)
@@ -300,6 +301,12 @@ jobs:
             [ -f "$mdir/reviews/retrospective.md" ] || { echo "completed milestone lacks its retrospective: $mdir/reviews/retrospective.md"; fail=1; }
             if [ -f "$mdir/ui.md" ]; then
               [ -f "$mdir/reviews/ux.md" ] || { echo "UI-flagged completed milestone lacks its UX review: $mdir/reviews/ux.md"; fail=1; }
+            fi
+            if grep -q '^\*\*Implementation review required\*\*: Yes' "$mdir/reviews/security.md" 2>/dev/null; then
+              [ -f "$mdir/reviews/security-impl.md" ] || { echo "security-flagged completed milestone lacks its implementation review: $mdir/reviews/security-impl.md"; fail=1; }
+            fi
+            if grep -q '^\*\*Measured check required\*\*: Yes' "$mdir/reviews/performance.md" 2>/dev/null; then
+              [ -f "$mdir/reviews/performance-impl.md" ] || { echo "budget-flagged completed milestone lacks its measured performance check: $mdir/reviews/performance-impl.md"; fail=1; }
             fi
           done
           [ "$fail" -eq 0 ] && echo "all example instances match their template contracts"

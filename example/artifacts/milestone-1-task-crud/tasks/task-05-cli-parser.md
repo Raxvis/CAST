@@ -55,7 +55,7 @@ that opens the DB, runs migrations, dispatches, and closes the DB.
 
 ## Handoff Log
 
-### 1. product -> coder — 2026-04-10
+### 1. orchestrator -> coder — 2026-04-10
 
 - **Outcome**: Task released; dependencies T-2, T-3, T-4 all Complete.
 - **Files touched**: None
@@ -66,6 +66,7 @@ that opens the DB, runs migrations, dispatches, and closes the DB.
 
 - **Outcome**: Parser and entrypoint implemented; `runMigrations` called unconditionally before dispatch.
 - **Files touched**: `src/cli.ts`, `src/index.ts`
+- **Commit**: `8e51f9a`
 - **Read next**: Manifest only — cover `--help`, no-args, unknown-command, `--all` routing
 - **Open items**: None
 
@@ -73,6 +74,7 @@ that opens the DB, runs migrations, dispatches, and closes the DB.
 
 - **Outcome**: 8 tests added; full `pnpm test` suite green across all five tasks.
 - **Files touched**: `src/cli.test.ts`
+- **Commit**: `2b6d0e7`
 - **Read next**: Manifest only
 - **Open items**: None
 

@@ -1,6 +1,6 @@
 ---
 name: performance
-description: "Use after Architecture publishes or revises a design document — reviews the plan against performance budgets, identifies bottlenecks, and files findings for the CEO gate."
+description: "Use after Architecture publishes or revises a design document — reviews the plan against performance budgets, identifies bottlenecks, and files findings for the CEO gate. Also runs the measured budget check at the milestone-completion checkpoint when the plan set budgets."
 model: inherit
 tools: Read, Grep, Glob, Edit, Write, Bash
 ---
@@ -30,7 +30,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`. Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. Read only the milestone README, the architecture document, and supplemental arch docs — not task files, not code. Report every bottleneck with estimated impact and confidence — never self-filter to only the biggest wins; the CEO review does the weighing. Require a measurement or profile trace before proposing any optimization — the performance-review finding requirements and budget checks in this file (Templates section) are mandatory.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. For the **planning review**, read only the milestone README, the architecture document, and supplemental arch docs — not task files, not code. For the **measured check** (milestone completion, budget-flagged milestones only), run the measurements against the implemented code and record real numbers — an unmeasured budget is a wish. Report every bottleneck with estimated impact and confidence — never self-filter to only the biggest wins; the CEO review does the weighing. Require a measurement or profile trace before proposing any optimization — the performance-review finding requirements and budget checks in this file (Templates section) are mandatory.
 
 ---
 
@@ -101,6 +101,7 @@ Performance findings do not use a `templates/*.md` skeleton — the finding requ
 | Artifact type | Format reference | Instance destination |
 |---|---|---|
 | Performance review (produced during `/agent-plan` Stage 3b) | Finding requirements below + budget table in `artifacts/AGENT_STATE.md` → `## performance` | `artifacts/milestone-{N}-{slug}/reviews/performance.md` |
+| Measured performance check (produced at the `/agent-code` milestone-completion checkpoint, budget-flagged milestones only) | Same finding requirements; executes the planning review's measurement plans against the implemented code | `artifacts/milestone-{N}-{slug}/reviews/performance-impl.md` |
 
 Every performance review file (the milestone's `reviews/performance.md`) must:
 
@@ -109,6 +110,9 @@ Every performance review file (the milestone's `reviews/performance.md`) must:
 - Name the hot path or module responsible.
 - Include a measurement plan describing how the finding can be verified after remediation.
 - Propose a concrete remediation (not "optimize this") — specific code-level changes the Coder can implement.
+- End with the single line `**Measured check required**: Yes/No` — Yes whenever the plan sets performance budgets that apply to this milestone. `/agent-code` reads this line at the milestone-completion checkpoint to decide whether the measured check runs.
+
+The measured check (`reviews/performance-impl.md`) executes the planning review's measurement plans against the implemented milestone, records the measured values, updates the live budget table's Current/Status columns in `artifacts/AGENT_STATE.md` → `## performance`, and files each budget violation through Bug Gatherer for Product triage. Budgets set at planning that are never measured are the gap this check closes.
 
 Budget-violating findings block the milestone until remediated or rolled into a CEO Approval Condition. Sub-budget findings can be accepted by Product and deferred.
 

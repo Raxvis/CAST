@@ -64,14 +64,17 @@ _Fill each metric from its recorded source (validator.md → Metric Sources) —
 | Conflicts escalated to Validator | 0 | Conflicts table in `artifacts/AGENT_STATE.md` → `## validator` |
 | Architecture doc revisions | 1 | `## Revision History` table in `artifacts/milestone-1-task-crud/architecture.md` |
 | UI spec revisions | 1 | `## Revision History` table in `artifacts/milestone-1-task-crud/ui.md` |
+| Manifest patches during engineering | 0 | Handoff Log entries across `artifacts/milestone-1-task-crud/tasks/task-*.md` — no stage had to add a missing Context Manifest reference this milestone |
 
 ---
 
 ## Actions for Next Milestone
 
-| # | Action | Owner | Due |
-|---|---|---|---|
-| 1 | Fix BUG-002: `done <id>` must error non-zero when the ID does not exist; un-skip the reserved Vitest case | coder | M2 |
-| 2 | Make "error on missing id" a standard acceptance criterion for every id-based mutation command | product | M2 planning (Stage 1) |
-| 3 | Add filesystem prerequisites (DB parent-directory creation) to the architecture review checklist | architect | M2 planning (Stage 2a) |
-| 4 | Automate the performance benchmark suite so budget tracking is populated during engineering, not after close | tester | M2 |
+_The Disposition column stays empty at retrospective time. Product fills it during the next `/agent-plan` Stage 1 (retrospective intake): `Adopted → M{N}` or `Declined — <reason>`. No row may be left undisposed at the next planning run._
+
+| # | Action | Owner | Due | Disposition |
+|---|---|---|---|---|
+| 1 | Fix BUG-002: `done <id>` must error non-zero when the ID does not exist; un-skip the reserved Vitest case | coder | M2 | |
+| 2 | Make "error on missing id" a standard acceptance criterion for every id-based mutation command | product | M2 planning (Stage 1) | |
+| 3 | Add filesystem prerequisites (DB parent-directory creation) to the architecture review checklist | architect | M2 planning (Stage 2a) | |
+| 4 | Automate the performance benchmark suite so budget tracking is populated during engineering, not after close | tester | M2 | |

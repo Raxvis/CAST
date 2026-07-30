@@ -97,6 +97,7 @@ _Append-only; newest last. One entry per stage transition, fixed format, max 10 
 
 - **Outcome**: [one line — what was done or decided]
 - **Files touched**: [paths, or "None"]
+- **Commit**: [hash — only when this stage committed code per the Commit discipline in `docs/PIPELINE_LOOP.md`; omit the line otherwise]
 - **Read next**: [file/section references the next agent needs BEYOND the Context Manifest, or "Manifest only"]
 - **Open items**: [blockers, questions, or "None"]
 

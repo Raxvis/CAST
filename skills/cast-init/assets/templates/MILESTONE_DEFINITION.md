@@ -127,7 +127,7 @@ _One row per task file under `tasks/`. Deliberately no status column — task st
 
 ## CEO Approval Conditions (required)
 
-_Filled after the CEO verdict (`reviews/ceo.md`). Coder tracks each condition during engineering; Reviewer and Product verify at completion. Tasks a condition names carry a `../README.md § CEO Approval Conditions` row in their Context Manifest._
+_Filled after the CEO verdict (`reviews/ceo.md`). Coder tracks each condition during engineering; Reviewer and Product verify at completion. **Product owns the flip to Verified**: while writing the completion record at the milestone-completion checkpoint, Product confirms each row's evidence and sets its Status to Verified (with verifier and date) — or leaves it and lists it under the completion record's Known Issues. Tasks a condition names carry a `../README.md § CEO Approval Conditions` row in their Context Manifest._
 
 | Condition | Source | Status |
 |-----------|--------|--------|

@@ -45,6 +45,10 @@ artifacts/
       performance.md               # Performance review (/agent-plan Stage 3)
       ceo.md                       # CEO planning verdict (/agent-plan Stage 4)
       ux.md                        # UX review (milestone completion; UI-flagged milestones only)
+      security-impl.md             # Security implementation review (milestone completion;
+                                   #   only when security.md flagged the milestone)
+      performance-impl.md          # Measured performance check (milestone completion;
+                                   #   only when performance.md flagged budgets)
       validation.md                # Milestone validation record (Product, milestone completion)
       completion.md                # Milestone completion report (Product, milestone completion)
       retrospective.md             # Milestone retrospective (Validator, milestone completion)
@@ -61,6 +65,11 @@ artifacts/
     bugs/
       bug-{XXX}-{slug}.md          # Bugs filed from one-off work (never archived — the
                                    #   BUGS.md index points at them)
+
+  archive/                         # Bounded-file overflow (created on first use by Validator
+    STANDUP.md                     #   at milestone completion): session sections and stale
+    AGENT_STATE.md                 #   state rows relocated verbatim — see validator.md →
+                                   #   Archival Duty. History stays greppable here.
 ```
 
 Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-created for them). `/cast-init` scaffolds only the root files and the `one-off/` directory.
@@ -83,6 +92,8 @@ Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-creat
 | Performance review findings | `milestone-{N}-{slug}/reviews/performance.md` | Performance (`/agent-plan` Stage 3) |
 | CEO planning verdict | `milestone-{N}-{slug}/reviews/ceo.md` | CEO (`/agent-plan` Stage 4) |
 | UX review of implemented screens | `milestone-{N}-{slug}/reviews/ux.md` | UI (milestone completion; UI-flagged milestones only) |
+| Security implementation review | `milestone-{N}-{slug}/reviews/security-impl.md` | Security (milestone completion; only when `reviews/security.md` flagged the milestone) |
+| Measured performance check | `milestone-{N}-{slug}/reviews/performance-impl.md` | Performance (milestone completion; only when `reviews/performance.md` flagged budgets) |
 | Milestone validation record | `milestone-{N}-{slug}/reviews/validation.md` | Product (milestone completion) |
 | Milestone completion report | `milestone-{N}-{slug}/reviews/completion.md` | Product (milestone completion) |
 | Milestone retrospective | `milestone-{N}-{slug}/reviews/retrospective.md` | Validator (milestone completion) |

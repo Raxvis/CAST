@@ -60,6 +60,8 @@ Entries under a session heading are appended in the order they happen (oldest fi
 - product | progress | Completion record written: `artifacts/milestone-1-task-crud/reviews/completion.md` — Status: Complete with Deferrals (BUG-002 under Known Issues)
 - product | progress | Validation record written: `artifacts/milestone-1-task-crud/reviews/validation.md` — Approved with Notes
 - ui | progress | UX review written: `artifacts/milestone-1-task-crud/reviews/ux.md` — APPROVED WITH NOTES (BUG-002 noted)
+- security | progress | Implementation review clean: `artifacts/milestone-1-task-crud/reviews/security-impl.md` — parameterized bindings confirmed at every query site in the milestone diff (flagged Yes at planning)
+- performance | progress | Measured check complete: `artifacts/milestone-1-task-crud/reviews/performance-impl.md` — all four budgets within target; AGENT_STATE budget table updated
 - docs-writer | progress | Milestone-completion drain: no pending docs entries remained
 - validator | progress | Retrospective written: `artifacts/milestone-1-task-crud/reviews/retrospective.md`; AGENT_STATE dashboards updated
 - agent-code | progress | Run complete: M1 closed — 5/5 tasks Complete, 42 tests passing, all CEO Approval Conditions Verified, BUG-002 held Deferred

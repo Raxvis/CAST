@@ -55,7 +55,7 @@ was filed during validation and is deferred to M2.
 
 ## Handoff Log
 
-### 1. product -> coder — 2026-04-09
+### 1. orchestrator -> coder — 2026-04-09
 
 - **Outcome**: Task released; dependency T-1 Complete.
 - **Files touched**: None
@@ -66,6 +66,7 @@ was filed during validation and is deferred to M2.
 
 - **Outcome**: `done` and `delete` implemented with parameterized statements; `delete` errors on missing id.
 - **Files touched**: `src/commands/done.ts`, `src/commands/delete.ts`
+- **Commit**: `d19e6b4`
 - **Read next**: Manifest only — cover missing-id and non-integer-id paths
 - **Open items**: None
 
@@ -73,6 +74,7 @@ was filed during validation and is deferred to M2.
 
 - **Outcome**: 6 tests added; `pnpm test` green (happy paths, `delete` missing-id error, non-integer usage error).
 - **Files touched**: `src/commands/done.test.ts`, `src/commands/delete.test.ts`
+- **Commit**: `4f7a2c9`
 - **Read next**: Manifest only
 - **Open items**: None
 
