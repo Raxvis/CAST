@@ -17,7 +17,7 @@ HOW TO CUSTOMIZE:
 
 This directory holds every artifact produced by work on [PROJECT_NAME], **grouped by milestone**: each milestone owns one directory containing its definition, design specs, reviews, per-task files, and per-bug files. Cross-milestone state (session log, agent state, bug index) lives at the root.
 
-> **Provenance:** Every file under this directory is produced by an agent running inside the `/agent-plan`, `/agent-code`, or `/agent-task` pipeline. Review accordingly — these are agent outputs, not hand-authored reference material. Humans may edit these files (to revise plans, triage bugs, or close milestones), but the canonical producer of each artifact is named at the top of the file.
+> **Provenance:** Every file under this directory is produced by an agent running inside the `/agent-plan`, `/agent-code`, or `/agent-task` pipeline (plus `artifacts/DOCTOR.md`, written by the `/cast-doctor` maintenance skill). Review accordingly — these are agent outputs, not hand-authored reference material. Humans may edit these files (to revise plans, triage bugs, or close milestones), but the canonical producer of each artifact is named at the top of the file.
 
 **Rule:** `artifacts/` is for **instances** of work. `docs/` is for **reference material**; `templates/` is for **reusable document skeletons**. If you are unsure where a file belongs, ask: "Is this content about a specific piece of work (feature, milestone, task, bug, session)?" If yes → `artifacts/`. "Is this a reusable skeleton agents copy?" If yes → `templates/`. "Is this reusable guidance?" If yes → `docs/`.
 
@@ -31,6 +31,8 @@ artifacts/
   BUGS.md                          # Global bug INDEX: one line per bug → the per-bug file
   STANDUP.md                       # Rolling session progress log (cross-milestone)
   AGENT_STATE.md                   # Live working state for every agent (cross-milestone)
+  DOCTOR.md                        # /cast-doctor health report (created on first run;
+                                   #   overwritten each run — git history keeps priors)
 
   milestone-{N}-{slug}/            # One directory per milestone — ALL of that milestone's work
     README.md                      # Milestone definition — the highest-order document: goal,
@@ -102,6 +104,7 @@ Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-creat
 | One-off task file | `one-off/task-{slug}.md` | `/agent-task` |
 | Session progress log | Entries in `artifacts/STANDUP.md` | Any agent / user |
 | Agent working state (Current Work, Decisions Logs, dashboards) | The agent's own section in `artifacts/AGENT_STATE.md` | Each agent |
+| Install health report (state findings, diet prescriptions, coverage gaps) | `artifacts/DOCTOR.md` — overwritten per run | `/cast-doctor` |
 
 Templates for every artifact type live in `templates/` — see `templates/README.md`.
 

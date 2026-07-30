@@ -93,6 +93,8 @@ artifacts/
   BUGS.md                                  # Global bug INDEX (one line per bug → its file)
   STANDUP.md                               # Rolling session progress log
   AGENT_STATE.md                           # Live working state for every agent
+  DOCTOR.md                                # /cast-doctor health report (created on first
+                                           #   run; overwritten each run — git keeps history)
 
   milestone-{N}-{slug}/                    # One directory per milestone
     README.md                              # Milestone definition (highest-order doc: goal,
@@ -245,7 +247,7 @@ Rules:
 - The body of the file is rewritten as needed; prior content is not preserved inline. Git history is the audit log.
 - The CEO reads this table first when re-reviewing a revised plan to identify which of its prior Revision Requests have been addressed.
 
-This block is mandatory for planning-stage artifacts produced by `/agent-plan`. It is **not** required for task files (their Handoff Log is the audit trail), bug files (their Status field advances per the lifecycle), or `artifacts/BUGS.md`, `artifacts/STANDUP.md`, and `artifacts/AGENT_STATE.md`, which are append-only running logs.
+This block is mandatory for planning-stage artifacts produced by `/agent-plan`. It is **not** required for task files (their Handoff Log is the audit trail), bug files (their Status field advances per the lifecycle), `artifacts/BUGS.md`, `artifacts/STANDUP.md`, and `artifacts/AGENT_STATE.md` (append-only running logs), or `artifacts/DOCTOR.md` (overwritten by each `/cast-doctor` run — git history is its audit trail).
 
 ---
 
@@ -271,11 +273,12 @@ The following behaviors violate these conventions. Do not do them:
 |---|---|---|
 | Reference docs | `docs/` | `UPPER_SNAKE_CASE.md` |
 | Document templates | `templates/` | `UPPER_SNAKE_CASE.md` |
-| _Case rule_ | — | UPPER_SNAKE is reserved for **system singletons** (reference docs, templates, the three artifacts-root state files — fixed files named at design time). **Instance files that multiply as work happens** (milestone dirs, task files, bug files, reviews, supplemental specs) are lowercase kebab-case. `README.md` / `CLAUDE.md` / `SKILL.md` follow their external conventions. |
+| _Case rule_ | — | UPPER_SNAKE is reserved for **system singletons** (reference docs, templates, the artifacts-root state files — fixed files named at design time). **Instance files that multiply as work happens** (milestone dirs, task files, bug files, reviews, supplemental specs) are lowercase kebab-case. `README.md` / `CLAUDE.md` / `SKILL.md` follow their external conventions. |
 | Release changelog | `docs/CHANGELOG.md` | fixed |
 | Global bug index | `artifacts/BUGS.md` | fixed |
 | Rolling session log | `artifacts/STANDUP.md` | fixed |
 | Agent working state | `artifacts/AGENT_STATE.md` | fixed |
+| Doctor health report | `artifacts/DOCTOR.md` | fixed — overwritten by each `/cast-doctor` run |
 | Milestone definition | `artifacts/milestone-{N}-{slug}/` | `README.md` |
 | Task file (one per task) | `artifacts/milestone-{N}-{slug}/tasks/` | `task-{T}-{slug}.md` |
 | One-off task file | `artifacts/one-off/` | `task-{slug}.md` |

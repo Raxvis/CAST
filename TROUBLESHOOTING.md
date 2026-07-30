@@ -6,7 +6,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## Which pipeline should I use — `/agent-plan`, `/agent-code`, or `/agent-task`?
 
-**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes, and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → Security + Performance → CEO). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Tester → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
+**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes (plus `/cast-doctor`, the maintenance skill — not a pipeline), and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → Security + Performance → CEO). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Tester → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
 
 **Fix.** Use the table below to pick a pipeline, then read the narrative note after it.
 
@@ -17,6 +17,7 @@ Common problems adopting or running this template, with the most likely cause an
 | "Fix a bug already in `artifacts/BUGS.md`" | `/agent-task` | Scope is bounded by the bug report. |
 | "Add a new command or endpoint" | `/agent-plan` then `/agent-code` | Touches the public interface — needs UI spec, security review, CEO sign-off. |
 | "One self-contained feature that needs a design decision or two" | `/agent-plan single: <feature>` then `/agent-code` | Single-task planning mode: Product + Architecture + CEO only, one task file — design work gets planned without full milestone ceremony. |
+| "Check the health of the CAST install / slim the docs after a model upgrade" | `/cast-doctor` | Maintenance skill, not a pipeline: verifies install invariants, prescribes model-gated documentation pruning, finds coverage gaps. Report-only until you approve treatments. |
 | "Bump a dependency and update call sites" | `/agent-task` | Mechanical change across existing patterns, no new design. |
 | "Refactor a single function" | `/agent-task` | Contract doesn't change, no architectural impact. |
 | "Refactor across multiple modules" | `/agent-plan` then `/agent-code` | Cross-cutting — needs an architecture revision. |
@@ -47,7 +48,7 @@ Common problems adopting or running this template, with the most likely cause an
 2. Run the move command(s) from the project root. Typically:
    ```
    mv .cast-stage/agents .claude/agents
-   mv .cast-stage/skills/agent-plan .cast-stage/skills/agent-code .cast-stage/skills/agent-task .claude/skills/
+   mv .cast-stage/skills/agent-plan .cast-stage/skills/agent-code .cast-stage/skills/agent-task .cast-stage/skills/cast-doctor .claude/skills/
    rmdir .cast-stage/skills .cast-stage
    ```
 3. Restart your Claude Code session so the moved agents and skills register.
@@ -164,6 +165,17 @@ Common problems adopting or running this template, with the most likely cause an
 2. Run the planning tier the halt message named. For a single self-contained feature needing one or two design decisions, `/agent-plan single: "<feature description>"` runs the light mode (Product + Architecture + CEO, one task file). For multi-task or cross-cutting scope, `/agent-plan "<feature description>"` runs the full stage (Product → Architecture + UI → Security + Performance → CEO). Either way it ends with a verdict file at `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
 3. After the CEO issues **APPROVED** or **APPROVED WITH CONDITIONS**, run `/agent-code <milestone>` to execute the engineering stage against the approved plan.
 4. If you disagree with the scope classification and think the change is really self-contained, you can re-run `/agent-task` with a more precise task description that narrows the scope (name the specific file, the specific bug ID, or the specific existing pattern the change follows). Do not try to sneak a design change through `/agent-task` — the gate exists to prevent drift, and the Reviewer in Step 3 will catch it anyway.
+
+---
+
+## Documentation feels heavier than the project needs (or models were upgraded)
+
+**Cause.** Installed CAST documentation restates things a capable model can infer from the code itself — directory layouts, naming tables, tech-stack lists, generic best-practice essays. That written scaffolding is load-bearing for less capable models (Opus 4.6/4.7, Haiku-pinned utility agents) but becomes redundant context weight once the models consuming a doc clear the Context Inference Bar (`docs/MODEL_OPTIMIZATION.md`).
+
+**Fix.**
+1. Run `/cast-doctor` (or `/cast-doctor checkup` for a report with no changes). It writes `artifacts/DOCTOR.md`: state findings, two-tier diet prescriptions (Tier A always safe; Tier B gated per doc on its weakest consumer's model), and coverage gaps.
+2. Approve or decline prescriptions individually — nothing is removed without your approval, and embedded decisions are rescued into `docs/DESIGN_RATIONALE.md` before any trim.
+3. Re-run after any model change: upgrades unlock previously bar-blocked prunes; downgrades surface restoration findings (git history keeps everything).
 
 ---
 

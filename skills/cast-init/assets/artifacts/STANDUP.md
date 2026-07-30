@@ -35,7 +35,7 @@ This is the **single canonical format** for everything written to this file. All
 ### YYYY-MM-DD — <skill> — <milestone/task>
 ```
 
-where `<skill>` is the pipeline skill running (`agent-plan`, `agent-code`, or `agent-task`) and `<milestone/task>` identifies the work (e.g., `milestone-2-search-ui` or a one-off task summary).
+where `<skill>` is the skill running (`agent-plan`, `agent-code`, `agent-task`, or `cast-doctor`) and `<milestone/task>` identifies the work (e.g., `milestone-2-search-ui`, a one-off task summary, or `install health` for a doctor run).
 
 **Entries** under a session heading are typed one-liners:
 

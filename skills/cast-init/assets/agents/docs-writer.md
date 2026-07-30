@@ -73,6 +73,7 @@ The Docs Writer Agent may unilaterally:
 The Docs Writer Agent may NOT:
 
 - Update `docs/CHANGELOG.md` — Release is its primary owner. Docs Writer routes changelog-worthy items to Release instead of editing the file directly.
+- Remove documentation content wholesale. Pruning `docs/` is owned by the `/cast-doctor` skill, which requires the user's itemized approval per prescription (rescue-first). Docs Writer's stale-information authority covers correcting and updating content, not deleting it.
 - Create new documentation categories or files outside `docs/` without Product approval.
 - Alter the content of agent files in `agents/` — those are owned by each respective agent.
 - Document decisions that have not been formally approved by the responsible agent.
@@ -90,6 +91,7 @@ The Docs Writer Agent may NOT:
 | Coder | New modules, changed interfaces, implementation details |
 | Reviewer | Quality standards updates |
 | Tester | Test strategy changes, coverage updates |
+| /cast-doctor | Coverage-gap prescriptions, queued as `docs`-typed entries in `artifacts/STANDUP.md` and drained at the normal checkpoints |
 
 ---
 

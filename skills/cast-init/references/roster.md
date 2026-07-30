@@ -73,7 +73,7 @@ Claude Code accepts the `opus` / `sonnet` / `haiku` aliases or full model IDs in
 
 ## Pipeline skills mapping
 
-The three CAST pipeline skills are `/agent-plan`, `/agent-code`, `/agent-task`. They install to `.claude/skills/<name>/SKILL.md`. For each, apply this decision:
+The four CAST skills are the three pipelines `/agent-plan`, `/agent-code`, `/agent-task`, plus the `/cast-doctor` maintenance skill (install health checks and model-aware documentation audits — installed unconditionally, no agent-tier coupling). They install to `.claude/skills/<name>/SKILL.md`. For each, apply this decision:
 
 | State | Action |
 |---|---|
@@ -88,6 +88,7 @@ The three CAST pipeline skills are `/agent-plan`, `/agent-code`, `/agent-task`. 
 - `/agent-plan` ← `plan.md`, `planning.md`, `design.md`, `spec.md`, `prd.md`, `requirements.md`, `architect.md`
 - `/agent-code` ← `code.md`, `implement.md`, `engineer.md`, `build.md`, `work.md`, `develop.md`, `dev.md`
 - `/agent-task` ← `task.md`, `fix.md`, `do.md`, `patch.md`, `tweak.md`, `small.md`, `quick.md`
+- `/cast-doctor` ← `doctor.md`, `health.md`, `audit.md`, `doc-audit.md`
 
 ## Agent similar-name candidates
 

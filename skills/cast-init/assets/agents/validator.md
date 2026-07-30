@@ -130,6 +130,7 @@ _Run at the beginning of every working session._
 - [ ] Confirm Architecture has an Approved document for every module Coder will touch this session.
 - [ ] Confirm UI has an Approved spec for every screen Coder will touch this session.
 - [ ] Spot-check the bug index: each row's Status in `artifacts/BUGS.md` matches the Status field in its per-bug file. On a mismatch, the bug file wins — correct the index row and log a process violation.
+- [ ] If `artifacts/DOCTOR.md` exists, confirm it lists no unresolved Error-severity state findings; surface any that remain.
 
 ---
 
@@ -206,6 +207,8 @@ The shared root files must stay bounded — twenty milestones of append-only gro
 3. **AGENT_STATE rows**: move log rows (Decisions Logs, Process Violations, Conflicts with Status resolved, completed Current Work rows, drained queues) dated before the just-completed milestone's first session from `artifacts/AGENT_STATE.md` to the matching section of `artifacts/archive/AGENT_STATE.md`. Never move: unresolved Conflicts, open Open Questions, pending Future Work, the Agent Status Dashboard, the Milestone Progress table, or the Performance Budget Tracking table — live state stays live regardless of age.
 
 Archive files mirror the live files' structure; create them on first use. This sanctioned move is the one exception to the append-only rule — rows are relocated verbatim, never edited or dropped, so the full history remains greppable under `artifacts/archive/`.
+
+`artifacts/DOCTOR.md` is bounded by overwrite (each `/cast-doctor` run replaces it; git history keeps priors) — Validator never relocates it.
 
 ---
 

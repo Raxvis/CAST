@@ -85,9 +85,12 @@ Read these in order for the clearest picture:
 ## Deliberate Omissions
 
 - **No `.claude/` directory.** In a real populated project this would hold
-  the installed agent files (`.claude/agents/*.md`) and pipeline skills
-  (`.claude/skills/agent-plan/SKILL.md`, `agent-code`, `agent-task`).
-  Including them here would just duplicate the template payload verbatim.
+  the installed agent files (`.claude/agents/*.md`) and skills
+  (`.claude/skills/agent-plan/SKILL.md`, `agent-code`, `agent-task`,
+  `cast-doctor`). Including them here would just duplicate the template
+  payload verbatim.
+- **No `artifacts/DOCTOR.md`.** `/cast-doctor` (the install health check) has
+  not been run in this fixture's timeline; its report is created on first run.
 - **No `src/` directory.** This fixture demonstrates the *planning and review
   artifacts*, not a working build. Acme Todo is not a real package.
 - **No full `docs/` set.** Only `PRD.md`, `CONCEPT.md`, and `GLOSSARY.md`

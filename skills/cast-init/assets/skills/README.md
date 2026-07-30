@@ -1,7 +1,7 @@
 <!-- TEMPLATE INSTRUCTIONS
 PURPOSE: This file is the in-directory index for the pipeline skills payload. It is
 reference material for readers browsing the template repo — it must NOT be copied to
-target projects during adoption. /cast-init installs only the three skill directories
+target projects during adoption. /cast-init installs only the four skill directories
 below.
 
 HOW TO CUSTOMIZE: no customization needed. This file is metadata about the directory.
@@ -16,22 +16,24 @@ Each subdirectory here (except this README) contains one Claude Code skill. The 
 When `/cast-init` installs the template into a target project, each skill directory is copied to `.claude/skills/` at the target's project root, with placeholders substituted:
 
 ```
-skills/agent-plan/SKILL.md  →  <target>/.claude/skills/agent-plan/SKILL.md
-skills/agent-code/SKILL.md  →  <target>/.claude/skills/agent-code/SKILL.md
-skills/agent-task/SKILL.md  →  <target>/.claude/skills/agent-task/SKILL.md
+skills/agent-plan/SKILL.md   →  <target>/.claude/skills/agent-plan/SKILL.md
+skills/agent-code/SKILL.md   →  <target>/.claude/skills/agent-code/SKILL.md
+skills/agent-task/SKILL.md   →  <target>/.claude/skills/agent-task/SKILL.md
+skills/cast-doctor/SKILL.md  →  <target>/.claude/skills/cast-doctor/SKILL.md
 ```
 
 Claude Code auto-discovers any `<name>/SKILL.md` under `.claude/skills/` at session start and registers it as a skill invocable as `/<name>`. The SKILL.md frontmatter `name` field must match its directory name.
 
 **This README file is NOT copied to the target project.** It documents the payload directory, not the installed workflow.
 
-## The three pipeline skills in this directory
+## The skills in this directory
 
 | Directory | Skill | Purpose |
 |---|---|---|
 | `agent-plan/` | `/agent-plan <feature description>` | Runs the full Planning Stage: Product → Architecture + UI → Security + Performance → CEO. Produces a complete milestone directory (`artifacts/milestone-{N}-{slug}/`): the milestone README, one task file per task (each with a Context Manifest), architecture document, UI spec, reviews, and a CEO verdict. No code is written. **Single-task mode** (`/agent-plan single: <feature>`) plans a one-task feature with Product + Architecture + CEO only — same milestone layout, minimal ceremony. |
 | `agent-code/` | `/agent-code <milestone or task>` | Runs the Engineering Stage for a CEO-approved milestone: Coder → Tester → Reviewer → Product validation. Independent tasks (disjoint dependencies and file lists) run their loops in parallel, up to 3 at a time, with shared-state writes serialized by the orchestrator. Defect findings route through Bug Gatherer → Product triage → Debugger investigation. Issue findings route through Refactor → Tester → Reviewer loop. At task- and milestone-completion checkpoints it invokes Docs Writer (drains the `docs` queue in `artifacts/STANDUP.md`) and Validator (records outcomes in `artifacts/AGENT_STATE.md`; writes the milestone retrospective); at milestone completion it also runs the UX review for UI-flagged milestones. Release is not launched by any skill — the user invokes the release agent after milestone completion. |
 | `agent-task/` | `/agent-task <task description>` | Runs a mini engineering pipeline for a single one-off task without requiring a milestone, planning artifacts, or CEO verdict. Same Defect/Issue routing as `/agent-code` but no planning stage. Bails out if the task turns out to need design work — recommending `/agent-plan` single-task mode for one design decision, the full run for cross-cutting scope. |
+| `cast-doctor/` | `/cast-doctor` (or `/cast-doctor checkup` for report-only) | The maintenance skill, not a pipeline: a run-anytime health check of the CAST install. Verifies structural and state invariants (bug index, task indexes, STANDUP grammar, bounded logs, resolving references), prescribes model-aware documentation pruning in two tiers gated on the Context Inference Bar in `docs/MODEL_OPTIMIZATION.md`, and finds documentation coverage gaps. Writes `artifacts/DOCTOR.md`; treats only user-approved prescriptions. Run it after model changes or every few milestones. |
 
 ## When to use each skill
 
@@ -41,18 +43,19 @@ Short version:
 - **One self-contained feature with a design decision or two?** → `/agent-plan single: <feature>` then `/agent-code`
 - **Bug fix, typo, small refactor, dependency bump?** → `/agent-task`
 - **Unsure?** → `/agent-plan` first (single-task mode keeps the tax small). It is strictly safer to plan and not need it than to skip planning and discover you needed it mid-implementation.
+- **Docs feel heavier than the project needs, models were upgraded, or the install hasn't been checked in a while?** → `/cast-doctor`
 
 Longer version with a decision table: see the repo's `TROUBLESHOOTING.md` → "Which pipeline should I use?"
 
 ## Model compatibility
 
-All three skills are optimized for the Claude Opus 4.x family (agents default to `model: inherit`, running on the session model; `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` are the supported executing models). Each SKILL.md carries a **Model Compatibility** section with orchestration notes for the model executing it — chiefly that Opus 4.8/4.7 delegate conservatively (the explicit stage invocations are load-bearing) while Opus 4.6 over-delegates (spawn only the agents each stage names). Behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`.
+All four skills are optimized for the Claude Opus 4.x family (agents default to `model: inherit`, running on the session model; `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` are the supported executing models). Each SKILL.md carries a **Model Compatibility** section with orchestration notes for the model executing it — chiefly that Opus 4.8/4.7 delegate conservatively (the explicit stage invocations are load-bearing) while Opus 4.6 over-delegates (spawn only the agents each stage names). Behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`.
 
 ## How pipeline skills work
 
 A SKILL.md is Markdown with YAML frontmatter (`name`, `description`) that Claude Code discovers at session start. When the user invokes the skill (e.g. `/agent-plan add dark mode`), Claude loads the file body and follows it, treating the text the user typed after the skill name as the invocation input. The rest of the file is instructions to Claude for how to orchestrate the work.
 
-Open any of the three SKILL.md files to see the full orchestration: which agents get launched, in what order, with what inputs, and how findings are routed. The files are self-documenting and deliberately verbose — they are the contract between the user's intent and the agent pipeline.
+Open any of the SKILL.md files to see the full orchestration: which agents get launched, in what order, with what inputs, and how findings are routed (`cast-doctor` is the exception — it runs self-contained in the session, cooperating with the roster through the STANDUP docs queue rather than launching agents). The files are self-documenting and deliberately verbose — they are the contract between the user's intent and the agent pipeline.
 
 ## Customization
 

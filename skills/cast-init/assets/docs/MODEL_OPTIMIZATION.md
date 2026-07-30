@@ -95,6 +95,25 @@ Each supported model executes the same agent definitions differently. The per-ag
 
 ---
 
+## Context Inference Bar
+
+Newer models infer project facts — directory layout, naming conventions, tech stack, standard best practices — directly from the codebase, which turns documentation that merely restates them into redundant context weight. `/cast-doctor`'s **Tier B** prune prescriptions (mechanical restatements of code/structure and generic best-practice material) are gated on the bar below. **Tier A** findings (duplication, dead references, unfilled skeletons) apply on any supported model.
+
+| Model | Clears the bar |
+|---|---|
+| Claude Opus 4.8 (`claude-opus-4-8`) and newer Opus | Yes |
+| Fable/Mythos-class models | Yes |
+| Claude Sonnet 5 (`claude-sonnet-5`) and newer Sonnet | Yes |
+| Claude Opus 4.7 (`claude-opus-4-7`) | No — the most literal instruction-follower; it does not infer unstated conventions, so written restatements still carry weight |
+| Claude Opus 4.6 (`claude-opus-4-6`) | No |
+| Claude Haiku 4.5 (`claude-haiku-4-5`) and older Haiku | No — utility-tier; relies on written structure |
+
+The bar is applied **per document, against its weakest consumer**: `/cast-doctor` resolves each consuming agent's executing model (the frontmatter pin, or the session model under `inherit` — plus the session itself for docs that are live Memory Imports) and prescribes a Tier B prune only when the least capable consumer clears the bar. On a right-sized roster this means a doc cited by a Haiku-pinned utility agent keeps its mechanical content no matter how capable the session model is — correct, not a bug.
+
+Re-run `/cast-doctor` after any model change: upgrades unlock previously bar-blocked Tier B prescriptions; downgrades surface restoration findings for previously pruned mechanical content (git history has it).
+
+---
+
 ## Upgrade Paths
 
 ### Opus 4.6 → Opus 4.7
@@ -135,3 +154,4 @@ After re-pinning any agent:
 2. Run `/agents` in Claude Code and confirm each agent registers with the expected model.
 3. Run one cheap smoke stage (e.g. `/agent-task` on a trivial fix) and confirm the executing model in the session output matches the intended model (the session model under `inherit`, or the pin).
 4. Record the change in `docs/DESIGN_RATIONALE.md` (which models, why, date) so mid-milestone reproducibility questions have an answer.
+5. Run `/cast-doctor` — a model change moves the Context Inference Bar for Tier B documentation: upgrades unlock prunes, downgrades surface restoration findings.

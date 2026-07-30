@@ -8,7 +8,7 @@
 
 # CAST — Claude Agent Staged Team
 
-> **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three pipeline skills, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
+> **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three pipeline skills plus a maintenance skill, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
 
 ![Template version](https://img.shields.io/badge/template-v2.0.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
@@ -57,7 +57,7 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 **What you get out of the box:**
 
 - **15 specialist subagents** defaulting to `model: inherit` — each runs on the session model — with per-agent recommended reasoning effort matched to the workload (planning and engineering at high/xhigh, utility at low).
-- **Three pipeline skills** — `/agent-plan`, `/agent-code`, `/agent-task` — as plain Markdown orchestration scripts Claude Code discovers at session start.
+- **Three pipeline skills** — `/agent-plan`, `/agent-code`, `/agent-task` — as plain Markdown orchestration scripts Claude Code discovers at session start, plus **`/cast-doctor`**, a run-anytime health check that verifies the install's invariants, prescribes model-aware documentation pruning, and finds coverage gaps.
 - **A hard `docs/` / `templates/` / `artifacts/` split** — `docs/` holds reference material (requirements, conventions), `templates/` holds reusable document skeletons, and `artifacts/` holds live work **grouped by milestone**: one directory per milestone containing its README, design docs, reviews, one file per task, and one file per bug. The CEO gate, placeholder check, and smoke test all enforce the split.
 - **Minimal-context handoffs** — every task is an isolated file carrying its own Context Manifest (the complete read set an agent needs) and Handoff Log (the capped, fixed-format record each stage appends). Agents ship the next agent the least context required, through the task file — never through conversation or whole-directory re-reads — and reply to the orchestrator with a single routing line, so the orchestrating context stays flat across a whole milestone.
 - **Parallel task execution** — `/agent-code` runs engineering loops for independent tasks concurrently (disjoint dependencies and file lists, up to 3 at a time), with all shared-state writes serialized by the orchestrator. Task isolation is what makes this safe.
@@ -173,7 +173,7 @@ Each file defines one agent role with YAML frontmatter for Claude Code auto-disc
 
 ### skills/ (pipeline skills)
 
-Each subdirectory defines one pipeline skill that orchestrates a multi-agent workflow stage end-to-end. When installed to `.claude/skills/` in the target project, Claude Code registers them as skills named after the directory (e.g. `agent-plan/SKILL.md` becomes `/agent-plan`). Three pipelines ship with this template: `/agent-plan` runs the Planning Stage (Product → Architecture + UI → Security + Performance → CEO), `/agent-code` runs the Engineering Stage (Coder → Tester → Reviewer, with defects to Bug Gatherer → Product → Debugger and issues to Refactor → Tester → Reviewer), and `/agent-task` runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone, planning artifacts, or a CEO verdict — use it for bug fixes, typos, small refactors, and dependency bumps, not for new modules or cross-cutting changes. Between the two, `/agent-plan single: <feature>` runs a light single-task planning mode (Product + Architecture + CEO, one task file) for a self-contained feature that needs a design decision without full milestone ceremony.
+Each subdirectory defines one pipeline skill that orchestrates a multi-agent workflow stage end-to-end. When installed to `.claude/skills/` in the target project, Claude Code registers them as skills named after the directory (e.g. `agent-plan/SKILL.md` becomes `/agent-plan`). Three pipelines ship with this template, plus the `/cast-doctor` maintenance skill (run-anytime install health check and model-aware documentation audit — not a pipeline): `/agent-plan` runs the Planning Stage (Product → Architecture + UI → Security + Performance → CEO), `/agent-code` runs the Engineering Stage (Coder → Tester → Reviewer, with defects to Bug Gatherer → Product → Debugger and issues to Refactor → Tester → Reviewer), and `/agent-task` runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone, planning artifacts, or a CEO verdict — use it for bug fixes, typos, small refactors, and dependency bumps, not for new modules or cross-cutting changes. Between the two, `/agent-plan single: <feature>` runs a light single-task planning mode (Product + Architecture + CEO, one task file) for a self-contained feature that needs a design decision without full milestone ceremony.
 
 ### docs/
 
@@ -384,6 +384,7 @@ With agent files in `.claude/agents/`, Claude Code can invoke them in three ways
 | `/agent-plan <feature>` | Run the Planning Stage end-to-end. Product → Architecture + UI → Security + Performance → CEO. Produces planning documents and a CEO verdict. No code is written. **Single-task mode** (`/agent-plan single: <feature>`) plans a one-task feature with Product + Architecture + CEO only — same milestone layout, minimal ceremony. |
 | `/agent-code <milestone-or-task>` | Run the Engineering Stage for a CEO-approved milestone. Coder → Tester → Reviewer, with Defects routed through Bug Gatherer → Product (triage) → Debugger and Issues routed through Refactor → Tester → Reviewer, then Product validation. After every task it drains the `docs` queue (Docs Writer) and records the outcome (Validator); when every task is Complete or Deferred, the milestone checkpoint runs Deferred re-triage, the completion and validation records (verifying CEO Approval Conditions), the UX review (UI-flagged milestones), the security implementation review and measured performance check (flagged milestones), the retrospective, and root-file archival. |
 | `/agent-task <task description>` | Run a mini engineering pipeline for a single one-off task without requiring a milestone or CEO verdict. Coder → Tester → Reviewer, with the same Defect/Issue routing as `/agent-code`. Use for bug fixes, typos, small refactors, and dependency bumps — NOT for new modules or cross-cutting changes (it bails out to `/agent-plan`, whose single-task mode covers the one-design-decision middle ground). |
+| `/cast-doctor` (or `/cast-doctor checkup`) | Run a health check on the CAST install: verify structural and state invariants, prescribe model-aware documentation pruning (two tiers, gated on the Context Inference Bar in `docs/MODEL_OPTIMIZATION.md`), and find documentation coverage gaps. Writes `artifacts/DOCTOR.md`; treats only user-approved prescriptions. Run after model changes or every few milestones. |
 
 ### Inter-Agent Handoff
 
@@ -494,7 +495,7 @@ All payload paths below are relative to `skills/cast-init/assets/` in this repo.
 | `agents/validator.md` | Defines the validator agent; enforces agent protocols, resolves conflicts, tracks milestones, runs retrospectives |
 | `agents/README.md` | Master overview of the agent system: roster, interaction diagram, planning and engineering stage workflows, and placeholder reference |
 
-### skills/ → `.claude/skills/` (3 pipeline skills + README)
+### skills/ → `.claude/skills/` (4 skills + README)
 
 > **Note:** `skills/README.md` is metadata about the directory. It is NOT installed to the target project.
 
@@ -503,6 +504,7 @@ All payload paths below are relative to `skills/cast-init/assets/` in this repo.
 | `skills/agent-plan/SKILL.md` | Defines the `/agent-plan` pipeline skill; orchestrates the Planning Stage end-to-end (Product → Architecture + UI → Security + Performance → CEO) |
 | `skills/agent-code/SKILL.md` | Defines the `/agent-code` pipeline skill; orchestrates the Engineering Stage per task (Coder → Tester → Reviewer, with Defects through Bug Gatherer → Product → Debugger and Issues through Refactor → Tester → Reviewer) |
 | `skills/agent-task/SKILL.md` | Defines the `/agent-task` pipeline skill; runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone or CEO verdict |
+| `skills/cast-doctor/SKILL.md` | Defines the `/cast-doctor` maintenance skill; run-anytime install health check — state invariants, two-tier model-gated documentation diet (Context Inference Bar in `docs/MODEL_OPTIMIZATION.md`), and documentation coverage gaps. Writes `artifacts/DOCTOR.md` |
 
 ### docs/ (reference material, 21 files)
 
