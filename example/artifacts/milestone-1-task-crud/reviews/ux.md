@@ -12,7 +12,7 @@
 
 **Date**: 2026-04-10
 **Reviewer**: UI Agent
-**Spec Reference**: `artifacts/ui-specs/ui-milestone-1.md`
+**Spec Reference**: `artifacts/milestone-1-task-crud/ui.md`
 
 Acme Todo is a CLI, so the layout-oriented items below are read against terminal output — alignment, truncation, color usage, and exit-state messaging — per the UX review template's CLI guidance. All four commands (`add`, `list`, `done`, `delete`) plus `--help` were exercised against the implemented M1 build.
 
@@ -87,4 +87,4 @@ Acme Todo is a CLI, so the layout-oriented items below are read against terminal
 - [x] **APPROVED WITH NOTES** — Minor issues noted. Follow-up in next pass.
 - [ ] **CHANGES REQUIRED** — See Issues Found. Coder must revise before Product review.
 
-The implemented command surface matches `artifacts/ui-specs/ui-milestone-1.md` in output format, exit codes, stdout/stderr split, and empty-state behavior. The single deviation (BUG-002, `done` silent success) is Low severity, already Deferred by Product with an M2 fix path, and does not block Product sign-off.
+The implemented command surface matches `artifacts/milestone-1-task-crud/ui.md` in output format, exit codes, stdout/stderr split, and empty-state behavior. The single deviation (BUG-002, `done` silent success) is Low severity, already Deferred by Product with an M2 fix path, and does not block Product sign-off.

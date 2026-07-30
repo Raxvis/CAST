@@ -44,8 +44,8 @@ Use this table as the authoritative reference when comparing an existing project
 | 1 | `product` | 1 | `inherit` | `high` | Use at the start of /agent-plan to define milestone goals and acceptance criteria, when validating completed work against those criteria, and when triaging bug reports (Fix Now / Defer / Not a Bug). Owns requirements and final sign-off. |
 | 2 | `architect` | 2 / 4 | `inherit` | `xhigh` | Use during /agent-plan after Product publishes a milestone definition, and whenever Coder raises a design question, a new dependency is proposed, or Security/Performance findings require remediation. Owns system design, module boundaries, and data schemas. |
 | 3 | `ui` | 4 | `inherit` | `high` | Use during /agent-plan after Product publishes a milestone definition (in parallel with Architecture) to produce screen specs, and at /agent-code milestone completion for the UX review of milestones with UI-flagged tasks. Owns visual design and the style guide. |
-| 4 | `security` | 4 | `inherit` | `high` | Use after Architecture publishes or revises a design document, approves a new dependency, or changes a data schema; also on direct user request or when Release requests the pre-release security checklist. Audits for vulnerabilities with Critical/High/Medium/Low/Informational findings. |
-| 5 | `performance` | 4 | `inherit` | `high` | Use after Architecture publishes or revises a design document — reviews the plan against performance budgets, identifies bottlenecks, and files findings for the CEO gate. |
+| 4 | `security` | 4 | `inherit` | `high` | Use after Architecture publishes or revises a design document, approves a dependency, or changes a schema; at milestone completion for security-flagged milestones (implementation-diff review); or on user or Release request. Files Critical/High/Medium/Low/Informational findings. |
+| 5 | `performance` | 4 | `inherit` | `high` | Use after Architecture publishes or revises a design document — reviews the plan against performance budgets, identifies bottlenecks, and files findings for the CEO gate. Also runs the measured budget check at the milestone-completion checkpoint when the plan set budgets. |
 | 6 | `ceo` | 4 | `inherit` | `high` | Use as the final planning-stage gate once Product, Architecture, UI, Security, and Performance have all completed their milestone outputs — issues APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED before engineering begins. |
 | 7 | `coder` | 1 | `inherit` | `xhigh` | Use to implement each task in /agent-code or /agent-task, and whenever a test failure, review change request, Fix Now defect, or Product rejection returns work. Writes all production code, then submits to Tester. |
 | 8 | `tester` | 1 | `inherit` | `high` | Use PROACTIVELY after every Coder change — automated test gate. Also runs after every Refactor handoff; tests must pass before Reviewer runs. Failures route back to Coder. |
@@ -73,7 +73,7 @@ Claude Code accepts the `opus` / `sonnet` / `haiku` aliases or full model IDs in
 
 ## Pipeline skills mapping
 
-The three CAST pipeline skills are `/agent-plan`, `/agent-code`, `/agent-task`. They install to `.claude/skills/<name>/SKILL.md`. For each, apply this decision:
+The four CAST skills are the three pipelines `/agent-plan`, `/agent-code`, `/agent-task`, plus the `/cast-doctor` maintenance skill (install health checks and model-aware documentation audits — installed unconditionally, no agent-tier coupling). They install to `.claude/skills/<name>/SKILL.md`. For each, apply this decision:
 
 | State | Action |
 |---|---|
@@ -88,6 +88,7 @@ The three CAST pipeline skills are `/agent-plan`, `/agent-code`, `/agent-task`. 
 - `/agent-plan` ← `plan.md`, `planning.md`, `design.md`, `spec.md`, `prd.md`, `requirements.md`, `architect.md`
 - `/agent-code` ← `code.md`, `implement.md`, `engineer.md`, `build.md`, `work.md`, `develop.md`, `dev.md`
 - `/agent-task` ← `task.md`, `fix.md`, `do.md`, `patch.md`, `tweak.md`, `small.md`, `quick.md`
+- `/cast-doctor` ← `doctor.md`, `health.md`, `audit.md`, `doc-audit.md`
 
 ## Agent similar-name candidates
 

@@ -12,7 +12,7 @@ Live working state for every agent. Agents read their own section on activation 
 
 | Task | Milestone | Status | Notes |
 |---|---|---|---|
-| Milestone 1 definition + task breakdown (T-1 – T-5) | M1 | Complete | `milestone-1-task-crud.md`, `-tasks.md` |
+| Milestone 1 definition + task files (T-1 – T-5) | M1 | Complete | `milestone-1-task-crud/README.md`, `tasks/task-01…05-*.md` |
 | Milestone 1 validation against acceptance criteria | M1 | Complete | Validation record `milestone-1-task-crud-validation.md` (Approved with Notes); completion record written 2026-04-10 (Complete with Deferrals) |
 | Deferred re-triage at M1 completion checkpoint | M1 | Complete | BUG-002 held Deferred into M2; re-triage again at M2 `/agent-plan` Stage 1 |
 
@@ -44,7 +44,7 @@ Live working state for every agent. Agents read their own section on activation 
 
 | Task | Milestone | Status | Notes |
 |---|---|---|---|
-| Milestone 1 architecture document | M1 | Complete | `artifacts/architecture/arch-milestone-1.md` |
+| Milestone 1 architecture document | M1 | Complete | `artifacts/milestone-1-task-crud/architecture.md` |
 
 ### Architecture Documents
 
@@ -52,7 +52,7 @@ _Index of every architecture document produced, with its status._
 
 | Document | Module / System | Status | Milestone |
 |---|---|---|---|
-| `arch-milestone-1.md` | `src/db/`, `src/commands/`, `src/cli.ts` | Approved (CEO, with conditions) | M1 |
+| `milestone-1-task-crud/architecture.md` | `src/db/`, `src/commands/`, `src/cli.ts` | Approved (CEO, with conditions) | M1 |
 
 ### Decisions Log
 
@@ -81,8 +81,8 @@ _Index of every architecture document produced, with its status._
 
 | Task | Milestone | Status | Notes |
 |---|---|---|---|
-| Milestone 1 UI spec (command surfaces) | M1 | Complete | `artifacts/ui-specs/ui-milestone-1.md` |
-| Milestone 1 UX review (implemented command surface) | M1 | Complete | `artifacts/reviews/ux-review-milestone-1.md` — APPROVED WITH NOTES (BUG-002 noted) |
+| Milestone 1 UI spec (command surfaces) | M1 | Complete | `artifacts/milestone-1-task-crud/ui.md` |
+| Milestone 1 UX review (implemented command surface) | M1 | Complete | `artifacts/milestone-1-task-crud/reviews/ux.md` — APPROVED WITH NOTES (BUG-002 noted) |
 
 ### Screen Specifications
 
@@ -90,7 +90,7 @@ _Index of every completed screen spec._
 
 | Screen | Milestone | Status | Notes |
 |---|---|---|---|
-| `ui-milestone-1.md` (all four commands) | M1 | Approved | Covers output format, exit codes, and error messages per command |
+| `milestone-1-task-crud/ui.md` (all four commands) | M1 | Approved | Covers output format, exit codes, and error messages per command |
 
 ### Decisions Log
 
@@ -439,7 +439,7 @@ _All new files created by Coder. Supports Architecture review and documentation.
 | Task | Status | Notes |
 |---|---|---|
 | M1 process check at milestone close | Complete | No violations; all handoffs followed the loop |
-| M1 retrospective | Complete | `artifacts/reviews/retrospective-milestone-1.md` — metrics filled from the tasks-file Summary, this file's validator tables, the arch/UI revision histories, and the `STANDUP.md` session dates |
+| M1 retrospective | Complete | `artifacts/milestone-1-task-crud/reviews/retrospective.md` — metrics filled from the tasks-file Summary, this file's validator tables, the arch/UI revision histories, and the `STANDUP.md` session dates |
 
 ### Conflicts
 

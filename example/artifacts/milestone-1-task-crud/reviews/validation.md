@@ -467,9 +467,9 @@ _Deferred items that Product re-triaged at the milestone-completion checkpoint a
 
 Links or references to related task breakdown documents for this milestone:
 
-- `artifacts/milestones/milestone-1-task-crud-tasks.md` — task breakdown with final statuses and CEO Approval Conditions tracking
-- `artifacts/milestones/milestone-1-task-crud-completion.md` — completion report (Status: Complete with Deferrals)
-- `artifacts/reviews/ux-review-milestone-1.md` — UX review of the implemented command surface (APPROVED WITH NOTES)
+- `artifacts/milestone-1-task-crud/tasks/` — task breakdown with final statuses and CEO Approval Conditions tracking
+- `artifacts/milestone-1-task-crud/reviews/completion.md` — completion report (Status: Complete with Deferrals)
+- `artifacts/milestone-1-task-crud/reviews/ux.md` — UX review of the implemented command surface (APPROVED WITH NOTES)
 
 ---
 

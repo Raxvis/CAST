@@ -209,7 +209,7 @@
 
 ## CEO Verdict (required)
 
-Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-{N}.md`. Do not sign off here.
+Gated by the CEO planning review — see `artifacts/milestone-{N}-{slug}/reviews/ceo.md`. Do not sign off here.
 
 ---
 

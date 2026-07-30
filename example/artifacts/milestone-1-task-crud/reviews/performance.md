@@ -13,8 +13,8 @@
 **Date**: 2026-04-08
 **Stage**: `/agent-plan` Stage 3b
 **Inputs Reviewed**:
-- Milestone: `artifacts/milestones/milestone-1-task-crud.md`
-- Architecture: `artifacts/architecture/arch-milestone-1.md`
+- Milestone: `artifacts/milestone-1-task-crud/README.md`
+- Architecture: `artifacts/milestone-1-task-crud/architecture.md`
 
 ---
 
@@ -26,7 +26,7 @@ Two findings filed against the Milestone 1 architecture. One Medium (WAL mode no
 
 ## Performance Budget Tracking
 
-_Targets defined by Architecture in `artifacts/architecture/arch-milestone-1.md` → Performance Budgets. Performance Agent owns Current and Status._
+_Targets defined by Architecture in `artifacts/milestone-1-task-crud/architecture.md` → Performance Budgets. Performance Agent owns Current and Status._
 
 | Metric | Target | Current | Status | Notes |
 |---|---|---|---|---|
@@ -84,3 +84,7 @@ _Targets defined by Architecture in `artifacts/architecture/arch-milestone-1.md`
 - No hot paths beyond the four command handlers exist in Milestone 1. No rendering, no tick loop, no network I/O.
 - `better-sqlite3` is synchronous and already the correct choice for a short-lived CLI process; no async overhead to optimize.
 - Startup cost is dominated by `require('better-sqlite3')` and the one-time migration check. Both are out of scope for M1 optimization.
+
+---
+
+**Measured check required**: Yes — the architecture sets four budget rows for this milestone (command latency cold/warm, `list` latency at 1k rows, DB file size). `/agent-code` runs the measured check at the milestone-completion checkpoint (`reviews/performance-impl.md`).

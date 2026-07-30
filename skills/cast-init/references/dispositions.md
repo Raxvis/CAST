@@ -22,8 +22,9 @@ For each CAST reference doc and document template, determine the disposition fro
 | `docs/CHANGELOG.md` | Skip (optional) | Preserve — note Release agent will maintain going forward |
 | `docs/ASSETS.md` | Skip (optional) | Preserve |
 | `docs/MVP_LAUNCH.md` | Skip (optional) | Preserve |
-| `templates/MILESTONE_DEFINITION.md` | **Always install** — consumed by /agent-plan Stage 1 | Install CAST version; any existing content moves to `artifacts/milestones/` as an instance |
-| `templates/MILESTONE_TASKS.md` | **Always install** — consumed by /agent-plan Stage 1 | Same |
+| `templates/MILESTONE_DEFINITION.md` | **Always install** — consumed by /agent-plan Stage 1 (instantiated as each milestone's `README.md`) | Install CAST version; any existing content moves into the appropriate `artifacts/milestone-{N}-{slug}/` directory as an instance |
+| `templates/TASK.md` | **Always install** — consumed by /agent-plan Stage 1 (one instance per task) and /agent-task | Same |
+| `templates/BUG_REPORT.md` | **Always install** — consumed by Bug Gatherer (one instance per bug) | Same |
 | `templates/MILESTONE_COMPLETION.md` | **Always install** | Same |
 | `templates/MILESTONE_VALIDATION.md` | **Always install** | Same |
 | `templates/MILESTONE_RETROSPECTIVE.md` | **Always install** — consumed by the Validator at milestone completion; installs verbatim like the other `templates/*` skeletons | Same |
@@ -46,15 +47,35 @@ For each CAST reference doc and document template, determine the disposition fro
 
 If `artifacts/` does not exist, Create it with:
 
-- `BUGS.md` from CAST template
+- `BUGS.md` from CAST template (the global bug index)
 - `STANDUP.md` from CAST template
 - `AGENT_STATE.md` from CAST template
 - `README.md` from CAST template
-- Empty subdirectories: `milestones/`, `architecture/`, `ui-specs/`, `reviews/`
+- Empty subdirectory: `one-off/`
+
+Milestone directories (`artifacts/milestone-{N}-{slug}/`) are **not** pre-created — `/agent-plan` Stage 1 creates each one.
 
 If `artifacts/` already exists and contains CAST-shaped files, preserve as-is and integrate.
 
-If a directory named `features/`, `work/`, or `planning/` exists and contains CAST-shaped files (detected by filename patterns `milestone-*.md`, `arch-milestone-*.md`, `ceo-review-*.md`), propose Rename + Update: rename the directory to `artifacts/` and update every reference across agents, pipeline skills, docs. This is the pre-0.3.0 CAST migration path. **Ask the user before renaming a directory.**
+**Pre-2.0 by-type layout migration.** If `artifacts/` contains the v1 by-type subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`), propose a **Rename + Update migration** to the milestone-grouped layout — one plan action per milestone `{N}` found:
+
+| v1 file | v2 destination |
+|---|---|
+| `milestones/milestone-{N}-{slug}.md` | `milestone-{N}-{slug}/README.md` |
+| `milestones/milestone-{N}-{slug}-tasks.md` | split into `milestone-{N}-{slug}/tasks/task-{T}-{slug}.md`, one file per task (see note) |
+| `milestones/milestone-{N}-{slug}-completion.md` | `milestone-{N}-{slug}/reviews/completion.md` |
+| `milestones/milestone-{N}-{slug}-validation.md` | `milestone-{N}-{slug}/reviews/validation.md` |
+| `architecture/arch-milestone-{N}.md` | `milestone-{N}-{slug}/architecture.md` |
+| `architecture/module-{slug}.md`, `system-{slug}.md`, `schema-{slug}.md` | `milestone-{N}-{slug}/arch-{slug}.md` (the milestone that produced them; Ask if unclear) |
+| `ui-specs/ui-milestone-{N}.md` | `milestone-{N}-{slug}/ui.md` |
+| `ui-specs/screen-{slug}.md`, `component-{slug}.md` | `milestone-{N}-{slug}/ui-{slug}.md` (same attribution rule) |
+| `reviews/{security,performance,ceo,ux}-review-milestone-{N}.md` | `milestone-{N}-{slug}/reviews/{security,performance,ceo,ux}.md` |
+| `reviews/retrospective-milestone-{N}.md` | `milestone-{N}-{slug}/reviews/retrospective.md` |
+| `BUGS.md` bug entries | one `milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` per entry (attributed by the entry's task/milestone reference; `one-off/bugs/` when unattributable), with `BUGS.md` rewritten as the v2 index |
+
+Use `git mv` per file (preserve history); the `-tasks.md` split and `BUGS.md` conversion are content transformations — flag them as their own plan actions so the user approves them explicitly. Then update every stale path reference across `.claude/`, `docs/`, and the project README. **Ask the user before executing the migration.**
+
+If a directory named `features/`, `work/`, or `planning/` exists and contains CAST-shaped files (detected by filename patterns `milestone-*.md`, `arch-milestone-*.md`, `ceo-review-*.md`), propose Rename + Update: rename the directory to `artifacts/` and update every reference across agents, pipeline skills, docs, then apply the pre-2.0 migration above to its contents. This is the pre-0.3.0 CAST migration path. **Ask the user before renaming a directory.**
 
 ## Root files
 

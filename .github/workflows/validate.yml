@@ -233,7 +233,7 @@ jobs:
             fi
           done
           # (2) No instance-pattern path may appear under docs/ or templates/.
-          hits=$(grep -rnE '(docs|templates)/[A-Za-z0-9_{}./-]*(milestone-|ceo-review-|ux-review-|retrospective-)' skills/cast-init/assets/ || true)
+          hits=$(grep -rnE '(docs|templates)/[A-Za-z0-9_{}./-]*(milestone-|task-[0-9{]|bug-[0-9{]|ceo-review-|ux-review-|retrospective-)' skills/cast-init/assets/ || true)
           if [ -n "$hits" ]; then
             echo "Instance-pattern path under docs/ or templates/:"; echo "$hits"; fail=1
           fi
@@ -271,32 +271,42 @@ jobs:
             done < <(grep -E '^## .*\(required\)' "$tmpl" | sed 's/ (required)$//')
           }
           while IFS= read -r f; do
-            case "$(basename "$f")" in
-              AGENT_STATE.md|BUGS.md|STANDUP.md) ;;  # seed instances, covered by their own checks
-              milestone-*-tasks.md)      check_headings "$f" MILESTONE_TASKS.md ;;
-              milestone-*-completion.md) check_headings "$f" MILESTONE_COMPLETION.md ;;
-              milestone-*-validation.md) check_headings "$f" MILESTONE_VALIDATION.md ;;
-              arch-milestone-*.md)       check_headings "$f" ARCH_SYSTEM.md ;;
-              ui-milestone-*.md)         check_headings "$f" UI_SPEC.md ;;
-              ceo-review-*.md)           check_headings "$f" CEO_REVIEW.md ;;
-              ux-review-*.md)            check_headings "$f" UX_REVIEW.md ;;
-              retrospective-*.md)        check_headings "$f" MILESTONE_RETROSPECTIVE.md ;;
-              security-review-*.md|performance-review-*.md) ;;  # planning reviews carry no template contract
-              milestone-*.md)            check_headings "$f" MILESTONE_DEFINITION.md ;;
-              *) echo "unrecognized example artifact: $f — add a filename pattern here or fix the filename"; fail=1 ;;
+            case "$f" in
+              */AGENT_STATE.md|*/BUGS.md|*/STANDUP.md) ;;  # seed instances, covered by their own checks
+              */milestone-*/README.md)             check_headings "$f" MILESTONE_DEFINITION.md ;;
+              */milestone-*/tasks/task-*.md)       check_headings "$f" TASK.md ;;
+              */one-off/task-*.md)                 check_headings "$f" TASK.md ;;
+              */bugs/bug-*.md)                     check_headings "$f" BUG_REPORT.md ;;
+              */milestone-*/architecture.md)       check_headings "$f" ARCH_SYSTEM.md ;;
+              */milestone-*/arch-*.md) ;;          # supplemental module/schema docs carry no single contract
+              */milestone-*/ui.md)                 check_headings "$f" UI_SPEC.md ;;
+              */milestone-*/ui-*.md) ;;            # supplemental screen/component specs
+              */reviews/ceo.md)                    check_headings "$f" CEO_REVIEW.md ;;
+              */reviews/ux.md)                     check_headings "$f" UX_REVIEW.md ;;
+              */reviews/completion.md)             check_headings "$f" MILESTONE_COMPLETION.md ;;
+              */reviews/validation.md)             check_headings "$f" MILESTONE_VALIDATION.md ;;
+              */reviews/retrospective.md)          check_headings "$f" MILESTONE_RETROSPECTIVE.md ;;
+              */reviews/security.md|*/reviews/performance.md) ;;  # planning reviews carry no template contract
+              */reviews/security-impl.md|*/reviews/performance-impl.md) ;;  # completion reviews: same agent-defined formats
+              *) echo "unrecognized example artifact: $f — add a path pattern here or fix the filename"; fail=1 ;;
             esac
           done < <(find example/artifacts -type f -name '*.md' | sort)
           # Completeness: a milestone with a completion record must also carry its
-          # validation record and retrospective, and — when UI-flagged (a UI spec
+          # validation record and retrospective, and — when UI-flagged (a ui.md
           # exists for it) — a UX review. All derived from the files present.
-          for c in example/artifacts/milestones/*-completion.md; do
+          for c in example/artifacts/milestone-*/reviews/completion.md; do
             [ -e "$c" ] || continue
-            stem=${c%-completion.md}
-            n=$(basename "$stem" | sed -E 's/^milestone-([0-9]+).*/\1/')
-            [ -f "${stem}-validation.md" ] || { echo "completed milestone lacks its validation record: ${stem}-validation.md"; fail=1; }
-            [ -f "example/artifacts/reviews/retrospective-milestone-$n.md" ] || { echo "completed milestone lacks its retrospective: example/artifacts/reviews/retrospective-milestone-$n.md"; fail=1; }
-            if [ -f "example/artifacts/ui-specs/ui-milestone-$n.md" ]; then
-              [ -f "example/artifacts/reviews/ux-review-milestone-$n.md" ] || { echo "UI-flagged completed milestone lacks its UX review: example/artifacts/reviews/ux-review-milestone-$n.md"; fail=1; }
+            mdir=$(dirname "$(dirname "$c")")
+            [ -f "$mdir/reviews/validation.md" ] || { echo "completed milestone lacks its validation record: $mdir/reviews/validation.md"; fail=1; }
+            [ -f "$mdir/reviews/retrospective.md" ] || { echo "completed milestone lacks its retrospective: $mdir/reviews/retrospective.md"; fail=1; }
+            if [ -f "$mdir/ui.md" ]; then
+              [ -f "$mdir/reviews/ux.md" ] || { echo "UI-flagged completed milestone lacks its UX review: $mdir/reviews/ux.md"; fail=1; }
+            fi
+            if grep -q '^\*\*Implementation review required\*\*: Yes' "$mdir/reviews/security.md" 2>/dev/null; then
+              [ -f "$mdir/reviews/security-impl.md" ] || { echo "security-flagged completed milestone lacks its implementation review: $mdir/reviews/security-impl.md"; fail=1; }
+            fi
+            if grep -q '^\*\*Measured check required\*\*: Yes' "$mdir/reviews/performance.md" 2>/dev/null; then
+              [ -f "$mdir/reviews/performance-impl.md" ] || { echo "budget-flagged completed milestone lacks its measured performance check: $mdir/reviews/performance-impl.md"; fail=1; }
             fi
           done
           [ "$fail" -eq 0 ] && echo "all example instances match their template contracts"
@@ -316,6 +326,14 @@ jobs:
           count=$(printf '%s\n' "$distinct" | grep -c .)
           echo "model pins found: $distinct ($count distinct)"
           [ "$count" -eq 1 ] || { echo "agent model pins are not identical"; fail=1; }
+          # Every agent declares a tools: list, and none includes Task — the
+          # "do not spawn subagents" rule is enforced by the toolset itself.
+          for f in skills/cast-init/assets/agents/*.md; do
+            [ "$(basename "$f")" = "README.md" ] && continue
+            t=$(awk '/^tools:/{sub(/^tools: */,""); print; exit}' "$f")
+            [ -n "$t" ] || { echo "$f: missing tools: frontmatter line"; fail=1; continue; }
+            echo "$t" | grep -qw Task && { echo "$f: tools list includes Task (subagent spawning must stay disabled)"; fail=1; }
+          done
           exit $fail
 
       - name: No stale pipeline-routing orders (docs/PIPELINE_LOOP.md is canonical)
@@ -335,13 +353,11 @@ jobs:
       - name: Template level-2 headings carry (required)/(optional) markers
         run: |
           # Since 1.2.0 every template section states its contract. Level-3 headings are
-          # exempt (repeatable per-instance blocks like task or module entries), as is the
-          # "## Task Template" sub-skeleton in MILESTONE_TASKS.md.
+          # exempt (repeatable per-instance blocks like task or module entries).
           fail=0
           for f in skills/cast-init/assets/templates/*.md; do
             [ "$(basename "$f")" = "README.md" ] && continue
             while IFS= read -r h; do
-              [ "$h" = "## Task Template" ] && continue
               echo "$h" | grep -qE '\((required|optional)\)' || { echo "UNMARKED [$f]: $h"; fail=1; }
             done < <(grep -E '^## ' "$f")
           done
@@ -360,6 +376,40 @@ jobs:
             echo "example BUGS.md uses pre-1.2 status vocabulary:"; echo "$stale"; exit 1
           fi
           echo "clean"
+
+      - name: Example task and bug state consistency
+        run: |
+          # The structure makes these invariants statically checkable: task Status
+          # values are legal enums, the Task Index and tasks/ agree bidirectionally,
+          # and the BUGS.md index Status column matches each per-bug file's Status.
+          fail=0
+          enum='Not Started|In Progress|Blocked|Complete|Deferred'
+          for f in example/artifacts/milestone-*/tasks/task-*.md example/artifacts/one-off/task-*.md; do
+            [ -e "$f" ] || continue
+            st=$(grep -m1 -oE '\| \*\*Status\*\* \| [^|]+' "$f" | sed 's/| \*\*Status\*\* | //; s/ *$//')
+            echo "$st" | grep -qxE "$enum" || { echo "$f: Status '$st' is not a legal enum value"; fail=1; }
+          done
+          for r in example/artifacts/milestone-*/README.md; do
+            mdir=$(dirname "$r")
+            while IFS= read -r p; do
+              [ -f "$mdir/$p" ] || { echo "$r: Task Index references missing file $p"; fail=1; }
+            done < <(grep -oE '`tasks/task-[^`]+`' "$r" | tr -d '`')
+            for tf in "$mdir"/tasks/task-*.md; do
+              [ -e "$tf" ] || continue
+              base="tasks/$(basename "$tf")"
+              grep -q "\`$base\`" "$r" || { echo "$r: Task Index has no row for $base"; fail=1; }
+            done
+          done
+          while IFS='|' read -r _ id title sev status file _; do
+            id=$(echo "$id" | xargs); status=$(echo "$status" | xargs); file=$(echo "$file" | tr -d '\` ')
+            case "$id" in BUG-*) ;; *) continue ;; esac
+            bf="example/artifacts/$file"
+            [ -f "$bf" ] || { echo "BUGS.md index: file not found: $bf"; fail=1; continue; }
+            fst=$(grep -m1 -oE "\*\*Status\*\*: [A-Za-z' ]+" "$bf" | sed "s/\*\*Status\*\*: //; s/ *$//")
+            [ "$fst" = "$status" ] || { echo "$bf: file Status '$fst' != index Status '$status'"; fail=1; }
+          done < example/artifacts/BUGS.md
+          [ "$fail" -eq 0 ] && echo "task/bug state consistent"
+          exit $fail
 
       - name: Example fixture includes the 1.2 state files
         run: |

@@ -2,6 +2,7 @@
 name: reviewer
 description: "Use after Tester passes on every Coder or Refactor submission — reviews quality, standards compliance, and architecture adherence, classifying findings as Defects (→ Bug Gatherer) or Issues (→ Refactor). No code bypasses review."
 model: inherit
+tools: Read, Grep, Glob, Edit, Bash
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -27,7 +28,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `xhigh` (`high` when the executing model is Opus 4.6). Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. Report **every** Defect and Issue found, with severity and confidence — never self-filter to high-severity only; filtering happens downstream (Product, Refactor). Anchor every Issue to a named convention in `docs/CODE_PATTERNS.md`.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Follow the Handoff Protocol in `docs/PIPELINE_LOOP.md`: read only the task file, its Context Manifest, and the latest handoff entry's "Read next", then append one capped Handoff Log entry to the task file and reply to the orchestrator with a single routing line (the entry is the report, not the reply) — no narrative recap; emit the full finding block even when there are no findings — silence is not a clean report. Report **every** Defect and Issue found, with severity and confidence — never self-filter to high-severity only; filtering happens downstream (Product, Refactor). Anchor every Issue to a named convention in `docs/CODE_PATTERNS.md`.
 
 ---
 
@@ -90,6 +91,7 @@ The Reviewer Agent may NOT:
 ## Interaction Rules
 
 - **Trigger**: Reviewer runs after Tester passes. If Tester blocks a submission (tests fail), Reviewer does not run until tests pass. This gate also applies inside the Issue loop: after Refactor hands off, Tester re-runs before Reviewer re-reviews.
+- **Review the diff, not the tree**: the review surface is the commits recorded in the task's Handoff Log since the last Reviewer approval (Commit discipline, `docs/PIPELINE_LOOP.md`), read via `git show`/`git diff`. Read surrounding files only where the diff demands it — re-reading whole files the task did not touch is a minimal-context violation.
 - Reviewer reviews every change the Coder or Refactor submits — no code bypasses review.
 - Reviewer must cite the specific standard, document, or convention that a piece of code violates when requesting changes.
 - When Reviewer finds a defect, it routes to Bug Gatherer, which files the structured report (status New) for Product triage. Reviewer does not route defects to Debugger — Debugger activates only when Product triages a defect as **Fix Now**.

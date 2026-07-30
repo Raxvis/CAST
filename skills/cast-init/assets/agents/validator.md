@@ -2,6 +2,7 @@
 name: validator
 description: "Use at session start (Session-Start Checklist), at task- and milestone-completion checkpoints (invoked by /agent-code) to record outcomes in artifacts/AGENT_STATE.md, and whenever agents conflict or a process rule needs enforcement. Owns process integrity and milestone retrospectives."
 model: inherit
+tools: Read, Grep, Glob, Edit, Write
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -51,6 +52,7 @@ The Validator Agent owns the process. It does not write code, design screens, or
 - Detect and resolve conflicts between agents before they block progress.
 - Maintain an accurate Agent Status Dashboard at all times.
 - Run a milestone retrospective at the end of every milestone.
+- At the milestone-completion checkpoint, run the Archival Duty below — one-off hygiene plus bounding the shared root files.
 - Flag process violations when agents skip required steps.
 
 ---
@@ -127,6 +129,8 @@ _Run at the beginning of every working session._
 - [ ] Review the Process Violations log — confirm all violations have a resolution or owner.
 - [ ] Confirm Architecture has an Approved document for every module Coder will touch this session.
 - [ ] Confirm UI has an Approved spec for every screen Coder will touch this session.
+- [ ] Spot-check the bug index: each row's Status in `artifacts/BUGS.md` matches the Status field in its per-bug file. On a mismatch, the bug file wins — correct the index row and log a process violation.
+- [ ] If `artifacts/DOCTOR.md` exists, confirm it lists no unresolved Error-severity state findings; surface any that remain.
 
 ---
 
@@ -173,9 +177,9 @@ At the end of each milestone, Validator runs the retrospective: read `templates/
 
 | Artifact type | Template to read | Instance destination |
 |---|---|---|
-| Milestone retrospective (produced at `/agent-code` milestone completion) | `templates/MILESTONE_RETROSPECTIVE.md` | `artifacts/reviews/retrospective-milestone-{N}.md` |
+| Milestone retrospective (produced at `/agent-code` milestone completion) | `templates/MILESTONE_RETROSPECTIVE.md` | `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` |
 
-Every retrospective written under `artifacts/reviews/` must include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts — the template carries it; fill it in starting at v1 and add a row on every subsequent revision.
+Every retrospective (the milestone's `reviews/retrospective.md`) must include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts — the template carries it; fill it in starting at v1 and add a row on every subsequent revision.
 
 ### Metric Sources
 
@@ -183,13 +187,28 @@ Every metric in the retrospective maps to a recorded source. Fill from these —
 
 | Retrospective field | Source |
 |---|---|
-| Tasks planned / completed / rejected | Summary table in the milestone tasks file (`artifacts/milestones/milestone-{N}-{slug}-tasks.md`) |
+| Tasks planned / completed / rejected | Task Index in the milestone README (planned) plus Status fields and Handoff Logs across `tasks/task-*.md` (completed / rejected) |
 | Process violations | Process Violations table in `artifacts/AGENT_STATE.md` → `## validator` |
 | Conflicts escalated to Validator | Conflicts table in `artifacts/AGENT_STATE.md` → `## validator` |
-| Architecture doc revisions | `## Revision History` table in `artifacts/architecture/arch-milestone-{N}.md` |
-| UI spec revisions | `## Revision History` table in `artifacts/ui-specs/ui-milestone-{N}.md` |
-| Estimated effort | "Estimated Effort" field in the milestone definition (`artifacts/milestones/milestone-{N}-{slug}.md`) |
+| Architecture doc revisions | `## Revision History` table in `artifacts/milestone-{N}-{slug}/architecture.md` |
+| UI spec revisions | `## Revision History` table in `artifacts/milestone-{N}-{slug}/ui.md` |
+| Manifest patches during engineering | Handoff Log entries across `artifacts/milestone-{N}-{slug}/tasks/task-*.md` noting a Context Manifest addition (the insufficient-manifest fallback in `docs/PIPELINE_LOOP.md` → Handoff Protocol) |
+| Estimated effort | "Estimated Effort" field in the milestone definition (`artifacts/milestone-{N}-{slug}/README.md`) |
 | Actual duration | Session dates for this milestone in `artifacts/STANDUP.md` (first to last session) |
+
+---
+
+## Archival Duty (milestone-completion checkpoint)
+
+The shared root files must stay bounded — twenty milestones of append-only growth turns every session-start read into the context bomb the per-milestone layout exists to prevent. As part of the milestone-completion invocation (after recording the outcome and writing the retrospective), Validator archives:
+
+1. **One-off hygiene**: move every `artifacts/one-off/task-{slug}.md` with Status Complete into `artifacts/one-off/archive/` (bug files stay in place — `artifacts/BUGS.md` index rows point at them).
+2. **STANDUP sessions**: move session sections older than the just-completed milestone's first session from `artifacts/STANDUP.md` to `artifacts/archive/STANDUP.md` (same Entry Grammar, appended newest-first). The live file keeps the just-completed milestone's sessions and anything newer.
+3. **AGENT_STATE rows**: move log rows (Decisions Logs, Process Violations, Conflicts with Status resolved, completed Current Work rows, drained queues) dated before the just-completed milestone's first session from `artifacts/AGENT_STATE.md` to the matching section of `artifacts/archive/AGENT_STATE.md`. Never move: unresolved Conflicts, open Open Questions, pending Future Work, the Agent Status Dashboard, the Milestone Progress table, or the Performance Budget Tracking table — live state stays live regardless of age.
+
+Archive files mirror the live files' structure; create them on first use. This sanctioned move is the one exception to the append-only rule — rows are relocated verbatim, never edited or dropped, so the full history remains greppable under `artifacts/archive/`.
+
+`artifacts/DOCTOR.md` is bounded by overwrite (each `/cast-doctor` run replaces it; git history keeps priors) — Validator never relocates it.
 
 ---
 

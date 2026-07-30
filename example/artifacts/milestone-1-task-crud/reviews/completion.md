@@ -133,7 +133,7 @@ via CEO Condition 3 and is **closed**.
 |---|--------|-------|
 | 1 | Fix BUG-002: `done <id>` must error non-zero when the id does not exist. Add the previously-skipped Vitest case. | Coder |
 | 2 | Add "error on missing id" as a standard acceptance criterion for every id-based mutation command. | Product |
-| 3 | Document filesystem prerequisites (DB parent dir creation) in the M2 architecture document's data-layer section (carry-over from `artifacts/architecture/arch-milestone-1.md` §4). | Docs Writer |
+| 3 | Document filesystem prerequisites (DB parent dir creation) in the M2 architecture document's data-layer section (carry-over from `artifacts/milestone-1-task-crud/architecture.md` §4). | Docs Writer |
 
 ---
 
@@ -147,14 +147,14 @@ via CEO Condition 3 and is **closed**.
 
 ## References
 
-- **Milestone Definition**: `artifacts/milestones/milestone-1-task-crud.md`
-- **Task Breakdown**: `artifacts/milestones/milestone-1-task-crud-tasks.md`
-- **Validation Report**: `artifacts/milestones/milestone-1-task-crud-validation.md`
-- **CEO Review**: `artifacts/reviews/ceo-review-milestone-1.md`
-- **UX Review**: `artifacts/reviews/ux-review-milestone-1.md`
-- **Retrospective**: `artifacts/reviews/retrospective-milestone-1.md`
+- **Milestone Definition**: `artifacts/milestone-1-task-crud/README.md`
+- **Task Breakdown**: `artifacts/milestone-1-task-crud/tasks/`
+- **Validation Report**: `artifacts/milestone-1-task-crud/reviews/validation.md`
+- **CEO Review**: `artifacts/milestone-1-task-crud/reviews/ceo.md`
+- **UX Review**: `artifacts/milestone-1-task-crud/reviews/ux.md`
+- **Retrospective**: `artifacts/milestone-1-task-crud/reviews/retrospective.md`
 - **Bug Log**: `artifacts/BUGS.md`
-- **Architecture**: `artifacts/architecture/arch-milestone-1.md`
+- **Architecture**: `artifacts/milestone-1-task-crud/architecture.md`
 
 ---
 

@@ -139,7 +139,7 @@ Manage with `[PKG_MANAGER]`. Add new dependencies:
 ```
 
 Every new dependency must be justified in the Architect's Decisions Log in
-`artifacts/architecture/arch-milestone-{N}.md`. Dependencies are irreversible in practice
+`artifacts/milestone-{N}-{slug}/architecture.md`. Dependencies are irreversible in practice
 and compound over time — resist adding them.
 
 Current dependencies (see `[PKG_MANIFEST]`):
@@ -159,7 +159,7 @@ The project uses a strict split between reference material, document templates, 
 
 - **`docs/`** — reference only: requirements, conventions, design rationale. Never receives work artifacts. One deliberate exception: `docs/CHANGELOG.md` is a long-lived project register maintained by the release agent (see `docs/README.md` → Project Registers and Reference Logs).
 - **`templates/`** — reusable document templates (architecture, UI spec, milestone files). Agents copy them into `artifacts/` as instances; never filled in place.
-- **`artifacts/`** — all live work: milestone plans, per-milestone architecture and UI specs, security/performance/CEO reviews, bug reports (`artifacts/BUGS.md`), the rolling session log (`artifacts/STANDUP.md`), and every agent's live working state (`artifacts/AGENT_STATE.md`). Everything produced by `/agent-plan` and `/agent-code` lands here.
+- **`artifacts/`** — all live work, **grouped by milestone**: each `milestone-{N}-{slug}/` directory holds that milestone's README (definition), `architecture.md`, `ui.md`, `reviews/`, per-task files (`tasks/task-{T}-{slug}.md` — one isolated file per task, with its Context Manifest and Handoff Log), and per-bug files (`bugs/`). Cross-milestone state lives at the root: the bug index (`artifacts/BUGS.md`), the rolling session log (`artifacts/STANDUP.md`), every agent's live working state (`artifacts/AGENT_STATE.md`), and the `/cast-doctor` health report (`artifacts/DOCTOR.md`, created on first run and overwritten per run). One-off `/agent-task` work goes under `artifacts/one-off/`. Everything produced by the pipelines lands here.
 
 When in doubt, read `docs/FILE_CONVENTIONS.md` and `artifacts/README.md`.
 

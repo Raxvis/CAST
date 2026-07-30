@@ -21,6 +21,8 @@
 
 This file serves as a lightweight continuity log. Before starting each session, read the most recent session section. During and after each session, append entries using the Entry Grammar below.
 
+To stay lightweight, the log is bounded: at milestone-completion checkpoints, Validator moves session sections older than the just-completed milestone to `artifacts/archive/STANDUP.md` (see `validator.md` → Archival Duty). The live file keeps the current milestone's sessions plus a tail; archived sessions remain greppable in the archive file.
+
 ---
 
 ## Entry Grammar
@@ -33,7 +35,7 @@ This is the **single canonical format** for everything written to this file. All
 ### YYYY-MM-DD — <skill> — <milestone/task>
 ```
 
-where `<skill>` is the pipeline skill running (`agent-plan`, `agent-code`, or `agent-task`) and `<milestone/task>` identifies the work (e.g., `milestone-2-search-ui` or a one-off task summary).
+where `<skill>` is the skill running (`agent-plan`, `agent-code`, `agent-task`, or `cast-doctor`) and `<milestone/task>` identifies the work (e.g., `milestone-2-search-ui`, a one-off task summary, or `install health` for a doctor run).
 
 **Entries** under a session heading are typed one-liners:
 
@@ -80,7 +82,7 @@ _No sessions recorded yet. Add the first session section using the Entry Grammar
 | Document | Purpose |
 |----------|---------|
 | `BUGS.md` | Active bug tracker — reference when reporting blockers |
-| `../templates/MILESTONE_TASKS.md` | Milestone task breakdown template — reference for planned work |
+| `../templates/TASK.md` | Single-task file template — reference for planned work |
 | `milestones/milestone-{N}-{slug}-validation.md` | Milestone acceptance record — reference when validating completed work |
 
 ---

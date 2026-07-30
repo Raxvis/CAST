@@ -11,7 +11,7 @@
     {
       "name": "cast",
       "source": "./",
-      "description": "CAST — Claude Agent Staged Team. Run /cast-init in your project to install the staged multi-agent workflow (15 agents, /agent-plan, /agent-code, /agent-task).",
+      "description": "CAST — Claude Agent Staged Team. Run /cast-init in your project to install the staged multi-agent workflow (15 agents, /agent-plan, /agent-code, /agent-task, /cast-doctor).",
       "category": "workflows"
     }
   ]

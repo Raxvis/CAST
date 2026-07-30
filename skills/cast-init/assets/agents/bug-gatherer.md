@@ -2,6 +2,7 @@
 name: bug-gatherer
 description: "Use whenever a defect surfaces — Reviewer defect classifications, Tester failures worth tracking, Security findings, or user reports — files the structured report (status New) for Product triage. Single entry point for all bugs."
 model: inherit
+tools: Read, Grep, Glob, Edit, Write
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -15,8 +16,8 @@ HOW TO CUSTOMIZE:
 4. Replace [AREA_*] in the bug report template with the actual feature areas or modules in
    your project — this helps Bug Gatherer route reports to the right owner.
 5. Review the Severity Rubric and adjust the examples to match your project's severity scale.
-   The four levels (Critical, High, Medium, Low) match the canonical schema in artifacts/BUGS.md.
-6. The canonical bug entry format lives at the top of artifacts/BUGS.md — this file
+   The four levels (Critical, High, Medium, Low) match the canonical lifecycle rules in artifacts/BUGS.md.
+6. The canonical bug entry format lives in templates/BUG_REPORT.md — this file
    deliberately does not restate it. Keep the two aligned if you customize either.
 7. Review the Rules section and remove or adjust any that do not apply to your workflow.
 -->
@@ -98,8 +99,8 @@ The Bug Gatherer Agent may NOT:
 ## Interaction Rules
 
 - **Trigger**: Bug Gatherer activates when any agent or external source submits a bug. Sources include: Reviewer (defect classifications), Tester (failure reports), Security (findings), Product (validation bugs), Coder (self-reported issues), and external testers/stakeholders. Debugger is **not** a source of new reports — it appends investigation fields to existing triaged reports after Product triages them Fix Now.
-- Bug Gatherer is the single entry point for all bug reports. No agent logs bugs directly to `artifacts/BUGS.md` without going through Bug Gatherer first.
-- Bug Gatherer files the initial report. Debugger later adds investigation fields. The canonical entry format, status flow, and field ownership live at the top of `artifacts/BUGS.md`.
+- Bug Gatherer is the single entry point for all bug reports. No agent creates bug files or index rows without going through Bug Gatherer first.
+- Bug Gatherer creates the per-bug file (`bugs/bug-{XXX}-{slug}.md` beside the work that surfaced it, from `templates/BUG_REPORT.md`) and adds its index row to `artifacts/BUGS.md`. Debugger later adds investigation fields to the bug file. The status flow and field ownership live at the top of `artifacts/BUGS.md`; the entry format is `templates/BUG_REPORT.md`.
 - Bug Gatherer coordinates with Debugger to prevent duplicate entries.
 - Bug Gatherer does not assign bugs to Coder without Product's triage approval.
 
@@ -115,7 +116,7 @@ The Bug Gatherer follows these five steps for every incoming report:
 
 3. **Suggest Severity** — Apply the Severity Rubric below. State the suggested level and briefly explain why.
 
-4. **Write Report** — Produce a complete bug report using the canonical entry format at the top of `artifacts/BUGS.md`. Include all required fields, all situational fields that apply, and all auto-determined fields.
+4. **Write Report** — Create the per-bug file from `templates/BUG_REPORT.md` in the current milestone's `bugs/` directory (or `artifacts/one-off/bugs/` for /agent-task work), then add its one-line row to the index in `artifacts/BUGS.md`. Include all required fields, all situational fields that apply, and all auto-determined fields.
 
 5. **Confirm** — Read the completed report back to the reporter. Ask: "Does this accurately describe what you observed?" Make corrections if needed, then submit to Product.
 
@@ -179,7 +180,7 @@ When in doubt, round up (assign the higher severity level) and let Product adjus
 
 ## Bug Report Format
 
-The canonical bug entry format and field ownership live at the top of `artifacts/BUGS.md` — file reports in exactly that format. IDs follow the `BUG-XXX` convention (sequential, zero-padded, never reused). Every report is filed with status `New`; the full status flow is `New → Triaged → In Progress → Fixed → Verified → Closed`, with additional statuses `Duplicate` (set by Bug Gatherer at filing time), `Cannot Reproduce` (set by Debugger after investigation), `Won't Fix` (Product), and `Deferred` (Product). Terminal states are `Closed`, `Won't Fix`, `Duplicate`, and `Cannot Reproduce`; `Deferred` is an **open** held state — Product re-triages Deferred bugs at milestone completion and when planning the next milestone. The field-ownership table at the top of `artifacts/BUGS.md` is canonical. Frequency uses the canonical enum: `Always / Intermittent — N of M / Observed once / Unknown`. Debugger later adds the investigation fields, and Coder fills the resolution fields at fix time — do not fill those on initial filing.
+The canonical bug entry format is `templates/BUG_REPORT.md` (one file per bug, filed beside the work that surfaced it); the lifecycle and field ownership live at the top of `artifacts/BUGS.md`, where every bug also gets its one-line index row. IDs follow the `BUG-XXX` convention (sequential across the project, zero-padded, never reused — the next free ID is one greater than the highest in the index). Every report is filed with status `New`; the full status flow is `New → Triaged → In Progress → Fixed → Verified → Closed`, with additional statuses `Duplicate` (set by Bug Gatherer at filing time), `Cannot Reproduce` (set by Debugger after investigation), `Won't Fix` (Product), and `Deferred` (Product). Terminal states are `Closed`, `Won't Fix`, `Duplicate`, and `Cannot Reproduce`; `Deferred` is an **open** held state — Product re-triages Deferred bugs at milestone completion and when planning the next milestone. The field-ownership table at the top of `artifacts/BUGS.md` is canonical. Frequency uses the canonical enum: `Always / Intermittent — N of M / Observed once / Unknown`. Debugger later adds the investigation fields, and Coder fills the resolution fields at fix time — do not fill those on initial filing.
 
 ---
 

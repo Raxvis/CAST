@@ -28,7 +28,7 @@ Reference material for the command-line surface of [PROJECT_NAME]. This document
 covers argument parsing, stream discipline, exit codes, terminal formatting, and
 cross-platform behavior. Patterns here apply to any terminal binary regardless of
 [LANGUAGE] or [FRAMEWORK]; project-specific commands and flags live in
-`artifacts/ui-specs/`.
+the milestone's `ui.md` spec (`artifacts/milestone-{N}-{slug}/ui.md`).
 
 ---
 
@@ -48,7 +48,7 @@ on three streams (stdin, stdout, stderr) plus an exit code.
 ## Argument Parsing and Command Structure
 
 A CLI's argv is its public API. Design it once, document it in
-`artifacts/ui-specs/`, and do not change it without a version bump.
+the milestone's `ui.md` spec, and do not change it without a version bump.
 
 **Subcommand pattern.** For anything beyond a handful of flags, dispatch on the
 first positional arg:
@@ -143,7 +143,7 @@ Rules:
 
 - Every path that returns non-zero must also write a human-readable message to
   stderr prefixed with `[binaryName]: `.
-- Document every exit code the tool can return in `artifacts/ui-specs/`.
+- Document every exit code the tool can return in the milestone's `ui.md` spec.
 - Do not introduce new codes casually — each one is a compatibility commitment.
 - An uncaught exception must map to exit 2, not a crash with no code. Install a
   top-level handler.
@@ -270,7 +270,7 @@ boundaries) are in the root `CLAUDE.md`.
   mapping from error classes to user-facing messages and exit codes.
 - `docs/FILE_CONVENTIONS.md` — where CLI source lives in the project
   structure.
-- `artifacts/ui-specs/` — active, per-milestone CLI UX specifications (command
+- `artifacts/milestone-{N}-{slug}/ui.md` — active, per-milestone CLI UX specifications (command
   surface, exact stdout/stderr strings, exit-code table, edge cases).
 
 ---

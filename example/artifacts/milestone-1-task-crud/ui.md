@@ -22,7 +22,7 @@
 
 Acme Todo is a CLI tool with no visual UI. This spec defines the user-facing text surface: argv shapes, stdout formats, error messages, exit codes, and cross-platform behavior. Everything in this document is observable via a terminal or a pipe.
 
-**Related documents:** All commands read/write data through `src/db/connection.ts` (see `arch-milestone-1.md`). The underlying `Task` shape is defined in `src/types/task.ts`.
+**Related documents:** All commands read/write data through `src/db/connection.ts` (see `architecture.md`). The underlying `Task` shape is defined in `src/types/task.ts`.
 
 ---
 
@@ -300,7 +300,7 @@ Target platforms: macOS, Linux, Windows.
 
 ## CEO Verdict
 
-Gated by the CEO planning review — see `artifacts/reviews/ceo-review-milestone-1.md`: **APPROVED WITH CONDITIONS** (2026-04-08). None of the three conditions target this spec directly; the plain-text-only decision was confirmed for v1, with the color scheme deferred to a later milestone.
+Gated by the CEO planning review — see `artifacts/milestone-1-task-crud/reviews/ceo.md`: **APPROVED WITH CONDITIONS** (2026-04-08). None of the three conditions target this spec directly; the plain-text-only decision was confirmed for v1, with the color scheme deferred to a later milestone.
 
 ---
 

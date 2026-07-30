@@ -13,9 +13,9 @@
 **Date**: 2026-04-08
 **Stage**: `/agent-plan` Stage 3a
 **Inputs Reviewed**:
-- Milestone: `artifacts/milestones/milestone-1-task-crud.md`
-- Architecture: `artifacts/architecture/arch-milestone-1.md`
-- UI Spec: `artifacts/ui-specs/ui-milestone-1.md`
+- Milestone: `artifacts/milestone-1-task-crud/README.md`
+- Architecture: `artifacts/milestone-1-task-crud/architecture.md`
+- UI Spec: `artifacts/milestone-1-task-crud/ui.md`
 
 ---
 
@@ -73,3 +73,7 @@ Two findings filed against the Milestone 1 architecture. One Critical (SQL injec
 - No new third-party dependencies beyond `better-sqlite3` were introduced by this milestone; no dependency audit required.
 - No authentication, authorization, or network surface exists in Milestone 1 — scope is local filesystem and local SQLite only.
 - The `src/types/task.ts` type definition does not itself introduce a security concern but should not be used to validate untrusted input; all validation must happen at the command handler boundary.
+
+---
+
+**Implementation review required**: Yes — this milestone introduces a new dependency (`better-sqlite3`) and routes untrusted CLI input into SQL across all four command handlers. `/agent-code` runs the implementation-diff review at the milestone-completion checkpoint (`reviews/security-impl.md`).

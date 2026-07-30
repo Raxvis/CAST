@@ -1,9 +1,11 @@
 <!-- TEMPLATE INSTRUCTIONS
   FILE: MILESTONE_DEFINITION.md
-  PURPOSE: Template for the milestone definition artifact produced by the Product
-  agent during /agent-plan Stage 1. A milestone definition describes WHAT the
-  milestone is and WHY it matters. The task-level breakdown ("how") lives in a
-  separate sibling file using templates/MILESTONE_TASKS.md as its template.
+  PURPOSE: Template for the milestone README — the highest-order document of a milestone
+  directory, produced by the Product agent during /agent-plan Stage 1 as
+  artifacts/milestone-{N}-{slug}/README.md. It describes WHAT the milestone is and WHY it
+  matters, indexes the milestone's per-task files (tasks/task-{T}-{slug}.md, one instance
+  of templates/TASK.md each), and carries the milestone Status and the CEO Approval
+  Conditions. Task-level detail ("how") lives in the task files, one per task.
 
   HOW TO CUSTOMIZE:
   - Replace [PROJECT_NAME] with your project name.
@@ -37,11 +39,10 @@
 | **Milestone ID** | [M#] |
 | **Slug** | [kebab-case short name, e.g. `user-auth`] |
 | **Owner** | Product agent |
-| **Status** | Planning / CEO-Approved / In Progress / Complete / Deferred |
+| **Status** | Planning / CEO-Approved / In Progress / Complete / Complete with Deferrals |
 | **Requirements Reference** | [REQUIREMENTS_REFERENCE] |
 | **Estimated Effort** | [e.g., 2–3 days / 1 week / one sprint] |
 | **Depends On** | [List of prior milestone IDs that must be complete, or "None"] |
-| **Related Task Breakdown** | `artifacts/milestones/milestone-[M#]-[slug]-tasks.md` |
 
 ---
 
@@ -73,7 +74,7 @@ _Concrete, measurable outcomes that indicate the milestone is successful. Prefer
 
 ## In Scope (required)
 
-_Bulleted list of features, modules, or behaviors that belong in this milestone. Be specific. The tasks file will break each of these down into implementable work items._
+_Bulleted list of features, modules, or behaviors that belong in this milestone. Be specific. The per-task files under `tasks/` will break each of these down into implementable work items._
 
 - [In-scope item 1]
 - [In-scope item 2]
@@ -113,6 +114,27 @@ _List any external dependencies (libraries, services, prior milestones, team dec
 
 ---
 
+## Task Index (required)
+
+_One row per task file under `tasks/`. Deliberately no status column — task status lives ONLY in each task file's Header, so it is never written twice. To check milestone progress, read the Status field across `tasks/task-*.md`._
+
+| Task ID | Task Name | File | Dependencies |
+|---------|-----------|------|--------------|
+| [M#-T01] | [Task name] | `tasks/task-01-[slug].md` | None |
+| [M#-T02] | [Task name] | `tasks/task-02-[slug].md` | [M#-T01] |
+
+---
+
+## CEO Approval Conditions (required)
+
+_Filled after the CEO verdict (`reviews/ceo.md`). Coder tracks each condition during engineering; Reviewer and Product verify at completion. **Product owns the flip to Verified**: while writing the completion record at the milestone-completion checkpoint, Product confirms each row's evidence and sets its Status to Verified (with verifier and date) — or leaves it and lists it under the completion record's Known Issues. Tasks a condition names carry a `../README.md § CEO Approval Conditions` row in their Context Manifest._
+
+| Condition | Source | Status |
+|-----------|--------|--------|
+| [Condition text, or "None — verdict was APPROVED"] | `reviews/ceo.md` | Open / Addressed / Verified |
+
+---
+
 ## Cross-Cutting Concerns (optional)
 
 _Anything that touches multiple tasks in this milestone and needs to be specified once at the milestone level rather than repeated per-task. Examples: error-handling conventions, logging requirements, shared naming rules, the set of platforms that must be tested._
@@ -125,10 +147,10 @@ _Anything that touches multiple tasks in this milestone and needs to be specifie
 ## References (required)
 
 - **PRD section(s):** [PRD link or section anchor]
-- **Architecture document:** `artifacts/architecture/arch-milestone-[M#].md`
-- **UI specification:** `artifacts/ui-specs/ui-milestone-[M#].md`
-- **Task breakdown:** `artifacts/milestones/milestone-[M#]-[slug]-tasks.md`
-- **CEO review:** `artifacts/reviews/ceo-review-milestone-[M#].md`
+- **Architecture document:** `architecture.md`
+- **UI specification:** `ui.md`
+- **Task files:** `tasks/`
+- **CEO review:** `reviews/ceo.md`
 
 ---
 

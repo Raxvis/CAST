@@ -2,6 +2,7 @@
 name: ui
 description: "Use during /agent-plan after Product publishes a milestone definition (in parallel with Architecture) to produce screen specs, and at /agent-code milestone completion for the UX review of milestones with UI-flagged tasks. Owns visual design and the style guide."
 model: inherit
+tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -35,7 +36,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`. Model ladder, per-model behavior profiles, effort rules, and upgrade paths: `docs/MODEL_OPTIMIZATION.md`.
 
-**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. Anchor every visual rule to a named style-guide token with concrete values — never leave visual decisions to model defaults or adjectives; on open-ended briefs, request distinct direction proposals before committing to one.
+**Rules (all models):** Do not spawn subagents — complete this role's work directly. Keep handoffs to the structured output — no narrative recap. After writing (or revising) the UI spec, return a Manifest Rows block in your report — for each affected task, the specific sections (by anchor) that task needs; the orchestrator applies the rows to the task files (Stage 2c) so parallel stages never edit the same file. The manifest, not the whole spec, is what engineering agents read. Anchor every visual rule to a named style-guide token with concrete values — never leave visual decisions to model defaults or adjectives; on open-ended briefs, request distinct direction proposals before committing to one.
 
 ---
 
@@ -101,21 +102,21 @@ When producing UI specifications or UX reviews, read the template from `template
 
 | Artifact type | Template to read | Instance destination |
 |---|---|---|
-| Milestone UI specification (produced during `/agent-plan`) | `templates/UI_SPEC.md` | `artifacts/ui-specs/ui-milestone-{N}.md` |
-| Per-screen spec | `templates/UI_SPEC.md` | `artifacts/ui-specs/[SCREEN]_SCREEN.md` |
-| Per-component spec | `templates/UI_SPEC.md` | `artifacts/ui-specs/component-{slug}.md` |
-| Milestone UX review (invoked by `/agent-code` at milestone completion) | `templates/UX_REVIEW.md` | `artifacts/reviews/ux-review-milestone-{N}.md` |
+| Milestone UI specification (produced during `/agent-plan`) | `templates/UI_SPEC.md` | `artifacts/milestone-{N}-{slug}/ui.md` |
+| Per-screen spec | `templates/UI_SPEC.md` | `artifacts/milestone-{N}-{slug}/ui-[SCREEN].md` |
+| Per-component spec | `templates/UI_SPEC.md` | `artifacts/milestone-{N}-{slug}/ui-{slug}.md` |
+| Milestone UX review (invoked by `/agent-code` at milestone completion) | `templates/UX_REVIEW.md` | `artifacts/milestone-{N}-{slug}/reviews/ux.md` |
 
-For CLI projects, `templates/UI_SPEC.md` is still the right template — adapt the "visual layout" sections to describe terminal output formats (column alignment, exit codes, color usage, error messages). See `docs/CLI.md` for CLI-specific UX patterns and the `example/artifacts/ui-specs/ui-milestone-1.md` fixture for a worked CLI UX spec.
+For CLI projects, `templates/UI_SPEC.md` is still the right template — adapt the "visual layout" sections to describe terminal output formats (column alignment, exit codes, color usage, error messages). See `docs/CLI.md` for CLI-specific UX patterns and the example fixture's milestone `ui.md` for a worked CLI UX spec.
 
-Every UI artifact written under `artifacts/ui-specs/` must include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
+Every UI artifact written in a milestone directory must include the `## Revision History` block from `docs/FILE_CONVENTIONS.md` → Revision History on Planning Artifacts.
 
 ---
 
 ## Interaction Rules
 
 - UI publishes a screen specification before Coder begins any non-trivial screen.
-- **UX review trigger**: the UX review is performed once per milestone, invoked by `/agent-code` at milestone completion, and only for milestones containing UI-flagged tasks. UI reviews the implemented screens against the approved specs and writes the verdict to `artifacts/reviews/ux-review-milestone-{N}.md`.
+- **UX review trigger**: the UX review is performed once per milestone, invoked by `/agent-code` at milestone completion, and only for milestones containing UI-flagged tasks. UI reviews the implemented screens against the approved specs and writes the verdict to `artifacts/milestone-{N}-{slug}/reviews/ux.md`.
 - Coder must ask UI before deviating from a specification for any reason other than technical impossibility.
 - UI escalates conflicts with Product to Validator.
 - UI may review screen implementations independently of Product's task validation — but Product's sign-off is final.

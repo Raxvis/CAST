@@ -260,7 +260,7 @@ breakdown, use the corresponding template from `templates/`:
 | A high-level system | `templates/ARCH_SYSTEM.md` |
 | A data/save schema | `templates/ARCH_DATA_SCHEMA.md` |
 | A UI screen or component | `templates/UI_SPEC.md` |
-| A milestone's task list | `templates/MILESTONE_TASKS.md` |
+| A single task (one file per task) | `templates/TASK.md` |
 
 Copy the template to the correct location per `FILE_CONVENTIONS.md` before filling it in.
 Do not create architecture or specification documents from scratch.

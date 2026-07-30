@@ -45,17 +45,18 @@ In the Claude Code session, type:
 
 ---
 
-## Step 3 — Run `/agent-plan`, `/agent-code`, and `/agent-task` as "tab completion" smoke checks
+## Step 3 — Check the installed skills as "tab completion" smoke checks
 
-Type `/agent` and check that all three pipeline skills auto-complete (on current Claude Code versions, skills are invocable as `/<name>`):
+Type `/agent` and check that the three pipeline skills auto-complete, then `/cast` for the maintenance skill (on current Claude Code versions, skills are invocable as `/<name>`):
 
 ```
 /agent-plan
 /agent-code
 /agent-task
+/cast-doctor
 ```
 
-**Verify:** every pipeline skill you kept in `.claude/skills/` appears in the completion list. You do not need to actually run them yet — just confirm Claude Code sees them.
+**Verify:** every skill you kept in `.claude/skills/` appears in the completion list. You do not need to actually run them yet — just confirm Claude Code sees them.
 
 **If a pipeline is missing:** restart the session. Claude Code discovers `.claude/skills/` at session start; if you installed while a session was already open, the new files are not picked up until you restart. If it is still missing after a restart, confirm the file exists at `.claude/skills/<name>/SKILL.md` and its frontmatter `name` matches the directory name.
 
@@ -69,13 +70,13 @@ With your session still open, run:
 /agent-plan "Print a hello-world message when the app starts"
 ```
 
-**Verify:** the Product agent kicks off. You should see it begin writing a milestone definition to `artifacts/milestones/milestone-1-*.md`.
+**Verify:** the Product agent kicks off. You should see it create `artifacts/milestone-1-<slug>/` and begin writing the milestone README there.
 
-You can interrupt the planning run as soon as Product starts writing — you are not trying to produce a real milestone, you are just confirming the command routing works. If Product writes anything at all into `artifacts/milestones/`, Steps 1–3 are confirmed and the pipeline is wired up correctly.
+You can interrupt the planning run as soon as Product starts writing — you are not trying to produce a real milestone, you are just confirming the command routing works. If Product writes anything at all into a new `artifacts/milestone-1-*/` directory, Steps 1–3 are confirmed and the pipeline is wired up correctly.
 
 **If Product never writes a file:** the Product agent is not loading. Check `.claude/agents/product.md` for frontmatter issues, or re-run `/agents` to confirm Product is listed.
 
-**If `/agent-plan` halts with a "missing template" error:** your `templates/` directory is missing `MILESTONE_TASKS.md` or another planning template that the pipeline references. Re-run `/cast-init` to reinstall `templates/`.
+**If `/agent-plan` halts with a "missing template" error:** your `templates/` directory is missing `TASK.md` or another planning template that the pipeline references. Re-run `/cast-init` to reinstall `templates/`.
 
 ---
 
@@ -98,11 +99,10 @@ For a lighter-weight verification that the engineering pipeline is working:
 If you ran Step 4 or Step 5, a few files are now in `artifacts/`. Delete them before your real work begins:
 
 ```
-rm -f artifacts/milestones/milestone-1-*
-rm -f artifacts/architecture/arch-milestone-1*
-rm -f artifacts/ui-specs/ui-milestone-1*
-rm -f artifacts/reviews/*-review-milestone-1*
+rm -rf artifacts/milestone-1-*
 ```
+
+(Everything a planning run writes — reviews included — lives inside that one milestone directory.)
 
 Or use the completion-report template to keep a record of the first run if you want a historical marker.
 
@@ -150,6 +150,12 @@ Each probe is a single prompt to launch the named agent explicitly. Each takes u
 - **Probe returns generic output that could come from any agent:** the role definition is not being loaded. Check that `.claude/agents/<name>.md` has valid frontmatter (see Step 2).
 - **Probe returns a "model not available" error:** your account does not have access to the pinned model. Override the `model:` line in the agent's frontmatter to a model you have access to.
 - **Probe returns output that contradicts the agent's role definition:** the model is not reading the agent body carefully enough. Try a more capable model tier, or tighten the agent's Interaction Rules section to be more prescriptive.
+
+---
+
+## After the first run
+
+Once this checklist passes, this file has done its job — later health questions belong to `/cast-doctor`, the run-anytime install check (structural invariants, documentation audit, coverage gaps). Expect a future `/cast-doctor` run to propose deleting this file as self-obsoleted; that is working as intended.
 
 ---
 

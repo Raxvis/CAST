@@ -6,7 +6,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## Which pipeline should I use — `/agent-plan`, `/agent-code`, or `/agent-task`?
 
-**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes, and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → Security + Performance → CEO). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Tester → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
+**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes (plus `/cast-doctor`, the maintenance skill — not a pipeline), and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → Security + Performance → CEO). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Tester → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
 
 **Fix.** Use the table below to pick a pipeline, then read the narrative note after it.
 
@@ -16,13 +16,15 @@ Common problems adopting or running this template, with the most likely cause an
 | "Fix a typo in the README" | `/agent-task` | Self-contained text change, no design work needed. |
 | "Fix a bug already in `artifacts/BUGS.md`" | `/agent-task` | Scope is bounded by the bug report. |
 | "Add a new command or endpoint" | `/agent-plan` then `/agent-code` | Touches the public interface — needs UI spec, security review, CEO sign-off. |
+| "One self-contained feature that needs a design decision or two" | `/agent-plan single: <feature>` then `/agent-code` | Single-task planning mode: Product + Architecture + CEO only, one task file — design work gets planned without full milestone ceremony. |
+| "Check the health of the CAST install / slim the docs after a model upgrade" | `/cast-doctor` | Maintenance skill, not a pipeline: verifies install invariants, prescribes model-gated documentation pruning, finds coverage gaps. Report-only until you approve treatments. |
 | "Bump a dependency and update call sites" | `/agent-task` | Mechanical change across existing patterns, no new design. |
 | "Refactor a single function" | `/agent-task` | Contract doesn't change, no architectural impact. |
 | "Refactor across multiple modules" | `/agent-plan` then `/agent-code` | Cross-cutting — needs an architecture revision. |
 | "Add a flag following an existing pattern" | `/agent-task` | The pattern already exists; no new design decisions. |
 | "Add a new data field to a schema" | `/agent-plan` then `/agent-code` | Schema change requires migration planning, security review, CEO sign-off. |
 
-**When in doubt, run `/agent-plan` first.** The planning gate exists because ad-hoc changes that turn out to need design work produce drift that is expensive to untangle later. `/agent-task` will halt and tell you to run `/agent-plan` if its Pre-Flight or Reviewer step notices you've crossed the line — but front-loading the decision is faster than backing out of a half-finished one-off task.
+**When in doubt, run `/agent-plan` first** — single-task mode (`/agent-plan single: <feature>`) keeps the tax small when the work is one task. The planning gate exists because ad-hoc changes that turn out to need design work produce drift that is expensive to untangle later. `/agent-task` will halt and route you to the right planning tier if its Pre-Flight or Reviewer step notices you've crossed the line — but front-loading the decision is faster than backing out of a half-finished one-off task.
 
 ---
 
@@ -46,7 +48,7 @@ Common problems adopting or running this template, with the most likely cause an
 2. Run the move command(s) from the project root. Typically:
    ```
    mv .cast-stage/agents .claude/agents
-   mv .cast-stage/skills/agent-plan .cast-stage/skills/agent-code .cast-stage/skills/agent-task .claude/skills/
+   mv .cast-stage/skills/agent-plan .cast-stage/skills/agent-code .cast-stage/skills/agent-task .cast-stage/skills/cast-doctor .claude/skills/
    rmdir .cast-stage/skills .cast-stage
    ```
 3. Restart your Claude Code session so the moved agents and skills register.
@@ -120,19 +122,19 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## `/agent-code` fails at pre-flight with "CEO review not found"
 
-**Cause.** `/agent-code` reads `artifacts/reviews/ceo-review-milestone-{N}.md` before running any task. If that file does not exist, the planning stage was never completed (or was not completed for the milestone you specified).
+**Cause.** `/agent-code` reads `artifacts/milestone-{N}-{slug}/reviews/ceo.md` before running any task. If that file does not exist, the planning stage was never completed (or was not completed for the milestone you specified).
 
 **Fix.**
 1. Run `/agent-plan <milestone>` first. The planning stage ends with a CEO verdict written to that path.
 2. If the CEO issued **REVISION REQUIRED**, the planning stage is not complete. Address the Revision Requests (named by agent in the review document), re-run the affected stage, and re-run the CEO review.
-3. If you are trying to run engineering for a milestone that was planned manually (not via `/agent-plan`), you have two options: either run `/agent-plan` to produce the CEO review file retroactively, or hand-create `artifacts/reviews/ceo-review-milestone-{N}.md` from `templates/CEO_REVIEW.md` with its single `**Verdict**: APPROVED` line filled in. Pre-Flight parses that one line — there is exactly one verdict string in the file (the old three-checkbox verdict block is gone), so don't leave all three options in place.
-4. Note what Pre-Flight does beyond the existence check: it reads the verdict from the `**Verdict**:` line, and on **APPROVED WITH CONDITIONS** it cross-checks the CEO Approval Conditions table in the milestone's tasks file — backfilling it from the CEO review if missing or stale — so the conditions follow every task through implementation and review. A hand-created review with conditions should list them explicitly.
+3. If you are trying to run engineering for a milestone that was planned manually (not via `/agent-plan`), you have two options: either run `/agent-plan` to produce the CEO review file retroactively, or hand-create `artifacts/milestone-{N}-{slug}/reviews/ceo.md` from `templates/CEO_REVIEW.md` with its single `**Verdict**: APPROVED` line filled in. Pre-Flight parses that one line — there is exactly one verdict string in the file (the old three-checkbox verdict block is gone), so don't leave all three options in place.
+4. Note what Pre-Flight does beyond the existence check: it reads the verdict from the `**Verdict**:` line, and on **APPROVED WITH CONDITIONS** it cross-checks the CEO Approval Conditions table in the milestone README — backfilling it from the CEO review if missing or stale, and adding the manifest row to affected task files — so the conditions follow every task through implementation and review. A hand-created review with conditions should list them explicitly.
 
 ---
 
 ## I have no `ui` agent — will `/agent-plan` and `/agent-code` still run?
 
-**Cause.** Backend and CLI-only projects can opt out of the `ui` agent during `/cast-init` (the UI templates are skipped together with it). Before v1.4.0, `/agent-code` Pre-Flight unconditionally required `artifacts/ui-specs/ui-milestone-{N}.md`, so opted-out projects dead-ended between the two pipelines.
+**Cause.** Backend and CLI-only projects can opt out of the `ui` agent during `/cast-init` (the UI templates are skipped together with it). Before v1.4.0, `/agent-code` Pre-Flight unconditionally required the milestone UI spec (now `artifacts/milestone-{N}-{slug}/ui.md`), so opted-out projects dead-ended between the two pipelines.
 
 **Fix.** Nothing to work around on a current install — the opt-out is wired through end to end:
 1. `/agent-plan` skips its UI design stage when `.claude/agents/ui.md` is absent, so no UI spec is produced and the CEO review's UI section is marked not applicable.
@@ -144,7 +146,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## I interrupted `/agent-code` mid-milestone — how do I resume?
 
-**Cause.** A session died (or you stopped it) partway through a milestone. This is a designed-for case, not an error: the task-completion checkpoint writes each finished task's **Status** back to `artifacts/milestones/milestone-{N}-{slug}-tasks.md`, so the tasks file is the resume ledger.
+**Cause.** A session died (or you stopped it) partway through a milestone. This is a designed-for case, not an error: the task-completion checkpoint writes each finished task's **Status** into its own task file's Header (`artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md`), so the task files are the resume ledger.
 
 **Fix.**
 1. Re-run `/agent-code <milestone>`. Task Selection skips every task whose Status is already Complete or Deferred and picks up at the first remaining task — finished work is not redone.
@@ -160,9 +162,20 @@ Common problems adopting or running this template, with the most likely cause an
 
 **Fix.**
 1. Re-read the halt message. It should name the specific scope-crossing concern (e.g., "introduces a new module", "changes a data schema", "adds a new CLI subcommand").
-2. Run `/agent-plan "<feature description>"` to produce the planning artifacts for that scope. This runs Product → Architecture + UI → Security + Performance → CEO and ends with a verdict file at `artifacts/reviews/ceo-review-milestone-{N}.md`.
+2. Run the planning tier the halt message named. For a single self-contained feature needing one or two design decisions, `/agent-plan single: "<feature description>"` runs the light mode (Product + Architecture + CEO, one task file). For multi-task or cross-cutting scope, `/agent-plan "<feature description>"` runs the full stage (Product → Architecture + UI → Security + Performance → CEO). Either way it ends with a verdict file at `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
 3. After the CEO issues **APPROVED** or **APPROVED WITH CONDITIONS**, run `/agent-code <milestone>` to execute the engineering stage against the approved plan.
 4. If you disagree with the scope classification and think the change is really self-contained, you can re-run `/agent-task` with a more precise task description that narrows the scope (name the specific file, the specific bug ID, or the specific existing pattern the change follows). Do not try to sneak a design change through `/agent-task` — the gate exists to prevent drift, and the Reviewer in Step 3 will catch it anyway.
+
+---
+
+## Documentation feels heavier than the project needs (or models were upgraded)
+
+**Cause.** Installed CAST documentation restates things a capable model can infer from the code itself — directory layouts, naming tables, tech-stack lists, generic best-practice essays. That written scaffolding is load-bearing for less capable models (Opus 4.6/4.7, Haiku-pinned utility agents) but becomes redundant context weight once the models consuming a doc clear the Context Inference Bar (`docs/MODEL_OPTIMIZATION.md`).
+
+**Fix.**
+1. Run `/cast-doctor` (or `/cast-doctor checkup` for a report with no changes). It writes `artifacts/DOCTOR.md`: state findings, two-tier diet prescriptions (Tier A always safe; Tier B gated per doc on its weakest consumer's model), and coverage gaps.
+2. Approve or decline prescriptions individually — nothing is removed without your approval, and embedded decisions are rescued into `docs/DESIGN_RATIONALE.md` before any trim.
+3. Re-run after any model change: upgrades unlock previously bar-blocked prunes; downgrades surface restoration findings (git history keeps everything).
 
 ---
 
@@ -190,7 +203,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 **Fix.**
 1. Use `/agent-plan` and `/agent-code` as the canonical entry points. They exist specifically to sequence the agents correctly.
-2. If you must invoke an agent directly, give it the prior agent's output as input ("Here is the architecture document at `artifacts/architecture/arch-milestone-3.md`; implement task T-4.").
+2. If you must invoke an agent directly, give it the task file as input ("Work `artifacts/milestone-3-search/tasks/task-04-index-rebuild.md` — read only its Context Manifest and latest handoff entry.").
 3. Escalate conflicts per the repo's `skills/cast-init/assets/agents/README.md` → Conflict Resolution Priority: **Product > Architecture > UI**. The Validator agent arbitrates the dispute by applying that hierarchy — it does not sit in the hierarchy and does not override anyone; Product has final say on scope.
 
 ---
@@ -200,7 +213,7 @@ Common problems adopting or running this template, with the most likely cause an
 **Cause.** The CEO applies a cross-cutting review against Security, Performance, Architecture, UI, and milestone scope. If any of those have open Critical findings, scope contradictions, or budget violations, the verdict will keep coming back as REVISION REQUIRED until resolved.
 
 **Fix.**
-1. Open `artifacts/reviews/ceo-review-milestone-{N}.md` and read the "Revision Requests" table (the verdict itself is the single `**Verdict**:` line). Every revision is addressed to a specific agent with a cited section.
+1. Open `artifacts/milestone-{N}-{slug}/reviews/ceo.md` and read the "Revision Requests" table (the verdict itself is the single `**Verdict**:` line). Every revision is addressed to a specific agent with a cited section.
 2. Re-run only the affected planning stage — but note a revised architecture re-passes Stage 3 (both Security and Performance) before the CEO sees it again, so the CEO never re-reviews against stale findings.
 3. Only then re-run Stage 4 (CEO). The CEO does not rewrite plans; it reviews them.
 4. If you disagree with a CEO revision, escalate per the conflict resolution hierarchy (Product > Architecture > UI) — Validator arbitrates but does not override, and the CEO does not override Product on business intent.

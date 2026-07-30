@@ -27,17 +27,18 @@ filled in place — copy first, then edit the copy.
 
 | Template | Produced by | Used in | Instance destination |
 |---|---|---|---|
-| `ARCH_MODULE.md` | Architect | `/agent-plan` Stage 2a | `artifacts/architecture/` |
-| `ARCH_SYSTEM.md` | Architect | `/agent-plan` Stage 2a | `artifacts/architecture/` |
-| `ARCH_DATA_SCHEMA.md` | Architect | `/agent-plan` Stage 2a | `artifacts/architecture/` |
-| `UI_SPEC.md` | UI | `/agent-plan` Stage 2b | `artifacts/ui-specs/` |
-| `MILESTONE_DEFINITION.md` | Product | `/agent-plan` Stage 1 | `artifacts/milestones/milestone-{N}-{slug}.md` |
-| `MILESTONE_TASKS.md` | Product | `/agent-plan` Stage 1 | `artifacts/milestones/milestone-{N}-{slug}-tasks.md` |
-| `MILESTONE_COMPLETION.md` | Product | `/agent-code` (after engineering) | `artifacts/milestones/milestone-{N}-{slug}-completion.md` |
-| `MILESTONE_VALIDATION.md` | Product | `/agent-code` milestone-completion checkpoint only (milestone acceptance record; its Task Validation Checklist doubles as the *criteria* Product applies per task at Step 4 — per-task outcomes go to the tasks file's Status plus a STANDUP `progress` entry, with no per-task document) | `artifacts/milestones/milestone-{N}-{slug}-validation.md` |
-| `CEO_REVIEW.md` | CEO | `/agent-plan` Stage 4 | `artifacts/reviews/ceo-review-milestone-{N}.md` |
-| `UX_REVIEW.md` | UI | `/agent-code` milestone-completion checkpoint (once per milestone; only milestones with UI-flagged tasks) | `artifacts/reviews/ux-review-milestone-{N}.md` |
-| `MILESTONE_RETROSPECTIVE.md` | Validator | `/agent-code` milestone-completion checkpoint | `artifacts/reviews/retrospective-milestone-{N}.md` |
+| `MILESTONE_DEFINITION.md` | Product | `/agent-plan` Stage 1 | `artifacts/milestone-{N}-{slug}/README.md` — the milestone's highest-order document |
+| `TASK.md` | Product | `/agent-plan` Stage 1 (one instance **per task**); `/agent-task` (one-off tasks) | `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md`, or `artifacts/one-off/task-{slug}.md` |
+| `ARCH_MODULE.md` | Architect | `/agent-plan` Stage 2a | `artifacts/milestone-{N}-{slug}/architecture.md` (or `arch-{slug}.md` for supplemental docs) |
+| `ARCH_SYSTEM.md` | Architect | `/agent-plan` Stage 2a | `artifacts/milestone-{N}-{slug}/architecture.md` (or `arch-{slug}.md` for supplemental docs) |
+| `ARCH_DATA_SCHEMA.md` | Architect | `/agent-plan` Stage 2a | `artifacts/milestone-{N}-{slug}/architecture.md` (or `arch-{slug}.md` for supplemental docs) |
+| `UI_SPEC.md` | UI | `/agent-plan` Stage 2b | `artifacts/milestone-{N}-{slug}/ui.md` (or `ui-{slug}.md` for supplemental screen/component specs) |
+| `BUG_REPORT.md` | Bug Gatherer | Any pipeline, when a defect is filed (one instance **per bug**) | `artifacts/milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md`, or `artifacts/one-off/bugs/bug-{XXX}-{slug}.md`; indexed in `artifacts/BUGS.md` |
+| `MILESTONE_COMPLETION.md` | Product | `/agent-code` milestone-completion checkpoint | `artifacts/milestone-{N}-{slug}/reviews/completion.md` |
+| `MILESTONE_VALIDATION.md` | Product | `/agent-code` milestone-completion checkpoint only (milestone acceptance record; its Task Validation Checklist doubles as the *criteria* Product applies per task at Step 4 — per-task outcomes go to the task file's Status plus a STANDUP `progress` entry, with no per-task document) | `artifacts/milestone-{N}-{slug}/reviews/validation.md` |
+| `CEO_REVIEW.md` | CEO | `/agent-plan` Stage 4 | `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |
+| `UX_REVIEW.md` | UI | `/agent-code` milestone-completion checkpoint (once per milestone; only milestones with UI-flagged tasks) | `artifacts/milestone-{N}-{slug}/reviews/ux.md` |
+| `MILESTONE_RETROSPECTIVE.md` | Validator | `/agent-code` milestone-completion checkpoint | `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` |
 
 ---
 
@@ -45,8 +46,9 @@ filled in place — copy first, then edit the copy.
 
 1. Pick the template that matches what you are documenting (see the table above, or
    `docs/CODE_PATTERNS.md` → "Architecture Document Templates").
-2. **Copy** it to the correct `artifacts/` subdirectory under the naming pattern in
-   `docs/FILE_CONVENTIONS.md`.
+2. **Copy** it to the correct location inside the milestone's directory
+   (`artifacts/milestone-{N}-{slug}/`) under the naming pattern in
+   `docs/FILE_CONVENTIONS.md` — or under `artifacts/one-off/` for `/agent-task` work.
 3. Fill in the copy. Never edit the template in `templates/` directly.
 
 ---

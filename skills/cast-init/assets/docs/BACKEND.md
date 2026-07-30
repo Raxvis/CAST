@@ -279,7 +279,7 @@ Backend-specific traps that recur across projects:
 
 - `docs/CODE_PATTERNS.md` — universal naming, module layout, and style conventions
 - `docs/ERROR_HANDLING.md` — project-wide error category taxonomy and logging rules
-- `artifacts/architecture/` — active architecture documents, including per-milestone
+- `artifacts/milestone-{N}-{slug}/architecture.md` (and supplemental `arch-{slug}.md` docs) — active architecture documents, including per-milestone
   service and data-schema designs
 
 ---

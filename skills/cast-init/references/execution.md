@@ -54,7 +54,7 @@ The per-file read-merge-write procedure in 5.4–5.8 remains **required** for ev
 
 ## 5.2 — Create directories
 
-Create any missing directories: `.claude/agents/`, `.claude/skills/`, `docs/`, `templates/`, `artifacts/`, `artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, `artifacts/reviews/`.
+Create any missing directories: `.claude/agents/`, `.claude/skills/`, `docs/`, `templates/`, `artifacts/`, `artifacts/one-off/`. (Milestone directories are created by `/agent-plan`, never by the installer.)
 
 ## 5.3 — Handle directory renames
 
@@ -71,7 +71,7 @@ For each agent:
 3. If the action is **Create**: write to `.claude/agents/<name>.md` directly.
 4. If the action is **Rename + Update**: read the existing file first, identify custom sections (anything not in CAST's standard section list), write the CAST template as the base, insert custom sections as an appendix after the standard sections, then move the old file to the new canonical name.
 5. If the action is **Update in place**: read the existing file, identify custom sections, replace CAST-owned sections with CAST's current versions, leave custom sections untouched. **Role-mismatch guard**: before merging, compare the existing file's frontmatter `description` (and its evident role) against the roster's Role column for that name. If they diverge — e.g. `.claude/agents/coder.md` exists but is not a coder-role agent — the file is occupying a canonical CAST path without fulfilling the CAST role: never silently update in place. Treat it as an Ask (rename the user's file aside and Create fresh, or merge deliberately), stopping to get the user's answer if the Phase 3 plan did not already resolve it.
-6. Verify YAML frontmatter is valid (`name`, `description`, `model` keys present, properly quoted description).
+6. Verify YAML frontmatter is valid (`name`, `description`, `model`, `tools` keys present, properly quoted description; `tools` omits `Task`).
 
 After completing the loop, **re-enumerate the 15 names and confirm each `.claude/agents/<name>.md` exists**. If any file is missing, that means the action was skipped. Create it from the canonical template before moving on to 5.5.
 
@@ -104,10 +104,10 @@ Place preserved custom sections in a `## Project Customizations (preserved)` sec
 
 ## 5.5 — Install pipeline skills
 
-For each of `agent-plan`, `agent-code`, `agent-task`:
+For each of `agent-plan`, `agent-code`, `agent-task`, `cast-doctor`:
 
 1. Read from `<CAST_SOURCE>/skills/<name>/SKILL.md`. **Never install `<CAST_SOURCE>/skills/README.md`** — it is payload documentation, not a skill.
-2. Substitute project-specific values including `[PROJECT_NAME]`, `[TEST_CMD]`, and `[MAX_LOOP_COUNT]` (default 3 if not specified).
+2. Substitute project-specific values including `[PROJECT_NAME]`, `[TEST_CMD]`, and `[MAX_LOOP_COUNT]` (default 3 if not specified). `cast-doctor` carries only `[PROJECT_NAME]` — it never runs project code, so it takes no test command or loop cap.
 3. Write to `.claude/skills/<name>/SKILL.md` (create the directory). Keep the frontmatter `name` field equal to the directory name — Claude Code requires the match.
 4. If updating an existing similar-named pipeline: preserve any project-specific pre-flight or post-completion steps by moving them to an appendix section labelled `## Project-Specific Extensions (preserved from pre-CAST version)`.
 5. **Pre-1.0 migration**: if `.claude/commands/<name>.md` exists (the pipelines were slash commands before CAST v1.0.0), treat it as the existing counterpart — merge its preserved custom sections into the new SKILL.md per rule 4, then propose Delete of the old command file. The delete requires explicit user approval (per the safety rules), but leaving both files registers a duplicate `/<name>`, so flag it clearly rather than silently keeping both.
@@ -124,7 +124,7 @@ For each CAST reference doc and document template in the plan:
 2. For **Rename + Update**: read the existing file first, preserve all non-template content (e.g., an existing PRD with real requirements) as the body, update only the header and any CAST-specific framing.
 3. For **Update in place**: same as Rename + Update but without moving the file.
 4. Always install `docs/FILE_CONVENTIONS.md` — it's load-bearing for the docs/templates/artifacts split enforcement.
-5. The `templates/*` skeletons (architecture, UI spec, milestone, milestone-retrospective, CEO review, and UX review templates — every `templates/*` file except `README.md`, eleven skeletons in all) install verbatim into the project's top-level `templates/` directory. Create the directory if it does not exist. `templates/README.md` also installs, but as documentation — with placeholder substitution and the scaffolding strip applied, per its disposition row.
+5. The `templates/*` skeletons (architecture, UI spec, milestone, task, bug-report, milestone-retrospective, CEO review, and UX review templates — every `templates/*` file except `README.md`, twelve skeletons in all) install verbatim into the project's top-level `templates/` directory. Create the directory if it does not exist. `templates/README.md` also installs, but as documentation — with placeholder substitution and the scaffolding strip applied, per its disposition row.
 6. In installed README files (`docs/README.md`, `templates/README.md`, `artifacts/README.md`), replace any `[YYYY-MM-DD]` "Last updated" token with the install date.
 
 ## 5.7 — Install artifacts scaffold
@@ -132,7 +132,7 @@ For each CAST reference doc and document template in the plan:
 1. Read `BUGS.md`, `STANDUP.md`, `AGENT_STATE.md`, `README.md` from `<CAST_SOURCE>/artifacts/`.
 2. Substitute placeholders.
 3. Write to `artifacts/`. If a file already exists with user content, preserve it — merge only if the user explicitly approved.
-4. Ensure all four subdirectories (`milestones/`, `architecture/`, `ui-specs/`, `reviews/`) exist. Do not populate them — they fill up during `/agent-plan` and `/agent-code` runs.
+4. Ensure `artifacts/one-off/` exists. Do not pre-create milestone directories — `/agent-plan` Stage 1 creates each `artifacts/milestone-{N}-{slug}/`. If the plan approved a pre-2.0 by-type layout migration (see `dispositions.md` → Artifacts directory), execute it here: per-file `git mv` into the milestone directories, the `-tasks.md` → per-task-file split, and the `BUGS.md` → index + per-bug-file conversion, exactly as planned.
 5. **State migration rule**: if an existing pre-1.2 agent file carries populated state tables (Current Work, Decisions Log, Directives Queue, dashboards, etc.), move the populated rows into the matching `artifacts/AGENT_STATE.md` section during the update, then install the slimmed agent definition. Empty `_(empty)_` tables are simply dropped from the agent file — the empty schemas already exist in `AGENT_STATE.md`.
 
 ## 5.8 — Install CLAUDE.md
