@@ -8,6 +8,20 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [2.0.1] — 2026-07-30
+
+Post-release fixes for stale v1 paths that survived the 2.0.0 restructure, caught in post-merge review.
+
+### Fixed
+
+- **Installed `artifacts/STANDUP.md`** (and the example fixture's): the Related Documents table pointed at the v1 `milestones/milestone-{N}-{slug}-validation.md` path (now `milestone-{N}-{slug}/reviews/validation.md`) and described `BUGS.md` as an "active bug tracker" (it is the global index — one line per bug pointing at the per-bug file).
+- **Installed `docs/PRD.md`**: the Timeline preamble described a milestone as having a single dedicated task file; reworded for the v2 layout — one task file per task under the milestone's `tasks/` directory.
+- **Example fixture `artifacts/AGENT_STATE.md`**: one validation-record reference used the v1 single-file path.
+
+### Added
+
+- **CI guard for v1 artifact paths**: `validate.yml` now fails on any v1-shaped path (`milestones/milestone-*`, combined `-tasks.md`/`-validation.md`/`-completion.md` filenames, `MILESTONE_TASKS`) in the payload or example. The `references/` migration tables stay exempt — they legitimately map old paths to new. This check caught the fourth instance above the moment it was written.
+
 ## [2.0.0] — 2026-07-29
 
 **Breaking restructure of how agents hand off work and where artifacts live.** Artifacts are now grouped by milestone instead of by type, every task and every bug is its own isolated file, and agent-to-agent handoffs follow a minimal-context protocol: each stage reads only its task file's Context Manifest and appends one capped Handoff Log entry. Existing installs need the migration below.

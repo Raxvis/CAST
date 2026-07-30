@@ -13,7 +13,7 @@ Live working state for every agent. Agents read their own section on activation 
 | Task | Milestone | Status | Notes |
 |---|---|---|---|
 | Milestone 1 definition + task files (T-1 – T-5) | M1 | Complete | `milestone-1-task-crud/README.md`, `tasks/task-01…05-*.md` |
-| Milestone 1 validation against acceptance criteria | M1 | Complete | Validation record `milestone-1-task-crud-validation.md` (Approved with Notes); completion record written 2026-04-10 (Complete with Deferrals) |
+| Milestone 1 validation against acceptance criteria | M1 | Complete | Validation record `milestone-1-task-crud/reviews/validation.md` (Approved with Notes); completion record written 2026-04-10 (Complete with Deferrals) |
 | Deferred re-triage at M1 completion checkpoint | M1 | Complete | BUG-002 held Deferred into M2; re-triage again at M2 `/agent-plan` Stage 1 |
 
 ### Review Queue
