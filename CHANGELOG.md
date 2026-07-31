@@ -8,6 +8,19 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [2.1.0] — 2026-07-31
+
+Claude Opus 5 becomes the preferred executing model for the roster.
+
+### Added
+
+- **Claude Opus 5 is the preferred executing model.** `docs/MODEL_OPTIMIZATION.md` adds `claude-opus-5` to the ladder as Preferred (Opus 4.8 → Supported), a full Opus 5 behavior profile (self-verifies unprompted — delete verification scaffolding; expands task scope — minimal-change discipline and Files lists are load-bearing; delegates readily — the reverse of 4.7/4.8; longer responses that effort settings don't shorten; same coverage-first review-recall rule), an "Opus 5 additional requirements" block (separate rate-limit bucket from the Opus 4.x pool, thinking on by default with `disabled` only at effort ≤ `high`, `stop_reason: "refusal"` handling, 512-token prompt-cache minimum, fast mode on the Claude API only at its own pricing), and Opus 4.8 → Opus 5 / 4.x → 5 upgrade checklists plus a 5 → 4.8 downgrade note.
+
+### Changed
+
+- **The three pipeline skills' Model Compatibility sections** gain an Opus 5 orchestration note (spawn only named agents, hold tasks to their Files lists, no extra verification passes), and `/agent-code`'s review-recall rule now names all supported models.
+- **README prerequisites, `agents/README.md`, `skills/README.md`, docs index, roster/validation references, `docs/FIRST_RUN.md`, and the example fixture's author-model lines** now name `claude-opus-5` as the preferred executing model.
+
 ## [2.0.1] — 2026-07-30
 
 Post-release fixes for stale v1 paths that survived the 2.0.0 restructure, caught in post-merge review.

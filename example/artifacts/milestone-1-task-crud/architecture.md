@@ -12,7 +12,7 @@
 |-------|-------|
 | **Version** | 1.0 |
 | **Date** | 2026-04-08 |
-| **Author** | Architect agent (claude-opus-4-8) |
+| **Author** | Architect agent (claude-opus-5) |
 | **Status** | Approved |
 | **Milestone** | M1 — `task-crud` |
 

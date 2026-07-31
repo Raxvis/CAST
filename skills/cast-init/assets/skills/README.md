@@ -49,7 +49,7 @@ Longer version with a decision table: see the repo's `TROUBLESHOOTING.md` → "W
 
 ## Model compatibility
 
-All four skills are optimized for the Claude Opus 4.x family (agents default to `model: inherit`, running on the session model; `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` are the supported executing models). Each SKILL.md carries a **Model Compatibility** section with orchestration notes for the model executing it — chiefly that Opus 4.8/4.7 delegate conservatively (the explicit stage invocations are load-bearing) while Opus 4.6 over-delegates (spawn only the agents each stage names). Behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists live in `docs/MODEL_OPTIMIZATION.md`.
+All four skills are optimized for the Claude Opus family (agents default to `model: inherit`, running on the session model; `claude-opus-5` is the preferred executing model, with `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` supported). Each SKILL.md carries a **Model Compatibility** section with orchestration notes for the model executing it — chiefly that Opus 5 delegates readily and expands scope (spawn only the agents each stage names; hold tasks to their Files lists), Opus 4.8/4.7 delegate conservatively (the explicit stage invocations are load-bearing), and Opus 4.6 over-delegates like Opus 5. Behavior profiles and the upgrade checklists through Opus 4.8 → Opus 5 live in `docs/MODEL_OPTIMIZATION.md`.
 
 ## How pipeline skills work
 

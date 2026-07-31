@@ -37,7 +37,7 @@ CAST ships **fifteen** agents. An adoption must account for every one of them �
 
 ## Canonical CAST agent roster (current release)
 
-Use this table as the authoritative reference when comparing an existing project's agents against CAST. The description column is pulled verbatim from each agent file's YAML frontmatter — match role against role, not name against name. Every agent defaults to `model: inherit` and runs on the session model (the Claude Opus 4.x family is the optimized target — `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` are the supported executing models; see `docs/MODEL_OPTIMIZATION.md`); the Effort column is the recommended reasoning effort from each agent's Model Configuration section. Override per-agent only when the user has a reason.
+Use this table as the authoritative reference when comparing an existing project's agents against CAST. The description column is pulled verbatim from each agent file's YAML frontmatter — match role against role, not name against name. Every agent defaults to `model: inherit` and runs on the session model (the Claude Opus family is the optimized target — `claude-opus-5` preferred, with `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` supported; see `docs/MODEL_OPTIMIZATION.md`); the Effort column is the recommended reasoning effort from each agent's Model Configuration section. Override per-agent only when the user has a reason.
 
 | # | Agent | Tier | Model | Effort | Role (from agent frontmatter) |
 |---|---|---|---|---|---|

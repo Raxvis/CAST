@@ -61,12 +61,13 @@ The argument text the user provided when invoking this skill (e.g. `/agent-code 
 
 ## Model Compatibility
 
-Each stage runs on the model set in that agent's file (default: `inherit` — the session model; the Claude Opus 4.x family is the optimized target, with `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` supported — full profiles and upgrade paths in `docs/MODEL_OPTIMIZATION.md`). Orchestration notes by executing model:
+Each stage runs on the model set in that agent's file (default: `inherit` — the session model; the Claude Opus family is the optimized target, with `claude-opus-5` preferred and `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` supported — full profiles and upgrade paths in `docs/MODEL_OPTIMIZATION.md`). Orchestration notes by executing model:
 
+- **Opus 5** — this model delegates readily and expands scope; invoke only the agents named in the stages below, spawn no ad-hoc subagents beyond them, and hold each task to its Files list. Do not add extra verification passes — the model self-verifies within each stage.
 - **Opus 4.8 / 4.7** — these models delegate conservatively; the explicit stage invocations below are load-bearing. Execute every stage exactly as written, including the Defect/Issue routing loops.
 - **Opus 4.6** — this model over-delegates; invoke only the agents named in the stages below and spawn no ad-hoc subagents beyond them.
 - **Effort** — run the Coder, Reviewer, and Debugger stages at `xhigh` on Opus 4.7+ (`high` on Opus 4.6); Tester, Refactor, routing, and Product validation at `high`.
-- **Review recall (Opus 4.8 / 4.7)** — these models follow severity filters literally: the Reviewer stage must report every Defect and Issue found; filtering happens in the routing stages, never at review time.
+- **Review recall (all supported models)** — Opus 5, 4.8, and 4.7 follow severity filters literally: the Reviewer stage must report every Defect and Issue found; filtering happens in the routing stages, never at review time.
 
 ## Instructions
 

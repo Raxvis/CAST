@@ -10,7 +10,7 @@
 
 > **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three pipeline skills plus a maintenance skill, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v2.0.1-blue)
+![Template version](https://img.shields.io/badge/template-v2.1.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
 
@@ -65,7 +65,7 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 - **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v2.0.1` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v2.1.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
@@ -297,7 +297,7 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 
 ### Agents
 
-Each agent file has its model set in the YAML frontmatter — there is no `[AI_MODEL]` placeholder. Every agent defaults to `model: inherit`, running on whatever model the invoking session uses, and is optimized for the Claude Opus 4.x family (`claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` are the supported executing models); workload differentiation comes from the recommended reasoning effort stated in each agent's **Model Configuration** section rather than model tier. Edit the `model:` line in an individual agent file if you need an explicit pin, and see `docs/MODEL_OPTIMIZATION.md` for per-model behavior profiles and the 4.6 → 4.7 → 4.8 upgrade checklists.
+Each agent file has its model set in the YAML frontmatter — there is no `[AI_MODEL]` placeholder. Every agent defaults to `model: inherit`, running on whatever model the invoking session uses, and is optimized for the Claude Opus family (`claude-opus-5` is the preferred executing model; `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` are supported); workload differentiation comes from the recommended reasoning effort stated in each agent's **Model Configuration** section rather than model tier. Edit the `model:` line in an individual agent file if you need an explicit pin, and see `docs/MODEL_OPTIMIZATION.md` for per-model behavior profiles and the upgrade checklists through Opus 4.8 → Opus 5.
 
 **Right-size models at install time.** `inherit` is the safe default, but per-agent pins are the roster's main cost lever, and `/cast-init` proposes an assignment during adoption. A sensible split: keep the judgment-heavy gates (CEO, Architect, Reviewer, Security) on the most capable model you have — e.g. `opus`, or a Fable/Mythos-class model if your account serves one; run the planning-and-implementation loop (Product, UI, Performance, Coder, Tester, Debugger, Refactor) on `sonnet`; and drop the utility roles (Bug Gatherer, Docs Writer, Release, Validator) to `haiku`, whose work is structured writing against templates. Claude Code accepts the `opus` / `sonnet` / `haiku` aliases or full model IDs in agent frontmatter.
 
@@ -315,7 +315,7 @@ Before installing, confirm the following:
 
 - **Claude Code CLI installed and authenticated.** This template is built for Claude Code specifically. The pipeline skills (`/agent-plan`, `/agent-code`) and subagent auto-discovery rely on Claude Code's `.claude/skills/` and `.claude/agents/` conventions. Other AI coding assistants do not read these files. Install and sign in to Claude Code before continuing.
 - **A target project directory.** Either a new empty git repo or an existing project where you want to introduce the agent workflow. The template does not create the project for you.
-- **An Anthropic account with access to the Claude Opus 4.x family.** All agents default to `model: inherit` and run on the session model; the Opus 4.x family is the optimized target (`claude-opus-4-8` recommended; `claude-opus-4-7` and `claude-opus-4-6` are supported — all three are priced identically). You can set the `model:` line in an individual agent file if you need an explicit pin — `docs/MODEL_OPTIMIZATION.md` covers the per-model behavior differences and upgrade paths.
+- **An Anthropic account with access to the Claude Opus family.** All agents default to `model: inherit` and run on the session model; the Opus family is the optimized target (`claude-opus-5` preferred; `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` are supported — all four share the same standard API pricing, though Opus 5's optional fast mode is priced separately and Opus 5 has its own rate-limit bucket). You can set the `model:` line in an individual agent file if you need an explicit pin — `docs/MODEL_OPTIMIZATION.md` covers the per-model behavior differences and upgrade paths.
 
 ## Known Limitations
 
@@ -522,7 +522,7 @@ Reference documentation. Never holds work artifacts. Document templates live in 
 | `docs/FILE_CONVENTIONS.md` | File naming rules, directory layout expectations, and `docs/` vs `artifacts/` split |
 | `docs/ERROR_HANDLING.md` | Guidelines for handling errors across all categories; defines principles, patterns, and user-facing message standards |
 | `docs/TEST_FRAMEWORK.md` | Testing strategy, test runner setup, file conventions, and coverage requirements |
-| `docs/MODEL_OPTIMIZATION.md` | Model policy for the agent roster: the Claude Opus 4.x ladder, per-model behavior profiles, and the 4.6 → 4.7 → 4.8 upgrade checklists |
+| `docs/MODEL_OPTIMIZATION.md` | Model policy for the agent roster: the Claude Opus ladder (Opus 5 preferred), per-model behavior profiles, and the upgrade checklists through Opus 4.8 → Opus 5 |
 | `docs/PIPELINE_LOOP.md` | The canonical engineering-loop contract executed by both `/agent-code` and `/agent-task`: per-task sequence, Defect/Issue routing, loop-counter rules, test gate, targeted re-runs, pass-forward rule |
 | `docs/FIRST_RUN.md` | Interactive checklist to run in Claude Code after a fresh install; verifies that subagents load and pipeline skills register |
 | `docs/CLAUDE_CODE_SETTINGS.md` | Reference for `.claude/settings.json` — explains permission rules, environment variables, and hooks, with common extension patterns |
