@@ -82,8 +82,9 @@ If in doubt, run `/agent-plan` first — for a single self-contained feature tha
 
 ## Model Compatibility
 
-Each stage runs on the model set in that agent's file (default: `inherit` — the session model; the Claude Opus 4.x family is the optimized target, with `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` supported — full profiles and upgrade paths in `docs/MODEL_OPTIMIZATION.md`). Orchestration notes by executing model:
+Each stage runs on the model set in that agent's file (default: `inherit` — the session model; the Claude Opus family is the optimized target, with `claude-opus-5` preferred and `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` supported — full profiles and upgrade paths in `docs/MODEL_OPTIMIZATION.md`). Orchestration notes by executing model:
 
+- **Opus 5** — this model delegates readily and expands scope; invoke only the agents this pipeline names, keep the task to its stated description (out-of-scope discoveries go in the Handoff Log), and honor the bail-out rule above instead of spawning planning agents ad hoc.
 - **Opus 4.8 / 4.7** — these models delegate conservatively; execute the pipeline stages exactly as written rather than folding them into direct work.
 - **Opus 4.6** — this model over-delegates; invoke only the agents this pipeline names, and honor the bail-out rule above instead of spawning planning agents ad hoc.
 - **Effort** — `high` reasoning effort is sufficient for one-off tasks; use `xhigh` for nontrivial fixes on Opus 4.7+ (Opus 4.6 caps at `high`).
