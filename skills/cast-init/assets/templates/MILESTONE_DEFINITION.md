@@ -24,13 +24,6 @@
 
 # [PROJECT_NAME] — [MILESTONE_NAME]
 
-## Revision History (required)
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | [YYYY-MM-DD] | product | Initial version |
-
----
 
 ## Header (required)
 
@@ -127,7 +120,7 @@ _One row per task file under `tasks/`. Deliberately no status column — task st
 
 ## CEO Approval Conditions (required)
 
-_Filled after the CEO verdict (`reviews/ceo.md`). Coder tracks each condition during engineering; Reviewer and Product verify at completion. **Product owns the flip to Verified**: while writing the completion record at the milestone-completion checkpoint, Product confirms each row's evidence and sets its Status to Verified (with verifier and date) — or leaves it and lists it under the completion record's Known Issues. Tasks a condition names carry a `../README.md § CEO Approval Conditions` row in their Context Manifest._
+_Filled after the CEO verdict (`reviews/ceo.md`). Coder tracks each condition during engineering; Reviewer and Product verify at completion. **Product owns the flip to Verified**: while writing the close record (`reviews/close.md`) at the milestone-completion checkpoint, Product confirms each row's evidence and sets its Status to Verified (with verifier and date) — or leaves it and lists it under the close record's Known Issues. Tasks a condition names carry a `../README.md § CEO Approval Conditions` row in their Context Manifest._
 
 | Condition | Source | Status |
 |-----------|--------|--------|
@@ -147,10 +140,8 @@ _Anything that touches multiple tasks in this milestone and needs to be specifie
 ## References (required)
 
 - **PRD section(s):** [PRD link or section anchor]
-- **Architecture document:** `architecture.md`
-- **UI specification:** `ui.md`
-- **Task files:** `tasks/`
-- **CEO review:** `reviews/ceo.md`
+
+_Only the variable reference lives here — the milestone's fixed layout (`architecture.md`, `ui.md`, `tasks/`, `reviews/`) is `docs/FILE_CONVENTIONS.md`'s to define, not each README's to restate._
 
 ---
 

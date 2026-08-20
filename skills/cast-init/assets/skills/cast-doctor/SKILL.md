@@ -148,16 +148,16 @@ For every treated doc, also update every citation listed in the prescription's e
 
 | # | Check | Prescription shape |
 |---|---|---|
-| S1 | Agent roster complete (recorded opt-outs honored); frontmatter has `name`/`description`/`model`/`tools`; no `tools:` list includes `Task`; model pins are legal per the ladder in `docs/MODEL_OPTIMIZATION.md`; flag `xhigh` effort paired with an Opus 4.6 pin | Correct frontmatter / flag for user |
+| S1 | Agent roster complete (recorded opt-outs honored); frontmatter has `name`/`description`/`model`/`tools`; no `tools:` list includes `Task`; model pins are legal per the ladder in `docs/MODEL_OPTIMIZATION.md`; `effort:` values are legal (`low`–`max`), match the roster defaults in that ladder unless deliberately re-tuned, and no `effort: xhigh` pairs with an Opus 4.6 executing model | Correct frontmatter / flag for user |
 | S2 | Every kept skill exists at `.claude/skills/<name>/SKILL.md` with frontmatter `name` equal to the directory; no superseded pre-1.0 command file (a leftover `/cast-init` migration Delete target) still registers a duplicate `/<name>` | Fix frontmatter / propose Delete |
 | S3 | `CLAUDE.md` carries exactly one `Adopted with CAST v<X.Y.Z>` stamp; every live `@path` Memory Import resolves; report the total per-session import weight in lines | Fix stamp/imports; weight feeds the diet |
 | S4 | No real unfilled `[PLACEHOLDER]` tokens in installed files (same scope and per-use whitelist as `/cast-init` validation check 1) | List for user to fill |
 | S5 | docs/templates/artifacts split clean in both directions; no `TEMPLATE INSTRUCTIONS` block outside `templates/` | Move / strip |
 | S6 | Every `artifacts/BUGS.md` index row's Status matches its per-bug file (file wins); Status values are legal lifecycle enums | Correct index rows (canonical rule) |
 | S7 | Every milestone Task Index row points at an existing task file and vice versa; task Statuses are legal enums | Reconcile index/files |
-| S8 | Every completed milestone (has `reviews/completion.md`) also has `validation.md` and `retrospective.md`; plus `ux.md` when `ui.md` exists; plus `security-impl.md` / `performance-impl.md` when the planning reviews' flag lines say Yes | Name the missing review; route to the owning agent |
+| S8 | Every closed milestone (has `reviews/close.md` — or, pre-v3, `reviews/completion.md` with `validation.md` and `retrospective.md`) also has `ux.md` when `ui.md` exists, and `risk-impl.md` when either flag line in `reviews/risk.md` says Yes | Name the missing review; route to the owning agent |
 | S9 | `artifacts/STANDUP.md` conforms to its Entry Grammar (well-formed session headings, known skill names, typed entries) | Correct malformed entries |
-| S10 | Bounded files: no STANDUP sessions or closed AGENT_STATE rows older than the last completed milestone's first session remain in the live files | Flag Archival Duty overdue (Validator owns the move) |
+| S10 | Bounded files: no STANDUP sessions or closed AGENT_STATE rows older than the last completed milestone's first session remain in the live files | Flag archival overdue (`/agent-code`'s milestone-completion checkpoint owns the move) |
 | S11 | Context Manifest rows in In Progress / Not Started task files resolve — cited file exists, cited section anchor exists | Fix the anchor or flag the manifest |
 | S12 | Every `docs/*.md` has a row in `docs/README.md` and every index row points at an existing file | Register / deregister |
 | S13 | The `CLAUDE.md` stamp version matches the local cast-init skill's `metadata.version` (when a local install exists) | Note "run /cast-init to upgrade" — never self-treat |
@@ -171,7 +171,7 @@ For every treated doc, also update every citation listed in the prescription's e
 - **Tier A — always prunable, any model:** exact duplication of content canonical elsewhere in the install; unfilled skeletons paid every session through a live Memory Import (Demote the import, keep the file); stale or broken references; self-obsoleted content (e.g. `docs/FIRST_RUN.md` once STANDUP shows completed pipeline sessions); TOC duplication.
 - **Tier B — prunable only above the Context Inference Bar** (`docs/MODEL_OPTIMIZATION.md`), judged per doc against its weakest consumer (Phase 1): mechanical restatements of code and structure; generic best-practice essays. A bar-blocked prescription is still reported — with the blocking consumer named — so the user understands what a model upgrade would unlock. Re-run after any model change.
 
-**Never prune (files):** `docs/PIPELINE_LOOP.md`, `docs/MODEL_OPTIMIZATION.md`, `docs/DESIGN_RATIONALE.md` (its own rules forbid deleting entries), `docs/CHANGELOG.md`. **Never prune (sections):** anything cited by path-and-section from a live task Context Manifest, an agent file, a skill, or `templates/*` — unless the prescription includes the exact citation updates.
+**Never prune (files):** `docs/STAGE_CONTRACT.md` (every stage of every task reads it — it is already at its floor), `docs/PIPELINE_LOOP.md`, `docs/MODEL_OPTIMIZATION.md`, `docs/DESIGN_RATIONALE.md` (its own rules forbid deleting entries), `docs/CHANGELOG.md`. **Never prune (sections):** anything cited by path-and-section from a live task Context Manifest, an agent file, a skill, or `templates/*` — unless the prescription includes the exact citation updates.
 
 **Anchor protection.** Every prescription lists its citation set: grep `.claude/ docs/ templates/ artifacts/ CLAUDE.md` for the doc path and each `## heading` the prescription removes. A cited section is kept, or the citations are updated in the same treatment; Phase 6 re-greps to prove nothing dangles.
 
@@ -182,7 +182,7 @@ For every treated doc, also update every citation listed in the prescription's e
 | Doc | Prior |
 |---|---|
 | `docs/CODE_PATTERNS.md` | Skeleton (placeholder-dense) → Tier A **Demote** its always-on import; populated → Tier B **Trim** mechanical parts, keep chosen-convention policies |
-| `docs/FILE_CONVENTIONS.md` | Tier B **Trim** the directory trees and naming quick-reference; the split rule, case rule, Revision History policy, and Anti-Patterns always stay. Never Delete |
+| `docs/FILE_CONVENTIONS.md` | Tier B **Trim** the directory trees and naming quick-reference; the split rule, case rule, revision policy, and Anti-Patterns always stay. Never Delete |
 | `docs/FRONTEND.md` / `BACKEND.md` / `CLI.md` / `MOBILE.md` | Tier B **Trim** generic best-practice essays; keep project-specific budgets, contracts, and platform decisions |
 | `docs/CLAUDE_CODE_SETTINGS.md` | Tier A **Delete** candidate — restates external tool documentation; check citations first |
 | `docs/FIRST_RUN.md` | Tier A **Delete** once the install's first run is verified (STANDUP shows completed sessions) |
@@ -190,7 +190,7 @@ For every treated doc, also update every citation listed in the prescription's e
 | Root `CLAUDE.md` — Tech Stack, Project Structure, Style Conventions, Git Workflow sections | Tier B **Trim** — the highest-value target; every line is paid every session. Build & Test commands and the Directory Conventions stamp section stay |
 | `docs/MVP_LAUNCH.md` | **Flag** — template-shaped file living in `docs/`; user decides (move to `templates/`, keep, or delete) |
 | `docs/PRD.md`, `CONCEPT.md`, `GLOSSARY.md`, `ADDITIONAL.md`, `ERROR_HANDLING.md`, `TEST_FRAMEWORK.md`, `ASSETS.md` | Evaluate by rubric: filled decision/budget content stays; skeleton or generic sections follow the tiers |
-| `docs/PIPELINE_LOOP.md`, `MODEL_OPTIMIZATION.md`, `DESIGN_RATIONALE.md`, `CHANGELOG.md` | Never prune |
+| `docs/STAGE_CONTRACT.md`, `PIPELINE_LOOP.md`, `MODEL_OPTIMIZATION.md`, `DESIGN_RATIONALE.md`, `CHANGELOG.md` | Never prune |
 
 ### Coverage checks
 

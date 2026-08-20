@@ -5,7 +5,7 @@
            work); this file assigns IDs and tracks one line per bug so triage sweeps read
            one small file instead of every report. This file is also the SINGLE CANONICAL
            definition of the bug lifecycle, severity scale, and field ownership — agents
-           (Bug Gatherer, Debugger, Coder, Tester, Product) reference these rules rather
+           (Reviewer, Coder, Product, CEO) reference these rules rather
            than restating them. The per-bug entry format lives in templates/BUG_REPORT.md.
 
   HOW TO CUSTOMIZE:
@@ -40,11 +40,11 @@ Every bug is a standalone file created from `templates/BUG_REPORT.md` and filed 
 
 | Owner | Writes | Status set |
 |---|---|---|
-| **Bug Gatherer** | Creates the bug file from `templates/BUG_REPORT.md` and adds its index row: ID, Description, Expected, Actual, Steps to Reproduce, Platform, Frequency, Evidence, Likely Files, Regression, Related Issues, initial Severity | `New` (or `Duplicate` at filing, when the report duplicates an existing entry — cite the original ID in Related Issues) |
+| **Reviewer** | Creates the bug file from `templates/BUG_REPORT.md` and adds its index row: ID, Description, Expected, Actual, Steps to Reproduce, Platform, Frequency, Evidence, Likely Files, Regression, Related Issues, initial Severity | `New` (or `Duplicate` at filing, when the report duplicates an existing entry — cite the original ID in Related Issues) |
 | **Product** | Triages: sets final Severity, accepts/rejects/defers; re-triages `Deferred` entries at `/agent-code` milestone completion and `/agent-plan` Stage 1 | `Triaged` (or `Won't Fix` / `Deferred`) |
-| **Debugger** | Investigation fields: Root Cause, Affected Module(s), Alternative Solutions, Recommended Fix, Assigned To, Investigation Date | `In Progress` (or `Cannot Reproduce` after an investigation that fails to reproduce the bug) |
+| **Coder (investigation)** | Investigation fields: Root Cause, Affected Module(s), Alternative Solutions, Recommended Fix, Assigned To, Investigation Date | `In Progress` (or `Cannot Reproduce` after an investigation that fails to reproduce the bug) |
 | **Coder** | Resolution fields at fix time: Commit, Files Changed, Regression Notes | `Fixed` |
-| **Tester / Product** | Tester confirms the fix; Product signs off | `Verified` → `Closed` |
+| **Coder / orchestrator** | Coder's red→green evidence confirms the fix (`Verified`); the orchestrating skill flips `Verified` → `Closed` when the resolving task passes validation — a transcription of facts already on record (red→green evidence, green final suite, task validated), not a judgment. Product re-reviews every closed bug at the milestone close | `Verified` → `Closed` |
 
 A bug file never moves between directories — it stays where it was filed and its **Status** field advances (mirrored in the index).
 
@@ -60,7 +60,7 @@ A bug file never moves between directories — it stays where it was filed and i
 
 ## Regression Checklist
 
-**Owner: Tester.** Tester maintains this table and verifies each critical path after significant fixes or refactors.
+**Owner: Coder.** Coder maintains this table and verifies each critical path after significant fixes or refactors.
 
 | # | Area | Check Description | Last Verified | Verified By |
 |---|------|-------------------|--------------|-------------|

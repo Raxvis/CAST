@@ -29,23 +29,11 @@
 
 [ONE_SENTENCE_PITCH]
 
-## Tech Stack
+## Stack & Commands
 
-- **Framework**: [FRAMEWORK] ([FRAMEWORK_VERSION])
-- **Language**: [LANGUAGE] (strict mode)
-- **Persistence**: [PERSISTENCE_LAYER]
-- **Package Manager**: [PKG_MANAGER]
-- **Test Runner**: [TEST_RUNNER]
-- **Platforms**: [TARGET_PLATFORMS]
-- **Build**: `[DEV_SERVER_CMD]` (dev) / `[BUILD_CMD]` (production)
-
-## Build & Test
-
-- **Dev**: `[DEV_SERVER_CMD]`
-- **Type check**: `[TYPE_CHECK_CMD]`
-- **Tests**: `[TEST_CMD]`
-- **Production build**: `[BUILD_CMD]`
-- **Debug**: Use the framework's dev tooling or runtime logging. Prefer structured logs over `print`-style output so output stays greppable.
+- **Stack**: [LANGUAGE] (strict mode) on [FRAMEWORK] ([FRAMEWORK_VERSION]); persistence via [PERSISTENCE_LAYER]; packages via [PKG_MANAGER]; tests via [TEST_RUNNER].
+- **Dev**: `[DEV_SERVER_CMD]` · **Type check**: `[TYPE_CHECK_CMD]` · **Tests**: `[TEST_CMD]` · **Build**: `[BUILD_CMD]`
+- **Debug**: prefer structured logs over `print`-style output so output stays greppable.
 
 ## Common Pitfalls
 
@@ -75,36 +63,12 @@ Fill in or delete directories to match your actual structure. Reference the auth
 
 ## [LANGUAGE] Style Conventions
 
-> **Note:** Bracketed names in code examples below (e.g., `[MyType]`, `[doAction]`) are
-> illustrative example identifiers, not project placeholders. They show naming patterns
-> you should follow using your own project-specific names.
+Only the conventions a reader could **not** infer from existing code belong here — match the codebase for everything else. Defaults worth stating once:
 
-- **[LOWER_CASE_CONVENTION]** for variables, functions, and file names
-- **[PASCAL_CASE_CONVENTION]** for types, interfaces, and exported constructs
-- **[UPPER_SNAKE_CONVENTION]** for module-level constants
-- Prefer structured type declarations over anonymous shapes for object types
-- Prefer union/alias constructs for non-object types
-- Explicit return types on all exported functions
-- No unchecked/unsafe types — use proper types or a safe unknown equivalent
-- All business logic lives in pure [LANGUAGE] modules with no framework coupling, testable independently
-
-```
-// Pure logic module pattern
-export interface [DomainType] {
-  [field_one]: [FieldType]
-  [field_two]: [FieldType]
-}
-
-const [CONSTANT_NAME]: [Type] = [value]
-
-function [internalHelper]([param]: [DomainType]): [DomainType] {
-  // internal helper — not exported
-}
-
-export function [publicOperation](a: [DomainType], b: [DomainType]): [DomainType] {
-  // ...
-}
-```
+- Naming: **[LOWER_CASE_CONVENTION]** for variables, functions, and file names; **[PASCAL_CASE_CONVENTION]** for types and exported constructs; **[UPPER_SNAKE_CONVENTION]** for module-level constants.
+- Explicit return types on exported functions; no unchecked/unsafe types.
+- All business logic lives in pure [LANGUAGE] modules with no framework coupling, testable independently.
+- Group files by feature or domain, not by layer, once a directory outgrows ~15 files.
 
 ## Domain-Specific Patterns
 
@@ -123,43 +87,18 @@ Data is persisted via [PERSISTENCE_LAYER] using the key `[SAVE_KEY]`.
 - Always handle missing or corrupt data gracefully by falling back to defaults.
 - Migrations must be idempotent — the same migration can run twice without damaging data.
 
-## Git Workflow
+## Git & Dependencies
 
-- **Branching**: feature branches off `main`, merged via pull request.
-- **Branch naming**: `feature/description`, `fix/description`, `refactor/description`.
-- **Commits**: short imperative messages ("Add X", "Fix Y", "Refactor Z").
-- **Ignore**: build outputs, dependency directories, local environment files (already in `.gitignore`).
-
-## Dependencies
-
-Manage with `[PKG_MANAGER]`. Add new dependencies:
-
-```
-[PKG_ADD_CMD] <package>
-```
-
-Every new dependency must be justified in the Architect's Decisions Log in
-`artifacts/milestone-{N}-{slug}/architecture.md`. Dependencies are irreversible in practice
-and compound over time — resist adding them.
-
-Current dependencies (see `[PKG_MANIFEST]`):
-- **[FRAMEWORK]** — core framework
-- **[PERSISTENCE_LAYER]** — persistence layer
-- **[TEST_RUNNER]** — test runner
-
-## File Naming
-
-- [LOWER_CASE_CONVENTION] for source files: `[example-module].[EXT]`, `[example-helper].[EXT]`
-- [PASCAL_CASE_CONVENTION] for exported constructs: `[ExampleType]`, `[ExampleService]`
-- Group by feature or domain, not by layer, once the codebase outgrows ~15 files per directory.
+- Feature branches off `main` (`feature/…`, `fix/…`, `refactor/…`), merged via pull request; short imperative commit messages.
+- Add dependencies with `[PKG_ADD_CMD] <package>` — and justify every new one in the Architect's Decisions Log in `artifacts/milestone-{N}-{slug}/architecture.md`. Dependencies are irreversible in practice and compound over time; resist adding them.
 
 ## Directory Conventions
 
 The project uses a strict split between reference material, document templates, and work artifacts:
 
-- **`docs/`** — reference only: requirements, conventions, design rationale. Never receives work artifacts. One deliberate exception: `docs/CHANGELOG.md` is a long-lived project register maintained by the release agent (see `docs/README.md` → Project Registers and Reference Logs).
+- **`docs/`** — reference only: requirements, conventions, design rationale. Never receives work artifacts. One deliberate exception: `docs/CHANGELOG.md` is a long-lived project register maintained by the `/cast-release` skill (see `docs/README.md` → Project Registers and Reference Logs).
 - **`templates/`** — reusable document templates (architecture, UI spec, milestone files). Agents copy them into `artifacts/` as instances; never filled in place.
-- **`artifacts/`** — all live work, **grouped by milestone**: each `milestone-{N}-{slug}/` directory holds that milestone's README (definition), `architecture.md`, `ui.md`, `reviews/`, per-task files (`tasks/task-{T}-{slug}.md` — one isolated file per task, with its Context Manifest and Handoff Log), and per-bug files (`bugs/`). Cross-milestone state lives at the root: the bug index (`artifacts/BUGS.md`), the rolling session log (`artifacts/STANDUP.md`), every agent's live working state (`artifacts/AGENT_STATE.md`), and the `/cast-doctor` health report (`artifacts/DOCTOR.md`, created on first run and overwritten per run). One-off `/agent-task` work goes under `artifacts/one-off/`. Everything produced by the pipelines lands here.
+- **`artifacts/`** — all live work, **grouped by milestone**: each `milestone-{N}-{slug}/` directory holds that milestone's README (definition), `architecture.md`, `ui.md`, `reviews/`, per-task files (`tasks/task-{T}-{slug}.md` — one isolated file per task, with its Context Manifest and Handoff Log), and per-bug files (`bugs/`). Cross-milestone state lives at the root: the bug index (`artifacts/BUGS.md`), the rolling session log (`artifacts/STANDUP.md`), the orchestrator-written state tables (`artifacts/AGENT_STATE.md` — no agent reads it), and the `/cast-doctor` health report (`artifacts/DOCTOR.md`, created on first run and overwritten per run). One-off `/agent-task` work goes under `artifacts/one-off/`. Everything produced by the pipelines lands here.
 
 When in doubt, read `docs/FILE_CONVENTIONS.md` and `artifacts/README.md`.
 
@@ -168,27 +107,12 @@ Adopted with CAST v[CAST_VERSION]
 
 ## Memory Imports
 
-These documents are loaded into Claude Code's context at every session start. They
-provide the baseline context all agents need. Keep this list lean — every import is
-paid in every session. The Directory Conventions section above already covers where
-files live; agents read the detailed reference docs on demand by path (the planning
-stage reads `docs/PRD.md` on demand regardless of whether it is imported here).
+Bare `@path` lines below load into every session **and every subagent spawn** — the most
+expensive real estate in the project. The list ships empty on purpose; add an import only
+for a document that is needed unprompted in most sessions **and** cannot be inferred from
+the code (rationale: `docs/DESIGN_RATIONALE.md` → "Memory Imports ship empty").
 
-<!-- Core context — keep this -->
-@docs/CODE_PATTERNS.md
+<!-- Add bare import lines here (comments are inert; an import only fires as a bare
+     `@path` line at the left margin), e.g.:
+     @docs/GLOSSARY.md — domain terms that appear nowhere in the source -->
 
-<!-- Topic-specific context — add a bare import line (like the one above) for the
-     one(s) that match your project type, and ignore the rest. These files ship with
-     the template and can be edited freely: `@docs/FRONTEND.md`, `@docs/BACKEND.md`,
-     `@docs/CLI.md`, `@docs/MOBILE.md`. Paths in backticks here are inert — an import
-     only fires as a bare `@path` line, so copy one out to activate it. -->
-
-<!-- On-demand reference — agents read these by path when a task calls for them
-     (coder/docs-writer: FILE_CONVENTIONS; coder/reviewer: ERROR_HANDLING; tester:
-     TEST_FRAMEWORK; navigation: docs/README.md, artifacts/README.md). Add an import
-     line only if your sessions repeatedly need one unprompted:
-     `@docs/FILE_CONVENTIONS.md`, `@docs/ERROR_HANDLING.md` -->
-
-<!-- Add once they contain real project content (at install time these are placeholder
-     skeletons — importing them pays for hundreds of skeleton lines per session):
-     `@docs/PRD.md`, `@docs/CONCEPT.md`, `@docs/ADDITIONAL.md`, `@docs/GLOSSARY.md` -->

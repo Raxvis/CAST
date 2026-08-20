@@ -37,7 +37,7 @@ In the Claude Code session, type:
 /agents
 ```
 
-**Verify:** you see a list of subagents that matches the files in `.claude/agents/`. On a full install you should see all 15: `architect`, `bug-gatherer`, `ceo`, `coder`, `debugger`, `docs-writer`, `performance`, `product`, `refactor`, `release`, `reviewer`, `security`, `tester`, `ui`, `validator`. On a pruned install you should see whatever subset you kept.
+**Verify:** you see a list of subagents that matches the files in `.claude/agents/`. On a full install you should see all 7: `architect`, `ceo`, `coder`, `docs-writer`, `product`, `reviewer`, `ui`. On a pruned install you should see whatever subset you kept.
 
 **If an agent is missing:** the most common cause is malformed YAML frontmatter. Open the missing agent file and verify the `---` fences are balanced and the `name:`, `description:`, and `model:` keys are present on separate lines.
 
@@ -54,6 +54,7 @@ Type `/agent` and check that the three pipeline skills auto-complete, then `/cas
 /agent-code
 /agent-task
 /cast-doctor
+/cast-release
 ```
 
 **Verify:** every skill you kept in `.claude/skills/` appears in the completion list. You do not need to actually run them yet — just confirm Claude Code sees them.
@@ -88,7 +89,7 @@ For a lighter-weight verification that the engineering pipeline is working:
 /agent-task "Add a comment to CLAUDE.md saying this is a test run"
 ```
 
-**Verify:** the Coder agent picks up the task, makes the one-line change, the Tester agent runs, the Reviewer agent approves, and the Product agent validates. You can roll the commit back afterward.
+**Verify:** the Coder agent picks up the task, makes the one-line change, writes and runs its tests, and hands off with a verbatim test-results block; the Reviewer agent verifies that block, approves, and records the Acceptance Criteria Check; and the task closes — with no Product spawn if every criterion came back Met. You can roll the commit back afterward.
 
 **If any agent in the chain halts:** read the halt message. It should cite the specific agent and the specific reason. Cross-reference the CAST repo's [`TROUBLESHOOTING.md`](https://github.com/Raxvis/CAST/blob/main/TROUBLESHOOTING.md).
 
@@ -104,15 +105,13 @@ rm -rf artifacts/milestone-1-*
 
 (Everything a planning run writes — reviews included — lives inside that one milestone directory.)
 
-Or use the completion-report template to keep a record of the first run if you want a historical marker.
-
 ---
 
 ## Appendix — Per-agent smoke probes (optional)
 
 If Step 4 or Step 5 completes cleanly, the pipeline is working end-to-end and you can usually stop. The probes below are an optional next step for verifying that each individual agent does what its file says it does — useful after you customize an agent file, or if you want a finer-grained trust signal before running a real milestone.
 
-Each probe is a single prompt to launch the named agent explicitly. Each takes under a minute. Run only the ones you care about; you do not need all 15.
+Each probe is a single prompt to launch the named agent explicitly. Each takes under a minute. Run only the ones you care about; you do not need all 7.
 
 ### Planning-tier probes
 
@@ -121,28 +120,21 @@ Each probe is a single prompt to launch the named agent explicitly. Each takes u
 | `product` | "Use the product agent to write acceptance criteria for 'add a dark mode toggle'." | Testable, specific criteria (not vague statements like "works well"). |
 | `architect` | "Use the architect agent to sketch module boundaries for a new authentication system." | A module table plus a Decisions Log entry that cites alternatives considered. |
 | `ui` | "Use the ui agent to spec the interaction states for a login form." | Covers all six canonical states (default, pressed, disabled, loading, error, empty) explicitly, per `templates/UI_SPEC.md`. |
-| `security` | "Use the security agent to review a function that concatenates user input into a SQL string." | A Critical finding with an OWASP citation and a concrete remediation. |
-| `performance` | "Use the performance agent to review a function that iterates 100k items inside a render loop." | A finding that cites a specific performance budget, not a generic "this is slow". |
-| `ceo` | "Use the ceo agent to review a milestone plan where Security has an unaddressed Critical finding." | Verdict is REVISION REQUIRED, not APPROVED WITH CONDITIONS — the CEO does not paper over Critical findings. |
+| `ceo` | "Use the ceo agent to run its risk lenses over this architecture document." | Produces both lens sections (security and performance) even when one is empty, and ends with both flag lines set. |
+| `ceo` | "Use the ceo agent to review a milestone plan whose risk review has an unaddressed Critical finding." | Verdict is REVISION REQUIRED, not APPROVED WITH CONDITIONS — the CEO does not paper over Critical findings. |
 
 ### Engineering-tier probes
 
 | Agent | Probe | Expected |
 |---|---|---|
-| `coder` | "Use the coder agent to implement a function that returns the sum of two numbers." | Working code plus a completed Pre-Handoff Checklist. |
-| `tester` | "Use the tester agent to write tests for a function that divides two numbers." | Tests cover both the happy path and at least one edge case (zero divisor or empty input). |
-| `reviewer` | "Use the reviewer agent to review a file with both a logic bug and a style violation." | Classifies the logic bug as a Defect (route to Debugger) and the style issue as an Issue (route to Refactor). |
-| `debugger` | "Use the debugger agent to investigate a failing test where the root cause is an off-by-one error." | At least two alternative fix approaches with trade-offs, plus a recommended fix and an Assigned To. |
-| `refactor` | "Use the refactor agent to clean up a file with three copies of the same 10-line function." | Extracts a shared helper and cites the quality principle justifying the change (DRY, single-responsibility, etc.). |
+| `coder` | "Use the coder agent to implement a function that returns the sum of two numbers." | Working code, tests written and run, a commit, and a verbatim Test Results block in the handoff entry. |
+| `reviewer` | "Use the reviewer agent to review a file with both a logic bug and a style violation." | Classifies the logic bug as a Defect (files a bug file itself) and the style issue as an Issue (back to Coder). |
 
 ### Utility-tier probes
 
 | Agent | Probe | Expected |
 |---|---|---|
-| `bug-gatherer` | "File a raw bug: 'the login button doesn't work' and ask bug-gatherer to structure it." | Asks for the missing required fields (steps to reproduce, expected/actual, platform). Does not accept the raw report as-is. |
 | `docs-writer` | "Use the docs-writer agent to document a newly-added helper function." | Updates an existing doc under `docs/` rather than creating a new file. Does not write to `artifacts/`. |
-| `release` | "Use the release agent to prepare a changelog entry for a bug fix." | Entry follows the format in `docs/CHANGELOG.md` and cites the fixed bug by ID. |
-| `validator` | "Use the validator agent to review the current process state." | Checks the Agent Status Dashboard, flags any stale or blocked tasks, and does NOT modify code. |
 
 ### Interpreting results
 

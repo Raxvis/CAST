@@ -62,25 +62,18 @@ was filed during validation and is deferred to M2.
 - **Read next**: Manifest only
 - **Open items**: None
 
-### 2. coder -> tester — 2026-04-09
+### 2. coder -> reviewer — 2026-04-09
 
-- **Outcome**: `done` and `delete` implemented with parameterized statements; `delete` errors on missing id.
-- **Files touched**: `src/commands/done.ts`, `src/commands/delete.ts`
-- **Commit**: `d19e6b4`
-- **Read next**: Manifest only — cover missing-id and non-integer-id paths
-- **Open items**: None
-
-### 3. tester -> reviewer — 2026-04-09
-
-- **Outcome**: 6 tests added; `pnpm test` green (happy paths, `delete` missing-id error, non-integer usage error).
-- **Files touched**: `src/commands/done.test.ts`, `src/commands/delete.test.ts`
+- **Outcome**: `done` and `delete` implemented with parameterized statements; `delete` errors on missing id. 6 tests added covering both happy paths, the `delete` missing-id error, and the non-integer usage error.
+- **Files touched**: `src/commands/done.ts`, `src/commands/delete.ts`, `src/commands/done.test.ts`, `src/commands/delete.test.ts`
 - **Commit**: `4f7a2c9`
+- **Test Results**: `pnpm test` — `Test Files  5 passed (5)` / `Tests  34 passed (34)` / `Duration  3.10s`
 - **Read next**: Manifest only
 - **Open items**: None
 
-### 4. reviewer -> product — 2026-04-09
+### 3. reviewer -> product — 2026-04-09
 
-- **Outcome**: Clean review — no Defects, no Issues. Condition 1 verified on both mutation paths. Criterion 6 flagged Product judgment; routing to Product (Step 4b — this task also carries a CEO Approval Condition).
+- **Outcome**: Clean review — no Defects, no Issues. Condition 1 verified on both mutation paths. Criterion 6 flagged Product judgment; routing to Product (Step 3b — this task also carries a CEO Approval Condition).
 - **Files touched**: None
 - **Read next**: Manifest only
 - **Open items**: None
@@ -93,9 +86,9 @@ was filed during validation and is deferred to M2.
   - [6] Vitest suite covers happy path and missing-id path for `delete` (and for `done` once BUG-002 is fixed in M2). — Product judgment — the `done` missing-id path is deliberately uncovered pending BUG-002; whether that leaves the criterion satisfied for this milestone is a scope call
   - [7] No linter or type-check errors introduced. — Met — `pnpm typecheck` clean at `4f7a2c9`
 
-### 5. product — task complete — 2026-04-10
+### 4. product — task complete — 2026-04-10
 
-- **Outcome**: Criterion 6 disposed — the `done` missing-id coverage gap is in scope for M2, not this task, so the criterion holds as written; all others accepted on Reviewer's evidence. Status set to Complete. During milestone smoke testing Bug Gatherer filed BUG-002 (`done` silent success on missing id) — triaged Low and Deferred to M2; does not violate this task's criteria.
+- **Outcome**: Criterion 6 disposed — the `done` missing-id coverage gap is in scope for M2, not this task, so the criterion holds as written; all others accepted on Reviewer's evidence. Status set to Complete. During milestone smoke testing Reviewer filed BUG-002 (`done` silent success on missing id) — triaged Low and Deferred to M2; does not violate this task's criteria.
 - **Files touched**: This file (Header Status), `../bugs/bug-002-done-silent-success.md`, `artifacts/BUGS.md` (index row)
 - **Read next**: —
 - **Open items**: BUG-002 held Deferred (re-triage at M2 planning)

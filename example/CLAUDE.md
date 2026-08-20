@@ -217,7 +217,8 @@ The project uses a strict split between reference material, document templates, 
   (each with its Context Manifest and Handoff Log), and one file per bug under
   `bugs/`. Cross-milestone state lives at the root: the bug index
   (`artifacts/BUGS.md`), the rolling session log (`artifacts/STANDUP.md`), and
-  every agent's live working state (`artifacts/AGENT_STATE.md`). One-off
+  project state written by the orchestrator (`artifacts/AGENT_STATE.md`) —
+  no agent reads it. One-off
   `/agent-task` work goes under `artifacts/one-off/`. Everything produced by
   the pipelines lands here.
 
@@ -225,7 +226,7 @@ When in doubt, read `docs/FILE_CONVENTIONS.md` and `artifacts/README.md`.
 
 This structure and the agent workflow were installed by CAST
 (https://github.com/Raxvis/CAST).
-Adopted with CAST v2.0.0
+Adopted with CAST v3.0.0
 
 ## Memory Imports
 
@@ -249,7 +250,7 @@ whether it is imported here).
 @docs/PRD.md
 
 <!-- On-demand reference — agents read these by path when a task calls for them
-     (coder/docs-writer: FILE_CONVENTIONS; coder/reviewer: ERROR_HANDLING; tester:
+     (coder/docs-writer: FILE_CONVENTIONS; coder/reviewer: ERROR_HANDLING; coder:
      TEST_FRAMEWORK; navigation: docs/README.md, artifacts/README.md). Add an
      import line ("@docs/FILE_CONVENTIONS.md", "@docs/ERROR_HANDLING.md") only
      if sessions repeatedly need one unprompted. -->

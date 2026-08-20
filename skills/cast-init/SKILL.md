@@ -2,8 +2,8 @@
 name: cast-init
 description: >-
   Install or migrate the CAST multi-agent workflow (Claude Agent Staged Team) into the
-  current project: 15 specialist subagents, three pipeline skills (/agent-plan,
-  /agent-code, /agent-task) plus the /cast-doctor maintenance skill, a
+  current project: 8 specialist subagents, three pipeline skills (/agent-plan,
+  /agent-code, /agent-task) plus the /cast-doctor and /cast-release maintenance skills, a
   docs/templates/artifacts scaffold, and a parameterized CLAUDE.md — with project
   detection, a user-approved migration plan, and placeholder substitution. Use when the user says "install CAST", "adopt CAST", "set up CAST",
   "cast init", "migrate to CAST", asks for a staged multi-agent planning/engineering
@@ -11,7 +11,7 @@ description: >-
   produces the migration plan without changing files.
 license: MIT
 metadata:
-  version: "2.2.0"
+  version: "3.0.0"
   source: "https://github.com/Raxvis/CAST"
 ---
 
@@ -47,8 +47,8 @@ Act as an expert migration assistant for the CAST template: adopt CAST into an e
 CAST's canonical structure in a target project is:
 
 - `CLAUDE.md` at project root — top-level context for every session
-- `.claude/agents/` — 15 subagent definitions with YAML frontmatter and per-agent model settings (all `model: inherit` by default — agents run on the session model)
-- `.claude/skills/` — three pipeline skills (`/agent-plan`, `/agent-code`, `/agent-task`) plus `/cast-doctor`, the run-anytime install health check and documentation audit
+- `.claude/agents/` — 8 subagent definitions with YAML frontmatter and per-agent model settings (all `model: inherit` by default — agents run on the session model)
+- `.claude/skills/` — three pipeline skills (`/agent-plan`, `/agent-code`, `/agent-task`) plus `/cast-doctor`, the run-anytime install health check and documentation audit, and `/cast-release`, release-prep automation
 - `docs/` — reference material only (PRD, conventions, topic-specific guides)
 - `templates/` — reusable document templates (architecture, UI spec, milestone, task, and bug-report files) copied into `artifacts/` as instances
 - `artifacts/` — work artifacts only, **grouped by milestone**: one `milestone-{N}-{slug}/` directory per milestone (README, design docs, reviews/, one file per task under tasks/, one file per bug under bugs/), `one-off/` for /agent-task work, and cross-milestone logs (BUGS.md index, STANDUP.md, AGENT_STATE.md) at the root
@@ -56,7 +56,7 @@ CAST's canonical structure in a target project is:
 Two rules are load-bearing:
 
 1. **`docs/` vs `artifacts/` split.** `docs/` is reference material; `artifacts/` is work output. Never put work in `docs/` or reference material in `artifacts/`. Every CAST agent and pipeline enforces this.
-2. **Planning vs engineering phases.** `/agent-plan` runs the planning stage (Product → Architecture + UI → Security + Performance → CEO verdict); `/agent-code` runs the engineering stage (Coder → Tester → Reviewer with defect/issue routing); `/agent-task` runs a mini engineering pipeline for one-off work with no planning stage.
+2. **Planning vs engineering phases.** `/agent-plan` runs the planning stage (Product → Architecture + UI → Risk → CEO verdict); `/agent-code` runs the engineering stage (Coder → Reviewer with defect/issue routing); `/agent-task` runs a mini engineering pipeline for one-off work with no planning stage.
 
 ## Safety rules
 
@@ -122,10 +122,10 @@ Produce a detailed migration plan tailored to the classification. Structure it a
 
 Build the plan from these reference files:
 
-- **`references/roster.md`** — the canonical 15-agent roster with tiers, models, and effort levels; alias tables for matching existing files by role; and the pipeline-skills mapping (including the pre-1.0 command → skill migration path). **All 15 agents are non-negotiable by default**: every one must appear in the plan as Create / Rename+Update / Update-in-place / Preserve unless the user explicitly opts out of `release`, `validator`, or — for a clearly backend/CLI-only project with no user interface — `ui` (see the opt-out rules in `references/roster.md`). Before closing the plan, enumerate all 15 names and verify each has an action — add the missing Create actions if any slipped through.
+- **`references/roster.md`** — the canonical 7-agent roster with tiers, models, and effort levels; a table mapping the eight v2 agents that were merged away to their v3 homes; alias tables for matching existing files by role; and the pipeline-skills mapping. **All 7 agents are non-negotiable by default**: every one must appear in the plan as Create / Rename+Update / Update-in-place / Preserve unless the user explicitly opts out of `ui` for a clearly backend/CLI-only project (see the opt-out rules in `references/roster.md`). Before closing the plan, enumerate all 7 names and verify each has an action. When the inventory finds v2 CAST agents (`tester`, `refactor`, `debugger`, `bug-gatherer`, `validator`, `security`, `performance`, `release`) or a pre-release v3 `risk`, propose Delete for each **and name where its duties went** — the user must be able to see nothing was dropped.
 - **`references/dispositions.md`** — per-file disposition tables for docs and templates (including which topic docs install for which project type), artifacts scaffold rules, root-file rules (`root/CLAUDE.md` is the only file installed at target root), and the plan-file format.
 
-**Model right-sizing.** Agents install with `model: inherit` (the session model) by default. Every plan must include an Ask item inviting the user to right-size per-agent models for cost: the judgment-heavy gates (CEO, Architect, Reviewer, Security) stay on the most capable model available (e.g. `opus`, or a Fable/Mythos-class model), the planning-and-implementation loop runs well on `sonnet`, and the utility roles on `haiku`. The suggested assignment table is in `references/roster.md` → "Right-sizing models"; record accepted pins into the corresponding agent actions so 5.4 applies them at install.
+**Model right-sizing.** Agents install with `model: inherit` (the session model) by default. Every plan must include an Ask item inviting the user to right-size per-agent models for cost: the judgment-heavy gates (CEO, Architect, Reviewer, Risk) stay on the most capable model available (e.g. `opus`, or a Fable/Mythos-class model), the planning-and-implementation loop runs well on `sonnet`, and the utility roles on `haiku`. The suggested assignment table is in `references/roster.md` → "Right-sizing models"; record accepted pins into the corresponding agent actions so 5.4 applies them at install.
 
 Write the full plan to `artifacts/adoption-plan.md` using the format in `references/dispositions.md`. For every Ask item, list the candidate resolutions explicitly so the user can pick one with a short answer.
 
@@ -159,7 +159,7 @@ Once approval is given, **record every Phase 4 resolution into `artifacts/adopti
 
 ## Phase 5 — Execution
 
-Once the plan is approved, execute the actions in a safe order, reporting progress as you go. **Read `references/execution.md` before writing any file** — it contains the full install mechanics and the customization-preservation rules, including the global rule that `<!-- TEMPLATE INSTRUCTIONS -->` blocks and placeholder-pointer comments are stripped from every installed file (the eleven `templates/*` skeletons excepted). Execute its sections in order:
+Once the plan is approved, execute the actions in a safe order, reporting progress as you go. **Read `references/execution.md` before writing any file** — it contains the full install mechanics and the customization-preservation rules, including the global rule that `<!-- TEMPLATE INSTRUCTIONS -->` blocks and placeholder-pointer comments are stripped from every installed file (the ten `templates/*` skeletons excepted). Execute its sections in order:
 
 1. **5.1 Preflight**
 2. **5.1a Fast path for pure-Create actions**
@@ -180,7 +180,7 @@ As each executed action completes, check it off in `artifacts/adoption-plan.md` 
 Run every check in `references/validation.md` — the numbers below match its check numbers:
 
 1. **Placeholder scan** — scoped to the files the plan touched, excluding cast-init's own payload directory; expected sub-template tokens like `[DATE]` are fine, real unfilled placeholders are not.
-2. **All 15 agents exist** with frontmatter matching the canonical roles (Tier 5 absences and a `ui` absence on a backend/CLI-only project require a recorded opt-out; other Tier 1–4 absences are hard failures).
+2. **All 7 agents exist** with frontmatter matching the canonical roles (a `ui` absence on a backend/CLI-only project requires a recorded opt-out; every other absence is a hard failure). No v2 agent file survives in `.claude/agents/`.
 3. **Pipeline skills** — the skills the user chose to keep exist at `.claude/skills/<name>/SKILL.md` with valid frontmatter, and no superseded pre-1.0 command files remain (in unattended mode, a leftover whose Delete was downgraded to a recorded TODO passes).
 3a. **Artifacts scaffold and installed docs** — `artifacts/BUGS.md`, `STANDUP.md`, `AGENT_STATE.md` exist, and `docs/PIPELINE_LOOP.md` exists whenever `agent-code` or `agent-task` is installed.
 4. **docs/artifacts split** is clean in both directions.
@@ -231,7 +231,7 @@ Write the final report to `artifacts/adoption-report.md` using the template in `
 ## Reference files
 
 - **`references/discovery.md`** — Phase 1 checklists and the inventory template
-- **`references/roster.md`** — 15-agent roster, tiers, alias tables, pipeline-skills mapping
+- **`references/roster.md`** — 8-agent roster, tiers, alias tables, pipeline-skills mapping
 - **`references/dispositions.md`** — docs/templates/artifacts/root disposition tables and the plan-file format
 - **`references/execution.md`** — Phase 5 install mechanics and customization-preservation rules
 - **`references/validation.md`** — Phase 6 checklist and the Phase 7 report template

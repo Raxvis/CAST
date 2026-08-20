@@ -63,7 +63,13 @@ jobs:
           done
           count=$(ls skills/cast-init/assets/agents/*.md | grep -cv README.md)
           echo "agent files: $count"
-          [ "$count" -eq 15 ] || { echo "expected 15 agents, found $count"; fail=1; }
+          [ "$count" -eq 7 ] || { echo "expected 7 agents, found $count"; fail=1; }
+          # v3 merged eight v2 agents away (risk existed only in a pre-release v3 draft
+          # before folding into ceo). A resurrected file would register a subagent
+          # the pipelines no longer invoke, whose instructions contradict the v3 loop.
+          for gone in tester refactor debugger bug-gatherer validator security performance release risk; do
+            [ ! -e "skills/cast-init/assets/agents/$gone.md" ] || { echo "removed-in-v3 agent is back: $gone.md"; fail=1; }
+          done
           exit $fail
 
       - name: Payload READMEs agree with the canonical roster (names, tiers, skills)
@@ -192,7 +198,7 @@ jobs:
             TARGET_PLATFORM_LIST TASK_NAME TASK_OR_ISSUE_NAME TASK_REFERENCE TERM TERM_NAME
             TEST_DESCRIPTION_PATTERN TEST_DIRECTORY TEST_FILE_EXTENSION TEST_ROOT TEST_WATCH_CMD
             THEME_FILE THEME_KEY TIME TIMEOUT_MS TYPE UNKNOWN_TYPE USE_LOOP_HOOK USER_NEED USER_TYPE
-            UTILITY_CATEGORY UTILITY_PATH VALIDATOR VALUE VALUE_A VALUE_B VALUE_C VERSION VERSION_1
+            UTILITY_CATEGORY UTILITY_PATH VALUE VALUE_A VALUE_B VALUE_C VERSION VERSION_1
             VERSION_2 VERSION_OR_MILESTONE VERSIONING_SCHEME WEB WEIGHT
           "
           allow_flat=" $(printf '%s' "$allow" | tr '\n' ' ') "
@@ -287,30 +293,31 @@ jobs:
               */milestone-*/ui-*.md) ;;            # supplemental screen/component specs
               */reviews/ceo.md)                    check_headings "$f" CEO_REVIEW.md ;;
               */reviews/ux.md)                     check_headings "$f" UX_REVIEW.md ;;
-              */reviews/completion.md)             check_headings "$f" MILESTONE_COMPLETION.md ;;
-              */reviews/validation.md)             check_headings "$f" MILESTONE_VALIDATION.md ;;
-              */reviews/retrospective.md)          check_headings "$f" MILESTONE_RETROSPECTIVE.md ;;
-              */reviews/security.md|*/reviews/performance.md) ;;  # planning reviews carry no template contract
-              */reviews/security-impl.md|*/reviews/performance-impl.md) ;;  # completion reviews: same agent-defined formats
+              */reviews/close.md)                  check_headings "$f" MILESTONE_CLOSE.md ;;
+              */reviews/risk.md) ;;                # risk review: agent-defined format (both lenses + two flag lines), no template
+              */reviews/risk-impl.md) ;;           # risk implementation review: same agent-defined format
               *) echo "unrecognized example artifact: $f — add a path pattern here or fix the filename"; fail=1 ;;
             esac
           done < <(find example/artifacts -type f -name '*.md' | sort)
-          # Completeness: a milestone with a completion record must also carry its
-          # validation record and retrospective, and — when UI-flagged (a ui.md
-          # exists for it) — a UX review. All derived from the files present.
-          for c in example/artifacts/milestone-*/reviews/completion.md; do
+          # Completeness: a milestone with a close record must — when UI-flagged (a
+          # ui.md exists for it) — carry a UX review, and — when either flag line in
+          # reviews/risk.md says Yes — carry the risk implementation review. The flag
+          # strings are asserted to EXIST when risk.md does (a reworded flag line
+          # would otherwise silently disarm this check — the v3.0.0 dead-check bug).
+          for c in example/artifacts/milestone-*/reviews/close.md; do
             [ -e "$c" ] || continue
             mdir=$(dirname "$(dirname "$c")")
-            [ -f "$mdir/reviews/validation.md" ] || { echo "completed milestone lacks its validation record: $mdir/reviews/validation.md"; fail=1; }
-            [ -f "$mdir/reviews/retrospective.md" ] || { echo "completed milestone lacks its retrospective: $mdir/reviews/retrospective.md"; fail=1; }
             if [ -f "$mdir/ui.md" ]; then
-              [ -f "$mdir/reviews/ux.md" ] || { echo "UI-flagged completed milestone lacks its UX review: $mdir/reviews/ux.md"; fail=1; }
+              [ -f "$mdir/reviews/ux.md" ] || { echo "UI-flagged closed milestone lacks its UX review: $mdir/reviews/ux.md"; fail=1; }
             fi
-            if grep -q '^\*\*Implementation review required\*\*: Yes' "$mdir/reviews/security.md" 2>/dev/null; then
-              [ -f "$mdir/reviews/security-impl.md" ] || { echo "security-flagged completed milestone lacks its implementation review: $mdir/reviews/security-impl.md"; fail=1; }
-            fi
-            if grep -q '^\*\*Measured check required\*\*: Yes' "$mdir/reviews/performance.md" 2>/dev/null; then
-              [ -f "$mdir/reviews/performance-impl.md" ] || { echo "budget-flagged completed milestone lacks its measured performance check: $mdir/reviews/performance-impl.md"; fail=1; }
+            if [ -f "$mdir/reviews/risk.md" ]; then
+              grep -q '^\*\*Security implementation review required\*\*: ' "$mdir/reviews/risk.md" \
+                || { echo "$mdir/reviews/risk.md is missing its security flag line"; fail=1; }
+              grep -q '^\*\*Performance measured check required\*\*: ' "$mdir/reviews/risk.md" \
+                || { echo "$mdir/reviews/risk.md is missing its performance flag line"; fail=1; }
+              if grep -qE '^\*\*(Security implementation review|Performance measured check) required\*\*: Yes' "$mdir/reviews/risk.md"; then
+                [ -f "$mdir/reviews/risk-impl.md" ] || { echo "risk-flagged closed milestone lacks its implementation review: $mdir/reviews/risk-impl.md"; fail=1; }
+              fi
             fi
           done
           [ "$fail" -eq 0 ] && echo "all example instances match their template contracts"
@@ -340,16 +347,18 @@ jobs:
           done
           exit $fail
 
-      - name: No stale pipeline-routing orders (docs/PIPELINE_LOOP.md is canonical)
+      - name: No file instructs launching a removed v2 agent (docs/PIPELINE_LOOP.md is canonical)
         run: |
-          # Since 1.2.0: Defects route Bug Gatherer -> Product -> Debugger, and the Issue
-          # loop is Refactor -> Tester -> Reviewer. Any prose stating the old adjacencies
-          # (Debugger -> Bug Gatherer, or Refactor directly -> Reviewer) is drift.
-          # CHANGELOG.md is excluded: its historical entries describe the old behavior.
-          hits=$(grep -rnE 'Debugger(\*\*)? *(→|↔|->) *(\*\*)? *Bug Gatherer|Refactor(\*\*)? *(→|↔|->) *(\*\*)? *Reviewer' \
+          # v3 loop: Coder → Reviewer, with Product spawned on triggers. The seven removed
+          # v2 agents may appear in historical prose (merge rationale, migration tables,
+          # CHANGELOG) but never as a live instruction to launch, invoke, or route to one.
+          # This replaces the v2-era stale-routing grep, which tested for adjacencies
+          # between agents that no longer exist and therefore could never fire.
+          gone='tester|refactor|debugger|bug-gatherer|bug gatherer|validator|release agent|risk agent'
+          hits=$(grep -rinE "(launch(es)?|invoke(s)?|spawn(s)?) (the )?(\*\*)?($gone)" \
             README.md CLAUDE.md TROUBLESHOOTING.md skills/ example/ || true)
           if [ -n "$hits" ]; then
-            echo "Stale routing found (canonical: Defects = Bug Gatherer → Product → Debugger; Issues = Refactor → Tester → Reviewer):"
+            echo "Live instruction to launch a removed v2 agent (v3 loop is Coder → Reviewer; see docs/PIPELINE_LOOP.md):"
             echo "$hits"; exit 1
           fi
           echo "clean"

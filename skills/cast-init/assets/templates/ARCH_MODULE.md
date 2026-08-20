@@ -11,8 +11,6 @@
     domain-specific terms appropriate to your project.
   - Replace [FRAMEWORK], [LANGUAGE], [STATE_LIBRARY], [PERSISTENCE_LAYER] with your stack.
   - Fill in the Data Model, API Contract, and Integration sections with real details.
-  - Keep the Acceptance Checklist updated — it is the contract between the engineer and
-    the product owner.
   - Status values: Draft / In Review / Approved / Implemented
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.
@@ -22,13 +20,6 @@
 
 # [PROJECT_NAME] — Architecture Spec: [MODULE_NAME]
 
-## Revision History (required)
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | [YYYY-MM-DD] | architect | Initial version |
-
----
 
 | Field | Value |
 |-------|-------|
@@ -213,26 +204,7 @@ State fields owned or updated by this module's outputs:
 
 ## Performance Budget (required)
 
-Budgets: see the system-level table in the `ARCH_SYSTEM.md` instance and live tracking in `.claude/agents/performance.md`.
-
----
-
-## Acceptance Checklist (required)
-
-- [ ] All public functions implemented and match the API Contract table
-- [ ] All edge cases handled per the Edge Cases table
-- [ ] All unit test cases pass
-- [ ] All manual testing steps verified
-- [ ] Performance budget met
-- [ ] State / integration boundary wired and verified end-to-end (if applicable)
-- [ ] No linter or type-check errors
-- [ ] Code reviewed and merged
-
----
-
-## CEO Verdict (required)
-
-Gated by the CEO planning review — see `artifacts/milestone-{N}-{slug}/reviews/ceo.md`. Do not sign off here.
+Budgets: see the system-level table in the `ARCH_SYSTEM.md` instance and the live Performance Budget Tracking table in `artifacts/AGENT_STATE.md` (measured by Risk at implementation review; transcribed by the orchestrator).
 
 ---
 

@@ -124,7 +124,7 @@ For each CAST reference doc and document template in the plan:
 2. For **Rename + Update**: read the existing file first, preserve all non-template content (e.g., an existing PRD with real requirements) as the body, update only the header and any CAST-specific framing.
 3. For **Update in place**: same as Rename + Update but without moving the file.
 4. Always install `docs/FILE_CONVENTIONS.md` — it's load-bearing for the docs/templates/artifacts split enforcement.
-5. The `templates/*` skeletons (architecture, UI spec, milestone, task, bug-report, milestone-retrospective, CEO review, and UX review templates — every `templates/*` file except `README.md`, twelve skeletons in all) install verbatim into the project's top-level `templates/` directory. Create the directory if it does not exist. `templates/README.md` also installs, but as documentation — with placeholder substitution and the scaffolding strip applied, per its disposition row.
+5. The `templates/*` skeletons (three architecture templates — system, module, data schema —, UI spec, milestone definition, task, bug-report, milestone-close, CEO review, and UX review templates — every `templates/*` file except `README.md`, ten skeletons in all) install verbatim into the project's top-level `templates/` directory. Create the directory if it does not exist. `templates/README.md` also installs, but as documentation — with placeholder substitution and the scaffolding strip applied, per its disposition row.
 6. In installed README files (`docs/README.md`, `templates/README.md`, `artifacts/README.md`), replace any `[YYYY-MM-DD]` "Last updated" token with the install date.
 
 ## 5.7 — Install artifacts scaffold

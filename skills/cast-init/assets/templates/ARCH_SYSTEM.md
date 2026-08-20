@@ -10,7 +10,6 @@
   - Replace [DOMAIN_ENTITY], [RESOURCE_TYPE], [CORE_MECHANIC], [STATE_LIBRARY],
     [PERSISTENCE_LAYER], [FRAMEWORK] with domain- and stack-specific terms.
   - Fill in the Component Diagram and Data Flow with real details for your system.
-  - The Acceptance Checklist is the contract — keep it accurate and up to date.
   - Status values: Draft / In Review / Approved / Implemented
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.
@@ -36,13 +35,6 @@
 
 # [PROJECT_NAME] — Architecture Spec: [SYSTEM_NAME]
 
-## Revision History (required)
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | [YYYY-MM-DD] | architect | Initial version |
-
----
 
 | Field | Value |
 |-------|-------|
@@ -132,43 +124,7 @@
 | `[fnName]` | `([params]) => [ReturnType]` | [What it does] |
 | `[fnName]` | `([params]) => [ReturnType]` | [What it does] |
 
----
-
-### [MODULE_B]
-
-**Responsibility**: [What this module is solely responsible for.]
-
-**Inputs**:
-- `[input]` — [type and description]
-
-**Outputs**:
-- `[output]` — [type and description]
-
-**Key Functions**:
-
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `[fnName]` | `([params]) => [ReturnType]` | [What it does] |
-| `[fnName]` | `([params]) => [ReturnType]` | [What it does] |
-
----
-
-### [MODULE_C]
-
-**Responsibility**: [What this module is solely responsible for.]
-
-**Inputs**:
-- `[input]` — [type and description]
-
-**Outputs**:
-- `[output]` — [type and description]
-
-**Key Functions**:
-
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `[fnName]` | `([params]) => [ReturnType]` | [What it does] |
-| `[fnName]` | `([params]) => [ReturnType]` | [What it does] |
+_Duplicate the [MODULE_A] block above for each module the milestone touches ([MODULE_B], [MODULE_C], …) — one block per real module, no placeholder blocks._
 
 ---
 
@@ -258,23 +214,13 @@ Actor / Source          Action                         Result
 
 ---
 
-## Acceptance Checklist (required)
+## Decisions Log (required)
 
-- [ ] All modules implemented per their specifications
-- [ ] Data flow matches the described sequence end-to-end
-- [ ] All integration test cases pass
-- [ ] All manual testing checklist items verified
-- [ ] Performance budget met for all metrics
-- [ ] State persists correctly across sessions
-- [ ] No regressions in adjacent systems
-- [ ] No linter or type-check errors
-- [ ] Code reviewed and merged
+_Every decision that chose between real alternatives, and **every new dependency** (with what it buys and what it costs — Coder may not introduce one that is not recorded here). This section and the module boundaries are the CEO's primary read; Reviewer checks the diff against it. If the milestone required no such decisions, write `N/A — no decisions beyond the template defaults`._
 
----
-
-## CEO Verdict (required)
-
-Gated by the CEO planning review — see `artifacts/milestone-{N}-{slug}/reviews/ceo.md`. Do not sign off here.
+| # | Decision | Alternatives considered | Rationale |
+|---|----------|------------------------|-----------|
+| 1 | [Decision] | [What else was considered] | [Why this one] |
 
 ---
 
