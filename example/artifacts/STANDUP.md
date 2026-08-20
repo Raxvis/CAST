@@ -54,14 +54,10 @@ Entries under a session heading are appended in the order they happen (oldest fi
 - reviewer | progress | BUG-002 filed (`bugs/bug-002-done-silent-success.md`, initial severity Low): `done <id>` silently succeeds on a non-existent task ID
 - product | decision | BUG-002 triaged Low and set Deferred — does not affect correctness of normal flows; fix pairs with an M2 error-signaling task
 - reviewer | progress | T-5 closed at Step 3a — all 7 criteria Met, no Product spawn; Status set to Complete — all five tasks Complete
-- product | progress | Milestone-completion checkpoint: all three CEO Approval Conditions Verified (1 and 2 by Reviewer, 3 by Product)
-- product | decision | Deferred re-triage at the milestone-completion checkpoint: BUG-002 held Deferred into M2 with updated rationale; re-triaged again at M2 `/agent-plan` Stage 1
-- product | progress | Completion record written: `artifacts/milestone-1-task-crud/reviews/completion.md` — Status: Complete with Deferrals (BUG-002 under Known Issues)
-- product | progress | Validation record written: `artifacts/milestone-1-task-crud/reviews/validation.md` — Approved with Notes
 - ui | progress | UX review written: `artifacts/milestone-1-task-crud/reviews/ux.md` — APPROVED WITH NOTES (BUG-002 noted)
 - risk | progress | Implementation review complete: `artifacts/milestone-1-task-crud/reviews/risk-impl.md` — security lens: parameterized bindings confirmed at every query site; performance lens: both budgets met (list 31ms p50 vs 100ms target); AGENT_STATE budget table updated. No findings filed.
+- product | progress | Milestone close: `artifacts/milestone-1-task-crud/reviews/close.md` written in one pass — Deferred re-triage held BUG-002 Deferred into M2 with an updated rationale (re-triaged again at M2 `/agent-plan` Stage 1); all three CEO Approval Conditions Verified (1 and 2 by Reviewer, 3 by Product); Status set to Complete with Deferrals
 - docs-writer | progress | Milestone-completion drain: 4 pending docs entries drained (2 queued during planning, 1 during T-3, 1 during T-5)
-- product | progress | Retrospective written: `artifacts/milestone-1-task-crud/reviews/retrospective.md`
 - agent-code | progress | Milestone outcome and 5 Decisions Log rows recorded in `artifacts/AGENT_STATE.md`; no archival needed (first milestone)
 - agent-code | progress | Run complete: M1 closed — 5/5 tasks Complete, 42 tests passing, all CEO Approval Conditions Verified, BUG-002 held Deferred
 
@@ -107,9 +103,9 @@ Entries under a session heading are appended in the order they happen (oldest fi
 | Document | Purpose |
 |----------|---------|
 | `BUGS.md` | Global bug index (one line per bug → its per-bug file) — reference when reporting blockers |
-| `AGENT_STATE.md` | Live per-agent working state — each agent reads its own section on activation |
+| `AGENT_STATE.md` | Project state written by the orchestrator (Decisions Log, milestone progress, performance budgets, open questions) — no agent reads it |
 | `milestone-1-task-crud/tasks/` | Milestone 1 per-task files — reference for planned work |
-| `milestone-1-task-crud/reviews/validation.md` | Milestone 1 acceptance record — reference when validating completed work |
+| `milestone-1-task-crud/reviews/close.md` | Milestone 1 close record — reference when validating completed work |
 | `milestone-1-task-crud/reviews/ceo.md` | Planning sign-off and Approval Conditions |
 
 ---

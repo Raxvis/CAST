@@ -31,8 +31,9 @@ Planning stage — /agent-plan
 Engineering stage — /agent-code
 
     Coder  →  Reviewer  ──┬──  Defect  →  Reviewer files the bug  →  Product triage  →  Coder
-    (implement,           │
-     test, commit)        └──  Issue   →  Coder (loop)
+    (implement,           │             (straight to Coder when it violates a criterion —
+     test, commit)        │              Defer is forbidden there, so no triage question)
+                          └──  Issue   →  Coder (loop)
                                                                       │
                                                                       ▼
                                           Reviewer's criteria check: all Met?
@@ -45,11 +46,14 @@ Engineering stage — /agent-code
                                                                       │
                                              ... every task Complete or Deferred? ...
                                                                       ▼
-                                          milestone checkpoint: Deferred re-triage (Product)
-                                          →  completion + validation records (Product)
-                                          →  docs drain (Docs Writer)
+                                          milestone checkpoint:
                                           →  UX review (UI, UI-flagged milestones only)
-                                          →  retrospective (Product) + orchestrator records
+                                          →  risk implementation review (Risk, if flagged)
+                                          →  milestone close — one Product launch
+                                             (Deferred re-triage + close record + CEO
+                                              conditions + Status)
+                                          →  docs drain (Docs Writer, if entries pending)
+                                          →  orchestrator records + archives
 
 
 One-off task — /agent-task  (no planning stage, for small self-contained changes)
@@ -107,7 +111,7 @@ The skill reads all template files from its bundled payload — no network acces
 2. **Propose a migration plan** — numbered list of every file it will create, rename, update, or skip.
 3. **Wait for your approval** — nothing is touched until you explicitly approve.
 4. **Execute the plan** — install agents, pipeline skills, docs, and artifacts, substituting detected project values.
-5. **Validate** — verify all 15 agents exist, the docs/artifacts split is clean, and YAML frontmatter is valid.
+5. **Validate** — verify all 8 agents exist, the docs/artifacts split is clean, and YAML frontmatter is valid.
 
 This works for greenfield projects, existing projects with no agentic workflow, and existing projects with a mature agentic workflow you want to migrate to CAST.
 
@@ -230,7 +234,6 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 | `[PKG_MANIFEST]` | Package or dependency manifest file | package.json, pubspec.yaml |
 | `[FRAMEWORK_CONFIG]` | Framework configuration file | app.json, next.config.js |
 | `[TYPE_CONFIG]` | Type checker configuration file | tsconfig.json |
-| `[EXT]` | File extension for source files | tsx, dart, rb |
 
 ### Commands
 
@@ -297,7 +300,7 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 | Placeholder | Description | Example value |
 |---|---|---|
 | `[SESSION_TYPE]` | Type of user validation session | playtest, usability test, A/B test |
-| `[MAX_LOOP_COUNT]` | Maximum Defect/Issue loop iterations in the engineering pipeline before escalating to the user (used in `refactor.md`; loop semantics in `docs/PIPELINE_LOOP.md`) | 3 |
+| `[MAX_LOOP_COUNT]` | Maximum Defect/Issue loop iterations in the engineering pipeline before escalating to the user (used in `docs/PIPELINE_LOOP.md`, `templates/TASK.md`, and both the `agent-plan` and `agent-code` pipeline skills) | 3 |
 
 ### Agents
 
@@ -339,8 +342,8 @@ Before installing, browse [`example/`](example/) to see exactly what a real popu
 
 - A fully substituted `CLAUDE.md` with no `[PLACEHOLDER]` tokens ([`example/CLAUDE.md`](example/CLAUDE.md))
 - A populated PRD, concept, and glossary ([`example/docs/`](example/docs/))
-- A complete planning run for Milestone 1, grouped in one milestone directory: milestone README, five per-task files with Context Manifests and Handoff Logs, architecture document, UI spec, security review, performance review, and CEO verdict ([`example/artifacts/`](example/artifacts/))
-- The full engineering wrap-up for that milestone: completion and validation records, the UX review, the risk implementation review, and the retrospective
+- A complete planning run for Milestone 1, grouped in one milestone directory: milestone README, five per-task files with Context Manifests and Handoff Logs, architecture document, UI spec, one risk review (`reviews/risk.md`), and CEO verdict ([`example/artifacts/`](example/artifacts/))
+- The full engineering wrap-up for that milestone: the milestone close record (`reviews/close.md`, covering per-task validation, milestone validation, and the retrospective), the UX review, and the risk implementation review
 - An active bug tracker with one fixed bug and one Deferred (held-open) bug, and a session log following the canonical `STANDUP.md` entry grammar
 
 The example deliberately omits `.claude/` (those files are unchanged copies of the template agents and pipeline skills) and `src/` (this is a planning fixture, not a real build). The start-here file is [`example/README.md`](example/README.md).
@@ -358,7 +361,7 @@ The example deliberately omits `.claude/` (those files are unchanged copies of t
 With agent files in `.claude/agents/`, Claude Code can invoke them in three ways:
 
 1. **Automatic delegation** — Claude routes tasks to the matching subagent based on the `description` field in each agent's YAML frontmatter (e.g., asking "review this code" automatically delegates to the reviewer agent).
-2. **Explicit request** — Ask Claude directly: "Use the coder agent to implement this feature" or "Have the security agent audit this module."
+2. **Explicit request** — Ask Claude directly: "Use the coder agent to implement this feature" or "Have the risk agent audit this module."
 3. **Management** — Use the `/agents` command to view, create, and manage all available subagents.
 
 ### Agent Reference by Task Type
@@ -373,9 +376,9 @@ With agent files in `.claude/agents/`, Claude Code can invoke them in three ways
 | Implement features or fixes | `coder` |
 | Write or run tests | `coder` (Coder writes and runs the tests for what it implements) |
 | Review code quality | `reviewer` |
-| Investigate a bug | `debugger` |
+| Investigate a bug | `coder` |
 | Refactor code structure | `coder` (behavior-preserving restructuring is a Coder loop-back) |
-| File a bug report | `bug-gatherer` |
+| File a bug report | `reviewer` |
 | Update documentation | `docs-writer` |
 | Prepare a release | `/cast-release` skill (not an agent) |
 
@@ -384,7 +387,7 @@ With agent files in `.claude/agents/`, Claude Code can invoke them in three ways
 
 | Skill | Purpose |
 |---|---|
-| `/agent-plan <feature>` | Run the Planning Stage end-to-end. Product → Architecture + UI → Security + Performance → CEO. Produces planning documents and a CEO verdict. No code is written. **Light mode** (`/agent-plan light: <feature>`, or `single:` for the one-task case) plans a small feature with Product + Architecture + CEO only — same milestone layout, minimal ceremony. It also engages automatically when Stage 1 scoping finds 3 tasks or fewer, no new screen set, no security-sensitive scope, no applicable performance budget, and nothing cross-cutting; any one of those failing means the full run, and the per-task flags still pull a skipped stage back in. |
+| `/agent-plan <feature>` | Run the Planning Stage end-to-end. Product → Architecture + UI → Risk → CEO. Produces planning documents and a CEO verdict. No code is written. **Light mode** (`/agent-plan light: <feature>`, or `single:` for the one-task case) plans a small feature with Product + Architecture + CEO only — same milestone layout, minimal ceremony. It also engages automatically when Stage 1 scoping finds 3 tasks or fewer, no new screen set, no security-sensitive scope, no applicable performance budget, and nothing cross-cutting; any one of those failing means the full run, and the per-task flags still pull a skipped stage back in. |
 | `/agent-code <milestone-or-task>` | Run the Engineering Stage for a CEO-approved milestone. Coder (implement, test, commit) → Reviewer, with Defects filed by Reviewer and routed through Product triage, and Issues routed back to Coder — then validation. A clean task is two spawns. Reviewer's per-criterion Acceptance Criteria Check decides validation: all criteria Met and the orchestrator closes the task with no agent launch; a flagged criterion, a mid-task amendment, a CEO Approval Condition, or a resolved bug launches Product. The task checkpoint launches no agents — just the Status writeback, plus a `docs`-queue drain only once 10 entries are pending. When every task is Complete or Deferred, the milestone checkpoint runs Deferred re-triage, the completion and validation records (covering every task and verifying CEO Approval Conditions), the `docs` drain, the UX review (UI-flagged milestones), the risk implementation review (flagged milestones), the retrospective, and the orchestrator's outcome records and archival. |
 | `/agent-task <task description>` | Run a mini engineering pipeline for a single one-off task without requiring a milestone or CEO verdict. Coder → Reviewer, with the same Defect/Issue routing as `/agent-code`. Use for bug fixes, typos, small refactors, and dependency bumps — NOT for new modules or cross-cutting changes (it bails out to `/agent-plan`, whose light mode covers the small-feature middle ground). |
 | `/cast-doctor` (or `/cast-doctor checkup`) | Run a health check on the CAST install: verify structural and state invariants, prescribe model-aware documentation pruning (two tiers, gated on the Context Inference Bar in `docs/MODEL_OPTIMIZATION.md`), and find documentation coverage gaps. Writes `artifacts/DOCTOR.md`; treats only user-approved prescriptions. Run after model changes or every few milestones. |
@@ -400,7 +403,7 @@ Agents communicate through shared documents. When one agent completes work, the 
 - **Planning architecture documents** at `artifacts/milestone-{N}-{slug}/architecture.md` are the contract between Architect and Coder for a specific milestone — reaching engineering agents through each task file's Context Manifest, which cites the exact sections a task needs. Templates live at `templates/ARCH_MODULE.md`, `templates/ARCH_SYSTEM.md`, and `templates/ARCH_DATA_SCHEMA.md`.
 - **Planning UI specifications** at `artifacts/milestone-{N}-{slug}/ui.md` are the contract between UI and Coder. Template lives at `templates/UI_SPEC.md`. Produced only when the `ui` agent is installed — a backend/CLI project that opted out of `ui` runs both pipelines without a UI spec, and `/agent-code` does not demand one.
 - **CEO planning verdicts** at `artifacts/milestone-{N}-{slug}/reviews/ceo.md` gate entry into the engineering stage via a single `**Verdict**: <APPROVED | APPROVED WITH CONDITIONS | REVISION REQUIRED>` line that `/agent-code` Pre-Flight parses; on APPROVED WITH CONDITIONS the conditions are backfilled into the milestone README's CEO Approval Conditions table and referenced from the affected task files' Context Manifests. Template lives at `templates/CEO_REVIEW.md`.
-- **Milestone-completion records**: Product writes the completion record (Status `Complete`, or `Complete with Deferrals` when Deferred items survive re-triage) and the validation record, UI writes the UX review for UI-flagged milestones, and Product writes the retrospective — all under the milestone's `reviews/` directory (templates `MILESTONE_COMPLETION.md`, `MILESTONE_VALIDATION.md`, `UX_REVIEW.md`, and `MILESTONE_RETROSPECTIVE.md`).
+- **Milestone-close records**: UI writes the UX review for UI-flagged milestones (`templates/UX_REVIEW.md`), Risk writes the implementation review when flagged, and one Product launch writes the close record — per-task validation, milestone validation, completion summary (Status `Complete`, or `Complete with Deferrals` when Deferred items survive re-triage), and retrospective — under the milestone's `reviews/` directory (`templates/MILESTONE_CLOSE.md`).
 
 ### Minimum Viable Agent Set
 
@@ -447,7 +450,7 @@ All payload paths below are relative to `skills/cast-init/assets/` in this repo.
 |---|---|
 | `skills/cast-init/SKILL.md` | The `/cast-init` adoption workflow: seven phases from discovery to the final report |
 | `skills/cast-init/references/discovery.md` | Phase 1 checklists and the adoption-inventory template |
-| `skills/cast-init/references/roster.md` | Canonical 15-agent roster, tiers, alias tables, and the pipeline-skills mapping |
+| `skills/cast-init/references/roster.md` | Canonical 8-agent roster, tiers, alias tables, and the pipeline-skills mapping |
 | `skills/cast-init/references/dispositions.md` | Per-file disposition tables for docs/templates/artifacts/root and the plan-file format |
 | `skills/cast-init/references/execution.md` | Phase 5 install mechanics and customization-preservation rules |
 | `skills/cast-init/references/validation.md` | Phase 6 validation checklist and the Phase 7 report template |
@@ -460,13 +463,13 @@ All payload paths below are relative to `skills/cast-init/assets/` in this repo.
 |---|---|
 | `root/CLAUDE.md` | Top-level context file read first by every agent; defines project identity, structure, conventions, and run commands |
 
-### agents/ → `.claude/agents/` (15 agents + README)
+### agents/ → `.claude/agents/` (8 agents + README)
 
 > **Note:** `agents/README.md` is metadata about the directory. It should NOT be copied to `.claude/agents/` in the target project — Claude Code would try to register it as a subagent.
 
 | File | Description |
 |---|---|
-| `agents/product.md` | Defines the product agent; owns scope — milestone definition, task files, bug triage, validation, and the completion/validation/retrospective records |
+| `agents/product.md` | Defines the product agent; owns scope — milestone definition, task files, bug triage, validation, and the milestone close record |
 | `agents/architect.md` | Defines the system design agent; owns module boundaries, data schemas, contracts, and the performance budget |
 | `agents/ui.md` | Defines the UI agent; owns visual design, layout, interaction states, accessibility, and the milestone UX review |
 | `agents/risk.md` | Defines the risk agent; reviews an architecture through the security and performance lenses in one pass and sets the two implementation-review flags |
@@ -476,19 +479,19 @@ All payload paths below are relative to `skills/cast-init/assets/` in this repo.
 | `agents/docs-writer.md` | Defines the documentation agent; drains the `docs:` queue at the milestone-completion checkpoint, at an overflow drain, and at the `/agent-task` checkpoint |
 | `agents/README.md` | Master overview of the agent system: roster, interaction diagram, planning and engineering stage workflows, and placeholder reference |
 
-### skills/ → `.claude/skills/` (4 skills + README)
+### skills/ → `.claude/skills/` (5 skills + README)
 
 > **Note:** `skills/README.md` is metadata about the directory. It is NOT installed to the target project.
 
 | File | Description |
 |---|---|
-| `skills/agent-plan/SKILL.md` | Defines the `/agent-plan` pipeline skill; orchestrates the Planning Stage end-to-end (Product → Architecture + UI → Security + Performance → CEO) |
+| `skills/agent-plan/SKILL.md` | Defines the `/agent-plan` pipeline skill; orchestrates the Planning Stage end-to-end (Product → Architecture + UI → Risk → CEO, with UI and Risk conditional on the plan's flags) |
 | `skills/agent-code/SKILL.md` | Defines the `/agent-code` pipeline skill; orchestrates the Engineering Stage per task (Coder → Reviewer, with Defects through Product triage and Issues back to Coder) |
 | `skills/cast-release/SKILL.md` | Defines the `/cast-release` skill; verifies the release gates, derives the version, updates `docs/CHANGELOG.md`, and issues a GO/NO-GO. Runs in-session, launches no agents |
 | `skills/agent-task/SKILL.md` | Defines the `/agent-task` pipeline skill; runs a mini engineering pipeline (Coder → Reviewer → validation) for a single one-off task without requiring a milestone or CEO verdict |
 | `skills/cast-doctor/SKILL.md` | Defines the `/cast-doctor` maintenance skill; run-anytime install health check — state invariants, two-tier model-gated documentation diet (Context Inference Bar in `docs/MODEL_OPTIMIZATION.md`), and documentation coverage gaps. Writes `artifacts/DOCTOR.md` |
 
-### docs/ (reference material, 21 files)
+### docs/ (reference material, 22 files)
 
 Reference documentation. Never holds work artifacts. Document templates live in `templates/` (below).
 
@@ -505,18 +508,19 @@ Reference documentation. Never holds work artifacts. Document templates live in 
 | `docs/ERROR_HANDLING.md` | Guidelines for handling errors across all categories; defines principles, patterns, and user-facing message standards |
 | `docs/TEST_FRAMEWORK.md` | Testing strategy, test runner setup, file conventions, and coverage requirements |
 | `docs/MODEL_OPTIMIZATION.md` | Model policy for the agent roster: the Claude Opus ladder (Opus 5 preferred), per-model behavior profiles, and the upgrade checklists through Opus 4.8 → Opus 5 |
-| `docs/PIPELINE_LOOP.md` | The canonical engineering-loop contract executed by both `/agent-code` and `/agent-task`: per-task sequence, Defect/Issue routing, loop-counter rules, test gate, targeted re-runs, pass-forward rule |
+| `docs/STAGE_CONTRACT.md` | The stage contract — the only process document an agent reads: the closed read set, the handoff-entry format, and the one-line reply |
+| `docs/PIPELINE_LOOP.md` | The canonical engineering-loop contract executed by both `/agent-code` and `/agent-task` (orchestrator-only — never passed into a stage): per-task sequence, Defect/Issue routing, loop-counter rules, test gate, targeted re-runs, pass-forward rule |
 | `docs/FIRST_RUN.md` | Interactive checklist to run in Claude Code after a fresh install; verifies that subagents load and pipeline skills register |
 | `docs/CLAUDE_CODE_SETTINGS.md` | Reference for `.claude/settings.json` — explains permission rules, environment variables, and hooks, with common extension patterns |
 | `docs/FRONTEND.md` | Topic-specific reference for frontend projects; delete if not applicable |
 | `docs/BACKEND.md` | Topic-specific reference for API servers, workers, and pipelines; delete if not applicable |
 | `docs/CLI.md` | Topic-specific reference for command-line tools; delete if not applicable |
 | `docs/MOBILE.md` | Topic-specific reference for native and cross-platform mobile apps (iOS, Android, React Native, Expo, Flutter, SwiftUI, Jetpack Compose). Pair with `docs/FRONTEND.md` for mobile projects; delete if not applicable |
-| `docs/CHANGELOG.md` | Chronological log of notable changes across releases and milestones, maintained by the release agent |
+| `docs/CHANGELOG.md` | Chronological log of notable changes across releases and milestones, maintained by the `/cast-release` skill |
 | `docs/ASSETS.md` | Registry of all project assets (images, fonts, etc.) with status and source information |
 | `docs/MVP_LAUNCH.md` | Checklist and criteria for the initial public release |
 
-### templates/ (document templates, 12 files)
+### templates/ (document templates, 10 files)
 
 Reusable document skeletons. Agents copy them — never fill in place — to produce instances under `artifacts/`. See [`templates/README.md`](skills/cast-init/assets/templates/README.md).
 
@@ -525,15 +529,13 @@ Reusable document skeletons. Agents copy them — never fill in place — to pro
 | `templates/MILESTONE_DEFINITION.md` | Template for the milestone README — the milestone's highest-order document: goal, success metrics, in/out of scope, top-level acceptance criteria, Task Index, CEO Approval Conditions. Instance at `artifacts/milestone-{N}-{slug}/README.md`. |
 | `templates/TASK.md` | Template for a single task file — the isolated unit of work: description, dependencies, acceptance criteria, Context Manifest (the task's complete read set), and Handoff Log (the fixed-format record every stage appends). One instance per task at `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` (or `artifacts/one-off/` for `/agent-task`). |
 | `templates/BUG_REPORT.md` | Template for a single bug file. One instance per bug at `artifacts/milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` (or `artifacts/one-off/bugs/`), indexed in `artifacts/BUGS.md`. |
-| `templates/MILESTONE_VALIDATION.md` | Template for milestone validation / acceptance records. Instance at `artifacts/milestone-{N}-{slug}/reviews/validation.md`. |
-| `templates/MILESTONE_COMPLETION.md` | Template for milestone completion reports. Instance at `artifacts/milestone-{N}-{slug}/reviews/completion.md`. |
+| `templates/MILESTONE_CLOSE.md` | Template for the milestone close record, written by Product in one pass: per-task validation (citing Reviewer's evidence), milestone validation checklists, completion summary, and retrospective. Instance at `artifacts/milestone-{N}-{slug}/reviews/close.md`. |
 | `templates/ARCH_MODULE.md` | Template for documenting a single code module (instances at `artifacts/milestone-{N}-{slug}/arch-{slug}.md`) |
 | `templates/ARCH_SYSTEM.md` | Template for documenting a high-level system (the milestone `architecture.md` is an instance) |
 | `templates/ARCH_DATA_SCHEMA.md` | Template for documenting a data schema or save format (instances at `artifacts/milestone-{N}-{slug}/arch-{slug}.md`) |
 | `templates/UI_SPEC.md` | Template for specifying a UI screen or component (the milestone `ui.md` is an instance; supplemental specs at `ui-{slug}.md`) |
 | `templates/CEO_REVIEW.md` | Template for the CEO planning verdict: the six mandated inputs, the review checklist, and the APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED verdict block. Instance at `artifacts/milestone-{N}-{slug}/reviews/ceo.md`. |
 | `templates/UX_REVIEW.md` | Template for UI's UX review of an implemented milestone (instance at `artifacts/milestone-{N}-{slug}/reviews/ux.md`) |
-| `templates/MILESTONE_RETROSPECTIVE.md` | Template for Product's end-of-milestone retrospective: what went well, what didn't, process issues, metrics, and improvement actions. Instance at `artifacts/milestone-{N}-{slug}/reviews/retrospective.md`. |
 
 ### artifacts/ (work artifacts)
 
@@ -542,10 +544,10 @@ Live work artifacts produced by the agents. Copied as a seed into the target pro
 | Path | Description |
 |---|---|
 | `artifacts/README.md` | Explains the `docs/` vs `artifacts/` split and lists the subdirectory layout |
-| `artifacts/AGENT_STATE.md` | Live working state for all 15 agents (Current Work tables, decision logs, validator dashboards), one section per agent — the mutable counterpart to the immutable agent definition files |
+| `artifacts/AGENT_STATE.md` | Cross-milestone state tables written by the orchestrator (Decisions Log, Milestone Progress, Performance Budget Tracking, Open Questions) — no agent reads this file |
 | `artifacts/BUGS.md` | Global bug index — one line per bug pointing at its per-bug file. Carries the canonical lifecycle and field-ownership rules |
 | `artifacts/STANDUP.md` | Rolling log of progress updates, blockers, and decisions from work sessions |
-| `artifacts/milestone-{N}-{slug}/` | One directory per milestone: `README.md` (definition, Task Index, CEO conditions), `architecture.md`, `ui.md`, `reviews/` (security, performance, CEO, UX, validation, completion, retrospective), `tasks/` (one file per task), `bugs/` (one file per bug) |
+| `artifacts/milestone-{N}-{slug}/` | One directory per milestone: `README.md` (definition, Task Index, CEO conditions), `architecture.md`, `ui.md`, `reviews/` (risk, CEO, UX, risk-impl, close), `tasks/` (one file per task), `bugs/` (one file per bug) |
 | `artifacts/one-off/` | `/agent-task` work: one-off task files and their bug files |
 
 </details>

@@ -30,7 +30,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `medium`. Raise to `high` for a task the plan flagged as complex or a defect whose mechanism is not obvious. Ladder and per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
+**Effort:** `medium`. Raise to `high` for a task the plan flagged as complex or a defect whose mechanism is not obvious.
 
 **Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format. That file is the only process document you read.
 
@@ -56,7 +56,7 @@ You own every change to production code and its tests. One pass produces working
 
 ## The Test Results block
 
-Every handoff entry carries this, and it is what replaces the v2 Tester gate. Reviewer rejects the entry unread if it is missing or shows failures.
+Every handoff entry carries this. Reviewer rejects the entry unread if it is missing or shows failures.
 
 ```
 - **Test Results**: `[TEST_CMD]` — <verbatim tail of the run: the actual pass/fail counts as printed>
@@ -122,7 +122,3 @@ You may **not**:
 - Deviate from an Approved architecture document without pausing and proposing the amendment.
 - Change acceptance criteria — those are Product's.
 - Mark your own task validated. Reviewer checks the criteria; Product disposes of anything Reviewer cannot settle.
-
-## Documentation queue
-
-When a change alters something documentation-worthy — an API, command, configuration, convention, or user-facing behavior — append `- coder | docs | <note>` to the current session in `artifacts/STANDUP.md`. Docs Writer drains the queue at the milestone-completion checkpoint (or at an overflow drain).

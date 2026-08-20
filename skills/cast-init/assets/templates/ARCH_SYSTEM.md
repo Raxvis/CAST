@@ -125,43 +125,7 @@
 | `[fnName]` | `([params]) => [ReturnType]` | [What it does] |
 | `[fnName]` | `([params]) => [ReturnType]` | [What it does] |
 
----
-
-### [MODULE_B]
-
-**Responsibility**: [What this module is solely responsible for.]
-
-**Inputs**:
-- `[input]` — [type and description]
-
-**Outputs**:
-- `[output]` — [type and description]
-
-**Key Functions**:
-
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `[fnName]` | `([params]) => [ReturnType]` | [What it does] |
-| `[fnName]` | `([params]) => [ReturnType]` | [What it does] |
-
----
-
-### [MODULE_C]
-
-**Responsibility**: [What this module is solely responsible for.]
-
-**Inputs**:
-- `[input]` — [type and description]
-
-**Outputs**:
-- `[output]` — [type and description]
-
-**Key Functions**:
-
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `[fnName]` | `([params]) => [ReturnType]` | [What it does] |
-| `[fnName]` | `([params]) => [ReturnType]` | [What it does] |
+_Duplicate the [MODULE_A] block above for each module the milestone touches ([MODULE_B], [MODULE_C], …) — one block per real module, no placeholder blocks._
 
 ---
 
@@ -248,6 +212,16 @@ Actor / Source          Action                         Result
 - [ ] [Error / failure scenario]
 - [ ] [Performance scenario — verify budget is met]
 - [ ] [Persistence scenario — data survives app restart]
+
+---
+
+## Decisions Log (required)
+
+_Every decision that chose between real alternatives, and **every new dependency** (with what it buys and what it costs — Coder may not introduce one that is not recorded here). This section and the module boundaries are the CEO's primary read; Reviewer checks the diff against it. If the milestone required no such decisions, write `N/A — no decisions beyond the template defaults`._
+
+| # | Decision | Alternatives considered | Rationale |
+|---|----------|------------------------|-----------|
+| 1 | [Decision] | [What else was considered] | [Why this one] |
 
 ---
 

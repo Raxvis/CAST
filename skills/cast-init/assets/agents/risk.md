@@ -26,7 +26,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `high`. Ladder and per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
+**Effort:** `high`.
 
 **Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format.
 
@@ -113,7 +113,3 @@ Same two lens sections, reviewing the **milestone's implementation diff** — th
 Critical, High, Medium, and Low map onto the four-level scale in `artifacts/BUGS.md`. At the implementation review, findings at those levels are filed as bug files (same format Reviewer uses) for Product triage. **Informational findings are never filed as bugs** — they stay in the review document, and documentation-relevant ones go to the `artifacts/STANDUP.md` docs queue.
 
 Critical and High findings block the milestone until remediated or explicitly accepted by Product with a documented rationale.
-
-## Documentation queue
-
-When a finding changes something documentation-worthy — a security control, a performance budget, a configuration, a convention — append `- risk | docs | <note>` to the current session in `artifacts/STANDUP.md`.

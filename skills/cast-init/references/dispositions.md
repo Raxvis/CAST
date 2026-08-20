@@ -19,15 +19,13 @@ For each CAST reference doc and document template, determine the disposition fro
 | `docs/TEST_FRAMEWORK.md` | Skip (optional) | Rename |
 | `docs/PIPELINE_LOOP.md` | **Always install** — the engineering-loop contract consumed by /agent-code and /agent-task | Install CAST version; preserve user loop customizations as notes |
 | `docs/MODEL_OPTIMIZATION.md` | **Always install** — referenced by every agent's Model Configuration section | Install CAST version; preserve any user-added model pins as notes |
-| `docs/CHANGELOG.md` | Skip (optional) | Preserve — note Release agent will maintain going forward |
+| `docs/CHANGELOG.md` | Skip (optional) | Preserve — note the `/cast-release` skill will maintain going forward |
 | `docs/ASSETS.md` | Skip (optional) | Preserve |
 | `docs/MVP_LAUNCH.md` | Skip (optional) | Preserve |
 | `templates/MILESTONE_DEFINITION.md` | **Always install** — consumed by /agent-plan Stage 1 (instantiated as each milestone's `README.md`) | Install CAST version; any existing content moves into the appropriate `artifacts/milestone-{N}-{slug}/` directory as an instance |
 | `templates/TASK.md` | **Always install** — consumed by /agent-plan Stage 1 (one instance per task) and /agent-task | Same |
-| `templates/BUG_REPORT.md` | **Always install** — consumed by Bug Gatherer (one instance per bug) | Same |
-| `templates/MILESTONE_COMPLETION.md` | **Always install** | Same |
-| `templates/MILESTONE_VALIDATION.md` | **Always install** | Same |
-| `templates/MILESTONE_RETROSPECTIVE.md` | **Always install** — consumed by the Validator at milestone completion; installs verbatim like the other `templates/*` skeletons | Same |
+| `templates/BUG_REPORT.md` | **Always install** — consumed by Reviewer (one instance per bug) | Same |
+| `templates/MILESTONE_CLOSE.md` | **Always install** — consumed by Product at the milestone-completion checkpoint (per-task validation, milestone validation, completion summary, retrospective in one record). A pre-v3 (v2) install's `MILESTONE_VALIDATION.md` / `MILESTONE_COMPLETION.md` / `MILESTONE_RETROSPECTIVE.md` map to **Delete** with their duties named as merged here; existing `reviews/validation.md` / `completion.md` / `retrospective.md` *instances* are records — preserve them where they are | Same |
 | `templates/ARCH_MODULE.md` | **Always install** — consumed by /agent-plan Stage 2a | Same |
 | `templates/ARCH_SYSTEM.md` | **Always install** | Same |
 | `templates/ARCH_DATA_SCHEMA.md` | **Always install** | Same |
@@ -69,8 +67,9 @@ If `artifacts/` already exists and contains CAST-shaped files, preserve as-is an
 | `architecture/module-{slug}.md`, `system-{slug}.md`, `schema-{slug}.md` | `milestone-{N}-{slug}/arch-{slug}.md` (the milestone that produced them; Ask if unclear) |
 | `ui-specs/ui-milestone-{N}.md` | `milestone-{N}-{slug}/ui.md` |
 | `ui-specs/screen-{slug}.md`, `component-{slug}.md` | `milestone-{N}-{slug}/ui-{slug}.md` (same attribution rule) |
-| `reviews/{security,performance,ceo,ux}-review-milestone-{N}.md` | `milestone-{N}-{slug}/reviews/{security,performance,ceo,ux}.md` |
-| `reviews/retrospective-milestone-{N}.md` | `milestone-{N}-{slug}/reviews/retrospective.md` |
+| `reviews/{security,performance}-review-milestone-{N}.md` | `milestone-{N}-{slug}/reviews/risk.md` (merge the two into the one risk review, each as its lens section) |
+| `reviews/{ceo,ux}-review-milestone-{N}.md` | `milestone-{N}-{slug}/reviews/{ceo,ux}.md` |
+| `reviews/retrospective-milestone-{N}.md` | `milestone-{N}-{slug}/reviews/retrospective.md` (legacy record — preserved as-is; new milestones write `reviews/close.md`) |
 | `BUGS.md` bug entries | one `milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` per entry (attributed by the entry's task/milestone reference; `one-off/bugs/` when unattributable), with `BUGS.md` rewritten as the v2 index |
 
 Use `git mv` per file (preserve history); the `-tasks.md` split and `BUGS.md` conversion are content transformations — flag them as their own plan actions so the user approves them explicitly. Then update every stale path reference across `.claude/`, `docs/`, and the project README. **Ask the user before executing the migration.**
@@ -81,7 +80,7 @@ If a directory named `features/`, `work/`, or `planning/` exists and contains CA
 
 - `CLAUDE.md` — if present, merge with CAST's agnostic template; preserve user content. If absent, Create from CAST's `root/CLAUDE.md` with detected placeholders substituted.
 - `README.md` — preserve the user's existing README. Do not touch it. Optionally offer to add a CAST adoption note at the bottom if the user wants.
-- `TROUBLESHOOTING.md` / `CHANGELOG.md` — preserve if present; do **not** create them. CAST ships no root-level template for either. Point the user at the CAST repo's troubleshooting guide (`https://github.com/Raxvis/CAST/blob/main/TROUBLESHOOTING.md`) instead, and note that the Release agent maintains `docs/CHANGELOG.md` inside the project.
+- `TROUBLESHOOTING.md` / `CHANGELOG.md` — preserve if present; do **not** create them. CAST ships no root-level template for either. Point the user at the CAST repo's troubleshooting guide (`https://github.com/Raxvis/CAST/blob/main/TROUBLESHOOTING.md`) instead, and note that the `/cast-release` skill maintains `docs/CHANGELOG.md` inside the project.
 
 `root/CLAUDE.md` is the only file /cast-init installs at the target project root.
 

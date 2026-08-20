@@ -54,6 +54,7 @@ Type `/agent` and check that the three pipeline skills auto-complete, then `/cas
 /agent-code
 /agent-task
 /cast-doctor
+/cast-release
 ```
 
 **Verify:** every skill you kept in `.claude/skills/` appears in the completion list. You do not need to actually run them yet — just confirm Claude Code sees them.
@@ -104,15 +105,13 @@ rm -rf artifacts/milestone-1-*
 
 (Everything a planning run writes — reviews included — lives inside that one milestone directory.)
 
-Or use the completion-report template to keep a record of the first run if you want a historical marker.
-
 ---
 
 ## Appendix — Per-agent smoke probes (optional)
 
 If Step 4 or Step 5 completes cleanly, the pipeline is working end-to-end and you can usually stop. The probes below are an optional next step for verifying that each individual agent does what its file says it does — useful after you customize an agent file, or if you want a finer-grained trust signal before running a real milestone.
 
-Each probe is a single prompt to launch the named agent explicitly. Each takes under a minute. Run only the ones you care about; you do not need all 15.
+Each probe is a single prompt to launch the named agent explicitly. Each takes under a minute. Run only the ones you care about; you do not need all 8.
 
 ### Planning-tier probes
 
@@ -121,20 +120,20 @@ Each probe is a single prompt to launch the named agent explicitly. Each takes u
 | `product` | "Use the product agent to write acceptance criteria for 'add a dark mode toggle'." | Testable, specific criteria (not vague statements like "works well"). |
 | `architect` | "Use the architect agent to sketch module boundaries for a new authentication system." | A module table plus a Decisions Log entry that cites alternatives considered. |
 | `ui` | "Use the ui agent to spec the interaction states for a login form." | Covers all six canonical states (default, pressed, disabled, loading, error, empty) explicitly, per `templates/UI_SPEC.md`. |
-| `ceo` | "Use the ceo agent to review a milestone plan where Security has an unaddressed Critical finding." | Verdict is REVISION REQUIRED, not APPROVED WITH CONDITIONS — the CEO does not paper over Critical findings. |
+| `risk` | "Use the risk agent to review this architecture document." | Produces both lens sections (security and performance) even when one is empty, and ends with both flag lines set. |
+| `ceo` | "Use the ceo agent to review a milestone plan where the Risk review has an unaddressed Critical finding." | Verdict is REVISION REQUIRED, not APPROVED WITH CONDITIONS — the CEO does not paper over Critical findings. |
 
 ### Engineering-tier probes
 
 | Agent | Probe | Expected |
 |---|---|---|
-| `coder` | "Use the coder agent to implement a function that returns the sum of two numbers." | Working code plus a completed Pre-Handoff Checklist. |
-| `reviewer` | "Use the reviewer agent to review a file with both a logic bug and a style violation." | Classifies the logic bug as a Defect (files a bug file for Product triage) and the style issue as an Issue (back to Coder). |
+| `coder` | "Use the coder agent to implement a function that returns the sum of two numbers." | Working code, tests written and run, a commit, and a verbatim Test Results block in the handoff entry. |
+| `reviewer` | "Use the reviewer agent to review a file with both a logic bug and a style violation." | Classifies the logic bug as a Defect (files a bug file itself) and the style issue as an Issue (back to Coder). |
 
 ### Utility-tier probes
 
 | Agent | Probe | Expected |
 |---|---|---|
-| `risk` | "Use the risk agent to review this architecture document." | Produces both lens sections (security and performance) even when one is empty, and ends with both flag lines set. |
 | `docs-writer` | "Use the docs-writer agent to document a newly-added helper function." | Updates an existing doc under `docs/` rather than creating a new file. Does not write to `artifacts/`. |
 
 ### Interpreting results

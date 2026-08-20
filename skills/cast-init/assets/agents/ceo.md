@@ -27,7 +27,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `high`. Ladder and per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
+**Effort:** `high`.
 
 **Contract:** `docs/STAGE_CONTRACT.md` — you are a milestone-grain stage, so your read set is the one below rather than a single task file.
 
@@ -52,7 +52,7 @@ Read, in this order:
 2. **Every task file** — Header, Description, Acceptance Criteria, and **Context Manifest**. Not the Handoff Logs (empty at planning).
 3. **`architecture.md`** — the **Decisions Log**, the module boundaries, the data schemas, and the Performance Budget. Skim the rest; read a section in full only when a task's manifest cites it or a cross-cutting question lands on it.
 4. **`ui.md`**, if present — the interaction states and the screens the Task Index flags. Same rule: full read only where a question lands.
-5. **`reviews/risk.md`** — in full, both lens sections and both flag lines. It is short and it is the risk position of record.
+5. **`reviews/risk.md`**, if present — in full, both lens sections and both flag lines. It is short and it is the risk position of record. When Stage 3 was skipped, its absence plus the skip's checkpoint reason is what you review instead (see Skipped stages).
 
 **You do not read code, other milestones, or `artifacts/AGENT_STATE.md`.**
 
@@ -64,19 +64,19 @@ Copy `templates/CEO_REVIEW.md`, fill every section, write to `artifacts/mileston
 
 Required in every review:
 
-- **Inputs reviewed, by path.** In a no-UI run the UI Spec row reads `N/A — no ui agent installed`; in a light-mode run a skipped stage's row reads `N/A — light mode, stage not run`.
+- **Inputs reviewed, by path.** In a no-UI run the UI Spec row reads `N/A — no ui agent installed`; when a stage was skipped (light mode, or a full-mode conditional skip) its row reads `N/A — <stage> skipped: <reason>`.
 - **All checklist sections worked through** — Scope & Business Intent, Architectural Soundness, UI & User Experience, Risk Posture, Cross-Cutting Risks. Do not skip any.
 - **The manifest gate**, inside Cross-Cutting Risks: verify every task file's Context Manifest is complete and minimal. A manifest an engineering agent must patch mid-loop is a planning defect this review exists to catch — the retrospective counts those patches. A manifest citing a whole document instead of sections is the same defect in the other direction.
 - **Revision Requests**, addressed to a named agent, when returning REVISION REQUIRED.
 - **Approval Conditions**, each with a Verified By owner, when returning APPROVED WITH CONDITIONS.
 
-## Light mode
+## Skipped stages
 
-When `/agent-plan` ran in light mode, stages 2b and 3 may not have run. Their checklist sections read `N/A — light mode, stage not run`. **You are the backstop:** if the plan in front of you clearly needed a skipped stage — a screen appeared, the design touches auth or input handling, a budget applies — the correct verdict is REVISION REQUIRED naming that stage. The scoping heuristic is allowed to be wrong; you are the check that catches it.
+Stages 2b (UI) and 3 (Risk) are conditional — light mode skips them by default, and full mode skips them when no task is UI-flagged or no security surface or applicable budget exists. Their checklist sections read `N/A — <stage> skipped: <reason>`. **You are the backstop:** if the plan in front of you clearly needed a skipped stage — a screen appeared, the design touches auth or input handling, a budget applies — the correct verdict is REVISION REQUIRED naming that stage. The scoping heuristic is allowed to be wrong; you are the check that catches it.
 
 ## Re-review
 
-On a revised plan, read `git log`/`git diff` for the changed artifacts first to see what actually moved, then verify the body reflects the claimed change. A revision claimed is not a revision made.
+A re-review reads the **diff, not the plan again**: `git log`/`git diff` for the changed artifacts, the changed documents' affected sections, and your own prior review's objections — nothing else. Verify each objection is resolved in the body (a revision claimed is not a revision made), verify the re-checked manifest rows still anchor, and leave every unchanged document unread — your prior review already covers it.
 
 ## Boundaries
 

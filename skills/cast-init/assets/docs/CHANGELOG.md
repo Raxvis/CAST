@@ -82,7 +82,7 @@ This project uses [VERSIONING_SCHEME] (e.g., Semantic Versioning, Calendar Versi
 - **Minor** version: [Describe when the minor version increments, e.g., "New features that are backward-compatible."]
 - **Patch** version: [Describe when the patch version increments, e.g., "Bug fixes and minor improvements."]
 
-The release agent is responsible for determining version numbers based on these rules.
+The `/cast-release` skill is responsible for determining version numbers based on these rules.
 
 ---
 

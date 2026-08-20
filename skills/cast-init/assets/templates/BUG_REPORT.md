@@ -49,7 +49,7 @@
 - **Affected Module(s)**: [Files or modules involved.]
 - **Alternative Solutions**: [At least two approaches with trade-offs, for non-trivial bugs.]
 - **Recommended Fix**: [The approach chosen and why; one line on what else was considered.]
-- **Assigned To**: [Coder or Refactor]
+- **Assigned To**: Coder
 - **Investigation Date**: [YYYY-MM-DD]
 
 ## Resolution (optional) — written by Coder at fix time

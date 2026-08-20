@@ -17,7 +17,7 @@ HOW TO CUSTOMIZE:
 
 This directory holds every artifact produced by work on [PROJECT_NAME], **grouped by milestone**: each milestone owns one directory containing its definition, design specs, reviews, per-task files, and per-bug files. Cross-milestone state (session log, agent state, bug index) lives at the root.
 
-> **Provenance:** Every file under this directory is produced by an agent running inside the `/agent-plan`, `/agent-code`, or `/agent-task` pipeline (plus `artifacts/DOCTOR.md`, written by the `/cast-doctor` maintenance skill). Review accordingly — these are agent outputs, not hand-authored reference material. Humans may edit these files (to revise plans, triage bugs, or close milestones), but the canonical producer of each artifact is named at the top of the file.
+> **Provenance:** Every file under this directory is produced by an agent running inside the `/agent-plan`, `/agent-code`, or `/agent-task` pipeline (plus `artifacts/DOCTOR.md`, written by the `/cast-doctor` maintenance skill, and `artifacts/releases/`, written by `/cast-release`). Review accordingly — these are agent outputs, not hand-authored reference material. Humans may edit these files (to revise plans, triage bugs, or close milestones), but the canonical producer of each artifact is named at the top of the file.
 
 **Rule:** `artifacts/` is for **instances** of work. `docs/` is for **reference material**; `templates/` is for **reusable document skeletons**. If you are unsure where a file belongs, ask: "Is this content about a specific piece of work (feature, milestone, task, bug, session)?" If yes → `artifacts/`. "Is this a reusable skeleton agents copy?" If yes → `templates/`. "Is this reusable guidance?" If yes → `docs/`.
 
@@ -30,7 +30,9 @@ artifacts/
   README.md                        # This file
   BUGS.md                          # Global bug INDEX: one line per bug → the per-bug file
   STANDUP.md                       # Rolling session progress log (cross-milestone)
-  AGENT_STATE.md                   # Live working state for every agent (cross-milestone)
+  AGENT_STATE.md                   # Cross-milestone state tables, orchestrator-written
+                                   #   (Decisions Log, Milestone Progress, Performance Budget,
+                                   #   Open Questions) — NO agent reads this file
   DOCTOR.md                        # /cast-doctor health report (created on first run;
                                    #   overwritten each run — git history keeps priors)
 
@@ -43,17 +45,17 @@ artifacts/
     arch-{slug}.md                 # Supplemental module/system/schema docs (as needed)
     ui-{slug}.md                   # Supplemental screen/component specs (as needed)
     reviews/
-      risk.md                  # Security review (/agent-plan Stage 3)
-      risk.md               # Performance review (/agent-plan Stage 3)
+      risk.md                      # Risk review — security + performance lenses in one file
+                                   #   (/agent-plan Stage 3; only when the plan has a security
+                                   #   surface or an applicable performance budget)
       ceo.md                       # CEO planning verdict (/agent-plan Stage 4)
       ux.md                        # UX review (milestone completion; UI-flagged milestones only)
-      risk-impl.md             # Security implementation review (milestone completion;
-                                   #   only when risk.md flagged the milestone)
-      risk-impl.md          # Measured performance check (milestone completion;
-                                   #   only when risk.md flagged budgets)
-      validation.md                # Milestone validation record (Product, milestone completion)
-      completion.md                # Milestone completion report (Product, milestone completion)
-      retrospective.md             # Milestone retrospective (the orchestrator, milestone completion)
+      risk-impl.md                 # Risk implementation review — security controls verified and
+                                   #   budgets measured (milestone completion; only when a
+                                   #   risk.md flag line says Yes)
+      close.md                     # Milestone close record — per-task validation, milestone
+                                   #   validation, completion summary, retrospective
+                                   #   (Product, milestone completion, one pass)
     tasks/
       task-{T}-{slug}.md           # ONE FILE PER TASK — self-contained: description,
                                    #   acceptance criteria, Context Manifest, Handoff Log
@@ -68,10 +70,13 @@ artifacts/
       bug-{XXX}-{slug}.md          # Bugs filed from one-off work (never archived — the
                                    #   BUGS.md index points at them)
 
+  releases/                        # Release records (`release-{VERSION}.md`), written by /cast-release
+
   archive/                         # Bounded-file overflow (created on first use by the orchestrator
     STANDUP.md                     #   at milestone completion): session sections and stale
-    AGENT_STATE.md                 #   state rows relocated verbatim — see orchestrator.md →
-                                   #   Archival Duty. History stays greppable here.
+    AGENT_STATE.md                 #   state rows relocated verbatim — see the record-and-archive
+                                   #   step in the /agent-code milestone checkpoint. History
+                                   #   stays greppable here.
 ```
 
 Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-created for them). `/cast-init` scaffolds only the root files and the `one-off/` directory.
@@ -86,25 +91,22 @@ Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-creat
 |---|---|---|
 | Milestone definition (goal, scope, criteria, Status, Task Index, CEO conditions) | `milestone-{N}-{slug}/README.md` | Product (`/agent-plan` Stage 1; Status and conditions updated at later stages) |
 | Per-task file | `milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` | Product (`/agent-plan` Stage 1); manifest refs added by Architect/UI; Handoff Log appended by every engineering stage |
-| Architecture document | `milestone-{N}-{slug}/architecture.md` | Architect (`/agent-plan` Stage 2) |
-| UI specification | `milestone-{N}-{slug}/ui.md` | UI (`/agent-plan` Stage 2) |
+| Architecture document | `milestone-{N}-{slug}/architecture.md` | Architect (`/agent-plan` Stage 2a) |
+| UI specification | `milestone-{N}-{slug}/ui.md` | UI (`/agent-plan` Stage 2b) |
 | Supplemental arch docs (module/system/schema) | `milestone-{N}-{slug}/arch-{slug}.md` | Architect (during planning or engineering) |
 | Supplemental UI specs (screen/component) | `milestone-{N}-{slug}/ui-{slug}.md` | UI (during planning or engineering) |
-| Security review findings | `milestone-{N}-{slug}/reviews/risk.md` | Security (`/agent-plan` Stage 3) |
-| Performance review findings | `milestone-{N}-{slug}/reviews/risk.md` | Performance (`/agent-plan` Stage 3) |
+| Risk review (security + performance lenses, one file) | `milestone-{N}-{slug}/reviews/risk.md` | Risk (`/agent-plan` Stage 3) |
 | CEO planning verdict | `milestone-{N}-{slug}/reviews/ceo.md` | CEO (`/agent-plan` Stage 4) |
 | UX review of implemented screens | `milestone-{N}-{slug}/reviews/ux.md` | UI (milestone completion; UI-flagged milestones only) |
-| Security implementation review | `milestone-{N}-{slug}/reviews/risk-impl.md` | Security (milestone completion; only when `reviews/risk.md` flagged the milestone) |
-| Measured performance check | `milestone-{N}-{slug}/reviews/risk-impl.md` | Performance (milestone completion; only when `reviews/risk.md` flagged budgets) |
-| Milestone validation record | `milestone-{N}-{slug}/reviews/validation.md` | Product (milestone completion) |
-| Milestone completion report | `milestone-{N}-{slug}/reviews/completion.md` | Product (milestone completion) |
-| Milestone retrospective | `milestone-{N}-{slug}/reviews/retrospective.md` | the orchestrator (milestone completion) |
+| Risk implementation review (controls verified, budgets measured) | `milestone-{N}-{slug}/reviews/risk-impl.md` | Risk (milestone completion; only when a `reviews/risk.md` flag line says Yes) |
+| Milestone close record (per-task validation, milestone validation, completion summary, retrospective) | `milestone-{N}-{slug}/reviews/close.md` | Product (milestone completion, one pass) |
 | Per-bug report | `milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` (or `one-off/bugs/` for `/agent-task` work) | Reviewer files; Product triages and closes; Coder investigates, fixes, and verifies |
 | Bug index (ID assignment, one-line status per bug, regression checklist) | `artifacts/BUGS.md` | Reviewer adds rows; owners update status column |
 | One-off task file | `one-off/task-{slug}.md` | `/agent-task` |
 | Session progress log | Entries in `artifacts/STANDUP.md` | Any agent / user |
-| Agent working state (Current Work, Decisions Logs, dashboards) | The agent's own section in `artifacts/AGENT_STATE.md` | Each agent |
+| Cross-milestone state (Decisions Log, Milestone Progress, Performance Budget, Open Questions) | `artifacts/AGENT_STATE.md` — no agent reads this file | The orchestrator (from stages' handoff entries) |
 | Install health report (state findings, diet prescriptions, coverage gaps) | `artifacts/DOCTOR.md` — overwritten per run | `/cast-doctor` |
+| Release record (gates, version, changelog entry, GO / NO-GO) | `releases/release-{VERSION}.md` | `/cast-release` |
 
 Templates for every artifact type live in `templates/` — see `templates/README.md`.
 

@@ -217,7 +217,8 @@ The project uses a strict split between reference material, document templates, 
   (each with its Context Manifest and Handoff Log), and one file per bug under
   `bugs/`. Cross-milestone state lives at the root: the bug index
   (`artifacts/BUGS.md`), the rolling session log (`artifacts/STANDUP.md`), and
-  every agent's live working state (`artifacts/AGENT_STATE.md`). One-off
+  project state written by the orchestrator (`artifacts/AGENT_STATE.md`) —
+  no agent reads it. One-off
   `/agent-task` work goes under `artifacts/one-off/`. Everything produced by
   the pipelines lands here.
 

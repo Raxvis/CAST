@@ -68,7 +68,7 @@ Reply to the orchestrator with exactly:
 Handoff entry #<n> appended — <outcome>; next: <stage>
 ```
 
-Nothing else. The orchestrator routes on that line and never re-reads your work into its own context. Capped reads going in, one line coming out — this is what keeps the orchestrating context flat across a whole milestone.
+Nothing else. The orchestrator routes on that line and never re-reads your work into its own context.
 
 ## 4. Findings live in their artifact; pointers travel
 
@@ -78,6 +78,10 @@ Test failures and review findings go in the Handoff Log. Bug details go in a per
 
 Complete your role's work directly. Your `tools:` list omits the Task tool, so this is enforced, not requested.
 
-## 6. Silence is not a clean report
+## 6. Queue documentation work; do not do it
+
+When your work changes something documentation-worthy — an API, command, configuration, convention, requirement, schema, or user-facing behavior — append `- <your agent name> | docs | <note>` to the current session in `artifacts/STANDUP.md`. Docs Writer drains the queue at completion checkpoints; no other stage edits `docs/`.
+
+## 7. Silence is not a clean report
 
 If your role produces findings — review findings, test results, risk findings — emit the full result block even when it is empty. "No output" and "nothing found" must be distinguishable to the stage that reads your entry.

@@ -46,7 +46,7 @@ Use this table as the authoritative reference when comparing an existing project
 
 | # | Agent | Tier | Model | Effort | Role (from agent frontmatter) |
 |---|---|---|---|---|---|
-| 1 | `product` | 1 | `inherit` | `high` / `low` | Use to define milestone scope and write the task files at /agent-plan Stage 1, to triage filed bugs, to validate tasks Reviewer's criteria check flagged, to dispose of task-amendment proposals, and at milestone completion to re-triage Deferred items and write the completion, validation, and retrospective records. |
+| 1 | `product` | 1 | `inherit` | `high` / `low` | Use to define milestone scope and write the task files at /agent-plan Stage 1, to triage filed bugs, to validate tasks Reviewer's criteria check flagged, to dispose of task-amendment proposals, and at milestone completion to re-triage Deferred items and write the milestone close record in one pass. |
 | 2 | `architect` | 2 | `inherit` | `high` | Use at /agent-plan Stage 2a to produce the milestone architecture document — module boundaries, data schemas, cross-module contracts, data flows, and the performance budget — and to return the Context Manifest rows each task needs. Re-run when the CEO returns REVISION REQUIRED naming Architecture. |
 | 3 | `ui` | 3 | `inherit` | `high` | Use at /agent-plan Stage 2b to produce the milestone UI specification — layouts, interaction states, accessibility — and to return the Context Manifest rows each UI-flagged task needs. Also performs the milestone UX review at /agent-code completion for milestones containing UI-flagged tasks. |
 | 4 | `risk` | 3 | `inherit` | `high` | Use as the /agent-plan Stage 3 review of an architecture — examines it through the security lens and the performance lens in one pass, files findings with severity and remediation, and sets the two flags that decide whether implementation reviews run at milestone completion. Also runs those implementation reviews. |
@@ -65,9 +65,11 @@ Use this table as the authoritative reference when comparing an existing project
 |---|---|---|
 | Judgment-heavy gates and design | `ceo`, `architect`, `reviewer`, `risk` | The most capable model available — e.g. `opus` (or a Fable/Mythos-class model if the account serves one) |
 | Planning and implementation | `product`, `ui`, `coder` | `sonnet` — strong coding and spec writing at a fraction of the cost |
-| Structured utility work | `docs-writer` | `haiku` — template-driven writing against a queue |
+| Structured utility work | `docs-writer` | `sonnet` — the cheapest tier that still clears the Context Inference Bar (see caution below) |
 
 Claude Code accepts the `opus` / `sonnet` / `haiku` aliases or full model IDs in agent frontmatter. Record accepted assignments in the plan as part of each agent's Create/Update action; any agent the user leaves undecided keeps `inherit`.
+
+**Caution — a Haiku pin interacts with `/cast-doctor`'s doc audit.** The doctor computes each doc's Tier-B prune eligibility against its **weakest consumer**: a section may be deleted only when every model that reads it can infer the content from the codebase. `docs-writer` cites `docs/FILE_CONVENTIONS.md` and `docs/README.md`, so pinning it to a model below the Inference Bar (Haiku-class) permanently blocks Tier-B prunes on those docs — a per-spawn saving that forfeits a larger always-on saving. Pin utility roles no lower than a Sonnet-class model unless the project has decided against doc pruning.
 
 ## Pipeline skills mapping
 

@@ -77,14 +77,4 @@ _No sessions recorded yet. Add the first session section using the Entry Grammar
 
 ---
 
-## Related Documents
-
-| Document | Purpose |
-|----------|---------|
-| `BUGS.md` | Global bug index (one line per bug → its per-bug file) — reference when reporting blockers |
-| `../templates/TASK.md` | Single-task file template — reference for planned work |
-| `milestone-{N}-{slug}/reviews/validation.md` | Milestone acceptance record — reference when validating completed work |
-
----
-
 _Last updated: [YYYY-MM-DD]_

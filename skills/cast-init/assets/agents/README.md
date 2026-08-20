@@ -29,7 +29,7 @@ Eight specialist agents. Each owns a domain, hands work off through files rather
 
 | Agent | File | Tier | Role |
 |---|---|---|---|
-| Product | `product.md` | T1 | Owns scope. Writes the milestone definition and one file per task, triages bugs, validates what Reviewer flags, disposes of amendments, writes the completion / validation / retrospective records. |
+| Product | `product.md` | T1 | Owns scope. Writes the milestone definition and one file per task, triages bugs, validates what Reviewer flags, disposes of amendments, writes the milestone close record in one pass. |
 | Coder | `coder.md` | T1 | Owns every change to production code and its tests. Implements, tests, commits; handles every loop-back — defect fixes (investigating root cause when needed), Issue restructuring, and criteria rejections. |
 | Reviewer | `reviewer.md` | T1 | The independent gate. Verifies the test-results block, reviews the diff, classifies findings as Defects (filing each as a bug file) or Issues, and records the per-criterion Acceptance Criteria Check. |
 | Architect | `architect.md` | T2 | Owns system design: module boundaries, data schemas, cross-module contracts, the performance budget. Returns the manifest rows each task needs. |
@@ -56,7 +56,8 @@ v2 routed conflicts through a Validator agent. v3 escalates to the user: an unre
 | **Role** | What this agent owns, in a few lines |
 | **Duties / What a pass does** | The actual work, step by step |
 | **Boundaries** | What this agent may **not** do |
-| **Documentation queue** | What to append to the `docs` queue and when |
+
+The documentation-queue rule (append `- <agent> | docs | <note>` to `artifacts/STANDUP.md` when work changes something documentation-worthy) lives in `docs/STAGE_CONTRACT.md`, once, rather than restated per agent file.
 
 Agents may add domain-specific sections (checklists, rubrics, output formats). They may **not** re-add the v2 org-chart sections — Purpose, Goals, Authority, Inputs, Outputs — which averaged 52 lines per agent restating what the Rules block and the task file already carried. That is documentation *about* a role, loaded as instruction *to* it, on every spawn.
 
@@ -122,10 +123,10 @@ Light mode skips 2b and 3 for small, low-risk work — 3 tasks or fewer, no new 
                                                 │
                             ...every task Complete or Deferred?...
                                                 ▼
-                          milestone checkpoint: Deferred re-triage, completion +
-                          validation records, UX review (if UI-flagged), risk
-                          implementation review (if flagged), retrospective,
-                          docs drain, then orchestrator records and archives
+                          milestone checkpoint: UX review (if UI-flagged), risk
+                          implementation review (if flagged), then one Product
+                          launch closes the milestone (re-triage + close record),
+                          docs drain (if queued), orchestrator records + archives
 ```
 
 **A clean task is two spawns.** Loop-backs reuse the same two agent types, so they hit a warm cache prefix.
@@ -138,21 +139,21 @@ Same loop, no milestone and no CEO verdict: Coder → Reviewer → validation, w
 
 ### Planning (`/agent-plan`)
 
-1. **Product** defines scope and writes the milestone README plus one task file per task, each seeded with the smallest sufficient Context Manifest. It also sweeps the Deferred backlog and disposes of the previous retrospective's open actions.
-2. **Architect** and **UI** run in parallel, each producing its document and returning **Manifest Rows** rather than editing task files.
+1. **Product** defines scope and writes the milestone README plus one task file per task, each seeded with the smallest sufficient Context Manifest. It also sweeps the Deferred backlog and disposes of the previous close record's open actions.
+2. **Architect** and **UI** run in parallel, each producing its document and returning **Manifest Rows** rather than editing task files. UI runs only when a task is UI-flagged.
 3. **2c**: the orchestrator applies both agents' rows to the task files. Single-writer, no spawn.
-4. **Risk** reviews the architecture through both lenses and sets the two implementation-review flags.
+4. **Risk** reviews the architecture through both lenses and sets the two implementation-review flags. Runs only when the plan shows a security surface or an applicable performance budget.
 5. **CEO** reads across everything for cross-cutting problems and issues the verdict. REVISION REQUIRED returns the plan to the named agent; a revision that touches the architecture re-runs Risk before the CEO re-review. Cap: 3 revision cycles, then escalate.
-6. After approval, **Product** backfills the CEO Approval Conditions table and sets the README Status.
+6. After approval, the **orchestrator** backfills the CEO Approval Conditions table and sets the README Status — pure transcription, no spawn.
 
 ### Engineering (`/agent-code`)
 
 1. **Coder** implements, writes and runs the tests, commits, and hands off with a **verbatim Test Results block**.
-2. **Reviewer** rejects the entry unread if that block is missing or failing — that is the test gate. Otherwise it reviews the diff, classifies every finding, files Defects as bug files, and on approval records the Acceptance Criteria Check.
-3. **Defects** go to **Product** for triage (Fix Now returns the task to Coder; Defer and Not a Bug do not block). **Issues** return to Coder. Findings from one review are resolved in one pass.
-4. **Validation**: all criteria `Met` → the orchestrator closes the task, no spawn. Anything flagged, amended, condition-bearing, or bug-resolving → **Product**.
+2. The **orchestrator pre-checks** the entry for a passing verbatim Test Results block (presence only) and routes straight back to Coder when it is missing — no Reviewer launch wasted. **Reviewer** enforces the same gate as backstop, reviews the diff, classifies every finding, files Defects as bug files, and on approval records the Acceptance Criteria Check.
+3. **Defects** citing a violated acceptance criterion auto-route back to Coder as Fix Now (Defer is forbidden for them — no triage question exists); the rest go to **Product** for triage (Fix Now returns the task to Coder; Defer and Not a Bug do not block). **Issues** return to Coder. Findings from one review are resolved in one pass.
+4. **Validation**: all criteria `Met` → the orchestrator closes the task (and flips any resolved bug Verified → Closed), no spawn. Anything flagged, amended, or condition-bearing → **Product**.
 5. **Task checkpoint launches no agents** — Status writeback, progress entry, and a `docs` drain only past 10 pending entries.
-6. **Milestone checkpoint**: Product re-triages Deferred items and writes the completion, validation, and retrospective records; UI runs the UX review for UI-flagged milestones; Risk runs the implementation review when either flag is Yes; Docs Writer drains the queue; the orchestrator records outcomes and archives. Then the user may invoke `/cast-release`.
+6. **Milestone checkpoint**: UI runs the UX review for UI-flagged milestones; Risk runs the implementation review when either flag is Yes; then one **Product** launch closes the milestone — Deferred re-triage, the close record (`reviews/close.md`), CEO-condition verification, Status; Docs Writer drains the queue when entries are pending; the orchestrator records outcomes and archives. Then the user may invoke `/cast-release`.
 
 ### Cross-Reference Rules
 
@@ -204,6 +205,6 @@ No agent writes a work artifact to `docs/` or fills a template in place.
 
 ## Templates
 
-Agents that produce a document read its template from `templates/` **first** and follow its structure. Required sections are always present; sections marked `(required, scales)` collapse to one `N/A — <reason>` line when the work does not exercise them; `(optional)` sections are omitted unless their trigger fires. **Depth scales; coverage does not** — the milestone validation record still carries one block per task, and UI_SPEC's six interaction states and accessibility section are the gate, not a suggestion.
+Agents that produce a document read its template from `templates/` **first** and follow its structure. Required sections are always present; sections marked `(required, scales)` collapse to one `N/A — <reason>` line when the work does not exercise them; `(optional)` sections are omitted unless their trigger fires. **Depth scales; coverage does not** — the milestone close record still carries one Per-Task Validation row per task, and UI_SPEC's six interaction states and accessibility section are the gate, not a suggestion.
 
 Revisions happen in place. Git is the audit log — v2's hand-maintained `## Revision History` tables are gone (`docs/FILE_CONVENTIONS.md` → Revisions).

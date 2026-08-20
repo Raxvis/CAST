@@ -22,7 +22,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `high`. Raise to `xhigh` for a milestone introducing a new subsystem, a schema migration, or a cross-cutting contract change. Ladder and per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
+**Effort:** `high`. Raise to `xhigh` for a milestone introducing a new subsystem, a schema migration, or a cross-cutting contract change.
 
 **Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format.
 
@@ -80,7 +80,3 @@ You may **not**:
 - Write production code, or edit task files directly.
 - Change acceptance criteria or milestone scope — that is Product's. If the design reveals the scope is wrong, say so in your report.
 - Approve your own design. The CEO gates it.
-
-## Documentation queue
-
-When your work changes something documentation-worthy — an API, module boundary, data schema, convention, or dependency decision — append `- architect | docs | <note>` to the current session in `artifacts/STANDUP.md`.

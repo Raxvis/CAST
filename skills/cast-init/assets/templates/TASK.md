@@ -27,17 +27,10 @@
   - Context Manifest: Product seeds it at planning; Architect and UI append their document
     sections (with anchors) when they write the milestone design docs. Keep it minimal —
     every entry is a file another agent is forced to read.
-  - Handoff Log: append-only, newest last. Every stage transition appends exactly one
-    entry in the fixed format. No narrative recaps — max 10 lines per entry; anything
-    longer belongs in the artifact the entry points to (bug file, review file, code).
-    Exceptions: (a) Coder entries carry a Test Results block with the VERBATIM tail
-    of the test run — Reviewer rejects an entry without it, unread, and that is the
-    test gate; (b) Reviewer entries add one line per finding — for that stage this
-    log IS the canonical record, so never drop findings to fit the cap; (c) a
-    Reviewer approval entry also carries the Acceptance Criteria Check block — one
-    line per criterion, each Met (with evidence) / Not met / Product judgment. That
-    block decides whether the task closes directly or spawns Product
-    (docs/PIPELINE_LOOP.md → Step 3).
+  - Handoff Log: append-only, newest last; one fixed-format entry per stage transition.
+    The 10-line cap and its exceptions (Coder's verbatim Test Results block, Reviewer's
+    per-finding lines and Acceptance Criteria Check) are defined once in
+    docs/STAGE_CONTRACT.md — the skeleton below shows the shape.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted.
 -->

@@ -206,7 +206,7 @@ State fields owned or updated by this module's outputs:
 
 ## Performance Budget (required)
 
-Budgets: see the system-level table in the `ARCH_SYSTEM.md` instance and live tracking in `.claude/agents/performance.md`.
+Budgets: see the system-level table in the `ARCH_SYSTEM.md` instance and the live Performance Budget Tracking table in `artifacts/AGENT_STATE.md` (updated by Risk at implementation review).
 
 ---
 

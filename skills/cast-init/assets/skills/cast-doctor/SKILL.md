@@ -155,7 +155,7 @@ For every treated doc, also update every citation listed in the prescription's e
 | S5 | docs/templates/artifacts split clean in both directions; no `TEMPLATE INSTRUCTIONS` block outside `templates/` | Move / strip |
 | S6 | Every `artifacts/BUGS.md` index row's Status matches its per-bug file (file wins); Status values are legal lifecycle enums | Correct index rows (canonical rule) |
 | S7 | Every milestone Task Index row points at an existing task file and vice versa; task Statuses are legal enums | Reconcile index/files |
-| S8 | Every completed milestone (has `reviews/completion.md`) also has `validation.md` and `retrospective.md`; plus `ux.md` when `ui.md` exists; plus `security-impl.md` / `performance-impl.md` when the planning reviews' flag lines say Yes | Name the missing review; route to the owning agent |
+| S8 | Every closed milestone (has `reviews/close.md` — or, pre-v3, `reviews/completion.md` with `validation.md` and `retrospective.md`) also has `ux.md` when `ui.md` exists, and `risk-impl.md` when either flag line in `reviews/risk.md` says Yes | Name the missing review; route to the owning agent |
 | S9 | `artifacts/STANDUP.md` conforms to its Entry Grammar (well-formed session headings, known skill names, typed entries) | Correct malformed entries |
 | S10 | Bounded files: no STANDUP sessions or closed AGENT_STATE rows older than the last completed milestone's first session remain in the live files | Flag archival overdue (`/agent-code`'s milestone-completion checkpoint owns the move) |
 | S11 | Context Manifest rows in In Progress / Not Started task files resolve — cited file exists, cited section anchor exists | Fix the anchor or flag the manifest |

@@ -32,7 +32,7 @@ Coder (implement + test + commit)  →  Reviewer (review + classify + criteria c
         └──────── Defect or Issue ───────────┘
 ```
 
-v2 ran Coder → Tester → Reviewer → Product as four cold subagent contexts. Tester read the same task file and the same diff the Coder had just written, in order to write tests for it — a second pass by an equally-invested party at full cold-context cost, not an independent check. v3 folds testing into the stage that wrote the code and keeps the *gate* by requiring verbatim evidence (below). The genuinely independent check — a different agent reading the diff against the criteria — is Reviewer, and it survives intact.
+Testing belongs to the stage that wrote the code; the gate is enforced by verbatim evidence (below). The independent check — a different agent reading the diff against the criteria — is Reviewer.
 
 ---
 
@@ -90,7 +90,7 @@ Launch the **coder** agent with the task file path. Coder implements, tests, and
 - Commit the pass (Commit discipline). For a Fix Now defect fix, also fill the bug file's Resolution → Commit field.
 - Append the handoff entry (`coder -> reviewer`): what was implemented, files touched, the commit, and the **Test Results block with verbatim `[TEST_CMD]` output**.
 
-**On a loop-back**, Coder handles all three return paths — a Reviewer-classified Defect, a Reviewer-classified Issue (behavior-preserving restructuring), and a Product criteria rejection. v2 routed these to separate Debugger and Refactor agents; the work is the same work, and the context needed to do it is the context Coder already holds.
+**On a loop-back**, Coder handles all three return paths — a Reviewer-classified Defect, a Reviewer-classified Issue (behavior-preserving restructuring), and a Product criteria rejection.
 
 **When a Fix Now defect needs root-cause investigation** before a fix is safe — an intermittent failure, a defect whose mechanism is not obvious from the diff — investigate first and record the finding in the bug file's Investigation section (root cause, affected modules, the approach chosen and what else was considered) before changing code. Do not guess-and-check against the test suite.
 
@@ -98,17 +98,21 @@ Launch the **coder** agent with the task file path. Coder implements, tests, and
 
 ## Step 2 — Reviewer
 
-After Coder hands off, launch the **reviewer** agent with the task file path:
+After Coder hands off, the orchestrator first applies the **test-gate pre-check**: read the latest Coder entry and confirm it carries a Test Results block with verbatim output showing no failures. This is a presence check, never judgment on the tests. Absent or failing: route straight back to Coder without launching Reviewer (a full Reviewer context spent rejecting a missing block is a wasted spawn); this does not increment the loop counter — no work was reviewed.
 
-- **Reject without reviewing** if Coder's entry has no Test Results block with verbatim output, or the output shows failures. That is the test gate.
+When the block is present, launch the **reviewer** agent with the task file path:
+
+- **Reject without reviewing** if the Test Results block turns out to be a paraphrase rather than verbatim output, or the output shows failures the pre-check missed. Reviewer is the backstop on the same gate.
 - Review the **diff** — the commits in the Handoff Log since the last Reviewer approval — against the task file (description, acceptance criteria) and the manifest's convention and design references. Read surrounding files only where the diff demands it.
 - Classify every finding as a **Defect** (incorrect behaviour, broken functionality, violated contract) or an **Issue** (structural problem, convention violation, maintainability concern), and list every finding with its classification in the handoff entry.
-- **File every Defect directly** as a per-bug file — `bugs/bug-{XXX}-{slug}.md` from `templates/BUG_REPORT.md`, status New — plus its row in the `artifacts/BUGS.md` index. v2 routed this through a separate Bug Gatherer agent, which re-read the task to transcribe a finding Reviewer had already written; Reviewer holds the context and writes the file.
+- **File every Defect directly** as a per-bug file — `bugs/bug-{XXX}-{slug}.md` from `templates/BUG_REPORT.md`, status New — plus its row in the `artifacts/BUGS.md` index. Reviewer holds the finding and writes the file; no intermediary.
 - **On approving a clean version, append the Acceptance Criteria Check** (see `agents/reviewer.md`): one line per criterion, each `Met` with an evidence pointer, `Not met`, or `Product judgment`.
 
 ### Step 2a — Defect routing
 
-For every finding Reviewer classified as a **Defect**, the orchestrator hands the filed bug to the **product** agent for triage. Product sets final severity and issues one of three outcomes:
+**Determined dispositions skip triage.** A Defect whose bug file cites a violated acceptance criterion has no triage question — Defer is forbidden for it by the rule below — so the orchestrator routes it straight back to Coder as **Fix Now** without a Product launch, noting `auto-routed: violates criterion <n>`. Product still reviews every bug at the milestone close, so nothing escapes oversight.
+
+For every other Defect, the orchestrator hands the filed bug to the **product** agent for triage. Product sets final severity and issues one of three outcomes:
 
 - **Fix Now** — the task returns to Coder (Step 1). Coder's read set gains the bug file via "Read next".
 - **Defer** — the bug file stays **open** with status Deferred. Deferred is a held-open state, not terminal: Product re-triages every Deferred bug at the `/agent-code` milestone-completion checkpoint and at `/agent-plan` Stage 1. Deferral is allowed only if the defect does not violate the task's acceptance criteria; the task proceeds without looping.
@@ -128,19 +132,18 @@ A task does not advance to Step 3 until Reviewer has approved a clean version �
 
 Every task's acceptance criteria are checked, criterion by criterion, before it closes. **Who** performs the check depends on Reviewer's Acceptance Criteria Check.
 
-**Step 3a — Clean close (no agent launch).** When Reviewer marks **every** criterion `Met` with an evidence pointer, the orchestrator closes the task itself: set the task file's Status to Complete and append a `progress` entry to `artifacts/STANDUP.md` citing Reviewer's entry number. Reviewer's entry is the validation record.
+**Step 3a — Clean close (no agent launch).** When Reviewer marks **every** criterion `Met` with an evidence pointer, the orchestrator closes the task itself: set the task file's Status to Complete and append a `progress` entry to `artifacts/STANDUP.md` citing Reviewer's entry number. Reviewer's entry is the validation record. If the task resolved a filed bug, the orchestrator also flips that bug's status `Verified` → `Closed` (mirroring the index row) per the field-ownership table in `artifacts/BUGS.md` — a transcription of recorded facts, not a judgment.
 
 **Step 3b — Product validation (agent launch).** Launch the **product** agent whenever any of these hold:
 
 - Reviewer's check reports any criterion `Not met` or `Product judgment`;
 - a criterion was added or amended mid-task (Task-amendment rule);
-- the task carries a CEO Approval Condition in its Context Manifest;
-- the task **resolved a filed bug** — the Verified → Closed transition is Product-owned per `artifacts/BUGS.md`, and 3a launches no agent that could make it.
+- the task carries a CEO Approval Condition in its Context Manifest.
 
 Product validates against the task file's criteria and disposes of every flagged criterion. If any criterion is unmet, it appends the handoff entry citing the failure and the task returns to Coder.
 
-**Product retains milestone-grain oversight either way.** At the `/agent-code` milestone-completion checkpoint Product's validation record covers every task in the milestone — including 3a closures — so no task escapes Product review. A 3a-closed task whose criteria Product later judges unmet re-enters the loop like any Fix Now finding.
+**Product retains milestone-grain oversight either way.** At the `/agent-code` milestone-completion checkpoint the close record's Per-Task Validation table (`templates/MILESTONE_CLOSE.md`) covers every task in the milestone — including 3a closures — so no task escapes Product review. A 3a-closed task whose criteria Product later judges unmet re-enters the loop like any Fix Now finding.
 
 ---
 
-Do NOT write any work artifact to `docs/`; that directory is reference-only. All live work — task files, bug files, progress entries, completion records — goes under `artifacts/`.
+Do NOT write any work artifact to `docs/`; that directory is reference-only. All live work — task files, bug files, progress entries, close records — goes under `artifacts/`.

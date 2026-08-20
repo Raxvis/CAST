@@ -36,22 +36,16 @@ Run the engineering stage for a milestone the CEO approved during `/agent-plan`.
 
 - [coder](../../agents/coder.md) — implements, writes and runs the tests, commits; handles every loop-back
 - [reviewer](../../agents/reviewer.md) — verifies the test-results gate, reviews the diff, classifies findings, files bugs, records the Acceptance Criteria Check
-- [product](../../agents/product.md) — triages bugs, validates tasks Reviewer flagged, disposes of amendments, re-triages Deferred items, writes the completion / validation / retrospective records
+- [product](../../agents/product.md) — triages bugs, validates tasks Reviewer flagged, disposes of amendments, and at milestone completion re-triages Deferred items and writes the close record in one pass
 - [ui](../../agents/ui.md) — milestone UX review (UI-flagged milestones only)
 - [risk](../../agents/risk.md) — implementation review and measured performance check (flagged milestones only)
 - [docs-writer](../../agents/docs-writer.md) — drains the `docs` queue at milestone completion, or at an overflow drain
 
-**Spawn only these.** No ad-hoc subagents, no extra verification passes — the executing model self-verifies within each stage.
+**Spawn only these, exactly as written.** No ad-hoc subagents, no extra verification passes (the executing model self-verifies within each stage), no collapsing a stage into direct work.
 
 ## Model Compatibility
 
-Each stage runs on the model in its agent file (default `inherit` — the session model; `claude-opus-5` preferred, `claude-opus-4-8`/`4-7`/`4-6` supported). Full profiles: `docs/MODEL_OPTIMIZATION.md`.
-
-- **Opus 5** — delegates readily and expands scope. Hold each task to its Files list; invoke only the agents named above. Do not add verification passes.
-- **Opus 4.8 / 4.7** — delegate conservatively; the explicit stage invocations below are load-bearing. Execute every stage as written.
-- **Opus 4.6** — over-delegates like Opus 5; same restriction. Substitute `high` wherever an agent file says `xhigh`.
-- **Effort** — per agent file. v3 defaults are Coder `medium`, Reviewer `high`, Product `high`/`low` by duty; `xhigh` is opt-in, not standing.
-- **Review recall (all models)** — Reviewer reports every Defect and Issue it finds. Filtering happens in triage, never at review time.
+Each stage runs on the model in its agent file (default `inherit` — the session model). Effort is per agent file (Coder `medium`, Reviewer `high`, Product `high`/`low` by duty; `xhigh` is opt-in). Reviewer reports every Defect and Issue it finds — filtering happens in triage, never at review time. Per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
 
 ## Input
 
@@ -84,11 +78,10 @@ Execute the loop in `docs/PIPELINE_LOOP.md` — Coder → Reviewer → validatio
 Deltas for this skill:
 
 - **Every stage receives the task file path** and reads only that file, its Context Manifest, and the latest entry's "Read next" (`docs/STAGE_CONTRACT.md`). Never pass whole design documents into a stage — the manifest cites the sections each task needs. A stage that finds the manifest insufficient adds the missing reference and notes it.
-- **Never pass `docs/PIPELINE_LOOP.md` into a stage.** It is yours. Stages read `docs/STAGE_CONTRACT.md`, which is a fraction of the size, and that split is the reason a v3 stage costs a fraction of a v2 one.
-- **Stage replies are one routing line**: `Handoff entry #<n> appended — <outcome>; next: <stage>`. Route on it. Never relay, summarize, or re-read a stage's work into your context — the Handoff Log on disk is the record. This is what keeps your context flat across a whole milestone.
+- **Never pass `docs/PIPELINE_LOOP.md` into a stage.** It is yours; stages read `docs/STAGE_CONTRACT.md`.
+- **Stage replies are one routing line**: `Handoff entry #<n> appended — <outcome>; next: <stage>`. Route on it. Never relay, summarize, or re-read a stage's work into your context — the Handoff Log on disk is the record.
 - **Coder (Step 1)** additionally honors any Approval Conditions the task's manifest points at.
-- **Reviewer (Step 2)** rejects a Coder entry that lacks a verbatim Test Results block, without reviewing. Route that straight back to Coder; it does not increment the loop counter (no work was reviewed).
-- **Batch the routing.** One review producing several findings gets one Product triage invocation for all Defects, and one Coder pass resolving Defects and Issues together — not one round trip each.
+- The test-gate pre-check, the criterion-violating-Defect auto-route, and the batch-triage rule are part of the loop doc (Step 2 and 2a/2b) — apply them as written there.
 
 ### Parallel Task Execution
 
@@ -131,17 +124,19 @@ When either trips, pause and escalate with: which tasks are looping and on what,
 Fires when every task file is Complete or Deferred.
 
 1. Run `[TEST_CMD]` once more to confirm everything still passes.
-2. **Deferred re-triage.** Launch **product** to re-triage every Deferred bug in `artifacts/BUGS.md` and every Deferred task file — schedule, re-defer with an updated rationale, or close as Won't Fix with a rationale.
-3. **Completion + validation records.** Launch **product** to write `reviews/completion.md` (`templates/MILESTONE_COMPLETION.md`) and `reviews/validation.md` (`templates/MILESTONE_VALIDATION.md`). The validation record covers **every** task including Step 3a closures. While writing the completion record, Product verifies each CEO Approval Condition — flipping Status to Verified with verifier and date, or leaving it open under Known Issues. Status is **Complete with Deferrals** when anything remains Deferred, otherwise **Complete**; Product mirrors it into the README Header.
-4. **UX review.** If any task has **Needs UI Spec** = Yes or Done, launch **ui** once to review the implemented screens against `ui.md` and write `reviews/ux.md`. Skip otherwise.
-5. **Risk implementation review.** Read the two flag lines in `reviews/risk.md`. If **either** is Yes, launch **risk** once to write `reviews/risk-impl.md` — reviewing the milestone's implementation diff against the planned controls for the security lens, and measuring against the budgets for the performance lens (updating the live table in `artifacts/AGENT_STATE.md`). One invocation covers both lenses. Skip when both flags say No or the file has no flag lines.
-   - Findings from steps 4–5 are filed as bug files for Product triage. A **Fix Now** finding sends the affected task back into the loop; Product revises the completion record once it resolves. Deferred findings join Known Issues.
-6. **Retrospective.** Launch **product** to write `reviews/retrospective.md` (`templates/MILESTONE_RETROSPECTIVE.md`), filling every metric from its recorded source.
-7. **Docs Writer.** Launch **docs-writer** to drain every pending `docs` entry. This is the milestone's primary drain.
-8. **Record and archive (orchestrator, no agent).** Append the milestone's rows to `artifacts/AGENT_STATE.md` — Milestone Progress, plus any Decisions Log entries stages surfaced in their handoff entries. Then bound the root files: move `artifacts/one-off/task-*.md` with Status Complete to `artifacts/one-off/archive/`; move STANDUP session sections older than this milestone's first session to `artifacts/archive/STANDUP.md`; move closed AGENT_STATE rows dated before it to `artifacts/archive/AGENT_STATE.md`. Never move unresolved Open Questions, the Milestone Progress table, or the Performance Budget table. Rows relocate verbatim — the history stays greppable.
-9. Append a final `progress` entry summarizing the run.
-10. **Summarize** for the user: what was implemented, test results, bugs filed (including any still Deferred), the outcome of each completion review that ran, and the status of every Approval Condition.
-11. **Suggest next steps** — more tasks, `/cast-release`, or a new `/agent-plan` run.
+2. **UX review.** If any task has **Needs UI Spec** = Yes or Done, launch **ui** once to review the implemented screens against `ui.md` and write `reviews/ux.md`. Skip otherwise.
+3. **Risk implementation review.** Read the two flag lines in `reviews/risk.md`. If **either** is Yes, launch **risk** once to write `reviews/risk-impl.md` — reviewing the milestone's implementation diff against the planned controls for the security lens, and measuring against the budgets for the performance lens (updating the live table in `artifacts/AGENT_STATE.md`). One invocation covers both lenses. Skip when both flags say No or the file has no flag lines.
+   - Findings from steps 2–3 are filed as bug files, triaged by Product inside the close pass below. A **Fix Now** finding sends the affected task back into the loop; the close pass runs (or is revised) once it resolves. Deferred findings join Known Issues.
+4. **Milestone close (one product launch).** Launch **product** once to close the milestone end-to-end — the steps are strictly sequential and each consumes what the previous produced, so they share one context:
+   - **Re-triage** every Deferred bug in `artifacts/BUGS.md` and every Deferred task file — schedule, re-defer with an updated rationale, or close as Won't Fix with a rationale — plus any bugs steps 2–3 just filed.
+   - **Write `reviews/close.md`** (`templates/MILESTONE_CLOSE.md`): the Per-Task Validation table covers **every** task including Step 3a closures, citing Reviewer's Acceptance Criteria Check as evidence; the retrospective sections fill every metric from its recorded source.
+   - **Verify each CEO Approval Condition** — flip Status to Verified with verifier and date, or leave it open under Known Issues.
+   - **Set Status** — **Complete with Deferrals** when anything remains Deferred, otherwise **Complete** — and mirror it into the README Header.
+5. **Docs Writer.** If any pending `docs` entries remain (`- <agent> | docs | <note>` lines without ✅), launch **docs-writer** to drain them. This is the milestone's primary drain; skip only when the queue is empty.
+6. **Record and archive (orchestrator, no agent).** Append the milestone's rows to `artifacts/AGENT_STATE.md` — Milestone Progress, plus any Decisions Log entries stages surfaced in their handoff entries. Then bound the root files: move `artifacts/one-off/task-*.md` with Status Complete to `artifacts/one-off/archive/`; move STANDUP session sections older than this milestone's first session to `artifacts/archive/STANDUP.md`; move closed AGENT_STATE rows dated before it to `artifacts/archive/AGENT_STATE.md`. Never move unresolved Open Questions, the Milestone Progress table, or the Performance Budget table. Rows relocate verbatim — the history stays greppable.
+7. Append a final `progress` entry summarizing the run.
+8. **Summarize** for the user: what was implemented, test results, bugs filed (including any still Deferred), the outcome of each completion review that ran, and the status of every Approval Condition.
+9. **Suggest next steps** — more tasks, `/cast-release`, or a new `/agent-plan` run.
 
 ### Error Handling
 

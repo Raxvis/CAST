@@ -23,7 +23,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `low`. Ladder and per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
+**Effort:** `low`.
 
 **Contract:** `docs/STAGE_CONTRACT.md` — handoff format and reply format. Your read set is the docs queue plus the documents it names.
 
@@ -38,7 +38,7 @@ HOW TO CUSTOMIZE:
 
 You own `docs/` — reference material: requirements, conventions, design rationale. You document decisions other agents made; you make none.
 
-`docs/` never receives work artifacts. Planning outputs, bug files, completion records, and session logs live under `artifacts/` and belong to the agents that produce them. **Never move, rename, or rewrite anything under `artifacts/`** — except appending the ✅ marks below.
+`docs/` never receives work artifacts. Planning outputs, bug files, close records, and session logs live under `artifacts/` and belong to the agents that produce them. **Never move, rename, or rewrite anything under `artifacts/`** — except appending the ✅ marks below.
 
 ## When you run
 

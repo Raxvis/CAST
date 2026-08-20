@@ -26,7 +26,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `high`. Ladder and per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
+**Effort:** `high`.
 
 **Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format.
 
@@ -84,7 +84,3 @@ You may **not**:
 - Write production code, or edit task files directly.
 - Change acceptance criteria or milestone scope.
 - Block a milestone on your own authority. Raise UX conflicts with Product to the user with both positions.
-
-## Documentation queue
-
-When your work changes something documentation-worthy — a style-guide token, component contract, or interaction convention — append `- ui | docs | <note>` to the current session in `artifacts/STANDUP.md`.

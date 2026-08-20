@@ -1,6 +1,6 @@
 # Acme Todo — M1: Task CRUD + SQLite Persistence
 
-**Status**: Complete (CEO: APPROVED WITH CONDITIONS 2026-04-08; completed 2026-04-10)
+**Status**: Complete with Deferrals (CEO: APPROVED WITH CONDITIONS 2026-04-08; completed 2026-04-10)
 
 
 ## Header
@@ -94,16 +94,16 @@ No internal milestone dependencies — this is the first implementation mileston
 
 ## Top-Level Acceptance Criteria
 
-- [ ] `pnpm build` produces a runnable CLI entrypoint.
-- [ ] `pnpm test` passes with coverage for all four commands and the migration runner.
-- [ ] `acme-todo add "write tests"` prints the new task ID and exits 0.
-- [ ] `acme-todo list` shows open tasks in the format `ID  TITLE  STATUS  CREATED`.
-- [ ] `acme-todo list --all` includes completed tasks.
-- [ ] `acme-todo done <id>` marks a task complete and sets `completedAt`.
-- [ ] `acme-todo delete <id>` removes the row.
-- [ ] `done` and `delete` both exit non-zero with a clear error if the id does not exist.
-- [ ] First invocation against a missing database file succeeds (migrations run automatically).
-- [ ] All three CEO Approval Conditions verified (see below).
+- [x] `pnpm build` produces a runnable CLI entrypoint.
+- [x] `pnpm test` passes with coverage for all four commands and the migration runner.
+- [x] `acme-todo add "write tests"` prints the new task ID and exits 0.
+- [x] `acme-todo list` shows open tasks in the format `ID  TITLE  STATUS  CREATED`.
+- [x] `acme-todo list --all` includes completed tasks.
+- [x] `acme-todo done <id>` marks a task complete and sets `completedAt`.
+- [x] `acme-todo delete <id>` removes the row.
+- [ ] `done` and `delete` both exit non-zero with a clear error if the id does not exist. — `delete` does; `done` does not (BUG-002, Deferred to M2)
+- [x] First invocation against a missing database file succeeds (migrations run automatically).
+- [x] All three CEO Approval Conditions verified (see below).
 
 ---
 

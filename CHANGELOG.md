@@ -89,7 +89,41 @@ A hand-maintained changelog on ten document types, restating what `git log` alre
 
 ### Changed — CEO read set narrowed
 
-The most expensive planning stage. It read "every Stage 1–3 artifact" in full; it now reads the README in full, each task file's Header/Description/Criteria/Manifest, the architecture document's **Decisions Log** and boundaries (body sections only where a question lands), the UI spec's interaction states, and `reviews/risk.md` in full. A cross-cutting review examines decisions and the interfaces between them — which is why the Decisions Log and the manifests come first.
+The most expensive planning stage. It read "every Stage 1–3 artifact" in full; it now reads the README in full, each task file's Header/Description/Criteria/Manifest, the architecture document's **Decisions Log** and boundaries (body sections only where a question lands), the UI spec's interaction states, and `reviews/risk.md` in full. A cross-cutting review examines decisions and the interfaces between them — which is why the Decisions Log and the manifests come first. **A re-review reads the diff, not the plan again**: `git diff` for the changed artifacts, the affected sections, and the prior review's objections — unchanged documents stay unread.
+
+### Changed — milestone close: 3 Product launches → 1, 3 templates → `MILESTONE_CLOSE.md`
+
+The milestone-completion checkpoint launched **product** three separate times — Deferred re-triage, then completion + validation records, then the retrospective — each paying a cold context over the same milestone directory, for steps that are strictly sequential and each consume what the previous produced. One chain of reasoning, split across three spawns.
+
+The three documents they produced duplicated each other: What Went Well / Action Items appeared in both the completion report and the retrospective; Known Issues in both the completion report and the validation record; and the validation record's ~60-line per-task checklist block re-derived checks Reviewer had already recorded (its Code Quality and Testing sub-checklists restated Reviewer's own checklist, and its per-task Sign-Off re-decided the Step 3 disposition).
+
+Now: **one launch, one record.** `templates/MILESTONE_CLOSE.md` → `reviews/close.md` carries the per-task validation (a table row per task **citing Reviewer's Acceptance Criteria Check as evidence**, not a re-derived checklist), the milestone validation checklists, the completion summary, and the retrospective. `MILESTONE_VALIDATION.md`, `MILESTONE_COMPLETION.md`, and `MILESTONE_RETROSPECTIVE.md` are deleted; on a 6-task milestone Product's heaviest write shrinks by roughly 60–70%. The UX and Risk implementation reviews now run *before* the close pass, so their filed bugs are triaged inside it.
+
+### Changed — transcription work moved to the orchestrator (no spawn)
+
+Four places launched an agent to transcribe facts already on record:
+
+- **The post-CEO Approval-Conditions backfill** was a second `product` launch that copied conditions from the CEO review into the README table — the exact operation `/agent-code`'s Pre-Flight already performs inline as a repair. The orchestrator does it now.
+- **The bug-status `Verified` → `Closed` flip** forced a Product spawn on every task that resolved a filed bug (the most common `/agent-task` use). The orchestrator flips it when the resolving task passes validation — a transcription of recorded facts (red→green evidence, green suite, task validated); Product still re-reviews every bug at milestone close. `artifacts/BUGS.md`'s field-ownership table records the new owner.
+- **The test gate's missing-block rejection** spent a full Reviewer cold context to notice a missing Test Results block. The orchestrator now pre-checks the block's presence (presence only, never judgment) before launching Reviewer, who keeps the same gate as backstop.
+- **Defects that violate an acceptance criterion** went to Product triage whose outcome was already determined — Defer is forbidden for them by the loop's own rule. They now auto-route straight back to Coder as Fix Now; every other Defect still gets triaged, and Product reviews all bugs at close.
+
+The docs-writer drains at both completion checkpoints are now **conditional on a non-empty queue** — most one-off tasks queue nothing and paid a spawn to discover that. The archetypal `/agent-task` bug fix drops from 4 launches to 2.
+
+### Changed — planning stages are conditional in full mode too
+
+Light mode already gated UI and Risk on the right flags; full mode ran both unconditionally, so a full-mode backend milestone paid a UI launch for a spec no manifest cites. Both modes now use the same tests — Stage 2b runs only when a task is UI-flagged; Stage 3 only when the plan has a security surface or an applicable performance budget (when unsure, run it). The CEO reviews every skip and remains the backstop (REVISION REQUIRED naming the stage). Stage 3 also no longer waits for the orchestrator's manifest application (Risk never reads a manifest) — it starts as soon as 2a/2b complete. A full planning run is now 4–6 launches depending on what the plan actually needs, down from 6 unconditional.
+
+### Changed — always-on context trimmed again
+
+- The installed root `CLAUDE.md` — paid once per session **and once per subagent spawn** — drops ~80 lines: the 28-line essay explaining why Memory Imports ship empty is now 5 lines plus a `docs/DESIGN_RATIONALE.md` entry; the Tech Stack / Style Conventions / Git Workflow sections that `/cast-doctor`'s own Tier-B table prescribes trimming ship pre-trimmed (the placeholder pseudocode example is gone — a convention example the codebase itself demonstrates better).
+- The `docs/MODEL_OPTIMIZATION.md` pointer is removed from all 8 agent effort lines — a 193-line human-facing policy doc dangling inside a read set the stage contract declares closed, on a model that follows pointers. It stays in `agents/README.md`, where humans read it.
+- The per-agent "Documentation queue" section (duplicated across 7 agent files) is now one rule in `docs/STAGE_CONTRACT.md`.
+- The ~10-line Model Compatibility block, near-verbatim in all three pipeline skills, collapses to three lines plus the pointer.
+
+### Fixed — the model policy now says what the platform enforces
+
+`MODEL_OPTIMIZATION.md` claimed "differentiation between roles comes from reasoning effort, not model tier" — but Claude Code subagent frontmatter has no effort key, so under `model: inherit` every agent runs at the session's effort and the per-role defaults are *advisory prompt guidance*, not settings. The doc now says so, and names the one enforceable per-role lever (the `model:` pin). The right-sizing guidance no longer suggests pinning Docs Writer to Haiku: the Context Inference Bar is applied per document against its **weakest consumer**, and Docs Writer cites `docs/FILE_CONVENTIONS.md` and `docs/README.md` — a Haiku pin would permanently block Tier-B prunes on those docs, forfeiting more than it saves. Sonnet-class is the floor for utility pins; the roster ships all-`inherit` either way.
 
 ### Changed — templates, CI, fixture
 

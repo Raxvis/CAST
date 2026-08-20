@@ -51,7 +51,7 @@
 - [x] No Critical finding is deferred to "future work" without explicit Product acceptance.
 - [x] New dependencies introduced by the architecture have been reviewed.
 
-**Notes**: CONDITIONAL. Security filed one Critical finding (SQL injection risk across command handlers) and one Medium finding (unvalidated `ACME_TODO_DB` env var). The Critical finding is rolled into **Approval Condition 1** below — the remediation is a coding rule, not an architectural change, so there is no document to revise. The Medium finding is Accepted as v1 risk per Security's own recommendation and logged for Milestone 2 revisit. No new dependencies beyond `better-sqlite3` (already vetted).
+**Notes**: CONDITIONAL. Risk's security lens filed one High finding (S1: SQL injection risk across command handlers), one Low finding (S2: database file permissions inherit the process umask), and an informational note (S3: the `ACME_TODO_DB` override is used only as a path, never as SQL — no action). The High finding is rolled into **Approval Condition 1** below — the remediation is a coding rule, not an architectural change, so there is no document to revise. S2 is Accepted as v1 risk per Risk's own recommendation. No new dependencies beyond `better-sqlite3` (already vetted).
 
 ---
 
@@ -60,7 +60,7 @@
 - [x] Hot paths are identified and have a measurement plan.
 - [x] No budget violation is deferred without explicit Product acceptance.
 
-**Notes**: CONDITIONAL. Performance filed one Medium finding (WAL mode not enabled — potential budget violation on large histories) and one Low finding (missing index on `completed`). Both remediations are single-line additions to the initial migration and are bundled into **Approval Condition 2** below. Neither deferral is requested; both will land in T-1.
+**Notes**: CONDITIONAL. Risk's performance lens filed two Medium findings — P1: no index on the `completed` column, and P2: an unbounded migration-check cost on every invocation — plus an informational note (P3: WAL mode is already specified in the architecture; no action). Both Medium remediations are single-line additions to the initial migration and are bundled into **Approval Condition 2** below. Neither deferral is requested; both will land in T-1.
 
 ---
 
@@ -98,4 +98,4 @@
 
 Milestone may proceed. Coder must satisfy the Approval Conditions above; Reviewer and Product verify on completion.
 
-**Verdict Notes**: The plan is coherent, appropriately scoped, and internally consistent across Product, Architecture, and UI. Every finding raised by Security and Performance has a concrete inline remediation that fits inside the existing task list — none require rework of the architecture or UI documents. Returning the plan to the owning agents for revision would add a round-trip without changing the substance of the work Coder will do. Conditional approval is the faster, cleaner path: Coder carries the three conditions forward as explicit checklist items during `/agent-code`, Reviewer gates the first two on merge, and Product gates the third during milestone validation. Engineering may begin.
+**Verdict Notes**: The plan is coherent, appropriately scoped, and internally consistent across Product, Architecture, and UI. Every finding raised by the Risk review's two lenses has a concrete inline remediation that fits inside the existing task list — none require rework of the architecture or UI documents. Returning the plan to the owning agents for revision would add a round-trip without changing the substance of the work Coder will do. Conditional approval is the faster, cleaner path: Coder carries the three conditions forward as explicit checklist items during `/agent-code`, Reviewer gates the first two on merge, and Product gates the third during milestone validation. Engineering may begin.

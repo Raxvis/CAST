@@ -49,7 +49,7 @@ This skill invokes the following agents. Open any of them for the full role defi
 
 - [coder](../../agents/coder.md) — implements the task, writes and runs its tests, commits; handles every loop-back
 - [reviewer](../../agents/reviewer.md) — verifies the test-results gate, reviews the diff, classifies findings as Defects (filing each as a bug file) or Issues, and on approval records the per-criterion Acceptance Criteria Check that decides whether Step 3 needs Product
-- [product](../../agents/product.md) — triages filed defects, and validates the finished task against the original task description when Reviewer's criteria check, scope creep, or a resolved bug calls for it (Step 3b)
+- [product](../../agents/product.md) — triages filed defects, and validates the finished task against the original task description when Reviewer's criteria check or scope creep calls for it (Step 3b)
 - [docs-writer](../../agents/docs-writer.md) — drains the `docs` queue from `artifacts/STANDUP.md` at the completion checkpoint
 
 This skill explicitly does NOT invoke [architect](../../agents/architect.md), [ui](../../agents/ui.md), [risk](../../agents/risk.md), or [ceo](../../agents/ceo.md). If the task turns out to need any of those, Pre-Flight or Reviewer will halt and tell you to run `/agent-plan` instead.
@@ -79,12 +79,7 @@ If in doubt, run `/agent-plan` first — for a small feature that needs a few de
 
 ## Model Compatibility
 
-Each stage runs on the model set in that agent's file (default: `inherit` — the session model; the Claude Opus family is the optimized target, with `claude-opus-5` preferred and `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` supported — full profiles and upgrade paths in `docs/MODEL_OPTIMIZATION.md`). Orchestration notes by executing model:
-
-- **Opus 5** — this model delegates readily and expands scope; invoke only the agents this pipeline names, keep the task to its stated description (out-of-scope discoveries go in the Handoff Log), and honor the bail-out rule above instead of spawning planning agents ad hoc.
-- **Opus 4.8 / 4.7** — these models delegate conservatively; execute the pipeline stages exactly as written rather than folding them into direct work.
-- **Opus 4.6** — this model over-delegates; invoke only the agents this pipeline names, and honor the bail-out rule above instead of spawning planning agents ad hoc.
-- **Effort** — per agent file (v3 defaults: Coder `medium`, Reviewer `high`). Raise Coder to `high` for a fix whose mechanism is not obvious. `xhigh` is opt-in and rarely warranted for one-off work.
+Each stage runs on the model set in that agent's file (default: `inherit` — the session model). Invoke only the agents this pipeline names, exactly as written: keep the task to its stated description (out-of-scope discoveries go in the Handoff Log), honor the bail-out rule above instead of spawning planning agents ad hoc, and never fold a stage into direct work. Effort is per agent file (Coder `medium`, Reviewer `high`; raise Coder to `high` for a fix whose mechanism is not obvious — `xhigh` is rarely warranted for one-off work). Per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
 
 ## Input
 
@@ -115,14 +110,14 @@ Deltas specific to this skill:
 
 - **Every stage** receives the one-off task file path; the Context Manifest and Handoff Log carry everything else — there is no milestone, architecture document, or UI spec.
 - **Reviewer files defect findings** as per-bug files under `artifacts/one-off/bugs/bug-{XXX}-{slug}.md`, indexed in `artifacts/BUGS.md`.
-- **Reviewer (Step 3)** reviews against project conventions, existing patterns in adjacent code, and any topic-specific doc that applies. If the Reviewer's findings reveal missing design context (e.g., "this change should not exist without a new architecture document" or "this introduces a pattern not used elsewhere"), **stop and instruct the user to run `/agent-plan` to introduce the missing context** — light mode (`/agent-plan light: ...`) when the missing context is a few design decisions, the full run when it is cross-cutting. Do not attempt to retrofit design work into a one-off task.
+- **Reviewer (Step 2)** reviews against project conventions, existing patterns in adjacent code, and any topic-specific doc that applies. If the Reviewer's findings reveal missing design context (e.g., "this change should not exist without a new architecture document" or "this introduces a pattern not used elsewhere"), **stop and instruct the user to run `/agent-plan` to introduce the missing context** — light mode (`/agent-plan light: ...`) when the missing context is a few design decisions, the full run when it is cross-cutting. Do not attempt to retrofit design work into a one-off task.
 - **Reviewer (Step 2)** appends the **Acceptance Criteria Check** to its approval entry, one line per criterion in the one-off task file. Because `/agent-task` derives its criteria from a free-form task description, Reviewer marks a criterion `Product judgment` whenever the description's intent is open to reading — a one-off task's criteria are less precise than a planned task's, so lean toward Product judgment here rather than assuming.
 - **Validation (Step 3)**: since `/agent-task` does not produce a milestone, the task description itself serves as the acceptance criteria. A task whose criteria Reviewer marked all `Met` closes via Step 3a — the orchestrator writes the Status and the `progress` entry directly. Otherwise launch **product** (Step 3b) to verify:
   1. The change does what the task description said it would.
   2. No regressions in adjacent features.
   3. The change did not sneak in scope beyond what was asked. If new scope appeared, flag it and either trim or escalate to `/agent-plan`.
 
-  **Scope creep always needs Product.** Point 3 is not something Reviewer's criteria check covers — if Reviewer's entry reports files touched beyond the task file's Files list, or any finding it classified as out-of-scope, route to Step 3b regardless of how the criteria were marked. (A task that resolved a filed bug already routes to Step 3b under the loop doc's own trigger list, which is what makes the Verified → Closed transition in Completion step 5 possible.)
+  **Scope creep always needs Product.** Point 3 is not something Reviewer's criteria check covers — if Reviewer's entry reports files touched beyond the task file's Files list, or any finding it classified as out-of-scope, route to Step 3b regardless of how the criteria were marked. (A resolved filed bug no longer forces a Product spawn: the orchestrator flips its status `Verified` → `Closed` at Completion step 5, per the field-ownership table in `artifacts/BUGS.md`.)
 
 ### Completion
 
@@ -131,8 +126,8 @@ After the task passes validation (Step 3a or 3b):
 1. Run `[TEST_CMD]` one final time to confirm everything still passes.
 2. Set the task file's Status to Complete in its Header.
 3. Append an entry to `artifacts/STANDUP.md` using that file's Entry Grammar: a session heading `### YYYY-MM-DD — agent-task — <task summary>` (if this run has not added one yet) and a `- <product|reviewer> | progress | <task summary, any bug ID resolved>` line — attributed to whichever stage closed the task.
-4. **Docs Writer.** Invoke the **docs-writer** agent to drain the `docs` entries from `artifacts/STANDUP.md` (entries of the form `- <agent> | docs | <note>` — see that file's Entry Grammar). Docs Writer marks each drained entry with ✅. This drain is unconditional: a one-off run has exactly one task, so this checkpoint is its only drain opportunity — `/agent-code`'s batching rule does not apply here.
-5. If the task resolved a filed bug, advance the per-bug file's status per the field-ownership table in `artifacts/BUGS.md` (which is canonical): Coder already set the status to **Fixed** at fix time, filling in the resolution fields (Commit, Files Changed, Regression Notes) — verify this happened and have Coder backfill it if not. Now that the suite is green and Product has validated, **Product** advances the status **Verified** → **Closed** (mirroring each change into the index row).
+4. **Docs Writer (conditional).** Count the pending `docs` entries in `artifacts/STANDUP.md` (lines of the form `- <agent> | docs | <note>` without ✅ — see that file's Entry Grammar). If **one or more** are pending, invoke the **docs-writer** agent to drain them all (it marks each with ✅) — a one-off run has exactly one task, so this checkpoint is its only drain opportunity. If the queue is empty — the common case for a one-off task — launch nothing.
+5. If the task resolved a filed bug, advance the per-bug file's status per the field-ownership table in `artifacts/BUGS.md` (which is canonical): Coder already set the status to **Fixed** at fix time, filling in the resolution fields (Commit, Files Changed, Regression Notes) — verify this happened and have Coder backfill it if not. Now that the suite is green and the task passed validation, **you (the orchestrator)** flip the status **Verified** → **Closed**, mirroring each change into the index row — a transcription of recorded facts, no agent launch.
 6. Summarize what changed, what tests were affected, and any follow-up items or deferred scope.
 
 ### Error Handling

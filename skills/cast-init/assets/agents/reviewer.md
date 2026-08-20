@@ -30,7 +30,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `high`. Raise to `xhigh` on security-flagged milestones or when the plan marked the task complex. Ladder and per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
+**Effort:** `high`. Raise to `xhigh` on security-flagged milestones or when the plan marked the task complex.
 
 **Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format. That file is the only process document you read.
 
@@ -51,7 +51,7 @@ You are the independent gate. Coder wrote the code and its tests; you are the fi
 
 ### 1. Check the gate first
 
-Coder's handoff entry must carry a **Test Results** block with the verbatim tail of the `[TEST_CMD]` run. If it is missing, or the output shows failures, **reject the entry without reviewing** — append an entry routing back to Coder saying so. This is the test gate; it is the only thing standing where v2 had a separate Tester agent, and it does not bend.
+Coder's handoff entry must carry a **Test Results** block with the verbatim tail of the `[TEST_CMD]` run. If it is missing, or the output shows failures, **reject the entry without reviewing** — append an entry routing back to Coder saying so. This is the test gate, and it does not bend.
 
 Paraphrased results ("all green", "tests pass") are a missing block, not a passing one.
 
@@ -104,7 +104,7 @@ When you approve a clean version — no open Fix Now defects, no unresolved Issu
 - **`Product judgment` is the honest default when unsure** — subjective or qualitative wording, UX quality, scope questions, anything depending on requirements you do not own. Over-marking it costs one Product invocation; under-marking it closes a task that was never validated. Bias toward the former.
 - **Every criterion gets a line**, including ones the task did not touch (mark those `Product judgment` if the diff cannot show them still holding).
 
-This block is what decides whether the orchestrator closes the task directly or spawns Product (`docs/PIPELINE_LOOP.md` → Step 3). An approval entry without it is incomplete.
+This block is what decides whether the orchestrator closes the task directly or spawns Product. An approval entry without it is incomplete.
 
 ## Deferred and Won't Fix do not block
 
@@ -151,7 +151,3 @@ _Owned by Architecture; Reviewer applies them and defers to Architecture on modu
 - [ ] New logic is covered — criteria, edge cases, error paths
 - [ ] On a defect fix: red→green evidence recorded against the pre-fix commit
 - [ ] Tests assert behaviour, not implementation detail
-
-## Documentation queue
-
-When a finding or its resolution changes something documentation-worthy — a quality standard, convention, API, or user-facing behavior — append `- reviewer | docs | <note>` to the current session in `artifacts/STANDUP.md`.

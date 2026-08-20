@@ -8,14 +8,14 @@
   HOW TO CUSTOMIZE:
   - Replace [MILESTONE_NAME] with the milestone under review.
   - Fill in every Inputs Reviewed path — all five inputs are mandatory; write "None"
-    only when a review stage produced no findings file. Exception: the UI Spec row
-    reads "N/A — no ui agent installed" when the project has no ui agent (Stage 2b
-    was skipped), and in /agent-plan light mode a skipped stage's row reads
-    "N/A — light mode, stage not run".
+    only when a review stage produced no findings file. Exceptions: the UI Spec row
+    reads "N/A — no ui agent installed" when the project has no ui agent, and a
+    conditionally skipped stage's row (light mode, or a full-mode skip) reads
+    "N/A — <stage> skipped: <reason>".
   - Work through all five checklist sections. Do not skip any. Section 3 accepts
-    "N/A — no ui agent installed" as its content in no-ui projects; in light
-    mode, Sections 3 and 4 accept "N/A — light mode, stage not run" for stages
-    that were skipped (a flagged-in stage gets a real section).
+    "N/A — no ui agent installed" as its content in no-ui projects; Sections 3
+    and 4 accept "N/A — <stage> skipped: <reason>" for a conditionally skipped
+    stage (a flagged-in stage gets a real section).
   - Record Revision Requests when returning REVISION REQUIRED, and Approval Conditions
     (with a Verified By owner) when returning APPROVED WITH CONDITIONS.
   - Record the verdict as the single `**Verdict**:` line in the Verdict section, with
@@ -38,7 +38,7 @@
 **Reviewer**: CEO Agent
 **Inputs Reviewed**:
 - Milestone: [PATH_TO_MILESTONE_DOC]
-- Task Breakdown: [PATH_TO_TASKS_DOC]
+- Task Breakdown: [PATH_TO_TASKS_DOC — list every tasks/task-{T}-{slug}.md file reviewed]
 - Architecture: [PATH_TO_ARCH_DOC]
 - UI Spec: [PATH_TO_UI_SPEC — or "N/A — no ui agent installed" for no-ui projects]
 - Risk Review: [PATH_OR_NONE]

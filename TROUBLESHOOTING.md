@@ -48,7 +48,7 @@ Common problems adopting or running this template, with the most likely cause an
 2. Run the move command(s) from the project root. Typically:
    ```
    mv .cast-stage/agents .claude/agents
-   mv .cast-stage/skills/agent-plan .cast-stage/skills/agent-code .cast-stage/skills/agent-task .cast-stage/skills/cast-doctor .claude/skills/
+   mv .cast-stage/skills/agent-plan .cast-stage/skills/agent-code .cast-stage/skills/agent-task .cast-stage/skills/cast-doctor .cast-stage/skills/cast-release .claude/skills/
    rmdir .cast-stage/skills .cast-stage
    ```
 3. Restart your Claude Code session so the moved agents and skills register.
@@ -97,7 +97,7 @@ Common problems adopting or running this template, with the most likely cause an
    ```
 2. Restart your Claude Code session (exit and re-open). Auto-discovery runs at session start, not continuously.
 3. If the files are missing, re-run `/cast-init` — it installs the pipeline skills as part of the adoption.
-4. Run `/agents` to confirm Claude Code sees the template's subagents. If `/agents` lists the 15 agents, the session is reading `.claude/`; if it doesn't, you are in the wrong directory.
+4. Run `/agents` to confirm Claude Code sees the template's subagents. If `/agents` lists the 8 agents, the session is reading `.claude/`; if it doesn't, you are in the wrong directory.
 
 ---
 
@@ -152,19 +152,19 @@ Common problems adopting or running this template, with the most likely cause an
 1. Re-run `/agent-code <milestone>`. Task Selection skips every task whose Status is already Complete or Deferred and picks up at the first remaining task — finished work is not redone.
 2. Do not hand-mark tasks Complete to "help" the resume; only tasks that actually passed Product validation carry that status. If the interruption hit mid-task, that task's Status is unchanged and the whole per-task loop re-runs for it, which is correct.
 3. The resumed run reuses the existing `### YYYY-MM-DD — agent-code — …` session heading in `artifacts/STANDUP.md` for the same milestone and date rather than opening a duplicate.
-4. When the last task lands, the milestone-completion checkpoint (Deferred re-triage, completion and validation records, UX review, retrospective) fires normally — it keys off "every task Complete or Deferred", not off an unbroken session.
+4. When the last task lands, the milestone-completion checkpoint (Deferred re-triage, the `reviews/close.md` close record, UX review) fires normally — it keys off "every task Complete or Deferred", not off an unbroken session.
 
 ---
 
 ## `/agent-task` halted and told me to run `/agent-plan`
 
-**Cause.** The Pre-Flight or Reviewer step in `/agent-task` detected that the change you described crosses the `/agent-task` scope boundary. `/agent-task` is explicitly bounded to self-contained changes: bug fixes, typos, single-function refactors, dependency bumps, and flags that follow existing patterns. When Pre-Flight reads the task description and notices it implies a new module, a schema change, a new endpoint, or a cross-cutting change, it halts rather than guessing. The Reviewer in Step 3 applies the same check against the actual diff and halts if the finished work has crossed the line.
+**Cause.** The Pre-Flight or Reviewer step in `/agent-task` detected that the change you described crosses the `/agent-task` scope boundary. `/agent-task` is explicitly bounded to self-contained changes: bug fixes, typos, single-function refactors, dependency bumps, and flags that follow existing patterns. When Pre-Flight reads the task description and notices it implies a new module, a schema change, a new endpoint, or a cross-cutting change, it halts rather than guessing. The Reviewer in Step 2 applies the same check against the actual diff and halts if the finished work has crossed the line.
 
 **Fix.**
 1. Re-read the halt message. It should name the specific scope-crossing concern (e.g., "introduces a new module", "changes a data schema", "adds a new CLI subcommand").
-2. Run the planning tier the halt message named. For a small feature needing a few design decisions, `/agent-plan light: "<feature description>"` runs the light mode (Product + Architecture + CEO). For multi-task or cross-cutting scope, `/agent-plan "<feature description>"` runs the full stage (Product → Architecture + UI → Security + Performance → CEO). Either way it ends with a verdict file at `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
+2. Run the planning tier the halt message named. For a small feature needing a few design decisions, `/agent-plan light: "<feature description>"` runs the light mode (Product + Architecture + CEO). For multi-task or cross-cutting scope, `/agent-plan "<feature description>"` runs the full stage (Product → Architecture + UI → Risk → CEO). Either way it ends with a verdict file at `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
 3. After the CEO issues **APPROVED** or **APPROVED WITH CONDITIONS**, run `/agent-code <milestone>` to execute the engineering stage against the approved plan.
-4. If you disagree with the scope classification and think the change is really self-contained, you can re-run `/agent-task` with a more precise task description that narrows the scope (name the specific file, the specific bug ID, or the specific existing pattern the change follows). Do not try to sneak a design change through `/agent-task` — the gate exists to prevent drift, and the Reviewer in Step 3 will catch it anyway.
+4. If you disagree with the scope classification and think the change is really self-contained, you can re-run `/agent-task` with a more precise task description that narrows the scope (name the specific file, the specific bug ID, or the specific existing pattern the change follows). Do not try to sneak a design change through `/agent-task` — the gate exists to prevent drift, and the Reviewer in Step 2 will catch it anyway.
 
 ---
 
@@ -210,11 +210,11 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## The CEO agent keeps returning `REVISION REQUIRED`
 
-**Cause.** The CEO applies a cross-cutting review against Security, Performance, Architecture, UI, and milestone scope. If any of those have open Critical findings, scope contradictions, or budget violations, the verdict will keep coming back as REVISION REQUIRED until resolved.
+**Cause.** The CEO applies a cross-cutting review against the CEO_REVIEW template's Risk Posture section (Risk, Architecture, UI) and milestone scope. If any of those have open Critical findings, scope contradictions, or budget violations, the verdict will keep coming back as REVISION REQUIRED until resolved.
 
 **Fix.**
 1. Open `artifacts/milestone-{N}-{slug}/reviews/ceo.md` and read the "Revision Requests" table (the verdict itself is the single `**Verdict**:` line). Every revision is addressed to a specific agent with a cited section.
-2. Re-run only the affected planning stage — but note a revised architecture re-passes Stage 3 (both Security and Performance) before the CEO sees it again, so the CEO never re-reviews against stale findings.
+2. Re-run only the affected planning stage — but note a revised architecture re-passes Stage 3 (the Risk review, both lenses) before the CEO sees it again, so the CEO never re-reviews against stale findings.
 3. Only then re-run Stage 4 (CEO). The CEO does not rewrite plans; it reviews them.
 4. If you disagree with a CEO revision, escalate per the conflict resolution hierarchy (Product > Architecture > UI) — the CEO does not override Product on business intent, and an unresolved disagreement comes to you rather than to another agent.
 

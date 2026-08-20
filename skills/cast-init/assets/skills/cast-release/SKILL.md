@@ -39,7 +39,7 @@ An optional version number or release name. If none was given, derive the versio
 
 Stop and report if any of these fails; do not continue past a failed gate.
 
-1. **A milestone is actually complete.** The highest-numbered `artifacts/milestone-*/` directory has `reviews/completion.md` with Status `Complete` or `Complete with Deferrals`. If not, tell the user which milestone is still open and stop.
+1. **A milestone is actually complete.** The highest-numbered `artifacts/milestone-*/` directory has `reviews/close.md` (or a pre-v3 `reviews/completion.md`) with Status `Complete` or `Complete with Deferrals`. If not, tell the user which milestone is still open and stop.
 2. **Tests pass.** Run `[TEST_CMD]`. Record the verbatim tail of the output — it goes in the release record.
 3. **Build succeeds.** Run `[BUILD_CMD]`. Record the result.
 4. **No blocking bugs.** Read `artifacts/BUGS.md`. **Deferred counts as open** — a Deferred Critical or High bug blocks the release until Product re-triages it. List any that do, and stop.
@@ -47,7 +47,7 @@ Stop and report if any of these fails; do not continue past a failed gate.
 
 ## Versioning
 
-`[VERSIONING_SCHEME]` (default: semantic versioning). Derive the bump from what actually shipped, read from the milestone's completion record and the commit range:
+`[VERSIONING_SCHEME]` (default: semantic versioning). Derive the bump from what actually shipped, read from the milestone's close record and the commit range:
 
 | Bump | When |
 |---|---|
@@ -61,11 +61,11 @@ State the bump and the reason before applying it. When the change set spans cate
 
 Update `docs/CHANGELOG.md` — **this skill is its owner**; Docs Writer routes changelog-worthy items here rather than editing the file. Add one entry for the new version, newest first, describing every substantive change since the prior version, grouped Added / Changed / Fixed / Removed. Source the entries from:
 
-- the milestone's `reviews/completion.md` (what shipped),
+- the milestone's `reviews/close.md` (what shipped),
 - the `artifacts/BUGS.md` rows closed during the milestone (what was fixed),
 - the commit range since the last release tag.
 
-Known Issues from the completion record — including anything still Deferred — go in the entry. A release that ships with known deferrals says so.
+Known Issues from the close record — including anything still Deferred — go in the entry. A release that ships with known deferrals says so.
 
 ## Release record
 
@@ -81,7 +81,7 @@ Write the result to `artifacts/releases/release-{VERSION}.md`:
 
 | Gate | Result |
 |---|---|
-| Milestone complete | [completion record path + Status] |
+| Milestone complete | [close record path + Status] |
 | Tests | [verbatim tail of [TEST_CMD]] |
 | Build | [result of [BUILD_CMD]] |
 | Blocking bugs | [None / list] |

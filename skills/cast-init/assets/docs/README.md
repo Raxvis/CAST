@@ -124,12 +124,11 @@ appropriate `artifacts/` subdirectory first.
 | `templates/ARCH_DATA_SCHEMA.md` | Template for documenting a data schema or save format | `artifacts/milestone-{N}-{slug}/arch-{slug}.md` |
 | `templates/UI_SPEC.md` | Template for specifying a UI screen or component | `artifacts/milestone-{N}-{slug}/ui.md` or `ui-{slug}.md` |
 | `templates/MILESTONE_DEFINITION.md` | Template for the milestone definition file (what and why) | `artifacts/milestone-{N}-{slug}/README.md` |
-| `templates/TASK.md` | Template for the task breakdown file (how; one row per task) | `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` |
-| `templates/MILESTONE_COMPLETION.md` | Template for milestone completion reports | `artifacts/milestone-{N}-{slug}/reviews/completion.md` |
-| `templates/MILESTONE_VALIDATION.md` | Template for per-task validation checklists and milestone acceptance records | `artifacts/milestone-{N}-{slug}/reviews/validation.md` |
+| `templates/TASK.md` | Template for the per-task file (how; one file per task) | `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` |
+| `templates/BUG_REPORT.md` | Template for per-bug reports, filed by Reviewer and indexed in `artifacts/BUGS.md` | `artifacts/milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md`, or `artifacts/one-off/bugs/` |
+| `templates/MILESTONE_CLOSE.md` | Template for the milestone close record — per-task validation, milestone validation, completion summary, and retrospective, written by Product in one pass at the `/agent-code` milestone-completion checkpoint | `artifacts/milestone-{N}-{slug}/reviews/close.md` |
 | `templates/CEO_REVIEW.md` | Template for the CEO's planning-stage review and verdict | `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |
 | `templates/UX_REVIEW.md` | Template for UI's UX review of a milestone's implemented screens — written once per milestone at the `/agent-code` milestone-completion checkpoint, only for milestones with UI-flagged tasks | `artifacts/milestone-{N}-{slug}/reviews/ux.md` |
-| `templates/MILESTONE_RETROSPECTIVE.md` | Template for the milestone retrospective, written by Product at the `/agent-code` milestone-completion checkpoint | `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` |
 
 ---
 
@@ -140,7 +139,7 @@ appropriate `artifacts/` subdirectory first.
 3. **Creating a new file?** Read `FILE_CONVENTIONS.md` before deciding where to put it.
 4. **Documenting a design decision?** Add an entry to `DESIGN_RATIONALE.md`.
 5. **Found a bug?** File it as a per-bug file in the milestone's `bugs/` directory and index it in `artifacts/BUGS.md` (not here — `docs/` is reference-only).
-6. **Completing a milestone?** Copy `templates/MILESTONE_VALIDATION.md` to the milestone's `reviews/validation.md` and fill it in there.
+6. **Completing a milestone?** Copy `templates/MILESTONE_CLOSE.md` to the milestone's `reviews/close.md` and fill it in there.
 
 ---
 

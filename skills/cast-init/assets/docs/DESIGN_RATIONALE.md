@@ -40,7 +40,7 @@ A decision is significant enough to record here if any of the following are true
 If a decision was obvious, required no deliberation, and has no meaningful alternative,
 it does not need an entry here.
 
-**Scope vs. Architect's Decisions Log:** Each agent has its own Decisions Log (in `artifacts/AGENT_STATE.md`, one section per agent — the architect section especially) for milestone-scoped architectural choices made during that agent's work. This document is for project-wide decisions that span milestones or outlast any single agent's scope — e.g., "why SQLite over Postgres," "why this state management pattern," "why monorepo." If a milestone-specific architectural decision turns out to have project-wide implications, promote it here with a reference to the original.
+**Scope vs. the Decisions Logs:** Milestone-scoped architectural choices live in each milestone's `architecture.md` Decisions Log, with cross-milestone rows mirrored by the orchestrator into `artifacts/AGENT_STATE.md` → Decisions Log. This document is for project-wide decisions that span milestones or outlast any single agent's scope — e.g., "why SQLite over Postgres," "why this state management pattern," "why monorepo." If a milestone-specific architectural decision turns out to have project-wide implications, promote it here with a reference to the original.
 
 ---
 
@@ -105,7 +105,13 @@ Reference specific goals from PRD.md or CONCEPT.md where applicable.]
 
 <!-- Add entries here as significant architectural or implementation decisions are made. -->
 
-*No entries yet.*
+### Memory Imports ship empty
+
+**Decision:** The Memory Imports list in the root `CLAUDE.md` ships empty; documents are cited by task-file Context Manifests (sections, not files) instead of imported globally.
+
+**Rationale:** A bare `@path` import is loaded at every session start **and into every subagent spawn** — paid once per session plus once per stage, so a 250-line document costs more across one milestone than most agent definitions do. CAST v2 imported `docs/CODE_PATTERNS.md` unconditionally, which contradicted its own Context Inference Bar (`docs/MODEL_OPTIMIZATION.md`): on Opus 4.8+ and Sonnet 5+, conventions that merely restate what the codebase shows — naming, file layout, function ordering — are inferred from the code, and writing them down again buys only weight.
+
+**Trade-off accepted:** A genuinely non-inferable, needed-every-session document (a domain glossary whose terms appear nowhere in the source, a compliance constraint) must be added back by hand — and removed again if `/cast-doctor` later flags it as inferable.
 
 ---
 

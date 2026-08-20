@@ -64,7 +64,7 @@ that opens the DB, runs migrations, dispatches, and closes the DB.
 
 ### 2. coder -> reviewer — 2026-04-10
 
-- **Outcome**: Parser and entrypoint implemented; `runMigrations` called unconditionally before dispatch. 8 tests added covering `--help`, no-args, unknown-command, and `--all` routing. Final pass, so the full suite ran.
+- **Outcome**: Parser and entrypoint implemented; `runMigrations` called unconditionally before dispatch. 7 tests added covering `--help`, no-args, unknown-command, and `--all` routing. Final pass, so the full suite ran.
 - **Files touched**: `src/cli.ts`, `src/index.ts`, `src/cli.test.ts`
 - **Commit**: `2b6d0e7`
 - **Test Results**: `pnpm test` — `Test Files  6 passed (6)` / `Tests  42 passed (42)` / `Duration  4.20s`
@@ -83,8 +83,8 @@ that opens the DB, runs migrations, dispatches, and closes the DB.
   - [3] Unknown command prints usage and exits non-zero. — Met — `cli.test.ts` › "unknown command exits 1"
   - [4] `list --all` is parsed correctly (flag routed to `runList`). — Met — `src/cli.ts:41`; `cli.test.ts` › "routes --all to runList"
   - [5] `src/index.ts` always calls `runMigrations` before dispatching. — Met — `src/index.ts:12` (unconditional, ahead of the switch); `cli.test.ts` › "migrations run before dispatch"
-  - [6] Vitest suite covers parser happy paths, `--help`, and unknown-command error. — Met — 8 tests added in `2b6d0e7`
-  - [7] No linter or type-check errors introduced. — Met — `pnpm typecheck` and lint clean at `8e51f9a`
+  - [6] Vitest suite covers parser happy paths, `--help`, and unknown-command error. — Met — 7 tests added in `2b6d0e7`
+  - [7] No linter or type-check errors introduced. — Met — `pnpm typecheck` and lint clean at `2b6d0e7`
 
 ### 4. orchestrator — task closed (Step 3a) — 2026-04-10
 

@@ -33,15 +33,18 @@ See `CLAUDE.md` for the full project overview and `docs/PRD.md` for requirements
    T-4 still routed to Product (Step 3b) because each carries a CEO Approval
    Condition, and T-4 shows a `Product judgment` flag and how Product disposed
    of it.
-4. The milestone-completion checkpoint fired on 2026-04-10: Product re-triaged
+4. The milestone-completion checkpoint fired on 2026-04-10: the UI agent
+   reviewed the implemented command surface (UX review, APPROVED WITH NOTES);
+   the Risk agent ran the implementation review (both lenses, no findings);
+   then a single Product launch closed the milestone end-to-end — re-triaging
    the Deferred BUG-002 (held Deferred into M2 — Deferred is an open, held
-   state, not terminal) and wrote the completion record ("Complete with
-   Deferrals") and the milestone validation record covering all five tasks; the
-   UI agent reviewed the implemented command surface (UX review, APPROVED WITH
-   NOTES); Docs Writer drained all four queued `docs` entries in one pass; and
-   Product wrote the retrospective, and the orchestrator recorded the milestone
-   outcome and the Decisions Log rows. The per-task checkpoints launched no
-   agents at all.
+   state, not terminal), writing the close record (`reviews/close.md`,
+   "Complete with Deferrals") covering per-task validation, milestone
+   validation, and the retrospective in one pass, and verifying all three CEO
+   Approval Conditions. Docs Writer then drained all four queued `docs`
+   entries in one pass, and the orchestrator recorded the milestone outcome
+   and the Decisions Log rows. The per-task checkpoints launched no agents at
+   all.
 
 ## Where to Start Reading
 
@@ -61,17 +64,17 @@ Read these in order for the clearest picture:
    walks the full defect loop (BUG-001: coder -> reviewer files the bug ->
    product triages Fix Now -> coder investigates, fixes, and proves the test
    red -> reviewer approves).
-7. **`artifacts/milestone-1-task-crud/reviews/validation.md`** — Product's
-   milestone-grain validation record (Approved with Notes), and its companion
-   completion report (`reviews/completion.md`, "Complete with Deferrals").
+7. **`artifacts/milestone-1-task-crud/reviews/close.md`** — Product's one-pass
+   milestone close record (Sign-Off: Approved with Notes; Header Status:
+   "Complete with Deferrals"): per-task validation for all five tasks, the
+   milestone validation checklist, known issues, and the retrospective, with
+   every metric filled from a recorded fixture source.
 8. **`artifacts/milestone-1-task-crud/reviews/ux.md`** — the UI agent's review of
    the implemented command surface against the approved spec.
-9. **`artifacts/milestone-1-task-crud/reviews/retrospective.md`** — Product's
-   retrospective, with every metric filled from a recorded fixture source.
-10. **`artifacts/AGENT_STATE.md`** — every agent's live working state after
-    Milestone 1 closed: the Decisions Log, milestone progress, and the measured
-    performance budgets. No agent reads this file.
-11. **`artifacts/STANDUP.md`** — the rolling session log across the three days,
+9. **`artifacts/AGENT_STATE.md`** — project state written by the orchestrator
+   after Milestone 1 closed: the Decisions Log, milestone progress, and the
+   measured performance budgets. No agent reads this file.
+10. **`artifacts/STANDUP.md`** — the rolling session log across the three days,
     written in the canonical Entry Grammar (typed one-liner entries under
     dated session headings, with loop counters and the ✅-marked Docs Writer
     queue).
@@ -90,8 +93,7 @@ Read these in order for the clearest picture:
     - `bugs/bug-001…002-*.md` — one file per bug filed during the milestone
     - `reviews/` — the risk review (security + performance lenses) and the CEO
       planning verdict, plus the milestone-completion UX review, the risk
-      implementation review, the validation and completion records, and the
-      retrospective
+      implementation review, and the close record
   - `one-off/` — where `/agent-task` work would land (empty in this fixture)
 
 ## Deliberate Omissions
