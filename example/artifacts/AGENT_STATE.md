@@ -29,7 +29,7 @@ Decisions worth carrying past the milestone that produced them.
 
 ## Performance Budget Tracking
 
-Targets set by Architecture in `milestone-1-task-crud/architecture.md` § Performance Budget. Current values measured by the Risk agent at the M1 completion check.
+Targets set by Architecture in `milestone-1-task-crud/architecture.md` § Performance Budget. Current values measured at the M1 risk implementation review (`reviews/risk-impl.md`, CEO agent) and transcribed by the orchestrator.
 
 | Metric | Target | Current | Status | Measured |
 |---|---|---|---|---|

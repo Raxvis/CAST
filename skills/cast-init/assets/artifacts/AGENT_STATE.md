@@ -58,7 +58,7 @@ One row per milestone, updated at planning approval and at completion.
 
 ## Performance Budget Tracking
 
-Targets are set by Architecture in the milestone's `architecture.md` → Performance Budget. Current values are measured by the Risk agent at the milestone-completion check (recorded in `reviews/risk-impl.md`) and transcribed here by the orchestrator, when the plan flagged one.
+Targets are set by Architecture in the milestone's `architecture.md` → Performance Budget. Current values are measured at the milestone-completion risk implementation review (recorded in `reviews/risk-impl.md` by the CEO) and transcribed here by the orchestrator, when the plan flagged one.
 
 | Metric | Target | Current | Status | Measured |
 |---|---|---|---|---|

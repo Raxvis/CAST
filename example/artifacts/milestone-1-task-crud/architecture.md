@@ -287,7 +287,7 @@ There are no network integrations, background services, or other processes in M1
 | `list` latency at 1,000 rows | < 100 ms | Must use `idx_tasks_completed`, not a table scan (CEO Condition 2) |
 | DB file size at 1,000 rows | < 1 MB | ISO-8601 TEXT timestamps accepted within this budget |
 
-The Risk Agent measures these targets at the milestone-completion check and fills the Current/Status columns in `artifacts/AGENT_STATE.md` → Performance Budget Tracking.
+The CEO agent measures these targets at the milestone-completion risk implementation review; the orchestrator fills the Current/Status columns in `artifacts/AGENT_STATE.md` → Performance Budget Tracking.
 
 ---
 

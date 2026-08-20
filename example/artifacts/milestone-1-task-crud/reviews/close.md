@@ -44,9 +44,9 @@ Deferred is a held-open state, not terminal. Product re-triaged BUG-002 at this 
 
 | Task | Closed Via | Reviewer Evidence | Disposition | Notes |
 |------|-----------|-------------------|-------------|-------|
-| T-1 — Task type, SQLite schema, migration runner | Step 3b | Handoff entry #3 | APPROVED | All 8 criteria Met. CEO Conditions 1 (parameterized SQL) and 2 (WAL + index) verified in the migration. |
-| T-2 — `add` command | Step 3b | Handoff entry #3 | APPROVED | All 6 criteria Met. CEO Condition 1 verified on the insert path. |
-| T-3 — `list` command | Step 3b | Handoff entry #6 | APPROVED | All 7 criteria Met after the BUG-001 fix (loop 1/3). Red→green evidence verified against `9d4b1c7` (fail) → `a8f3d12` (pass). BUG-001 advanced Fixed → Verified → Closed at this checkpoint. |
+| T-1 — Task type, SQLite schema, migration runner | Step 3a | Handoff entry #3 | APPROVED | All 8 criteria + Condition lines 1 (parameterized SQL) and 2 (WAL + index) Met with evidence; closed without a Product spawn. |
+| T-2 — `add` command | Step 3a | Handoff entry #3 | APPROVED | All 6 criteria + Condition line 1 Met with evidence on the insert path; closed without a Product spawn. |
+| T-3 — `list` command | Step 3a | Handoff entry #6 | APPROVED | All 7 criteria + Condition line 3 Met with evidence after the BUG-001 fix (loop 1/3). Red→green evidence verified against `9d4b1c7` (fail) → `a8f3d12` (pass). BUG-001 advanced Fixed → Verified → Closed at this checkpoint. |
 | T-4 — `done` and `delete` commands | Step 3b | Handoff entry #3 | APPROVED WITH NOTES | Criterion 6 (missing-id coverage for `done`) disposed as in-scope for M2, not this task — held as written. BUG-002 was filed during milestone smoke testing (not against a T-4 criterion) and triaged Low / Deferred. |
 | T-5 — CLI argument parser wiring | Step 3a | Handoff entry #3 | APPROVED | All 7 criteria Met with evidence; migration-before-dispatch guard confirmed (Condition 3 regression-proof). Closing this task at Step 3a triggered the milestone-completion checkpoint; reviewed here per the batching Step 3a enables. |
 
@@ -145,7 +145,7 @@ No process issues. Every handoff followed the pipeline loop; nothing was escalat
 | Tasks planned | 5 | Task Index in `artifacts/milestone-1-task-crud/README.md` (count of task files) |
 | Tasks completed | 5 | Status fields across `artifacts/milestone-1-task-crud/tasks/task-*.md` |
 | Tasks rejected by Product | 0 | Handoff Logs across `artifacts/milestone-1-task-crud/tasks/task-*.md` (Product → Coder return entries) — average rejections per task: 0 |
-| Loop-backs, and what caused them | 1 | `Loop count` Headers across `tasks/task-*.md` plus the `loop` entries in `artifacts/STANDUP.md` — T-3 looped once (1/3) on BUG-001 (first-run crash), triaged Fix Now, resolved in the same session |
+| Loop-backs, and what caused them | 1 | `Loop count` Headers across `tasks/task-*.md` — T-3 looped once (1/3) on BUG-001 (first-run crash, per its Handoff Log), triaged Fix Now, resolved in the same session |
 | Escalations to the user | 0 | `blocker` entries in `artifacts/STANDUP.md` for this milestone — none recorded |
 | Architecture doc revisions | 1 | `git log --follow artifacts/milestone-1-task-crud/architecture.md` |
 | UI spec revisions | 1 | `git log --follow artifacts/milestone-1-task-crud/ui.md` |

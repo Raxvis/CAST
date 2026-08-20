@@ -211,12 +211,12 @@ Each task file is an instance of `templates/TASK.md`: a self-contained unit of w
 | Planning a milestone | Product creates `artifacts/milestone-{N}-{slug}/` and writes `README.md` + one `tasks/task-{T}-{slug}.md` per task |
 | Documenting architecture for a milestone | Architect writes `artifacts/milestone-{N}-{slug}/architecture.md` |
 | Specifying UI for a milestone | UI writes `artifacts/milestone-{N}-{slug}/ui.md` |
-| Filing risk findings | Risk writes `artifacts/milestone-{N}-{slug}/reviews/risk.md` (both lenses) |
+| Filing risk findings | CEO writes `artifacts/milestone-{N}-{slug}/reviews/risk.md` (both lenses, its risk pass) |
 | Recording a CEO verdict | CEO writes `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |
 | Logging a bug | Reviewer creates `bugs/bug-{XXX}-{slug}.md` in the current milestone (or `artifacts/one-off/bugs/`) and adds its index row to `artifacts/BUGS.md` |
 | Closing a milestone | Product writes `artifacts/milestone-{N}-{slug}/reviews/close.md` in one pass (per-task validation, milestone validation, completion summary, retrospective) |
 | Reviewing implemented UI at milestone completion | UI writes `artifacts/milestone-{N}-{slug}/reviews/ux.md` (UI-flagged milestones only) |
-| Reviewing the implementation for risk at milestone completion | Risk writes `artifacts/milestone-{N}-{slug}/reviews/risk-impl.md` — security controls verified and budgets measured (only when a `risk.md` flag line says Yes) |
+| Reviewing the implementation for risk at milestone completion | CEO writes `artifacts/milestone-{N}-{slug}/reviews/risk-impl.md` — security controls verified and budgets measured (only when a `risk.md` flag line says Yes) |
 | Recording session progress | Any agent appends to `artifacts/STANDUP.md` using its Entry Grammar (both `/agent-code` completion and `/agent-task` completion write entries here) |
 | Updating cross-milestone state tables | The orchestrator appends rows to `artifacts/AGENT_STATE.md` from stages' handoff entries — no agent reads or writes that file |
 | Updating reference documentation | Docs Writer edits the relevant file in `docs/` |

@@ -63,10 +63,11 @@ jobs:
           done
           count=$(ls skills/cast-init/assets/agents/*.md | grep -cv README.md)
           echo "agent files: $count"
-          [ "$count" -eq 8 ] || { echo "expected 8 agents, found $count"; fail=1; }
-          # v3 merged seven v2 agents away. A resurrected file would register a subagent
+          [ "$count" -eq 7 ] || { echo "expected 7 agents, found $count"; fail=1; }
+          # v3 merged eight v2 agents away (risk existed only in a pre-release v3 draft
+          # before folding into ceo). A resurrected file would register a subagent
           # the pipelines no longer invoke, whose instructions contradict the v3 loop.
-          for gone in tester refactor debugger bug-gatherer validator security performance release; do
+          for gone in tester refactor debugger bug-gatherer validator security performance release risk; do
             [ ! -e "skills/cast-init/assets/agents/$gone.md" ] || { echo "removed-in-v3 agent is back: $gone.md"; fail=1; }
           done
           exit $fail
@@ -353,7 +354,7 @@ jobs:
           # CHANGELOG) but never as a live instruction to launch, invoke, or route to one.
           # This replaces the v2-era stale-routing grep, which tested for adjacencies
           # between agents that no longer exist and therefore could never fire.
-          gone='tester|refactor|debugger|bug-gatherer|bug gatherer|validator|release agent'
+          gone='tester|refactor|debugger|bug-gatherer|bug gatherer|validator|release agent|risk agent'
           hits=$(grep -rinE "(launch(es)?|invoke(s)?|spawn(s)?) (the )?(\*\*)?($gone)" \
             README.md CLAUDE.md TROUBLESHOOTING.md skills/ example/ || true)
           if [ -n "$hits" ]; then

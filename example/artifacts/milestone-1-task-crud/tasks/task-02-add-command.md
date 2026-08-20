@@ -68,9 +68,9 @@ inserts a new row into `tasks` with `completed = 0`, `createdAt = new Date().toI
 - **Read next**: Manifest only
 - **Open items**: None
 
-### 3. reviewer -> product — 2026-04-09
+### 3. reviewer -> orchestrator — 2026-04-09
 
-- **Outcome**: Clean review — no Defects, no Issues. Condition 1 verified on the insert path. All 6 criteria Met; routing to Product anyway (Step 3b — this task carries a CEO Approval Condition).
+- **Outcome**: Clean review — no Defects, no Issues. All 6 criteria and the CEO Approval Condition line Met with evidence — closes at Step 3a.
 - **Files touched**: None
 - **Read next**: Manifest only
 - **Open items**: None
@@ -81,10 +81,11 @@ inserts a new row into `tasks` with `completed = 0`, `createdAt = new Date().toI
   - [4] Inserted row has `completed = false` and a valid ISO `createdAt`. — Met — `add.test.ts` › "ISO createdAt, completed false"
   - [5] Vitest suite covers happy path and missing-title error path. — Met — 4 tests in `e3a94f0`
   - [6] No linter or type-check errors introduced. — Met — `pnpm typecheck` clean at `e3a94f0`
+  - [C-1] CEO Approval Condition 1 — all SQL parameterized. — Met — `src/commands/add.ts:14` (`.prepare().run(params)`); `add.test.ts` › "binds params"
 
-### 4. product — task complete — 2026-04-09
+### 4. orchestrator — task complete — 2026-04-09
 
-- **Outcome**: All acceptance criteria met; Status set to Complete.
+- **Outcome**: Step 3a clean close — every criterion and condition line Met with evidence (entry #3); Status set to Complete.
 - **Files touched**: This file (Header Status)
 - **Read next**: —
 - **Open items**: None

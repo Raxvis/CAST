@@ -95,10 +95,10 @@ Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-creat
 | UI specification | `milestone-{N}-{slug}/ui.md` | UI (`/agent-plan` Stage 2b) |
 | Supplemental arch docs (module/system/schema) | `milestone-{N}-{slug}/arch-{slug}.md` | Architect (during planning or engineering) |
 | Supplemental UI specs (screen/component) | `milestone-{N}-{slug}/ui-{slug}.md` | UI (during planning or engineering) |
-| Risk review (security + performance lenses, one file) | `milestone-{N}-{slug}/reviews/risk.md` | Risk (`/agent-plan` Stage 3) |
+| Risk review (security + performance lenses, one file) | `milestone-{N}-{slug}/reviews/risk.md` | CEO (`/agent-plan` Stage 3, its risk pass) |
 | CEO planning verdict | `milestone-{N}-{slug}/reviews/ceo.md` | CEO (`/agent-plan` Stage 4) |
 | UX review of implemented screens | `milestone-{N}-{slug}/reviews/ux.md` | UI (milestone completion; UI-flagged milestones only) |
-| Risk implementation review (controls verified, budgets measured) | `milestone-{N}-{slug}/reviews/risk-impl.md` | Risk (milestone completion; only when a `reviews/risk.md` flag line says Yes) |
+| Risk implementation review (controls verified, budgets measured) | `milestone-{N}-{slug}/reviews/risk-impl.md` | CEO (milestone completion; only when a `reviews/risk.md` flag line says Yes) |
 | Milestone close record (per-task validation, milestone validation, completion summary, retrospective) | `milestone-{N}-{slug}/reviews/close.md` | Product (milestone completion, one pass) |
 | Per-bug report | `milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` (or `one-off/bugs/` for `/agent-task` work) | Reviewer files; Product triages and closes; Coder investigates, fixes, and verifies |
 | Bug index (ID assignment, one-line status per bug, regression checklist) | `artifacts/BUGS.md` | Reviewer adds rows; owners update status column |

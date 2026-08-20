@@ -1,7 +1,7 @@
 # Risk Review — M1: Task CRUD + SQLite Persistence
 
 **Date**: 2026-04-08
-**Reviewer**: Risk Agent (claude-opus-5, `/agent-plan` Stage 3)
+**Reviewer**: CEO Agent — risk lenses (claude-opus-5, `/agent-plan` Stage 3)
 **Inputs**: `../README.md`, `../architecture.md`, `../ui.md`
 
 ---

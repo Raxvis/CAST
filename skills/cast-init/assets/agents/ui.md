@@ -3,7 +3,7 @@ name: ui
 description: "Use at /agent-plan Stage 2b to produce the milestone UI specification — layouts, interaction states, accessibility — and to return the Context Manifest rows each UI-flagged task needs. Also performs the milestone UX review at /agent-code completion for milestones containing UI-flagged tasks."
 model: inherit
 effort: high
-tools: Read, Grep, Glob, Edit, Write
+tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
 <!-- TEMPLATE INSTRUCTIONS

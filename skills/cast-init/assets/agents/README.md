@@ -17,11 +17,11 @@ differentiation comes from the frontmatter `effort:` key. See docs/MODEL_OPTIMIZ
 
 ## What Is This?
 
-Eight specialist agents. Each owns a domain, hands work off through files rather than conversation, and reads a deliberately small slice of the project.
+Seven specialist agents. Each owns a domain, hands work off through files rather than conversation, and reads a deliberately small slice of the project.
 
 **The read set is the whole design.** An agent working a task reads that task file, the entries in its Context Manifest, and whatever the last handoff entry says to read next — nothing else. It appends one capped entry to the task file and replies to the orchestrator with a single routing line. Capped reads in, one line out, so the orchestrating context stays flat across an entire milestone. The full contract is `docs/STAGE_CONTRACT.md`, and it is the only process document an agent ever reads.
 
-**Why eight and not fifteen.** Every agent launch pays a cold context — the agent definition, project memory, the task file, the manifest — before doing any work, and each distinct agent *type* is a separate prompt-cache prefix. A role earns its own agent when it brings **independence**: a different reader, examining work someone else did, where the risk is self-serving judgment. Reviewer reading Coder's diff is independence and is worth its spawn. A separate agent writing tests for code another agent just wrote is not independence — it is a second pass by an equally-invested party, at full cold-context cost. v3 merged those cases into the stages that already held the context, and kept every gate they enforced.
+**Why seven and not fifteen.** Every agent launch pays a cold context — the agent definition, project memory, the task file, the manifest — before doing any work, and each distinct agent *type* is a separate prompt-cache prefix. A role earns its own agent when it brings **independence**: a different reader, examining work someone else did, where the risk is self-serving judgment. Reviewer reading Coder's diff is independence and is worth its spawn. A separate agent writing tests for code another agent just wrote is not independence — it is a second pass by an equally-invested party, at full cold-context cost. Nor is a second reviewer of the same plan: the CEO read the risk review in full minutes after another cold context wrote it, so the risk lenses now run inside the CEO's own pass. v3 merged those cases into the stages that already held the context, and kept every gate they enforced.
 
 ## Agent Roster
 
@@ -35,8 +35,7 @@ Eight specialist agents. Each owns a domain, hands work off through files rather
 | Architect | `architect.md` | T2 | Owns system design: module boundaries, data schemas, cross-module contracts, the performance budget. Returns the manifest rows each task needs. |
 | Docs Writer | `docs-writer.md` | T2 | Owns `docs/`. Drains the documentation queue at milestone completion, at an overflow drain, and at `/agent-task` completion — launched only when entries are pending. |
 | UI | `ui.md` | T3 | Owns visual design, layout, interaction states, accessibility. Performs the milestone UX review. Optional for backend/CLI-only projects. |
-| Risk | `risk.md` | T3 | Reviews the architecture through the security lens and the performance lens in one pass. Sets the two flags that decide whether implementation reviews run at milestone completion. |
-| CEO | `ceo.md` | T3 | The planning gate. Reads across every planning artifact for what falls *between* the specialists, and issues APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED. |
+| CEO | `ceo.md` | T3 | The planning gate. Runs the security and performance lenses over the plan (writing `reviews/risk.md` and its two flags when they apply), reads across every planning artifact for what falls *between* the specialists, and issues APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED. Also runs the flagged implementation reviews at milestone completion. |
 
 **Release is a skill, not an agent** — `/cast-release`. It is checklist execution against files the session can already read, and a spawn to run a checklist is a spawn spent on ceremony.
 
@@ -85,16 +84,12 @@ Agents may add domain-specific sections (checklists, rubrics, output formats). T
         │ application │  (orchestrator, no spawn)
         └──────┬──────┘
                ▼
-         ┌──────────┐
-         │   Risk   │  security lens + performance lens, one pass, two flag lines
-         └────┬─────┘
-              ▼
-         ┌──────────┐
-         │   CEO    │  APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED
-         └──────────┘
+         ┌──────────┐  Part 1: security + performance lenses → risk.md + two flag lines
+         │   CEO    │          (conditional on a security surface / applicable budget)
+         └──────────┘  Part 2: APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED
 ```
 
-Light mode skips 2b and 3 for small, low-risk work — 3 tasks or fewer, no new screens, no security surface, no applicable budget, nothing cross-cutting. The per-task flags pull a skipped stage back in, and the CEO is the backstop.
+Light mode skips 2b and the CEO's risk lenses for small, low-risk work — the five scoping tests in `/agent-plan`. The per-task flags pull skipped work back in, and the CEO is the backstop.
 
 ### Engineering Stage (`/agent-code`)
 
@@ -142,9 +137,8 @@ Same loop, no milestone and no CEO verdict: Coder → Reviewer → validation, w
 1. **Product** defines scope and writes the milestone README plus one task file per task, each seeded with the smallest sufficient Context Manifest. It also sweeps the Deferred backlog and disposes of the previous close record's open actions.
 2. **Architect** and **UI** run in parallel, each producing its document and returning **Manifest Rows** rather than editing task files. UI runs only when a task is UI-flagged.
 3. **2c**: the orchestrator applies both agents' rows to the task files. Single-writer, no spawn.
-4. **Risk** reviews the architecture through both lenses and sets the two implementation-review flags. Runs only when the plan shows a security surface or an applicable performance budget.
-5. **CEO** reads across everything for cross-cutting problems and issues the verdict. REVISION REQUIRED returns the plan to the named agent; a revision that touches the architecture re-runs Risk before the CEO re-review. Cap: 3 revision cycles, then escalate.
-6. After approval, the **orchestrator** backfills the CEO Approval Conditions table and sets the README Status — pure transcription, no spawn.
+4. **CEO** — one launch, two parts: the risk lenses over the architecture (only when the plan shows a security surface or an applicable performance budget; writes `reviews/risk.md` with the two implementation-review flags), then the cross-cutting review and verdict. REVISION REQUIRED returns the plan to the named agent; the CEO's re-review re-runs its lenses when the architecture changed. Cap: 3 revision cycles, then escalate.
+5. After approval, the **orchestrator** backfills the CEO Approval Conditions table and sets the README Status — pure transcription, no spawn.
 
 ### Engineering (`/agent-code`)
 
@@ -153,7 +147,7 @@ Same loop, no milestone and no CEO verdict: Coder → Reviewer → validation, w
 3. **Defects** citing a violated acceptance criterion auto-route back to Coder as Fix Now (Defer is forbidden for them — no triage question exists); the rest go to **Product** for triage (Fix Now returns the task to Coder; Defer and Not a Bug do not block). **Issues** return to Coder. Findings from one review are resolved in one pass.
 4. **Validation**: all criteria `Met` → the orchestrator closes the task (and flips any resolved bug Verified → Closed), no spawn. Anything flagged, amended, or condition-bearing → **Product**.
 5. **Task checkpoint launches no agents** — Status writeback, progress entry, and a `docs` drain only past 10 pending entries.
-6. **Milestone checkpoint**: UI runs the UX review for UI-flagged milestones; Risk runs the implementation review when either flag is Yes; then one **Product** launch closes the milestone — Deferred re-triage, the close record (`reviews/close.md`), CEO-condition verification, Status; Docs Writer drains the queue when entries are pending; the orchestrator records outcomes and archives. Then the user may invoke `/cast-release`.
+6. **Milestone checkpoint**: UI runs the UX review for UI-flagged milestones; the CEO runs the risk implementation review when either flag is Yes; then one **Product** launch closes the milestone — Deferred re-triage, the close record (`reviews/close.md`), CEO-condition verification, Status; Docs Writer drains the queue when entries are pending; the orchestrator records outcomes and archives. Then the user may invoke `/cast-release`.
 
 ### Cross-Reference Rules
 
@@ -161,7 +155,7 @@ Same loop, no milestone and no CEO verdict: Coder → Reviewer → validation, w
 - **Reviewer** cites the specific standard, convention, or document a finding violates.
 - **Product** cites a specific criterion when rejecting.
 - **Architect** records every new dependency in the Decisions Log with what it buys and costs.
-- **Risk** cites a vulnerability category for security findings and a named budget for performance findings.
+- **CEO** cites a vulnerability category for security findings and a named budget for performance findings.
 
 ### Escalation
 
@@ -183,7 +177,7 @@ Escalate to the **user**, not to another agent:
 | What are we building, and is it done? | Product |
 | How is it structured? | Architect |
 | What does it look like? | UI |
-| What could go wrong? | Risk |
+| What could go wrong? | CEO (risk lenses) |
 | Should this plan proceed at all? | CEO |
 | Does the code work? | Coder (writes it and its tests) |
 | Is the code right? | Reviewer (independently) |

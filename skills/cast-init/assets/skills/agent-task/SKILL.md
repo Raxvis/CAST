@@ -2,7 +2,8 @@
 name: agent-task
 description: >-
   Run the CAST mini engineering pipeline (Coder → Reviewer → validation, with Product
-  spawned only when Reviewer's acceptance-criteria check calls for it) for a
+  spawned only when Reviewer's acceptance-criteria check calls for it, and a micro path
+  where the orchestrator itself reviews diffs containing no executable statement) for a
   single self-contained task — bug fixes, typos, single-function refactors, dependency
   bumps — with no milestone, planning artifacts, or CEO verdict. Use when the user asks
   for a small one-off change or invokes /agent-task. Bails out for design work: to
@@ -52,7 +53,7 @@ This skill invokes the following agents. Open any of them for the full role defi
 - [product](../../agents/product.md) — triages filed defects, and validates the finished task against the original task description when Reviewer's criteria check or scope creep calls for it (Step 3b)
 - [docs-writer](../../agents/docs-writer.md) — drains the `docs` queue from `artifacts/STANDUP.md` at the completion checkpoint
 
-This skill explicitly does NOT invoke [architect](../../agents/architect.md), [ui](../../agents/ui.md), [risk](../../agents/risk.md), or [ceo](../../agents/ceo.md). If the task turns out to need any of those, Pre-Flight or Reviewer will halt and tell you to run `/agent-plan` instead.
+This skill explicitly does NOT invoke [architect](../../agents/architect.md), [ui](../../agents/ui.md), or [ceo](../../agents/ceo.md). If the task turns out to need any of those, Pre-Flight or Reviewer will halt and tell you to run `/agent-plan` instead.
 
 ## When to use this skill
 
@@ -93,7 +94,7 @@ This skill orchestrates a mini engineering pipeline by executing the canonical e
 
 Before any work begins:
 
-1. Reads split by reader. The **orchestrator** (this skill's main session) already has `CLAUDE.md` and whatever the project imported in context via the session's memory imports (root `CLAUDE.md` → Memory Imports) — it must not re-read those; it reads only what Pre-Flight needs beyond them: `docs/FILE_CONVENTIONS.md`, and any topic-specific reference doc (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) that applies to the project and is not already imported (mobile projects typically need both `docs/FRONTEND.md` and `docs/MOBILE.md`). The **loop's stages** run as subagents with their own context — they do not inherit this session's reads; they receive project memory plus exactly what the task file's Context Manifest cites, which is why the manifest seeded below must list the convention docs the task needs. v3 ships the Memory Imports list empty, so the manifest is the *only* route by which a stage sees a convention doc — seed it accordingly.
+1. Read only what Pre-Flight needs beyond what the session already has in context (root `CLAUDE.md` and its Memory Imports — do not re-read those): `docs/FILE_CONVENTIONS.md`, plus any applicable topic doc (`docs/FRONTEND.md` / `BACKEND.md` / `CLI.md` / `MOBILE.md`) not already imported. Stages run cold and see only what the task file's Context Manifest cites — so seed the manifest below with every convention doc the task needs; it is a stage's only route to one (rationale: `docs/DESIGN_RATIONALE.md` → "Memory Imports ship empty").
 2. If the task description references a bug ID, look it up in the `artifacts/BUGS.md` index and read its per-bug file.
 3. Read any files named in the task description.
 4. **Scope check.** If the task description implies an architectural change, a new module, a new screen, a new endpoint, or a cross-cutting change, **stop and route the user to the right planning tier**. Do not attempt to inline architect or UI work into a one-off task. For a small feature needing a few design decisions, point at light mode: "This task introduces <specific scope>, which needs a planning pass. Run `/agent-plan light: \"<feature description>\"` — a light run (Product + Architecture + CEO) — then `/agent-code` to implement." For multi-task or cross-cutting scope, point at the full run: "Run `/agent-plan \"<feature description>\"` first, then `/agent-code`."
@@ -109,6 +110,7 @@ Execute the engineering loop defined in `docs/PIPELINE_LOOP.md` — Coder → Re
 Deltas specific to this skill:
 
 - **Every stage** receives the one-off task file path; the Context Manifest and Handoff Log carry everything else — there is no milestone, architecture document, or UI spec.
+- **Micro path — no-logic diffs skip the Reviewer spawn.** After Coder's handoff passes the test-gate pre-check, if the diff touches **no executable statement** — documentation, comments, string typos, whitespace or formatting only; anything compiled or interpreted disqualifies — you (the orchestrator) review the diff yourself instead of launching Reviewer: verify it does exactly what the description says and follows the conventions the manifest cites, then append the handoff entry with the Acceptance Criteria Check and close via Step 3a. Independence holds — Coder, a spawn, wrote the diff; you did not. **Any doubt about whether the diff has logic means the normal Reviewer spawn.** Code never bypasses Reviewer; this path exists only for diffs with no code in them.
 - **Reviewer files defect findings** as per-bug files under `artifacts/one-off/bugs/bug-{XXX}-{slug}.md`, indexed in `artifacts/BUGS.md`.
 - **Reviewer (Step 2)** reviews against project conventions, existing patterns in adjacent code, and any topic-specific doc that applies. If the Reviewer's findings reveal missing design context (e.g., "this change should not exist without a new architecture document" or "this introduces a pattern not used elsewhere"), **stop and instruct the user to run `/agent-plan` to introduce the missing context** — light mode (`/agent-plan light: ...`) when the missing context is a few design decisions, the full run when it is cross-cutting. Do not attempt to retrofit design work into a one-off task.
 - **Reviewer (Step 2)** appends the **Acceptance Criteria Check** to its approval entry, one line per criterion in the one-off task file. Because `/agent-task` derives its criteria from a free-form task description, Reviewer marks a criterion `Product judgment` whenever the description's intent is open to reading — a one-off task's criteria are less precise than a planned task's, so lean toward Product judgment here rather than assuming.
@@ -133,14 +135,9 @@ After the task passes validation (Step 3a or 3b):
 ### Error Handling
 
 - If the task description is ambiguous enough that Coder cannot proceed without a design decision, stop and ask the user to clarify before continuing. Do not guess.
-- If the change turns out to touch more modules than initially expected, stop and recommend running `/agent-plan` for a proper milestone scope (light mode if it is still small — 3 tasks or fewer, no new screens, no security surface; the full run if it has grown beyond that). Do not attempt to finish a large change inside a one-off task — that defeats the purpose of the planning gate.
+- If the change turns out to touch more modules than initially expected, stop and re-apply the Pre-Flight scope check (step 4) — route to the right planning tier rather than finishing a large change inside a one-off task.
 - Loop-cap escalation (`[MAX_LOOP_COUNT]`) follows `docs/PIPELINE_LOOP.md`. On an Environment Issue, this skill escalates to the user directly and the user decides whether to continue.
 
-### Scope Boundaries (what this skill will NOT do)
+### Scope Boundaries
 
-`/agent-task` explicitly does not:
-- Produce milestone definitions, milestone task files, architecture documents, UI specs, risk reviews, or CEO verdicts. Those are outputs of `/agent-plan`.
-- Write files inside any `artifacts/milestone-{N}-{slug}/` directory. Those are owned by `/agent-plan` and `/agent-code` outputs — one-off work stays under `artifacts/one-off/`.
-- Write any work artifact to `docs/`. `docs/` is reference-only.
-
-If the work you are doing needs any of the above, run `/agent-plan` first. The planning gate exists for a reason.
+`/agent-task` produces no planning artifacts (milestone definitions, architecture documents, UI specs, risk reviews, CEO verdicts — those are `/agent-plan`'s), writes nothing inside any `artifacts/milestone-{N}-{slug}/` directory (one-off work stays under `artifacts/one-off/`), and writes no work artifact to `docs/`. If the work needs any of those, the Pre-Flight scope check routes to `/agent-plan`.

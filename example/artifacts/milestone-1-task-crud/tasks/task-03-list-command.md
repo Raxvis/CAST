@@ -110,10 +110,11 @@ on first invocation rather than throwing — this is the path BUG-001 surfaced.
   - [5] Query uses parameterized binding for the `completed` filter. — Met — `src/commands/list.ts:22`
   - [6] Vitest suite covers: empty DB, mixed open/completed, `--all` flag, first-run migration. — Met — 7 tests in `a8f3d12`
   - [7] No linter or type-check errors introduced. — Met — `pnpm typecheck` clean at `a8f3d12`
+  - [C-3] CEO Approval Condition 3 — migrations run on first invocation of any command. — Met — `ensureMigrations()` at every command entry (`a8f3d12`); `list.test.ts` › "fresh machine first run"
 
-### 7. product — task complete — 2026-04-09
+### 7. orchestrator — task complete — 2026-04-09
 
-- **Outcome**: All acceptance criteria met; Status set to Complete. BUG-001 advanced Fixed → Verified (Closed at milestone sign-off).
+- **Outcome**: Step 3a clean close — every criterion and condition line Met with evidence (entry #6); Status set to Complete. BUG-001 advanced Fixed → Verified (Closed at milestone sign-off).
 - **Files touched**: This file (Header Status), `../bugs/bug-001-list-first-run-crash.md`, `artifacts/BUGS.md` (index row)
 - **Read next**: —
 - **Open items**: None

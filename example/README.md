@@ -29,13 +29,13 @@ See `CLAUDE.md` for the full project overview and `docs/PRD.md` for requirements
    Every Coder handoff carries a **verbatim test-results block** (the test gate
    — Reviewer rejects an entry without one), and every Reviewer approval carries
    an **Acceptance Criteria Check**, one line per criterion with its evidence.
-   T-5 closed on that alone (Step 3a: 7/7 Met, no Product spawn); T-1 through
-   T-4 still routed to Product (Step 3b) because each carries a CEO Approval
-   Condition, and T-4 shows a `Product judgment` flag and how Product disposed
-   of it.
+   T-1, T-2, T-3, and T-5 closed on that alone (Step 3a — every criterion, and
+   each task's CEO Approval Condition lines, Met with evidence; no Product
+   spawn); only T-4 routed to Product (Step 3b), and it shows a
+   `Product judgment` flag and how Product disposed of it.
 4. The milestone-completion checkpoint fired on 2026-04-10: the UI agent
    reviewed the implemented command surface (UX review, APPROVED WITH NOTES);
-   the Risk agent ran the implementation review (both lenses, no findings);
+   the CEO agent ran the risk implementation review (both lenses, no findings);
    then a single Product launch closed the milestone end-to-end — re-triaging
    the Deferred BUG-002 (held Deferred into M2 — Deferred is an open, held
    state, not terminal), writing the close record (`reviews/close.md`,

@@ -10,7 +10,7 @@ The current template version is recorded in four synchronized locations: the roo
 
 ## [3.0.0] — 2026-08-19
 
-**Breaking.** The roster goes from 15 agents to 8, the engineering loop from four stages to two, and every agent file is rewritten. A clean task's fixed setup cost drops from ~72,000 tokens (v2.1) to **~10,000**.
+**Breaking.** The roster goes from 15 agents to 7, the engineering loop from four stages to two, and every agent file is rewritten. A clean task's fixed setup cost drops from ~72,000 tokens (v2.1) to **~10,000**.
 
 ### Why this release exists
 
@@ -27,9 +27,9 @@ Two things stood out. **The largest single item in every stage's context was the
 
 The organising idea of v3: **a role earns its own agent when it brings *independence* — a different reader examining work someone else did, where the risk is self-serving judgment.** Reviewer reading Coder's diff is independence and is worth its spawn. A separate agent writing tests for code another agent just wrote is not independence; it is a second pass by an equally-invested party at full cold-context cost. Every merge below is a case of the second kind, and **every gate the merged agent enforced is preserved as an evidence requirement.**
 
-### Changed — the roster: 15 agents → 8
+### Changed — the roster: 15 agents → 7
 
-`product`, `architect`, `ui`, `risk`, `ceo`, `coder`, `reviewer`, `docs-writer`.
+`product`, `architect`, `ui`, `ceo`, `coder`, `reviewer`, `docs-writer`.
 
 | Removed | Merged into | Reasoning |
 |---|---|---|
@@ -37,7 +37,7 @@ The organising idea of v3: **a role earns its own agent when it brings *independ
 | `refactor` | `coder` | "Behavior-preserving restructuring within the flagged Issue" is Coder's own job on a loop-back. A separate 1,942-token definition plus a spawn to do what Coder does. |
 | `debugger` | `coder` | Two cold contexts on one defect, the second re-deriving the first's context. Root-cause investigation is now a step inside Coder's defect pass, required whenever the mechanism is not obvious from the diff — with root cause, affected modules, and the alternatives considered written to the bug file **before** any code changes. |
 | `bug-gatherer` | `reviewer` | It re-read the task to transcribe a finding Reviewer had already written into a template. Its documented five-step workflow ended with "read the report back to the reporter and ask if it is accurate" — impossible for a subagent with no channel to Reviewer. Reviewer holds the finding and writes the bug file. |
-| `security` + `performance` | `risk` (new) | Two agents reading the same architecture document in the same parallel round, producing two files of the same shape, each ending in one flag line. **The two lenses stay distinct in the output** — that is what mattered; the second spawn was not. One review at `reviews/risk.md` with a Security section, a Performance section, and both flag lines. |
+| `security` + `performance` | `ceo` | Two agents reading the same architecture document in the same parallel round, producing two files of the same shape, each ending in one flag line — and then the CEO reading their output in full minutes later. **The two lenses stay distinct in the output** — that is what mattered; the extra spawns were not. The CEO's risk pass writes the one review at `reviews/risk.md` (Security section, Performance section, both flag lines) before its cross-cutting review, and runs the flagged implementation review at milestone completion. The independence that earns a spawn is author-vs-reviewer; two reviewers of the same plan share one launch. (A pre-release v3 draft carried the lenses as a standalone `risk` agent before folding it into `ceo`.) |
 | `validator` | `product` + orchestrator | Its bookkeeping (AGENT_STATE rows, archival) is orchestrator file-writing. The retrospective went to Product. Its conflict-resolution protocol had time-based triggers — "after 7 days blocked", "conflicts older than 14 days", "questions pending more than 2 sessions" — that can never fire in a pipeline where a milestone runs in one or two sessions. Unresolved specialist disagreements now escalate to **the user**, which is whose decision they were. |
 | `release` | `/cast-release` skill | Checklist execution against files the session can already read. An agent spawn to run a checklist is a spawn spent on ceremony. Same gates, now in-session. |
 
@@ -133,12 +133,16 @@ Claude Code agent frontmatter supports `effort: low | medium | high | xhigh | ma
 - **Planning passes paths, not bodies.** `/agent-plan` stages read their own inputs; the orchestrator no longer copies the README and task files into invocations (an extra copy per receiving stage, plus permanent orchestrator-context weight).
 - **`/agent-task` skips the redundant final suite run** when no commit landed after Coder's last full-suite run — the verbatim block in the Handoff Log is the record.
 - **Risk no longer writes `artifacts/AGENT_STATE.md`** (that file is orchestrator-written by contract): measured budget values are recorded in `reviews/risk-impl.md` and transcribed by the orchestrator at the record-and-archive step.
-- **Per-instance and per-spawn trims**: task files no longer restate the handoff-entry format `docs/STAGE_CONTRACT.md` §2 owns; Reviewer cites the canonical severity scale in `artifacts/BUGS.md` instead of duplicating it; the four design templates drop their never-checked Acceptance Checklists and the "CEO Verdict — do not sign off here" ceremony sections (the verdict lives in `reviews/ceo.md`; implementation gates live in Reviewer's checklist and the close record).
+- **Per-instance and per-spawn trims**: task files no longer restate the handoff-entry format `docs/STAGE_CONTRACT.md` §2 owns; Reviewer cites the canonical severity scale in `artifacts/BUGS.md` instead of duplicating it; the four design templates drop their never-checked Acceptance Checklists and the "CEO Verdict — do not sign off here" ceremony sections (the verdict lives in `reviews/ceo.md`; implementation gates live in Reviewer's checklist and the close record); `CEO_REVIEW.md` instances drop the verdict legend (meanings live in `agents/ceo.md`); `MILESTONE_DEFINITION.md`'s References section keeps only the variable PRD row (the fixed layout is `docs/FILE_CONVENTIONS.md`'s); `MILESTONE_CLOSE.md` drops its Sign-Off section (the Header Status and Summary are the sign-off).
+- **The STANDUP loop mirror is gone.** The task Header's `Loop count` is the single live counter (equally durable on disk); the Entry Grammar drops the `loop` type, and the close record's loop-back metric reads the Headers plus Handoff Logs.
+- **`/agent-task` micro path.** A diff containing no executable statement — docs, comments, string typos, formatting — is reviewed by the orchestrator itself (which did not write it; Coder, a spawn, did) instead of paying a Reviewer launch. Anything with logic takes the normal Reviewer spawn; any doubt means Reviewer. The archetypal typo fix drops to one spawn.
+- **The orchestration loop-doc stops restating agent bodies.** `docs/PIPELINE_LOOP.md`'s Step 1/2 now carry only what the orchestrator acts on (launch, gate, routing) with pointers to `coder.md`/`reviewer.md` for stage behavior; `/agent-task` states its scope gate twice instead of four times; `/agent-plan` names the five scoping tests once and cites them from light mode and both conditional stages.
+- **UI gains Bash.** The UX review instructs verification against the running implementation; the `ui` agent's toolset previously could not launch anything.
 
 ### Changed — templates, CI, fixture
 
 - **Templates**: `(required, scales)` markers from 2.2.0 retained; Revision History blocks removed; `CEO_REVIEW.md` merges Sections 4 and 5 into a single **Risk Posture**; `TASK.md` documents the Test Results block.
-- **CI**: agent count 15 → 8, plus a guard that fails if any of the seven removed agents reappears — a resurrected file would register a subagent the pipelines no longer invoke, carrying instructions that contradict the v3 loop.
+- **CI**: agent count 15 → 7, plus a guard that fails if any of the eight removed agents (or the pre-release `risk` draft) reappears — a resurrected file would register a subagent the pipelines no longer invoke, carrying instructions that contradict the v3 loop.
 - **`example/`**: regenerated for the v3 flow. The `list` defect (BUG-001) now shows the honest-failure handoff (Coder hands off a failing test run rather than fixing blind), Reviewer filing the bug directly, Product triaging, and Coder investigating with alternatives recorded before fixing — the whole defect loop in four spawns.
 
 ### Migration

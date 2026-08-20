@@ -1,7 +1,7 @@
 # Risk Implementation Review — M1: Task CRUD + SQLite Persistence
 
 **Date**: 2026-04-10
-**Reviewer**: Risk Agent (claude-opus-5, `/agent-code` milestone-completion checkpoint)
+**Reviewer**: CEO Agent — risk lenses (claude-opus-5, `/agent-code` milestone-completion checkpoint)
 **Diff reviewed**: commits prefixed `M1-T01` … `M1-T05` (`3f6c2a9`…`2b6d0e7`)
 **Triggered by**: both flag lines in `risk.md` set to Yes
 

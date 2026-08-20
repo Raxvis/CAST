@@ -104,7 +104,7 @@ One launch, one record, in one sequential pass: re-triage the Deferred backlog (
 | Field | Source |
 |---|---|
 | Tasks planned / completed / rejected | Task Index in the README; Status fields and Handoff Logs across `tasks/task-*.md` |
-| Loop counts and what caused them | `Loop count` Headers plus the `loop` entries in `artifacts/STANDUP.md` |
+| Loop counts and what caused them | `Loop count` Headers across `tasks/task-*.md`; causes from the Handoff Log entries that sent each task back |
 | Architecture / UI doc revisions | Git log for `architecture.md` and `ui.md` in the milestone directory |
 | Manifest patches during engineering | Handoff Log entries noting a Context Manifest addition (the insufficient-manifest fallback in `docs/STAGE_CONTRACT.md`) |
 | Actual duration | First-to-last session dates for this milestone in `artifacts/STANDUP.md` |

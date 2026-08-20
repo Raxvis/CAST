@@ -12,9 +12,9 @@
 
 ![Template version](https://img.shields.io/badge/template-v3.0.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
-![Agents](https://img.shields.io/badge/agents-8-orange)
+![Agents](https://img.shields.io/badge/agents-7-orange)
 
-CAST gives you a real team structure with clear handoffs, typed artifacts, and a review gate you can't accidentally skip. The name is a double pun: a *cast* is a group of specialists each playing a defined role, and the pipeline runs in *stages* — planning (Product → Architecture + UI → Risk → CEO sign-off) followed by engineering (Coder → Reviewer, with defect and issue routing).
+CAST gives you a real team structure with clear handoffs, typed artifacts, and a review gate you can't accidentally skip. The name is a double pun: a *cast* is a group of specialists each playing a defined role, and the pipeline runs in *stages* — planning (Product → Architecture + UI → CEO risk-lens review and sign-off) followed by engineering (Coder → Reviewer, with defect and issue routing).
 
 ```text
 Planning stage — /agent-plan
@@ -22,7 +22,7 @@ Planning stage — /agent-plan
     feature request
           │
           ▼
-    Product  →  Architecture + UI  →  Risk  →  CEO verdict
+    Product  →  Architecture + UI  →  CEO (risk lenses + verdict)
                                                                       │
                                                                       ▼
                                                          APPROVED (with conditions)
@@ -48,7 +48,7 @@ Engineering stage — /agent-code
                                                                       ▼
                                           milestone checkpoint:
                                           →  UX review (UI, UI-flagged milestones only)
-                                          →  risk implementation review (Risk, if flagged)
+                                          →  risk implementation review (CEO, if flagged)
                                           →  milestone close — one Product launch
                                              (Deferred re-triage + close record + CEO
                                               conditions + Status)
@@ -64,7 +64,7 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 
 **What you get out of the box:**
 
-- **8 specialist subagents** defaulting to `model: inherit` — each runs on the session model — with effort matched to the workload (`high` on the planning stages and the review gate, `medium` on implementation, `low` on utility). Every role that earned its own cold context has one; the seven v2 roles that did not were merged into the stages that already held their context, with every gate they enforced preserved.
+- **7 specialist subagents** defaulting to `model: inherit` — each runs on the session model — with effort enforced per role by frontmatter (`high` on the planning stages and the review gate, `medium` on implementation, `low` on utility). Every role that earned its own cold context has one; the eight v2 roles that did not were merged into the stages that already held their context, with every gate they enforced preserved.
 - **Three pipeline skills** — `/agent-plan`, `/agent-code`, `/agent-task` — as plain Markdown orchestration scripts Claude Code discovers at session start, plus two maintenance skills: **`/cast-doctor`** (health check, model-aware documentation pruning, coverage gaps) and **`/cast-release`** (gate verification, versioning, changelog, GO/NO-GO).
 - **A hard `docs/` / `templates/` / `artifacts/` split** — `docs/` holds reference material (requirements, conventions), `templates/` holds reusable document skeletons, and `artifacts/` holds live work **grouped by milestone**: one directory per milestone containing its README, design docs, reviews, one file per task, and one file per bug. The CEO gate, placeholder check, and smoke test all enforce the split.
 - **Minimal-context handoffs** — every task is an isolated file carrying its own Context Manifest (the complete read set an agent needs) and Handoff Log (the capped, fixed-format record each stage appends). Agents ship the next agent the least context required, through the task file — never through conversation or whole-directory re-reads — and reply to the orchestrator with a single routing line, so the orchestrating context stays flat across a whole milestone.
@@ -111,7 +111,7 @@ The skill reads all template files from its bundled payload — no network acces
 2. **Propose a migration plan** — numbered list of every file it will create, rename, update, or skip.
 3. **Wait for your approval** — nothing is touched until you explicitly approve.
 4. **Execute the plan** — install agents, pipeline skills, docs, and artifacts, substituting detected project values.
-5. **Validate** — verify all 8 agents exist, the docs/artifacts split is clean, and YAML frontmatter is valid.
+5. **Validate** — verify all 7 agents exist, the docs/artifacts split is clean, and YAML frontmatter is valid.
 
 This works for greenfield projects, existing projects with no agentic workflow, and existing projects with a mature agentic workflow you want to migrate to CAST.
 
@@ -181,7 +181,7 @@ Each file defines one agent role with YAML frontmatter for Claude Code auto-disc
 
 ### skills/ (pipeline skills)
 
-Each subdirectory defines one pipeline skill that orchestrates a multi-agent workflow stage end-to-end. When installed to `.claude/skills/` in the target project, Claude Code registers them as skills named after the directory (e.g. `agent-plan/SKILL.md` becomes `/agent-plan`). Three pipelines ship with this template, plus two maintenance skills — `/cast-doctor` (install health check and model-aware documentation audit) and `/cast-release` (release gates, versioning, changelog): `/agent-plan` runs the Planning Stage (Product → Architecture + UI → Risk → CEO), `/agent-code` runs the Engineering Stage (Coder → Reviewer, with Defects routed through Product triage and Issues back to Coder — a clean task is two spawns), and `/agent-task` runs a mini engineering pipeline (Coder → Reviewer → validation) for a single one-off task without requiring a milestone, planning artifacts, or a CEO verdict — use it for bug fixes, typos, small refactors, and dependency bumps, not for new modules or cross-cutting changes. Between the two, `/agent-plan light: <feature>` runs a light planning mode (Product + Architecture + CEO) for a small feature that needs a few design decisions without full milestone ceremony — it also engages automatically when Stage 1 scoping finds 3 tasks or fewer with no new screen set, no security-sensitive scope, no applicable performance budget, and nothing cross-cutting.
+Each subdirectory defines one pipeline skill that orchestrates a multi-agent workflow stage end-to-end. When installed to `.claude/skills/` in the target project, Claude Code registers them as skills named after the directory (e.g. `agent-plan/SKILL.md` becomes `/agent-plan`). Three pipelines ship with this template, plus two maintenance skills — `/cast-doctor` (install health check and model-aware documentation audit) and `/cast-release` (release gates, versioning, changelog): `/agent-plan` runs the Planning Stage (Product → Architecture + UI → CEO), `/agent-code` runs the Engineering Stage (Coder → Reviewer, with Defects routed through Product triage and Issues back to Coder — a clean task is two spawns), and `/agent-task` runs a mini engineering pipeline (Coder → Reviewer → validation) for a single one-off task without requiring a milestone, planning artifacts, or a CEO verdict — use it for bug fixes, typos, small refactors, and dependency bumps, not for new modules or cross-cutting changes. Between the two, `/agent-plan light: <feature>` runs a light planning mode (Product + Architecture + CEO) for a small feature that needs a few design decisions without full milestone ceremony — it also engages automatically when Stage 1 scoping finds 3 tasks or fewer with no new screen set, no security-sensitive scope, no applicable performance budget, and nothing cross-cutting.
 
 ### docs/
 
@@ -306,7 +306,7 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 
 Each agent file has its model set in the YAML frontmatter — there is no `[AI_MODEL]` placeholder. Every agent defaults to `model: inherit`, running on whatever model the invoking session uses, and is optimized for the Claude Opus family (`claude-opus-5` is the preferred executing model; `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` are supported); workload differentiation comes from the recommended reasoning effort stated in each agent's **Model Configuration** section rather than model tier. Edit the `model:` line in an individual agent file if you need an explicit pin, and see `docs/MODEL_OPTIMIZATION.md` for per-model behavior profiles and the upgrade checklists through Opus 4.8 → Opus 5.
 
-**Right-size models at install time.** `inherit` is the safe default, but per-agent pins are the roster's main cost lever, and `/cast-init` proposes an assignment during adoption. A sensible split: keep the judgment-heavy gates (CEO, Architect, Reviewer, Risk) on the most capable model you have — e.g. `opus`, or a Fable/Mythos-class model if your account serves one; run Product, UI, and Coder on `sonnet`; and drop Docs Writer to `haiku`. Note the ordering, though: **spawn count dominates both model tier and effort**, and v3's roster is already right-sized in that dimension. Claude Code accepts the `opus` / `sonnet` / `haiku` aliases or full model IDs in agent frontmatter.
+**Right-size models at install time.** `inherit` is the safe default, but per-agent pins are the roster's main cost lever, and `/cast-init` proposes an assignment during adoption. A sensible split: keep the judgment-heavy gates (CEO, Architect, Reviewer) on the most capable model you have — e.g. `opus`, or a Fable/Mythos-class model if your account serves one; run Product, UI, Coder, and Docs Writer on `sonnet` (do not pin Docs Writer to `haiku` — a below-the-Inference-Bar pin permanently blocks `/cast-doctor`'s Tier B doc prunes; see `docs/MODEL_OPTIMIZATION.md`). Note the ordering, though: **spawn count dominates both model tier and effort**, and v3's roster is already right-sized in that dimension. Claude Code accepts the `opus` / `sonnet` / `haiku` aliases or full model IDs in agent frontmatter.
 
 | Placeholder | Description | Example value |
 |---|---|---|
@@ -361,7 +361,7 @@ The example deliberately omits `.claude/` (those files are unchanged copies of t
 With agent files in `.claude/agents/`, Claude Code can invoke them in three ways:
 
 1. **Automatic delegation** — Claude routes tasks to the matching subagent based on the `description` field in each agent's YAML frontmatter (e.g., asking "review this code" automatically delegates to the reviewer agent).
-2. **Explicit request** — Ask Claude directly: "Use the coder agent to implement this feature" or "Have the risk agent audit this module."
+2. **Explicit request** — Ask Claude directly: "Use the coder agent to implement this feature" or "Have the ceo agent run its risk lenses over this module."
 3. **Management** — Use the `/agents` command to view, create, and manage all available subagents.
 
 ### Agent Reference by Task Type
@@ -371,7 +371,7 @@ With agent files in `.claude/agents/`, Claude Code can invoke them in three ways
 | Define or update requirements | `product` |
 | Design system architecture | `architect` |
 | Design UI screens or components | `ui` |
-| Audit for security or performance risk | `risk` |
+| Audit for security or performance risk | `ceo` (risk lenses) |
 | Final planning-stage review and sign-off | `ceo` |
 | Implement features or fixes | `coder` |
 | Write or run tests | `coder` (Coder writes and runs the tests for what it implements) |
@@ -387,7 +387,7 @@ With agent files in `.claude/agents/`, Claude Code can invoke them in three ways
 
 | Skill | Purpose |
 |---|---|
-| `/agent-plan <feature>` | Run the Planning Stage end-to-end. Product → Architecture + UI → Risk → CEO. Produces planning documents and a CEO verdict. No code is written. **Light mode** (`/agent-plan light: <feature>`, or `single:` for the one-task case) plans a small feature with Product + Architecture + CEO only — same milestone layout, minimal ceremony. It also engages automatically when Stage 1 scoping finds 3 tasks or fewer, no new screen set, no security-sensitive scope, no applicable performance budget, and nothing cross-cutting; any one of those failing means the full run, and the per-task flags still pull a skipped stage back in. |
+| `/agent-plan <feature>` | Run the Planning Stage end-to-end. Product → Architecture + UI → CEO (risk lenses + verdict). Produces planning documents and a CEO verdict. No code is written. **Light mode** (`/agent-plan light: <feature>`, or `single:` for the one-task case) plans a small feature with Product + Architecture + CEO only — same milestone layout, minimal ceremony. It also engages automatically when Stage 1 scoping finds 3 tasks or fewer, no new screen set, no security-sensitive scope, no applicable performance budget, and nothing cross-cutting; any one of those failing means the full run, and the per-task flags still pull a skipped stage back in. |
 | `/agent-code <milestone-or-task>` | Run the Engineering Stage for a CEO-approved milestone. Coder (implement, test, commit) → Reviewer, with Defects filed by Reviewer and routed through Product triage, and Issues routed back to Coder — then validation. A clean task is two spawns. Reviewer's per-criterion Acceptance Criteria Check decides validation: every criterion (and CEO Approval Condition line) Met with evidence and the orchestrator closes the task with no agent launch — flipping any resolved bug Verified → Closed itself; a flagged criterion or condition line, or a mid-task amendment, launches Product. The task checkpoint launches no agents — just the Status writeback, plus a `docs`-queue drain only once 10 entries are pending. When every task is Complete or Deferred, the milestone checkpoint runs the UX review (UI-flagged milestones), the risk implementation review (flagged milestones), one Product launch that closes the milestone (Deferred re-triage, the close record covering every task, CEO Approval Condition verification, Status), the `docs` drain (when entries are pending), and the orchestrator's outcome records and archival. |
 | `/agent-task <task description>` | Run a mini engineering pipeline for a single one-off task without requiring a milestone or CEO verdict. Coder → Reviewer, with the same Defect/Issue routing as `/agent-code`. Use for bug fixes, typos, small refactors, and dependency bumps — NOT for new modules or cross-cutting changes (it bails out to `/agent-plan`, whose light mode covers the small-feature middle ground). |
 | `/cast-doctor` (or `/cast-doctor checkup`) | Run a health check on the CAST install: verify structural and state invariants, prescribe model-aware documentation pruning (two tiers, gated on the Context Inference Bar in `docs/MODEL_OPTIMIZATION.md`), and find documentation coverage gaps. Writes `artifacts/DOCTOR.md`; treats only user-approved prescriptions. Run after model changes or every few milestones. |
@@ -403,7 +403,7 @@ Agents communicate through shared documents. When one agent completes work, the 
 - **Planning architecture documents** at `artifacts/milestone-{N}-{slug}/architecture.md` are the contract between Architect and Coder for a specific milestone — reaching engineering agents through each task file's Context Manifest, which cites the exact sections a task needs. Templates live at `templates/ARCH_MODULE.md`, `templates/ARCH_SYSTEM.md`, and `templates/ARCH_DATA_SCHEMA.md`.
 - **Planning UI specifications** at `artifacts/milestone-{N}-{slug}/ui.md` are the contract between UI and Coder. Template lives at `templates/UI_SPEC.md`. Produced only when the `ui` agent is installed — a backend/CLI project that opted out of `ui` runs both pipelines without a UI spec, and `/agent-code` does not demand one.
 - **CEO planning verdicts** at `artifacts/milestone-{N}-{slug}/reviews/ceo.md` gate entry into the engineering stage via a single `**Verdict**: <APPROVED | APPROVED WITH CONDITIONS | REVISION REQUIRED>` line that `/agent-code` Pre-Flight parses; on APPROVED WITH CONDITIONS the conditions are backfilled into the milestone README's CEO Approval Conditions table and referenced from the affected task files' Context Manifests. Template lives at `templates/CEO_REVIEW.md`.
-- **Milestone-close records**: UI writes the UX review for UI-flagged milestones (`templates/UX_REVIEW.md`), Risk writes the implementation review when flagged, and one Product launch writes the close record — per-task validation, milestone validation, completion summary (Status `Complete`, or `Complete with Deferrals` when Deferred items survive re-triage), and retrospective — under the milestone's `reviews/` directory (`templates/MILESTONE_CLOSE.md`).
+- **Milestone-close records**: UI writes the UX review for UI-flagged milestones (`templates/UX_REVIEW.md`), the CEO writes the risk implementation review when flagged, and one Product launch writes the close record — per-task validation, milestone validation, completion summary (Status `Complete`, or `Complete with Deferrals` when Deferred items survive re-triage), and retrospective — under the milestone's `reviews/` directory (`templates/MILESTONE_CLOSE.md`).
 
 ### Minimum Viable Agent Set
 
@@ -422,10 +422,9 @@ These three run `/agent-task` on their own. There is no separate Tier for it in 
 
 **Tier 3 — Required for `/agent-plan` and `/agent-code`:**
 
-The planning pipeline hard-wires a flow ending at a CEO sign-off. Keeping either skill means keeping all three on top of Tiers 1–2:
+The planning pipeline hard-wires a flow ending at a CEO sign-off. Keeping either skill means keeping both on top of Tiers 1–2:
 - **UI** — produces the UI specification during planning
-- **Risk** — reviews the architecture through the security and performance lenses, and sets the two implementation-review flags `/agent-code` reads at milestone completion
-- **CEO** — the planning gate. `/agent-plan` has no meaning without it; `/agent-code` pre-flight reads its verdict file before any task runs.
+- **CEO** — the planning gate. Runs the security and performance lenses over the plan (setting the two implementation-review flags `/agent-code` reads at milestone completion), then issues the verdict. `/agent-plan` has no meaning without it; `/agent-code` pre-flight reads its verdict file before any task runs.
 
 If you do not want a CEO planning gate, **delete `/agent-plan`, `/agent-code`, and `ceo.md` together** — they are a unit. `/agent-task` remains functional on its own and reads no verdict. Keeping `/agent-plan` or `/agent-code` while deleting the CEO agent produces a broken pipeline.
 
@@ -463,7 +462,7 @@ All payload paths below are relative to `skills/cast-init/assets/` in this repo.
 |---|---|
 | `root/CLAUDE.md` | Top-level context file read first by every agent; defines project identity, structure, conventions, and run commands |
 
-### agents/ → `.claude/agents/` (8 agents + README)
+### agents/ → `.claude/agents/` (7 agents + README)
 
 > **Note:** `agents/README.md` is metadata about the directory. It should NOT be copied to `.claude/agents/` in the target project — Claude Code would try to register it as a subagent.
 
@@ -472,8 +471,7 @@ All payload paths below are relative to `skills/cast-init/assets/` in this repo.
 | `agents/product.md` | Defines the product agent; owns scope — milestone definition, task files, bug triage, validation, and the milestone close record |
 | `agents/architect.md` | Defines the system design agent; owns module boundaries, data schemas, contracts, and the performance budget |
 | `agents/ui.md` | Defines the UI agent; owns visual design, layout, interaction states, accessibility, and the milestone UX review |
-| `agents/risk.md` | Defines the risk agent; reviews an architecture through the security and performance lenses in one pass and sets the two implementation-review flags |
-| `agents/ceo.md` | Defines the CEO agent; the planning gate — reads across every artifact for what falls between the specialists and issues the verdict |
+| `agents/ceo.md` | Defines the CEO agent; the planning gate — runs the security and performance lenses over the plan (setting the two implementation-review flags), reads across every artifact for what falls between the specialists, and issues the verdict |
 | `agents/coder.md` | Defines the implementation agent; writes production code and its tests, commits, and handles every loop-back (defect fixes, Issue restructuring, criteria rejections) |
 | `agents/reviewer.md` | Defines the review agent; the independent gate — verifies the test-results block, reviews the diff, classifies findings as Defects (filing each as a bug file) or Issues, and records the Acceptance Criteria Check |
 | `agents/docs-writer.md` | Defines the documentation agent; drains the `docs:` queue at the milestone-completion checkpoint, at an overflow drain, and at the `/agent-task` checkpoint |
@@ -485,7 +483,7 @@ All payload paths below are relative to `skills/cast-init/assets/` in this repo.
 
 | File | Description |
 |---|---|
-| `skills/agent-plan/SKILL.md` | Defines the `/agent-plan` pipeline skill; orchestrates the Planning Stage end-to-end (Product → Architecture + UI → Risk → CEO, with UI and Risk conditional on the plan's flags) |
+| `skills/agent-plan/SKILL.md` | Defines the `/agent-plan` pipeline skill; orchestrates the Planning Stage end-to-end (Product → Architecture + UI → CEO, with UI conditional on the plan's flags and the CEO's risk lenses conditional on a security surface or applicable budget) |
 | `skills/agent-code/SKILL.md` | Defines the `/agent-code` pipeline skill; orchestrates the Engineering Stage per task (Coder → Reviewer, with Defects through Product triage and Issues back to Coder) |
 | `skills/cast-release/SKILL.md` | Defines the `/cast-release` skill; verifies the release gates, derives the version, updates `docs/CHANGELOG.md`, and issues a GO/NO-GO. Runs in-session, launches no agents |
 | `skills/agent-task/SKILL.md` | Defines the `/agent-task` pipeline skill; runs a mini engineering pipeline (Coder → Reviewer → validation) for a single one-off task without requiring a milestone or CEO verdict |

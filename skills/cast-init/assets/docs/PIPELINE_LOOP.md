@@ -53,8 +53,7 @@ Tests must pass before Reviewer runs. No exceptions. Because Coder now owns test
 
 - Coder's handoff entry carries a **Test Results** block with the **verbatim tail of the `[TEST_CMD]` run** — the actual pass/fail counts as printed, not a paraphrase. "All tests pass" without output is an incomplete entry and Reviewer rejects it back to Coder without reviewing.
 - **Full suite vs. targeted.** The first pass of a task and the final pass before validation run the full `[TEST_CMD]` suite. Intermediate loop-back passes may run the targeted set for the affected modules — k loop iterations must not cost k full-suite runs.
-- **Defect cycles — prove the test red.** When a pass fixes a Fix Now defect, the covering test must demonstrably fail without the fix: check out the task's last pre-fix commit (from the Handoff Log), run the covering test, confirm it fails, return to the fixed head, confirm it passes. Record the red→green evidence in the handoff entry. A test written after the fix that has never been red proves little.
-- **Coverage.** Cover the acceptance criteria, edge cases, and error paths. The smallest test set that proves the criteria beats exhaustive line coverage. Project thresholds live in `docs/TEST_FRAMEWORK.md`.
+- **Defect cycles — prove the test red.** A pass that fixes a Fix Now defect must record red→green evidence against the pre-fix commit in its handoff entry (procedure in `agents/coder.md`); Reviewer checks for it.
 
 ## Environment Issue rule
 
@@ -74,39 +73,22 @@ The `/agent-plan` escalation remains for genuinely architectural discoveries —
 
 One full cycle is any return to Step 1 (Coder).
 
-- Track the count in the task file's Header (`Loop count`) and **escalate to the user after `[MAX_LOOP_COUNT]` cycles** on a single task, stating the specific blocker.
-- Mirror the count in `artifacts/STANDUP.md` after each cycle — `- <agent> | loop | Task <id>: loop <k>/[MAX_LOOP_COUNT]`, where `<agent>` is the one whose findings sent it back — so an interrupted run resumes with the real count.
+- Track the count in the task file's Header (`Loop count`) — the single live counter; an interrupted run resumes from it — and **escalate to the user after `[MAX_LOOP_COUNT]` cycles** on a single task, stating the specific blocker.
 - If Coder reports that a finding cannot be resolved without an architecture change (structural disagreement), the escalation must carry that flag and name Architecture as the needed re-entry point (`/agent-plan`).
 
 ---
 
 ## Step 1 — Coder
 
-Launch the **coder** agent with the task file path. Coder implements, tests, and commits in one stage:
+Launch the **coder** agent with the task file path. One pass implements, tests, and commits, ending in a `coder -> reviewer` handoff entry with the **Test Results block** (what a pass does is `agents/coder.md`'s content, not yours).
 
-- Read the task file and its Context Manifest (`docs/STAGE_CONTRACT.md` — nothing else). On a loop re-entry, start from the latest Handoff Log entry.
-- Implement the task in production code, following the conventions the manifest cites.
-- **Write or update the tests** covering the changed code, and run them. On the first and final passes run the full `[TEST_CMD]` suite; intermediate passes may run the targeted set (test gate rule).
-- Commit the pass (Commit discipline). For a Fix Now defect fix, also fill the bug file's Resolution → Commit field.
-- Append the handoff entry (`coder -> reviewer`): what was implemented, files touched, the commit, and the **Test Results block with verbatim `[TEST_CMD]` output**.
-
-**On a loop-back**, Coder handles all three return paths — a Reviewer-classified Defect, a Reviewer-classified Issue (behavior-preserving restructuring), and a Product criteria rejection.
-
-**When a Fix Now defect needs root-cause investigation** before a fix is safe — an intermittent failure, a defect whose mechanism is not obvious from the diff — investigate first and record the finding in the bug file's Investigation section (root cause, affected modules, the approach chosen and what else was considered) before changing code. Do not guess-and-check against the test suite.
-
-**If Coder cannot make tests pass** after a genuine attempt, it appends the failing entry and the orchestrator loops it back to Step 1 with the loop counter incremented — the same escalation path as any other cycle.
+Routing facts: **on a loop-back**, Coder handles all three return paths — a Reviewer-classified Defect, a Reviewer-classified Issue, and a Product criteria rejection — in one pass. **If Coder cannot make tests pass** after a genuine attempt, it appends the failing entry and you loop it back to Step 1 with the loop counter incremented — the same escalation path as any other cycle.
 
 ## Step 2 — Reviewer
 
 After Coder hands off, the orchestrator first applies the **test-gate pre-check**: read the latest Coder entry and confirm it carries a Test Results block with verbatim output showing no failures. This is a presence check, never judgment on the tests. Absent or failing: route straight back to Coder without launching Reviewer (a full Reviewer context spent rejecting a missing block is a wasted spawn); this does not increment the loop counter — no work was reviewed.
 
-When the block is present, launch the **reviewer** agent with the task file path:
-
-- **Reject without reviewing** if the Test Results block turns out to be a paraphrase rather than verbatim output, or the output shows failures the pre-check missed. Reviewer is the backstop on the same gate.
-- Review the **diff** — the commits in the Handoff Log since the last Reviewer approval — against the task file (description, acceptance criteria) and the manifest's convention and design references. Read surrounding files only where the diff demands it.
-- Classify every finding as a **Defect** (incorrect behaviour, broken functionality, violated contract) or an **Issue** (structural problem, convention violation, maintainability concern), and list every finding with its classification in the handoff entry.
-- **File every Defect directly** as a per-bug file — `bugs/bug-{XXX}-{slug}.md` from `templates/BUG_REPORT.md`, status New — plus its row in the `artifacts/BUGS.md` index. Reviewer holds the finding and writes the file; no intermediary.
-- **On approving a clean version, append the Acceptance Criteria Check** (see `agents/reviewer.md`): one line per criterion, each `Met` with an evidence pointer, `Not met`, or `Product judgment`.
+When the block is present, launch the **reviewer** agent with the task file path. Reviewer enforces the same gate as backstop, reviews the diff, files every Defect as a bug file, and hands back an entry you route on: every finding classified **Defect** (incorrect behaviour, broken functionality, violated contract) or **Issue** (structural problem, convention violation, maintainability concern), and — on approving a clean version — the **Acceptance Criteria Check**, one line per criterion (`Met` with evidence / `Not met` / `Product judgment`; details in `agents/reviewer.md`).
 
 ### Step 2a — Defect routing
 

@@ -2,18 +2,18 @@
 name: agent-plan
 description: >-
   Run the CAST Planning Stage end-to-end for a feature or milestone: Product →
-  Architecture + UI → Risk → CEO verdict, with UI and Risk launched only when the plan
-  shows a UI-flagged task, a security surface, or an applicable performance budget. Use
-  when the user asks to plan a feature or milestone, or invokes /agent-plan. Auto-engages
-  a light mode (Product + Architecture + CEO only) for small features — 3 tasks or fewer
-  with no new screens, no security surface, no applicable performance budget, and nothing
-  cross-cutting. Produces planning documents under artifacts/ and a CEO sign-off; writes
-  no code.
+  Architecture + UI → CEO (risk lenses + verdict), with UI launched only when the plan
+  shows a UI-flagged task and the CEO's risk lenses run only on a security surface or an
+  applicable performance budget. Use when the user asks to plan a feature or milestone, or
+  invokes /agent-plan. Auto-engages a light mode (Product + Architecture + CEO only) for
+  small features — 3 tasks or fewer with no new screens, no security surface, no applicable
+  performance budget, and nothing cross-cutting. Produces planning documents under
+  artifacts/ and a CEO sign-off; writes no code.
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
 PURPOSE: This file defines the /agent-plan pipeline skill. It runs the Planning Stage of the
-multi-agent workflow end-to-end: Product → (Architecture + UI) → Risk → CEO. No code is written — the stage produces planning documents only.
+multi-agent workflow end-to-end: Product → (Architecture + UI) → CEO. No code is written — the stage produces planning documents only.
 
 All work artifacts are written to `artifacts/`. Templates are read from `templates/`;
 guidelines are read from `docs/`. Never mix them: `docs/` and `templates/` are
@@ -42,12 +42,11 @@ This skill invokes the following agents. Open any of them for the full role defi
 - [product](../../agents/product.md) — defines milestone scope, goals, and acceptance criteria; writes the milestone README and one task file per task
 - [architect](../../agents/architect.md) — produces the milestone architecture document, data schemas, and module boundaries
 - [ui](../../agents/ui.md) — produces the milestone UI specification and interaction states
-- [risk](../../agents/risk.md) — reviews the architecture through the security and performance lenses in one pass, files findings, and sets the two implementation-review flags
-- [ceo](../../agents/ceo.md) — reads every prior artifact and issues the APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED verdict
+- [ceo](../../agents/ceo.md) — runs the security and performance lenses over the plan (writing `reviews/risk.md` with its two flag lines), then reads across every artifact and issues the APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED verdict
 
 ## Model Compatibility
 
-Each stage runs on the model set in that agent's file (default: `inherit` — the session model). Invoke only the agents named in the stages below, exactly as written: no ad-hoc subagents, no added verification passes (the executing model self-verifies), no collapsing a stage into direct work. Effort is per agent file — v3 planning defaults are `high` across the stage; raise Architecture to `xhigh` only for a new subsystem, a schema migration, or a cross-cutting contract change. Per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
+Each stage runs on the model set in that agent's file (default: `inherit` — the session model). Invoke only the agents named in the stages below, exactly as written: no ad-hoc subagents, no added verification passes (the executing model self-verifies), no collapsing a stage into direct work. Effort is per agent frontmatter — v3 planning defaults are `high` across the stage; re-pin Architecture to `xhigh` only for a new subsystem, a schema migration, or a cross-cutting contract change. Per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
 
 ## Input
 
@@ -63,11 +62,9 @@ This skill orchestrates the **Planning Stage** of the agent workflow. It runs th
 
 **Milestone numbering.** Unless the invocation input names an existing milestone to re-plan, allocate `{N}` as the highest `milestone-{N}-*` directory number already present under `artifacts/` plus one (`1` if there are none). Allocate it once, before Stage 1; Stage 1 creates the milestone directory `artifacts/milestone-{N}-{slug}/` and every artifact of the run is written inside it.
 
-### Light Mode
+### The five scoping tests
 
-Between `/agent-task` (no design content at all) and a full planning run there is a real middle tier: a small, well-understood feature that needs a handful of genuine design decisions. Light mode plans it without full ceremony — design work still gets planned and engineering still requires a CEO verdict; only the ceremony scales with the work. `/agent-plan single: <feature>` remains an accepted invocation and is the one-task case of this mode.
-
-**Entering the mode.** Run light mode when the user asks for it (`/agent-plan light: <feature>`, or `/agent-plan single: <feature>` for the one-task case), **or automatically when Stage 1 scoping concludes that every one of the following holds**:
+Stage 1's output is judged against these five tests. They decide light mode (all five hold), the Stage 2b skip (test 2), and the risk-lens skip inside Stage 3 (tests 3 and 4):
 
 1. The work decomposes to **3 tasks or fewer**.
 2. It introduces **no new screen set** — no new screens, and no change to the interaction model of existing ones. (A cosmetic change to one existing screen does not disqualify; a new screen does.)
@@ -75,14 +72,20 @@ Between `/agent-task` (no design content at all) and a full planning run there i
 4. **No performance budget applies** to it — the architecture document sets no budget this work exercises, and it introduces no hot path, no new persistence or network round trip, and no unbounded data growth.
 5. It is **not cross-cutting** — no change to a shared contract, module boundary, or convention that other milestones' code depends on.
 
-Any one of these failing means full mode. **Judge them from Stage 1's output, not from the invocation text** — a feature request that sounds small often is not, and the point of the gate is to catch that before four stages are skipped. When a condition is genuinely borderline, choose full mode: a wrongly-full plan costs stages, a wrongly-light one ships an unreviewed design decision.
+**Judge them from Stage 1's output, not from the invocation text** — a feature request that sounds small often is not. When a test is genuinely borderline, treat it as failed: a wrongly-full plan costs stages, a wrongly-light one ships an unreviewed design decision.
+
+### Light Mode
+
+Between `/agent-task` (no design content at all) and a full planning run there is a real middle tier: a small, well-understood feature that needs a handful of genuine design decisions. Light mode plans it without full ceremony — design work still gets planned and engineering still requires a CEO verdict; only the ceremony scales with the work. `/agent-plan single: <feature>` remains an accepted invocation and is the one-task case of this mode.
+
+**Entering the mode.** Run light mode when the user asks for it (`/agent-plan light: <feature>`, or `/agent-plan single: <feature>` for the one-task case), **or automatically when all five scoping tests hold**.
 
 **What changes:**
 
-- **Stages run:** Stage 1 (Product) → Stage 2a (Architecture) → Stage 2c → Stage 4 (CEO). Stages 2b (UI) and 3 (Risk) are skipped by default.
-- **Stage 1** creates the milestone directory exactly as in full mode — same layout, so `/agent-code` consumes it unchanged — with one task file per task. Every required README section is still present (lean is fine; absent is not). Stage 1 also sets the flags that pull skipped stages back in: **Needs UI Spec** = Yes on any task pulls in Stage 2b; security-sensitive scope (auth, input handling, new dependencies, sensitive data) or an applicable performance budget pulls in Stage 3. A pulled-in stage runs exactly as in full mode, including its completion-flag line. These flags are the safety net under the entry conditions above: a stage wrongly skipped at scoping time is pulled back the moment a task declares its need.
-- **Stage 4 (CEO)** reviews as usual; the skipped stages' checklist sections and input rows read "N/A — <stage> skipped: <reason>" (permitted by `templates/CEO_REVIEW.md`). **The CEO is the backstop:** if the plan in front of it clearly needed a skipped stage, the correct verdict is REVISION REQUIRED naming that stage, which re-runs it and re-reviews. The verdict line, Approval Conditions, and the post-verdict backfill work identically.
-- **Downstream:** a skipped Risk stage leaves no `reviews/risk.md` and therefore no flag lines, so the `/agent-code` milestone-completion checkpoint skips the implementation review automatically.
+- **Stages run:** Stage 1 (Product) → Stage 2a (Architecture) → Stage 2c → Stage 3 (CEO, risk lenses skipped). Stage 2b (UI) is skipped by default.
+- **Stage 1** creates the milestone directory exactly as in full mode — same layout, so `/agent-code` consumes it unchanged — with one task file per task. Every required README section is still present (lean is fine; absent is not). Stage 1 also sets the flags that pull skipped work back in: **Needs UI Spec** = Yes on any task pulls in Stage 2b; a failed test 3 or 4 (security surface, applicable budget) pulls the risk lenses back into Stage 3. These flags are the safety net under the scoping tests: work wrongly skipped at scoping time is pulled back the moment a task declares its need.
+- **Stage 3 (CEO)** reviews as usual; skipped work's checklist sections and input rows read "N/A — skipped: <reason>" (permitted by `templates/CEO_REVIEW.md`). **The CEO is the backstop:** if the plan clearly needed the skipped UI stage, the correct verdict is REVISION REQUIRED naming Stage 2b; if it clearly needed the risk lenses, the CEO runs them itself in the same pass (`agents/ceo.md` → Skipped stages). The verdict line, Approval Conditions, and the post-verdict backfill work identically.
+- **Downstream:** skipped risk lenses leave no `reviews/risk.md` and therefore no flag lines, so the `/agent-code` milestone-completion checkpoint skips the implementation review automatically.
 
 Record the mode and why it was chosen in the Stage 1 checkpoint entry — `- agent-plan | progress | Stage 1 complete (light mode: 2 tasks, no new screens, no security or perf surface): ...` — so a resumed run knows which stages to expect and a later reader can audit the call.
 
@@ -93,7 +96,7 @@ Record the mode and why it was chosen in the Stage 1 checkpoint entry — `- age
 Launch the **product** agent to:
 
 1. Define the feature scope, goals, and success metrics.
-2. Create the milestone directory `artifacts/milestone-{N}-{slug}/` and write the milestone README at `artifacts/milestone-{N}-{slug}/README.md` using `templates/MILESTONE_DEFINITION.md` as the template. This is the milestone's highest-order document: what it is and why it matters — goal, success metrics, in-scope, out-of-scope, top-level acceptance criteria, dependencies and risks, cross-cutting concerns — plus the Task Index (one row per task file; no status column) and the CEO Approval Conditions table (backfilled after Stage 4).
+2. Create the milestone directory `artifacts/milestone-{N}-{slug}/` and write the milestone README at `artifacts/milestone-{N}-{slug}/README.md` using `templates/MILESTONE_DEFINITION.md` as the template. This is the milestone's highest-order document: what it is and why it matters — goal, success metrics, in-scope, out-of-scope, top-level acceptance criteria, dependencies and risks, cross-cutting concerns — plus the Task Index (one row per task file; no status column) and the CEO Approval Conditions table (backfilled after Stage 3).
 3. Decompose the work into tasks and write **one task file per task** at `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` using `templates/TASK.md` — each file self-contained: ID, dependencies, description, files touched, per-task acceptance criteria, and a **seeded Context Manifest** naming the smallest read set the task needs (convention docs now; Architecture and UI append their section references in Stage 2). Every manifest entry forces a downstream read — keep them minimal.
 4. Review the Deferred backlog while defining the milestone: re-triage every Deferred bug in the `artifacts/BUGS.md` index and any Deferred task files from prior milestone directories (Status field in each task file's Header) — pull items into this milestone's scope, keep them Deferred with an updated rationale, or close them as Won't Fix with a rationale. Deferred is a held-open state, not terminal (see `artifacts/BUGS.md` → Bug Lifecycle).
 5. **Retrospective intake.** Read the previous milestone's close record, `reviews/close.md` (the highest-numbered milestone directory that has one — or a pre-v3 `reviews/retrospective.md`; skip this step if neither exists). For each row of its **Actions for Next Milestone** table that has no disposition yet, dispose of it: **adopt** it into this milestone's Cross-Cutting Concerns (or as a task), or **decline** it with a reason. Write the disposition into that Actions table (Disposition column: `Adopted → M{N}` or `Declined — <reason>`). No open action may be left undisposed — this step is what makes retrospectives feed planning instead of being write-only.
@@ -133,7 +136,7 @@ In parallel with Architecture, launch the **ui** agent to:
 
 Input to pass: the paths of the milestone README and the task files from Stage 1 (the `Needs UI Spec` flags live in each task file's Header). Coordinate state-shape questions with the architect agent if they arise.
 
-**This stage is conditional in full mode too**, on the same flag light mode uses: run it only when at least one task file's Header has **Needs UI Spec** = Yes. A full-mode backend milestone with no UI-flagged task would otherwise pay a UI launch for a spec no manifest cites. Skip with a checkpoint note (`- agent-plan | progress | Stage 2b skipped: no UI-flagged tasks`); the CEO reviews the skip like any light-mode skip ("N/A" input row), and a task that later declares **Needs UI Spec** = Yes pulls the stage back in.
+**This stage is conditional in full mode too**, on scoping test 2: run it only when at least one task file's Header has **Needs UI Spec** = Yes. A full-mode backend milestone with no UI-flagged task would otherwise pay a UI launch for a spec no manifest cites. Skip with a checkpoint note (`- agent-plan | progress | Stage 2b skipped: no UI-flagged tasks`); the CEO reviews the skip like any light-mode skip ("N/A" input row), and a task that later declares **Needs UI Spec** = Yes pulls the stage back in.
 
 If the project installed no `ui` agent (a backend/CLI adoption that opted out of the UI role), skip this stage entirely and note the skip in the stage checkpoint entry (`- agent-plan | progress | Stage 2b skipped: no ui agent installed`); downstream stages then run without a UI specification.
 
@@ -145,41 +148,18 @@ After both Stage 2a and Stage 2b complete (or 2a alone in a no-ui run), the orch
 2. Set each affected task's `Needs Arch Doc` / `Needs UI Spec` Header field to Done with the link.
 3. This single-writer step exists because 2a and 2b run in parallel — two agents editing the same task files concurrently would silently lose rows. All task-file manifest writes during planning go through this step.
 
-**Stage trigger:** Stage 3 starts once its inputs exist — after Stages 2a and 2b complete (or 2a alone when 2b is skipped). Risk reads the architecture document, the README, and the UI spec; it never reads a task-file manifest, so it does not wait on Stage 2c. Run 2c in the same round.
+**Stage trigger:** Stage 3 starts after 2c — the CEO's manifest gate reads the applied Context Manifests, so 2c must complete first.
 
-### Stage 3 — Risk
+### Stage 3 — CEO Review
 
-**Conditional in full mode, on the same tests light mode uses.** Launch Risk only when Stage 1's scoping shows a security surface (the milestone touches authentication or authorization, input handling, secrets or sensitive data, or adds a dependency) **or** an applicable performance budget (the architecture document sets a budget this milestone exercises, or the plan introduces a hot path, new persistence or network round trip, or unbounded data growth). When neither holds, skip with a checkpoint note (`- agent-plan | progress | Stage 3 skipped: no security surface, no applicable budget`) — a skipped Risk stage leaves no `reviews/risk.md`, so `/agent-code` skips the implementation review automatically, and the CEO reviews the skip ("N/A" input row) as its backstop. **When genuinely unsure, run it** — a wasted Risk launch costs one stage; an unreviewed security surface ships a risk.
+One launch covers the risk review and the verdict — the two halves are defined in `agents/ceo.md` as Part 1 and Part 2. Launch the **ceo** agent to:
 
-When it runs, launch the **risk** agent once to review the architecture through both lenses in a single pass:
+1. **Part 1 — risk lenses (conditional on scoping tests 3 and 4).** When Stage 1's scoping shows a security surface or an applicable performance budget, review the architecture through the security and performance lenses and write `artifacts/milestone-{N}-{slug}/reviews/risk.md` — both lens sections (even when one is empty) and the two flag lines `/agent-code` parses (`**Security implementation review required**` / `**Performance measured check required**`). A Yes on either commits `/agent-code` to a `reviews/risk-impl.md` at milestone completion. When both tests hold (no surface, no budget), the lenses are skipped, no `reviews/risk.md` is written, and `/agent-code` skips the implementation review automatically. **When genuinely unsure, tell the CEO to run them** — an unreviewed security surface ships a risk.
+2. **Part 2 — cross-cutting review and verdict.** Read the Stage 1–2 artifacts per the **Read set** in `agents/ceo.md` (that section bounds what the CEO opens; do not restate or widen it in the invocation), fill `templates/CEO_REVIEW.md`, and save to `artifacts/milestone-{N}-{slug}/reviews/ceo.md` with the single `**Verdict**:` line — exactly one of **APPROVED**, **APPROVED WITH CONDITIONS**, or **REVISION REQUIRED**. This skill's revision handling and `/agent-code`'s Pre-Flight both parse that line.
 
-1. Read the architecture document, the milestone README, and the UI specification (when one exists).
-2. **Security lens** — vulnerabilities, insecure patterns, and risky dependencies the milestone introduces: authentication and authorization boundaries, input handling and injection surfaces, secret handling, sensitive-data storage and transit, and the trust assumptions of every new dependency.
-3. **Performance lens** — hot paths, state-update frequency, memory footprint, rendering and query cost, and unbounded growth, against the architecture document's Performance Budget.
-4. Write both lens sections to `artifacts/milestone-{N}-{slug}/reviews/risk.md`, each finding carrying severity, its cited category or budget, the affected module or path, and a remediation recommendation. **Both sections appear even when one is empty** — "No findings" is a result.
-5. End the file with the two flag lines, both mandatory and both parsed by `/agent-code`:
-   - `**Security implementation review required**: Yes/No` — Yes whenever the milestone touches auth, input handling, new dependencies, or sensitive data.
-   - `**Performance measured check required**: Yes/No` — Yes whenever the plan sets a budget this milestone exercises.
+Input to pass: the milestone directory path, the template `templates/CEO_REVIEW.md`, and whether the risk lenses apply (scoping tests 3–4, with the reason). The CEO reads its own set — do not paste artifact bodies into the invocation; this is the most expensive stage in the pipeline and its read set is deliberately bounded.
 
-   A Yes on either commits `/agent-code` to a `reviews/risk-impl.md` at milestone completion. When unsure, answer Yes.
-6. Any **Critical** finding blocks the milestone until remediated or rolled into a CEO Approval Condition. Any finding that breaks a performance budget must be resolved or explicitly accepted by Product before CEO review.
-
-Input to pass: the paths of the milestone definition, architecture document, and UI specification.
-
-**Stage trigger:** Stage 4 starts after Stage 3 completes. If Risk requires architectural changes, return to Stage 2a for revision and re-run Stage 3 against the revised architecture.
-
-### Stage 4 — CEO Final Review
-
-After Stage 3 completes, launch the **ceo** agent to:
-
-1. Read the Stage 1–3 artifacts per the **Read set** in `agents/ceo.md` — that section bounds what the CEO opens; do not restate or widen it in the invocation.
-2. Produce the review using `templates/CEO_REVIEW.md` — copy it, fill in every section, and list all five inputs reviewed by path; a skipped stage's input row and section read "N/A — <stage> skipped: <reason>", per the template.
-3. Save the review to `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
-4. Produce a verdict — **APPROVED**, **APPROVED WITH CONDITIONS**, or **REVISION REQUIRED** — recorded as the review's single `**Verdict**:` line with exactly one of the three strings, per `templates/CEO_REVIEW.md`. This skill's revision handling and `/agent-code`'s Pre-Flight both parse that `**Verdict**:` line.
-
-Input to pass: the milestone directory path and the template `templates/CEO_REVIEW.md`. The CEO reads its own set — do not paste artifact bodies into the invocation; this is the most expensive stage in the pipeline and its read set is deliberately bounded.
-
-**If REVISION REQUIRED** (read from the review's `**Verdict**:` line): the CEO's Revision Requests identify which agent owns each change. Re-run the affected stage with the revision notes. If the revision touched the architecture — a Stage 2a re-run, or a UI revision that changes the architecture — re-run Stage 3 (Risk) on the revised plan **before** the CEO re-review, so the CEO never re-reviews against a stale risk position. Then re-run the CEO review on the revised plan. Planning does not advance until the CEO issues APPROVED or APPROVED WITH CONDITIONS. **Revision cap:** allow at most 3 revision cycles (one cycle = re-running the affected stages plus one CEO re-review). If the third cycle still ends in REVISION REQUIRED, stop the run and escalate to the user with a summary of the unresolved objections — do not keep looping.
+**If REVISION REQUIRED** (read from the review's `**Verdict**:` line): the CEO's Revision Requests identify which agent owns each change. Re-run the affected stage with the revision notes, re-apply Stage 2c for corrected manifest rows, then re-launch the CEO — its re-review reads the diff and, when the architecture changed, re-runs its risk lenses against the changed sections before re-issuing the verdict (`agents/ceo.md` → Re-review). Planning does not advance until the CEO issues APPROVED or APPROVED WITH CONDITIONS. **Revision cap:** allow at most 3 revision cycles (one cycle = re-running the affected stages plus one CEO re-review). If the third cycle still ends in REVISION REQUIRED, stop the run and escalate to the user with a summary of the unresolved objections — do not keep looping.
 
 **After any approval-level verdict**, the orchestrator backfills — no agent launch. This is pure transcription from the CEO review (the same operation `/agent-code`'s Pre-Flight performs as a repair when it finds the table missing or stale): (a) copy the conditions into the **CEO Approval Conditions** table in the milestone README (`artifacts/milestone-{N}-{slug}/README.md`, table defined by `templates/MILESTONE_DEFINITION.md`) — one row per condition with its source and Status Open, or a single "None — verdict was APPROVED" row; (b) add a `../README.md § CEO Approval Conditions` row to the Context Manifest of every task file a condition names; and (c) set the README's Status to CEO-Approved. `/agent-code` reads the conditions from the README table (its Pre-Flight may still cross-check them against the CEO review); Coder tracks them during engineering and Reviewer and Product verify them on completion.
 
@@ -196,8 +176,8 @@ When an agent revises a file during a re-run of an earlier stage (for example, t
 Summarize the run:
 
 1. What was planned — milestone scope, key architecture decisions, UI highlights.
-2. Risk findings by lens, and their resolution status.
-3. Which of the two implementation-review flags Risk set, and what that commits `/agent-code` to at milestone completion.
+2. Risk findings by lens, and their resolution status (or that the lenses were skipped, and why).
+3. Which of the two implementation-review flags were set, and what that commits `/agent-code` to at milestone completion.
 4. CEO verdict and any Approval Conditions or Revision Requests.
 5. Next step — if the verdict is approval-level, the milestone is ready for `/agent-code`.
 

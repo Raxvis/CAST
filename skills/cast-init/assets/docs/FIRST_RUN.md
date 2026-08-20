@@ -37,7 +37,7 @@ In the Claude Code session, type:
 /agents
 ```
 
-**Verify:** you see a list of subagents that matches the files in `.claude/agents/`. On a full install you should see all 8: `architect`, `ceo`, `coder`, `docs-writer`, `product`, `reviewer`, `risk`, `ui`. On a pruned install you should see whatever subset you kept.
+**Verify:** you see a list of subagents that matches the files in `.claude/agents/`. On a full install you should see all 7: `architect`, `ceo`, `coder`, `docs-writer`, `product`, `reviewer`, `ui`. On a pruned install you should see whatever subset you kept.
 
 **If an agent is missing:** the most common cause is malformed YAML frontmatter. Open the missing agent file and verify the `---` fences are balanced and the `name:`, `description:`, and `model:` keys are present on separate lines.
 
@@ -111,7 +111,7 @@ rm -rf artifacts/milestone-1-*
 
 If Step 4 or Step 5 completes cleanly, the pipeline is working end-to-end and you can usually stop. The probes below are an optional next step for verifying that each individual agent does what its file says it does — useful after you customize an agent file, or if you want a finer-grained trust signal before running a real milestone.
 
-Each probe is a single prompt to launch the named agent explicitly. Each takes under a minute. Run only the ones you care about; you do not need all 8.
+Each probe is a single prompt to launch the named agent explicitly. Each takes under a minute. Run only the ones you care about; you do not need all 7.
 
 ### Planning-tier probes
 
@@ -120,8 +120,8 @@ Each probe is a single prompt to launch the named agent explicitly. Each takes u
 | `product` | "Use the product agent to write acceptance criteria for 'add a dark mode toggle'." | Testable, specific criteria (not vague statements like "works well"). |
 | `architect` | "Use the architect agent to sketch module boundaries for a new authentication system." | A module table plus a Decisions Log entry that cites alternatives considered. |
 | `ui` | "Use the ui agent to spec the interaction states for a login form." | Covers all six canonical states (default, pressed, disabled, loading, error, empty) explicitly, per `templates/UI_SPEC.md`. |
-| `risk` | "Use the risk agent to review this architecture document." | Produces both lens sections (security and performance) even when one is empty, and ends with both flag lines set. |
-| `ceo` | "Use the ceo agent to review a milestone plan where the Risk review has an unaddressed Critical finding." | Verdict is REVISION REQUIRED, not APPROVED WITH CONDITIONS — the CEO does not paper over Critical findings. |
+| `ceo` | "Use the ceo agent to run its risk lenses over this architecture document." | Produces both lens sections (security and performance) even when one is empty, and ends with both flag lines set. |
+| `ceo` | "Use the ceo agent to review a milestone plan whose risk review has an unaddressed Critical finding." | Verdict is REVISION REQUIRED, not APPROVED WITH CONDITIONS — the CEO does not paper over Critical findings. |
 
 ### Engineering-tier probes
 

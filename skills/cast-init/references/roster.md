@@ -4,9 +4,9 @@ Reference material for Phase 3 (Migration plan). The roster table is the authori
 
 ## Critical agent requirements
 
-CAST v3 ships **eight** agents. An adoption must account for every one of them.
+CAST v3 ships **seven** agents. An adoption must account for every one of them.
 
-v2 shipped fifteen. Seven were removed by merging, not by dropping their work — see the v3 CHANGELOG for the full reasoning, and the migration table below for where each one's duties went. When you find a v2 CAST install (or any project with a `tester.md` / `refactor.md` / `debugger.md`), map the role forward rather than preserving the file.
+v2 shipped fifteen. Eight were removed by merging, not by dropping their work — see the v3 CHANGELOG for the full reasoning, and the migration table below for where each one's duties went. When you find a v2 CAST install (or any project with a `tester.md` / `refactor.md` / `debugger.md`), map the role forward rather than preserving the file.
 
 **Tier 1 — Core loop (always required):**
 
@@ -18,7 +18,7 @@ v2 shipped fifteen. Seven were removed by merging, not by dropping their work �
 
 **Tier 3 — Required for the full `/agent-plan` stage:**
 
-- `ui`, `risk`, `ceo`
+- `ui`, `ceo`
 
 ### Where the v2 agents went
 
@@ -28,17 +28,17 @@ v2 shipped fifteen. Seven were removed by merging, not by dropping their work �
 | `refactor` | `coder` | "Behavior-preserving restructuring" is Coder's own job on a loop-back. |
 | `debugger` | `coder` | Two cold contexts on one defect, the second re-deriving the first's context. Root-cause investigation is now a step inside Coder's defect pass. |
 | `bug-gatherer` | `reviewer` | It re-read the task to transcribe a finding Reviewer had already written, and its documented workflow ("read the report back to the reporter") was impossible for a subagent. Reviewer holds the finding and writes the bug file. |
-| `security` + `performance` | `risk` | Two agents reading the same architecture document in the same round, producing the same document shape and one flag line each. The two lenses stay distinct in the output; the second spawn did not survive. |
+| `security` + `performance` | `ceo` | Two agents reading the same architecture document in the same round, producing the same document shape and one flag line each — then a third (the CEO) reading their output in full immediately after. The lenses live on as the CEO's risk pass, which still writes `reviews/risk.md` with both flag lines; the separate spawns did not survive. (A pre-release v3 draft carried them as a single `risk` agent before folding it into `ceo`.) |
 | `validator` | `product` + orchestrator | Its bookkeeping (AGENT_STATE rows, archival) is orchestrator file-writing; the retrospective went to Product; its conflict-resolution protocol had time-based triggers ("after 7 days blocked") that could never fire in a pipeline where a milestone runs in one or two sessions. |
 | `release` | `/cast-release` skill | Checklist execution against files the session can already read. An agent spawn to run a checklist is a spawn spent on ceremony. |
 
 **`ui` opt-out for backend/CLI-only projects.** The `ui` agent is Tier 3, but it becomes optional when the project is clearly backend/CLI-only with no user interface (the same condition under which `dispositions.md` skips `templates/UI_SPEC.md` and `templates/UX_REVIEW.md`). The opt-out must be explicit: propose it as a Skip in the plan, get the user's confirmation at the Phase 4 gate, and record it in the Phase 7 report. The UI templates are skipped **if and only if** the `ui` agent is skipped — never install one half of the pair (Phase 6 checks this consistency). The installed `/agent-plan` skill skips its UI stage when no `ui` agent is present, so the pipeline stays runnable.
 
-**Default install set: all 8 agents**, `ui` excepted under a recorded opt-out. Do not silently omit any.
+**Default install set: all 7 agents**, `ui` excepted under a recorded opt-out. Do not silently omit any.
 
-**For each missing agent**, the plan must include a Create action. If the user has an existing file that fills the role under a different name, propose Rename + Update. If the fill is ambiguous, mark as Ask and list the candidates. A v2 `tester.md`/`refactor.md`/`debugger.md`/`bug-gatherer.md`/`validator.md`/`security.md`/`performance.md`/`release.md` maps to Delete with its duties folded into the target above — say so in the plan so the user can see nothing was lost.
+**For each missing agent**, the plan must include a Create action. If the user has an existing file that fills the role under a different name, propose Rename + Update. If the fill is ambiguous, mark as Ask and list the candidates. A v2 `tester.md`/`refactor.md`/`debugger.md`/`bug-gatherer.md`/`validator.md`/`security.md`/`performance.md`/`release.md` — or a pre-release v3 `risk.md` — maps to Delete with its duties folded into the target above — say so in the plan so the user can see nothing was lost.
 
-**Final check before closing the plan:** enumerate all 8 agent names from the table below and verify every one has a Create / Rename+Update / Update-in-place / Preserve action. If any is missing, add the Create action before presenting the plan.
+**Final check before closing the plan:** enumerate all 7 agent names from the table below and verify every one has a Create / Rename+Update / Update-in-place / Preserve action. If any is missing, add the Create action before presenting the plan.
 
 ## Canonical CAST agent roster (current release)
 
@@ -49,21 +49,20 @@ Use this table as the authoritative reference when comparing an existing project
 | 1 | `product` | 1 | `inherit` | `high` / `low` | Use to define milestone scope and write the task files at /agent-plan Stage 1, to triage filed bugs, to validate tasks Reviewer's criteria check flagged, to dispose of task-amendment proposals, and at milestone completion to re-triage Deferred items and write the milestone close record in one pass. |
 | 2 | `architect` | 2 | `inherit` | `high` | Use at /agent-plan Stage 2a to produce the milestone architecture document — module boundaries, data schemas, cross-module contracts, data flows, and the performance budget — and to return the Context Manifest rows each task needs. Re-run when the CEO returns REVISION REQUIRED naming Architecture. |
 | 3 | `ui` | 3 | `inherit` | `high` | Use at /agent-plan Stage 2b to produce the milestone UI specification — layouts, interaction states, accessibility — and to return the Context Manifest rows each UI-flagged task needs. Also performs the milestone UX review at /agent-code completion for milestones containing UI-flagged tasks. |
-| 4 | `risk` | 3 | `inherit` | `high` | Use as the /agent-plan Stage 3 review of an architecture — examines it through the security lens and the performance lens in one pass, files findings with severity and remediation, and sets the two flags that decide whether implementation reviews run at milestone completion. Also runs those implementation reviews. |
-| 5 | `ceo` | 3 | `inherit` | `high` | Use as the final planning-stage gate once Product, Architecture, UI, and Risk have completed their milestone outputs — issues APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED before engineering begins. |
-| 6 | `coder` | 1 | `inherit` | `medium` | Use to implement each task in /agent-code or /agent-task — writes production code, writes and runs its tests, and commits. Also handles every loop-back: Fix Now defects (investigating root cause first when the mechanism is not obvious), Reviewer Issues (behavior-preserving restructuring), and Product criteria rejections. |
-| 7 | `reviewer` | 1 | `inherit` | `high` | Use after every Coder handoff — the independent gate. Verifies the test-results block, reviews the diff for quality, standards, and architecture adherence, classifies findings as Defects (filing each as a bug file) or Issues (back to Coder), and on approval records the per-criterion Acceptance Criteria Check. No code bypasses review. |
-| 8 | `docs-writer` | 2 | `inherit` | `low` | Use at the milestone-completion checkpoint, at an overflow drain when the docs queue passes its bound, at the /agent-task completion checkpoint, or on direct user request — drains the docs queue in artifacts/STANDUP.md. Owns docs/ reference material. |
+| 4 | `ceo` | 3 | `inherit` | `high` | Use as the planning gate once Product, Architecture, and UI have completed their milestone outputs — runs the security and performance lenses over the plan (writing reviews/risk.md with its two flag lines when the plan has a security surface or an applicable budget), then reads across every artifact and issues APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED. Also runs the flagged implementation reviews at milestone completion. |
+| 5 | `coder` | 1 | `inherit` | `medium` | Use to implement each task in /agent-code or /agent-task — writes production code, writes and runs its tests, and commits. Also handles every loop-back: Fix Now defects (investigating root cause first when the mechanism is not obvious), Reviewer Issues (behavior-preserving restructuring), and Product criteria rejections. |
+| 6 | `reviewer` | 1 | `inherit` | `high` | Use after every Coder handoff — the independent gate. Verifies the test-results block, reviews the diff for quality, standards, and architecture adherence, classifies findings as Defects (filing each as a bug file) or Issues (back to Coder), and on approval records the per-criterion Acceptance Criteria Check. No code bypasses review. |
+| 7 | `docs-writer` | 2 | `inherit` | `low` | Use at the milestone-completion checkpoint, at an overflow drain when the docs queue passes its bound, at the /agent-task completion checkpoint, or on direct user request — drains the docs queue in artifacts/STANDUP.md. Owns docs/ reference material. |
 
 **How to compare against existing project agents.** When the Phase 1 inventory finds an agent file in the project under any name, match it by **role**, not by filename. Read the Role column in the table above and ask: "Does this existing file do what that role describes?" An existing `planner.md` whose purpose is "defines features and acceptance criteria" maps to `product`. An existing `coordinator.md` whose purpose is "resolves conflicts between roles and tracks milestones" has no v3 agent — its duties belong to the orchestrating skill and to `product`; propose Delete with the duties named. An existing `shipper.md` whose purpose is "runs the release cut and updates the changelog" maps to the `/cast-release` skill, not to an agent. Use the agent similar-name candidates table below for alias hints, but the description column above is the tiebreaker — the role always wins over the filename.
 
-**One-line summary you can keep in context:** 8 agents, all on `model: inherit` (the session model) = 5 planning-tier at effort `high` (product, architect, ui, risk, ceo) + 2 loop agents (coder at `medium`, reviewer at `high`) + 1 utility at `low` (docs-writer). Every adoption must account for all 8.
+**One-line summary you can keep in context:** 7 agents, all on `model: inherit` (the session model) = 4 planning-tier at effort `high` (product, architect, ui, ceo) + 2 loop agents (coder at `medium`, reviewer at `high`) + 1 utility at `low` (docs-writer). Every adoption must account for all 7.
 
 **Right-sizing models (cost optimization).** `model: inherit` is the safe default, but each agent's `model:` line can be pinned independently. Note the ordering: **spawn count dominates both model tier and effort** — a stage you don't launch costs nothing, and each distinct agent type is its own prompt-cache prefix. v3's roster is already right-sized in that dimension; the table below is the second-order lever. Every Phase 3 plan must include an Ask item proposing a right-sized assignment for the user to accept, adjust, or decline. A sensible starting split:
 
 | Workload | Agents | Suggested model |
 |---|---|---|
-| Judgment-heavy gates and design | `ceo`, `architect`, `reviewer`, `risk` | The most capable model available — e.g. `opus` (or a Fable/Mythos-class model if the account serves one) |
+| Judgment-heavy gates and design | `ceo`, `architect`, `reviewer` | The most capable model available — e.g. `opus` (or a Fable/Mythos-class model if the account serves one) |
 | Planning and implementation | `product`, `ui`, `coder` | `sonnet` — strong coding and spec writing at a fraction of the cost |
 | Structured utility work | `docs-writer` | `sonnet` — the cheapest tier that still clears the Context Inference Bar (see caution below) |
 
@@ -100,14 +99,13 @@ When scanning for existing agent files that might fill a CAST role under a diffe
 | `product` | `product-manager`, `pm`, `planner`, `owner`, `po`, `requirements`, `backlog` |
 | `architect` | `architect`, `architecture`, `designer`, `sys-design`, `system-design`, `tech-lead`, `techlead` |
 | `ui` | `ui`, `ux`, `designer`, `frontend-designer`, `screens`, `wireframe` |
-| `risk` | `risk`, `security`, `secops`, `appsec`, `auditor`, `pentester`, `sec`, `performance`, `perf`, `profiler`, `optimizer`, `benchmarker` |
-| `ceo` | `ceo`, `approver`, `gate`, `signoff`, `reviewer-final`, `exec`, `director` |
+| `ceo` | `ceo`, `approver`, `gate`, `signoff`, `reviewer-final`, `exec`, `director`, `risk`, `security`, `secops`, `appsec`, `auditor`, `pentester`, `sec`, `performance`, `perf`, `profiler`, `optimizer`, `benchmarker` |
 | `coder` | `coder`, `implementer`, `engineer`, `developer`, `dev`, `builder`, `worker`, `tester`, `test`, `qa`, `refactor`, `refactorer`, `debugger`, `debug`, `troubleshooter` |
 | `reviewer` | `reviewer`, `code-reviewer`, `review`, `lint`, `critic`, `bug-gatherer`, `bug-reporter`, `triage`, `issue-filer` |
 | `docs-writer` | `docs-writer`, `docs`, `documentation`, `writer`, `doc`, `technical-writer`, `tech-writer` |
 
 Aliases that map to **no v3 agent** — propose Delete and name where the duties went (see "Where the v2 agents went" above): `validator`, `validation`, `process`, `coordinator`, `orchestrator`, `enforcer`, `referee`, `arbiter`, `meta`, `supervisor`, `workflow` → the orchestrating skill and `product`. `release`, `release-manager`, `releaser`, `shipper`, `deployer`, `publisher`, `versioner` → the `/cast-release` skill.
 
-**The role most often missed** during adoption is `risk`, because a project rarely has one file covering both security and performance. If the inventory finds a `security.md` **or** a `performance.md` **or** neither, still install `risk` as a single Create action — and when it finds both, propose Rename+Update of one into `risk` and Delete of the other, folding its content in. Installing two half-agents is the failure mode here.
+**The mapping most often missed** during adoption is folding security and performance review into `ceo`: a project with a `security.md`, a `performance.md`, or a pre-release v3 `risk.md` gets those files' duties merged into the single `ceo` Create/Update action (its risk pass covers both lenses) and the source files proposed as Deletes. Installing standalone security/performance/risk half-agents alongside `ceo` is the failure mode here.
 
-The Phase 3 final check (the 8-name enumeration above) catches anything that slips through the per-role scan.
+The Phase 3 final check (the 7-name enumeration above) catches anything that slips through the per-role scan.

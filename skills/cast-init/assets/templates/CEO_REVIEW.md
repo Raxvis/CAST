@@ -131,10 +131,6 @@ _Both lenses of the Risk review. If a lens found nothing, say so — an empty le
 
 **Verdict**: <APPROVED | APPROVED WITH CONDITIONS | REVISION REQUIRED>
 
-Write exactly one of the three values on the line above — `/agent-plan` and `/agent-code` parse the `**Verdict**:` line. Meaning of each value:
-
-- **APPROVED** — Milestone may proceed to the engineering stage. No outstanding revisions.
-- **APPROVED WITH CONDITIONS** — Milestone may proceed. Coder must satisfy the Approval Conditions above; Reviewer and Product verify on completion.
-- **REVISION REQUIRED** — Milestone returned to the named agents. See Revision Requests. Re-review after revisions.
+Write exactly one of the three values on the line above — `/agent-plan` and `/agent-code` parse the `**Verdict**:` line (meanings: `agents/ceo.md`).
 
 **Verdict Notes**:

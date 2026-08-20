@@ -72,7 +72,7 @@ When the CEO returns REVISION REQUIRED naming Architecture, rewrite the document
 
 ## Performance budget
 
-The architecture document's Performance Budget section is where budgets are set. The Risk agent measures against them at milestone completion (the orchestrator transcribes the results into the live tracking table) — you define the targets, you do not track them.
+The architecture document's Performance Budget section is where budgets are set. The CEO measures against them at the milestone-completion risk implementation review (the orchestrator transcribes the results into the live tracking table) — you define the targets, you do not track them.
 
 ## Boundaries
 

@@ -2,7 +2,7 @@
   FILE: STANDUP.md
   PURPOSE: Rolling session/progress log. Every pipeline skill (/agent-plan, /agent-code,
            /agent-task) appends entries here using the single Entry Grammar defined below.
-           The grammar covers session sections, progress notes, loop counters, the Docs
+           The grammar covers session sections, progress notes, the Docs
            Writer queue, decisions, and blockers — there is exactly one format, cited by
            the pipeline skills and docs/PIPELINE_LOOP.md.
 
@@ -27,7 +27,7 @@ To stay lightweight, the log is bounded: at the milestone-completion checkpoint 
 
 ## Entry Grammar
 
-This is the **single canonical format** for everything written to this file. All producers — `/agent-plan` stage checkpoints, `/agent-code` and `/agent-task` completion entries, the loop counters from `docs/PIPELINE_LOOP.md`, and the Docs Writer queue — use it.
+This is the **single canonical format** for everything written to this file. All producers — `/agent-plan` stage checkpoints, `/agent-code` and `/agent-task` completion entries, and the Docs Writer queue — use it. (Loop counts live only in each task file's `Loop count` Header — they are not mirrored here.)
 
 **Session sections** are added newest-first at the top of the Log, headed:
 
@@ -48,7 +48,6 @@ where `<skill>` is the skill running (`agent-plan`, `agent-code`, `agent-task`, 
 | Type | Meaning | Note format |
 |---|---|---|
 | `progress` | Work completed — a stage finished, a task validated, an artifact written | Free text; name the artifact path where applicable |
-| `loop` | Engineering-loop cycle counter (see `docs/PIPELINE_LOOP.md`) | `Task <id>: loop <k>/[MAX_LOOP_COUNT]` |
 | `docs` | Documentation work queued for Docs Writer | Free text naming the doc and the needed change |
 | `decision` | A decision worth surfacing beyond the agent's own Decisions Log | Free text |
 | `blocker` | A blocker encountered (or resolved) | Free text; name the blocking dependency or agent |
@@ -60,14 +59,13 @@ Example session section:
 ```
 ### 2026-04-09 — agent-code — milestone-2-search-ui
 
-- reviewer | loop | Task M2-T01: loop 2/[MAX_LOOP_COUNT]
 - coder | docs | docs/CODE_PATTERNS.md needs the new debounce pattern documented ✅
 - reviewer | progress | M2-T01 closed at Step 3a — all 5 criteria Met, no Product spawn; Status set to Complete
 - coder | blocker | Task M2-T02 Environment Issue: fixture server port collision in CI
 - docs-writer | progress | Milestone-completion drain: 1 docs entry drained
 ```
 
-Entries under a session heading are appended in the order they happen (oldest first). In the example: the loop counter and the queued docs entry are written during task M2-T01; Reviewer's criteria check closes the task without a Product spawn; Coder hits an environment problem on M2-T02; and the queued `docs` entry drains at milestone completion (marked ✅ — the drained count matches the ✅ entries).
+Entries under a session heading are appended in the order they happen (oldest first). In the example: the queued docs entry is written during task M2-T01; Reviewer's criteria check closes the task without a Product spawn; Coder hits an environment problem on M2-T02; and the queued `docs` entry drains at milestone completion (marked ✅ — the drained count matches the ✅ entries).
 
 ---
 

@@ -140,10 +140,8 @@ _Anything that touches multiple tasks in this milestone and needs to be specifie
 ## References (required)
 
 - **PRD section(s):** [PRD link or section anchor]
-- **Architecture document:** `architecture.md`
-- **UI specification:** `ui.md`
-- **Task files:** `tasks/`
-- **CEO review:** `reviews/ceo.md`
+
+_Only the variable reference lives here — the milestone's fixed layout (`architecture.md`, `ui.md`, `tasks/`, `reviews/`) is `docs/FILE_CONVENTIONS.md`'s to define, not each README's to restate._
 
 ---
 

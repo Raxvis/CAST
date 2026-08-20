@@ -38,7 +38,7 @@ Run the engineering stage for a milestone the CEO approved during `/agent-plan`.
 - [reviewer](../../agents/reviewer.md) — verifies the test-results gate, reviews the diff, classifies findings, files bugs, records the Acceptance Criteria Check
 - [product](../../agents/product.md) — triages bugs, validates tasks Reviewer flagged, disposes of amendments, and at milestone completion re-triages Deferred items and writes the close record in one pass
 - [ui](../../agents/ui.md) — milestone UX review (UI-flagged milestones only)
-- [risk](../../agents/risk.md) — implementation review and measured performance check (flagged milestones only)
+- [ceo](../../agents/ceo.md) — risk implementation review and measured performance check (flagged milestones only)
 - [docs-writer](../../agents/docs-writer.md) — drains the `docs` queue at milestone completion, or at an overflow drain
 
 **Spawn only these, exactly as written.** No ad-hoc subagents, no extra verification passes (the executing model self-verifies within each stage), no collapsing a stage into direct work.
@@ -125,7 +125,7 @@ Fires when every task file is Complete or Deferred.
 
 1. Run `[TEST_CMD]` once more to confirm everything still passes.
 2. **UX review.** If any task has **Needs UI Spec** = Yes or Done, launch **ui** once to review the implemented screens against `ui.md` and write `reviews/ux.md`. Skip otherwise.
-3. **Risk implementation review.** Read the two flag lines in `reviews/risk.md`. If **either** is Yes, launch **risk** once to write `reviews/risk-impl.md` — reviewing the milestone's implementation diff against the planned controls for the security lens, and measuring against the budgets for the performance lens (recording Current vs. Target in `risk-impl.md`; you transcribe the budget rows into `artifacts/AGENT_STATE.md` at step 6 — agents never touch that file). One invocation covers both lenses. Skip when both flags say No or the file has no flag lines.
+3. **Risk implementation review.** Read the two flag lines in `reviews/risk.md`. If **either** is Yes, launch **ceo** once to write `reviews/risk-impl.md` (`agents/ceo.md` → The implementation review) — reviewing the milestone's implementation diff against the planned controls for the security lens, and measuring against the budgets for the performance lens (recording Current vs. Target in `risk-impl.md`; you transcribe the budget rows into `artifacts/AGENT_STATE.md` at step 6 — agents never touch that file). One invocation covers both lenses. Skip when both flags say No or `reviews/risk.md` does not exist (the planning risk lenses were skipped).
    - Findings from steps 2–3 are filed as bug files, triaged by Product inside the close pass below. A **Fix Now** finding sends the affected task back into the loop; the close pass runs (or is revised) once it resolves. Deferred findings join Known Issues.
 4. **Milestone close (one product launch).** Launch **product** once to close the milestone end-to-end — the steps are strictly sequential and each consumes what the previous produced, so they share one context:
    - **Re-triage** every Deferred bug in `artifacts/BUGS.md` and every Deferred task file — schedule, re-defer with an updated rationale, or close as Won't Fix with a rationale — plus any bugs steps 2–3 just filed.

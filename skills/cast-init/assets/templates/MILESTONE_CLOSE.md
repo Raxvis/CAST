@@ -232,7 +232,7 @@ _Fill each metric from its recorded source (product.md → Duty 5) — do not es
 | Tasks planned | [N] | Task Index in `artifacts/milestone-{N}-{slug}/README.md` (count of task files) |
 | Tasks completed | [N] | Status fields across `artifacts/milestone-{N}-{slug}/tasks/task-*.md` |
 | Tasks rejected by Product | [N] | Handoff Logs across `artifacts/milestone-{N}-{slug}/tasks/task-*.md` (Product → Coder return entries) — note average rejections per task |
-| Loop-backs, and what caused them | [N] | `Loop count` Headers across `tasks/task-*.md` plus the `loop` entries in `artifacts/STANDUP.md` |
+| Loop-backs, and what caused them | [N] | `Loop count` Headers across `tasks/task-*.md`; causes from the Handoff Log entries that sent each task back |
 | Escalations to the user | [N] | `blocker` entries in `artifacts/STANDUP.md` for this milestone |
 | Architecture doc revisions | [N] | `git log --follow artifacts/milestone-{N}-{slug}/architecture.md` |
 | UI spec revisions | [N] | `git log --follow artifacts/milestone-{N}-{slug}/ui.md` |
@@ -251,19 +251,6 @@ _The Disposition column stays empty at close time. Product fills it during the n
 |---|---|---|---|---|
 | 1 | [ACTION_1] | [AGENT] | [MILESTONE_OR_DATE] | |
 | 2 | [ACTION_2] | [AGENT] | [MILESTONE_OR_DATE] | |
-
----
-
-## Sign-Off (required)
-
-**Status**: Approved / Approved with Notes / Changes Requested
-
-**Signed off by**: Product Agent
-**Date**: [YYYY-MM-DD]
-
-**Notes**:
-> [Any conditions attached to approval, or reasons for requesting changes — including
-> the disposition of each CEO Approval Condition (Verified, or open under Known Issues).]
 
 ---
 

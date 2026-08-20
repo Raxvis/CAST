@@ -5,7 +5,7 @@
            work); this file assigns IDs and tracks one line per bug so triage sweeps read
            one small file instead of every report. This file is also the SINGLE CANONICAL
            definition of the bug lifecycle, severity scale, and field ownership — agents
-           (Reviewer, Coder, Product, Risk) reference these rules rather
+           (Reviewer, Coder, Product, CEO) reference these rules rather
            than restating them. The per-bug entry format lives in templates/BUG_REPORT.md.
 
   HOW TO CUSTOMIZE:

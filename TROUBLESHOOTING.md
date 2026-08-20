@@ -97,7 +97,7 @@ Common problems adopting or running this template, with the most likely cause an
    ```
 2. Restart your Claude Code session (exit and re-open). Auto-discovery runs at session start, not continuously.
 3. If the files are missing, re-run `/cast-init` — it installs the pipeline skills as part of the adoption.
-4. Run `/agents` to confirm Claude Code sees the template's subagents. If `/agents` lists the 8 agents, the session is reading `.claude/`; if it doesn't, you are in the wrong directory.
+4. Run `/agents` to confirm Claude Code sees the template's subagents. If `/agents` lists the 7 agents, the session is reading `.claude/`; if it doesn't, you are in the wrong directory.
 
 ---
 
