@@ -77,10 +77,17 @@ inserts a new row into `tasks` with `completed = 0`, `createdAt = new Date().toI
 
 ### 4. reviewer -> product — 2026-04-09
 
-- **Outcome**: Clean review — no Defects, no Issues. Condition 1 verified on the insert path.
+- **Outcome**: Clean review — no Defects, no Issues. Condition 1 verified on the insert path. All 6 criteria Met; routing to Product anyway (Step 4b — this task carries a CEO Approval Condition).
 - **Files touched**: None
 - **Read next**: Manifest only
 - **Open items**: None
+- **Acceptance Criteria Check**:
+  - [1] `acme-todo add "buy milk"` prints the new task id to stdout and exits 0. — Met — `add.test.ts` › "prints new id, exits 0" (`e3a94f0`)
+  - [2] Insert uses a prepared statement with bound parameters (no string interpolation). — Met — `src/commands/add.ts:14` (`.prepare().run(params)`); `add.test.ts` › "binds params"
+  - [3] Missing title argument prints an error and exits non-zero. — Met — `add.test.ts` › "missing title exits 1"
+  - [4] Inserted row has `completed = false` and a valid ISO `createdAt`. — Met — `add.test.ts` › "ISO createdAt, completed false"
+  - [5] Vitest suite covers happy path and missing-title error path. — Met — 4 tests in `e3a94f0`
+  - [6] No linter or type-check errors introduced. — Met — `pnpm typecheck` clean at `e3a94f0`
 
 ### 5. product — task complete — 2026-04-09
 

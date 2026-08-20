@@ -80,14 +80,22 @@ was filed during validation and is deferred to M2.
 
 ### 4. reviewer -> product — 2026-04-09
 
-- **Outcome**: Clean review — no Defects, no Issues. Condition 1 verified on both mutation paths.
+- **Outcome**: Clean review — no Defects, no Issues. Condition 1 verified on both mutation paths. Criterion 6 flagged Product judgment; routing to Product (Step 4b — this task also carries a CEO Approval Condition).
 - **Files touched**: None
 - **Read next**: Manifest only
 - **Open items**: None
+- **Acceptance Criteria Check**:
+  - [1] `acme-todo done 1` on an existing task sets `completed` and `completedAt`. — Met — `done.test.ts` › "marks task done" (`4f7a2c9`)
+  - [2] `acme-todo delete 1` on an existing task removes the row. — Met — `delete.test.ts` › "removes row"
+  - [3] Both commands use parameterized statements bound to the id argument. — Met — `src/commands/done.ts:16`, `src/commands/delete.ts:14`
+  - [4] `delete` with a non-existent id exits non-zero with a clear error. — Met — `delete.test.ts` › "missing id exits 1 with message"
+  - [5] Non-integer id argument prints a usage error. — Met — `delete.test.ts` › "non-integer id usage error"
+  - [6] Vitest suite covers happy path and missing-id path for `delete` (and for `done` once BUG-002 is fixed in M2). — Product judgment — the `done` missing-id path is deliberately uncovered pending BUG-002; whether that leaves the criterion satisfied for this milestone is a scope call
+  - [7] No linter or type-check errors introduced. — Met — `pnpm typecheck` clean at `4f7a2c9`
 
 ### 5. product — task complete — 2026-04-10
 
-- **Outcome**: All acceptance criteria met; Status set to Complete. During milestone smoke testing Bug Gatherer filed BUG-002 (`done` silent success on missing id) — triaged Low and Deferred to M2; does not violate this task's criteria.
+- **Outcome**: Criterion 6 disposed — the `done` missing-id coverage gap is in scope for M2, not this task, so the criterion holds as written; all others accepted on Reviewer's evidence. Status set to Complete. During milestone smoke testing Bug Gatherer filed BUG-002 (`done` silent success on missing id) — triaged Low and Deferred to M2; does not violate this task's criteria.
 - **Files touched**: This file (Header Status), `../bugs/bug-002-done-silent-success.md`, `artifacts/BUGS.md` (index row)
 - **Read next**: —
 - **Open items**: BUG-002 held Deferred (re-triage at M2 planning)

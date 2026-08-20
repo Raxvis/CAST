@@ -49,7 +49,7 @@ These documents describe how the project is built and the conventions that gover
 | `FILE_CONVENTIONS.md` | Rules governing where each type of file and document belongs in the repository. Read before creating any new file. |
 | `ERROR_HANDLING.md` | Guidelines for handling errors across all error categories. Defines principles, patterns, and user-facing message standards. |
 | `TEST_FRAMEWORK.md` | Testing strategy, test runner setup, file conventions, coverage requirements, and best practices. |
-| `PIPELINE_LOOP.md` | The canonical engineering-loop contract (Coder → Tester → Reviewer → Product validation, Defect/Issue routing, loop-counter rules) consumed by `/agent-code` and `/agent-task`. |
+| `PIPELINE_LOOP.md` | The canonical engineering-loop contract (Coder → Tester → Reviewer → validation, Defect/Issue routing, the Acceptance Criteria Check that decides whether validation spawns Product, loop-counter rules) consumed by `/agent-code` and `/agent-task`. |
 | `MODEL_OPTIMIZATION.md` | Model policy for the agent roster: the Claude Opus ladder (Opus 5 preferred), per-model behavior profiles, the Context Inference Bar (gates `/cast-doctor`'s Tier B documentation prunes), and the upgrade checklists through Opus 4.8 → Opus 5. |
 
 ---

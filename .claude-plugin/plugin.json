@@ -1,6 +1,6 @@
 {
   "name": "cast",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "CAST — Claude Agent Staged Team. Installs a staged multi-agent development workflow into your project via the /cast-init skill: 15 specialist subagents, /agent-plan, /agent-code, /agent-task, the /cast-doctor health check, and a docs/templates/artifacts scaffold.",
   "author": {
     "name": "Raxvis",

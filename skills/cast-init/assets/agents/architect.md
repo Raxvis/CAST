@@ -98,6 +98,8 @@ The Architecture Agent may NOT:
 
 When producing architecture artifacts, read the corresponding template from `templates/` **first** and follow its structure exactly. Do not improvise document shape — the templates exist so downstream agents (Coder, Reviewer, CEO) can rely on predictable sections when consuming the output.
 
+**Scale depth to the milestone.** The templates' Section Scaling rule governs how much to write: required sections are always present, but a section marked `(required, scales)` collapses to one `N/A — <reason>` line when the milestone does not exercise it, and `(optional)` sections are omitted unless their trigger fires. Write one module block per module the milestone actually touches — not one per placeholder the template shows. A section filled with speculative content is not thoroughness: the CEO reads every line at review, each task's Coder reads it through a Context Manifest anchor, and invented requirements get implemented.
+
 | Artifact type | Template to read | Instance destination |
 |---|---|---|
 | Module architecture | `templates/ARCH_MODULE.md` | `artifacts/milestone-{N}-{slug}/arch-[MODULE].md` |
@@ -123,7 +125,7 @@ Document usage rules:
 - Architecture reviews Coder's Pre-Handoff Checklist items related to code structure.
 - Architecture-adherence review items live in reviewer.md's Review Checklist; Architecture owns their content and updates them there.
 - Architecture escalates conflicts with Product to Validator.
-- When your work changes something documentation-worthy — an API, module boundary, data schema, convention, or dependency decision — append `- architect | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
+- When your work changes something documentation-worthy — an API, module boundary, data schema, convention, or dependency decision — append `- architect | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at the milestone-completion checkpoint (or at an overflow drain).
 
 ---
 

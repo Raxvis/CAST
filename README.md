@@ -10,7 +10,7 @@
 
 > **A multi-agent workflow template for Claude Code.** Fifteen specialist subagents, three pipeline skills plus a maintenance skill, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v2.1.0-blue)
+![Template version](https://img.shields.io/badge/template-v2.2.0-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Agents](https://img.shields.io/badge/agents-15-orange)
 
@@ -35,23 +35,27 @@ Engineering stage — /agent-code
                                      └──  Issue   →  Refactor  →  Tester  →  Reviewer (loop)
                                                                       │
                                                                       ▼
-                                                               Product validates
+                                          Reviewer's criteria check: all Met?
+                                            yes → orchestrator closes the task
+                                            no  → Product validates
                                                                       │
                                                                       ▼
-                                          task checkpoint: docs drain (Docs Writer) + outcome
-                                          record (Validator)
+                                          task checkpoint: no agents — Status writeback
+                                          (+ docs drain only past 10 pending entries)
                                                                       │
                                              ... every task Complete or Deferred? ...
                                                                       ▼
                                           milestone checkpoint: Deferred re-triage (Product)
                                           →  completion + validation records (Product)
+                                          →  docs drain (Docs Writer)
                                           →  UX review (UI, UI-flagged milestones only)
-                                          →  retrospective (Validator)
+                                          →  outcome records + retrospective (Validator)
 
 
 One-off task — /agent-task  (no planning stage, for small self-contained changes)
 
-    Coder  →  Tester  →  Reviewer  →  Product   (same Defect / Issue routing)
+    Coder  →  Tester  →  Reviewer  →  validation   (same Defect / Issue routing;
+                                                    Product only when the criteria check flags one)
 ```
 
 **What you get out of the box:**
@@ -65,7 +69,7 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 - **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v2.1.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v2.2.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
@@ -173,7 +177,7 @@ Each file defines one agent role with YAML frontmatter for Claude Code auto-disc
 
 ### skills/ (pipeline skills)
 
-Each subdirectory defines one pipeline skill that orchestrates a multi-agent workflow stage end-to-end. When installed to `.claude/skills/` in the target project, Claude Code registers them as skills named after the directory (e.g. `agent-plan/SKILL.md` becomes `/agent-plan`). Three pipelines ship with this template, plus the `/cast-doctor` maintenance skill (run-anytime install health check and model-aware documentation audit — not a pipeline): `/agent-plan` runs the Planning Stage (Product → Architecture + UI → Security + Performance → CEO), `/agent-code` runs the Engineering Stage (Coder → Tester → Reviewer, with defects to Bug Gatherer → Product → Debugger and issues to Refactor → Tester → Reviewer), and `/agent-task` runs a mini engineering pipeline (Coder → Tester → Reviewer → Product) for a single one-off task without requiring a milestone, planning artifacts, or a CEO verdict — use it for bug fixes, typos, small refactors, and dependency bumps, not for new modules or cross-cutting changes. Between the two, `/agent-plan single: <feature>` runs a light single-task planning mode (Product + Architecture + CEO, one task file) for a self-contained feature that needs a design decision without full milestone ceremony.
+Each subdirectory defines one pipeline skill that orchestrates a multi-agent workflow stage end-to-end. When installed to `.claude/skills/` in the target project, Claude Code registers them as skills named after the directory (e.g. `agent-plan/SKILL.md` becomes `/agent-plan`). Three pipelines ship with this template, plus the `/cast-doctor` maintenance skill (run-anytime install health check and model-aware documentation audit — not a pipeline): `/agent-plan` runs the Planning Stage (Product → Architecture + UI → Security + Performance → CEO), `/agent-code` runs the Engineering Stage (Coder → Tester → Reviewer, with defects to Bug Gatherer → Product → Debugger and issues to Refactor → Tester → Reviewer), and `/agent-task` runs a mini engineering pipeline (Coder → Tester → Reviewer → validation) for a single one-off task without requiring a milestone, planning artifacts, or a CEO verdict — use it for bug fixes, typos, small refactors, and dependency bumps, not for new modules or cross-cutting changes. Between the two, `/agent-plan light: <feature>` runs a light planning mode (Product + Architecture + CEO) for a small feature that needs a few design decisions without full milestone ceremony — it also engages automatically when Stage 1 scoping finds 3 tasks or fewer with no new screen set, no security-sensitive scope, no applicable performance budget, and nothing cross-cutting.
 
 ### docs/
 
@@ -381,18 +385,18 @@ With agent files in `.claude/agents/`, Claude Code can invoke them in three ways
 
 | Skill | Purpose |
 |---|---|
-| `/agent-plan <feature>` | Run the Planning Stage end-to-end. Product → Architecture + UI → Security + Performance → CEO. Produces planning documents and a CEO verdict. No code is written. **Single-task mode** (`/agent-plan single: <feature>`) plans a one-task feature with Product + Architecture + CEO only — same milestone layout, minimal ceremony. |
-| `/agent-code <milestone-or-task>` | Run the Engineering Stage for a CEO-approved milestone. Coder → Tester → Reviewer, with Defects routed through Bug Gatherer → Product (triage) → Debugger and Issues routed through Refactor → Tester → Reviewer, then Product validation. After every task it drains the `docs` queue (Docs Writer) and records the outcome (Validator); when every task is Complete or Deferred, the milestone checkpoint runs Deferred re-triage, the completion and validation records (verifying CEO Approval Conditions), the UX review (UI-flagged milestones), the security implementation review and measured performance check (flagged milestones), the retrospective, and root-file archival. |
-| `/agent-task <task description>` | Run a mini engineering pipeline for a single one-off task without requiring a milestone or CEO verdict. Coder → Tester → Reviewer, with the same Defect/Issue routing as `/agent-code`. Use for bug fixes, typos, small refactors, and dependency bumps — NOT for new modules or cross-cutting changes (it bails out to `/agent-plan`, whose single-task mode covers the one-design-decision middle ground). |
+| `/agent-plan <feature>` | Run the Planning Stage end-to-end. Product → Architecture + UI → Security + Performance → CEO. Produces planning documents and a CEO verdict. No code is written. **Light mode** (`/agent-plan light: <feature>`, or `single:` for the one-task case) plans a small feature with Product + Architecture + CEO only — same milestone layout, minimal ceremony. It also engages automatically when Stage 1 scoping finds 3 tasks or fewer, no new screen set, no security-sensitive scope, no applicable performance budget, and nothing cross-cutting; any one of those failing means the full run, and the per-task flags still pull a skipped stage back in. |
+| `/agent-code <milestone-or-task>` | Run the Engineering Stage for a CEO-approved milestone. Coder → Tester → Reviewer, with Defects routed through Bug Gatherer → Product (triage) → Debugger and Issues routed through Refactor → Tester → Reviewer, then validation. Reviewer's per-criterion Acceptance Criteria Check decides validation: all criteria Met and the orchestrator closes the task with no agent launch; a flagged criterion, a mid-task amendment, a CEO Approval Condition, or a resolved bug launches Product. The task checkpoint launches no agents — just the Status writeback, plus a `docs`-queue drain only once 10 entries are pending. When every task is Complete or Deferred, the milestone checkpoint runs Deferred re-triage, the completion and validation records (covering every task and verifying CEO Approval Conditions), the `docs` drain, the UX review (UI-flagged milestones), the security implementation review and measured performance check (flagged milestones), the per-task and milestone outcome records, the retrospective, and root-file archival. |
+| `/agent-task <task description>` | Run a mini engineering pipeline for a single one-off task without requiring a milestone or CEO verdict. Coder → Tester → Reviewer, with the same Defect/Issue routing as `/agent-code`. Use for bug fixes, typos, small refactors, and dependency bumps — NOT for new modules or cross-cutting changes (it bails out to `/agent-plan`, whose light mode covers the small-feature middle ground). |
 | `/cast-doctor` (or `/cast-doctor checkup`) | Run a health check on the CAST install: verify structural and state invariants, prescribe model-aware documentation pruning (two tiers, gated on the Context Inference Bar in `docs/MODEL_OPTIMIZATION.md`), and find documentation coverage gaps. Writes `artifacts/DOCTOR.md`; treats only user-approved prescriptions. Run after model changes or every few milestones. |
 
 ### Inter-Agent Handoff
 
 Agents communicate through shared documents. When one agent completes work, the next agent reads the updated files:
 
-- **`artifacts/AGENT_STATE.md`** holds every agent's live working state (Current Work tables, decision logs) in one file, one section per agent — agent definition files are immutable and carry only a pointer to their section. Validator records task and milestone outcomes here at every checkpoint.
+- **`artifacts/AGENT_STATE.md`** holds every agent's live working state (Current Work tables, decision logs) in one file, one section per agent — agent definition files are immutable and carry only a pointer to their section. Validator records task and milestone outcomes here in one pass at the milestone-completion checkpoint.
 - **`docs/PIPELINE_LOOP.md`** is the canonical engineering-loop contract (per-task sequence, Defect/Issue routing, loop-counter and test-gate rules) that both `/agent-code` and `/agent-task` execute.
-- **`artifacts/STANDUP.md`** is the rolling session log with one canonical Entry Grammar: each run opens a `### YYYY-MM-DD — <skill> — <milestone/task>` session heading, and every entry under it is a `- <agent> | <type> | <note>` line. Any agent with documentation fallout appends a `- <agent> | docs | <note>` entry; Docs Writer drains those entries (marking them ✅) at the task- and milestone-completion checkpoints.
+- **`artifacts/STANDUP.md`** is the rolling session log with one canonical Entry Grammar: each run opens a `### YYYY-MM-DD — <skill> — <milestone/task>` session heading, and every entry under it is a `- <agent> | <type> | <note>` line. Any agent with documentation fallout appends a `- <agent> | docs | <note>` entry; Docs Writer drains those entries (marking them ✅) at the milestone-completion checkpoint, at an overflow drain once 10 are pending, and at the `/agent-task` completion checkpoint.
 - **`artifacts/BUGS.md`** is the global bug index — every bug lives in its own file beside the work that surfaced it (`milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md`), with one status line in the index (Bug Gatherer files, Product triages, Debugger investigates, Coder fixes). Deferred is a held-open state, not a terminal one — the terminal states are Closed, Won't Fix, Duplicate, and Cannot Reproduce — and Product re-triages every Deferred item at milestone completion and at the next `/agent-plan` Stage 1.
 - **Planning architecture documents** at `artifacts/milestone-{N}-{slug}/architecture.md` are the contract between Architect and Coder for a specific milestone — reaching engineering agents through each task file's Context Manifest, which cites the exact sections a task needs. Templates live at `templates/ARCH_MODULE.md`, `templates/ARCH_SYSTEM.md`, and `templates/ARCH_DATA_SCHEMA.md`.
 - **Planning UI specifications** at `artifacts/milestone-{N}-{slug}/ui.md` are the contract between UI and Coder. Template lives at `templates/UI_SPEC.md`. Produced only when the `ui` agent is installed — a backend/CLI project that opted out of `ui` runs both pipelines without a UI spec, and `/agent-code` does not demand one.
@@ -490,7 +494,7 @@ All payload paths below are relative to `skills/cast-init/assets/` in this repo.
 | `agents/debugger.md` | Defines the debugging agent; investigates defects Product triages as "fix now" and hands root-cause analysis back to Coder |
 | `agents/refactor.md` | Defines the refactoring agent; addresses Reviewer Issues without changing behaviour, loops back through Tester to Reviewer |
 | `agents/bug-gatherer.md` | Defines the bug gatherer agent; structures bug reports and routes them to Product for triage |
-| `agents/docs-writer.md` | Defines the documentation agent; drains the `docs:` queue at task- and milestone-completion checkpoints, accepts direct user input |
+| `agents/docs-writer.md` | Defines the documentation agent; drains the `docs:` queue at the milestone-completion checkpoint, at an overflow drain, and at the `/agent-task` checkpoint; accepts direct user input |
 | `agents/release.md` | Defines the release preparation agent; responsible for changelogs, versioning, and build verification |
 | `agents/validator.md` | Defines the validator agent; enforces agent protocols, resolves conflicts, tracks milestones, runs retrospectives |
 | `agents/README.md` | Master overview of the agent system: roster, interaction diagram, planning and engineering stage workflows, and placeholder reference |

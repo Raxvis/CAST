@@ -100,6 +100,8 @@ The UI Agent may NOT:
 
 When producing UI specifications or UX reviews, read the template from `templates/` **first** and follow its structure exactly. The spec template ensures every spec covers all six interaction states (default, pressed, disabled, loading, error, empty — the CEO gate checks every one), accessibility requirements, and platform-specific concerns consistently.
 
+**Scale depth to the work, never coverage.** Per the template's Section Scaling rule, a `(required, scales)` section collapses to one `N/A — <reason>` line when this screen does not exercise it, and `(optional)` sections are omitted unless their trigger fires. Spec only the screens the milestone's tasks flag with **Needs UI Spec**, and for a cosmetic change to an existing screen, spec the delta rather than re-describing the screen. The six interaction states and the accessibility section are not scalable — they are the gate.
+
 | Artifact type | Template to read | Instance destination |
 |---|---|---|
 | Milestone UI specification (produced during `/agent-plan`) | `templates/UI_SPEC.md` | `artifacts/milestone-{N}-{slug}/ui.md` |
@@ -120,7 +122,7 @@ Every UI artifact written in a milestone directory must include the `## Revision
 - Coder must ask UI before deviating from a specification for any reason other than technical impossibility.
 - UI escalates conflicts with Product to Validator.
 - UI may review screen implementations independently of Product's task validation — but Product's sign-off is final.
-- When your work changes something documentation-worthy — a style-guide token, component contract, interaction convention, or user-facing behavior — append `- ui | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
+- When your work changes something documentation-worthy — a style-guide token, component contract, interaction convention, or user-facing behavior — append `- ui | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at the milestone-completion checkpoint (or at an overflow drain).
 
 ---
 

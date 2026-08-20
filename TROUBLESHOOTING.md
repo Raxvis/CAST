@@ -16,7 +16,7 @@ Common problems adopting or running this template, with the most likely cause an
 | "Fix a typo in the README" | `/agent-task` | Self-contained text change, no design work needed. |
 | "Fix a bug already in `artifacts/BUGS.md`" | `/agent-task` | Scope is bounded by the bug report. |
 | "Add a new command or endpoint" | `/agent-plan` then `/agent-code` | Touches the public interface — needs UI spec, security review, CEO sign-off. |
-| "One self-contained feature that needs a design decision or two" | `/agent-plan single: <feature>` then `/agent-code` | Single-task planning mode: Product + Architecture + CEO only, one task file — design work gets planned without full milestone ceremony. |
+| "A small feature that needs a few design decisions" | `/agent-plan light: <feature>` then `/agent-code` | Light planning mode: Product + Architecture + CEO only — design work gets planned without full milestone ceremony. Also engages automatically for work Stage 1 scopes to 3 tasks or fewer with no new screens, no security surface, no applicable performance budget, and nothing cross-cutting. |
 | "Check the health of the CAST install / slim the docs after a model upgrade" | `/cast-doctor` | Maintenance skill, not a pipeline: verifies install invariants, prescribes model-gated documentation pruning, finds coverage gaps. Report-only until you approve treatments. |
 | "Bump a dependency and update call sites" | `/agent-task` | Mechanical change across existing patterns, no new design. |
 | "Refactor a single function" | `/agent-task` | Contract doesn't change, no architectural impact. |
@@ -24,7 +24,7 @@ Common problems adopting or running this template, with the most likely cause an
 | "Add a flag following an existing pattern" | `/agent-task` | The pattern already exists; no new design decisions. |
 | "Add a new data field to a schema" | `/agent-plan` then `/agent-code` | Schema change requires migration planning, security review, CEO sign-off. |
 
-**When in doubt, run `/agent-plan` first** — single-task mode (`/agent-plan single: <feature>`) keeps the tax small when the work is one task. The planning gate exists because ad-hoc changes that turn out to need design work produce drift that is expensive to untangle later. `/agent-task` will halt and route you to the right planning tier if its Pre-Flight or Reviewer step notices you've crossed the line — but front-loading the decision is faster than backing out of a half-finished one-off task.
+**When in doubt, run `/agent-plan` first** — light mode (`/agent-plan light: <feature>`) keeps the tax small for a small feature, and it engages automatically when Stage 1 finds the work is 3 tasks or fewer with no new screens, no security surface, no applicable performance budget, and nothing cross-cutting. The planning gate exists because ad-hoc changes that turn out to need design work produce drift that is expensive to untangle later. `/agent-task` will halt and route you to the right planning tier if its Pre-Flight or Reviewer step notices you've crossed the line — but front-loading the decision is faster than backing out of a half-finished one-off task.
 
 ---
 
@@ -162,7 +162,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 **Fix.**
 1. Re-read the halt message. It should name the specific scope-crossing concern (e.g., "introduces a new module", "changes a data schema", "adds a new CLI subcommand").
-2. Run the planning tier the halt message named. For a single self-contained feature needing one or two design decisions, `/agent-plan single: "<feature description>"` runs the light mode (Product + Architecture + CEO, one task file). For multi-task or cross-cutting scope, `/agent-plan "<feature description>"` runs the full stage (Product → Architecture + UI → Security + Performance → CEO). Either way it ends with a verdict file at `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
+2. Run the planning tier the halt message named. For a small feature needing a few design decisions, `/agent-plan light: "<feature description>"` runs the light mode (Product + Architecture + CEO). For multi-task or cross-cutting scope, `/agent-plan "<feature description>"` runs the full stage (Product → Architecture + UI → Security + Performance → CEO). Either way it ends with a verdict file at `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
 3. After the CEO issues **APPROVED** or **APPROVED WITH CONDITIONS**, run `/agent-code <milestone>` to execute the engineering stage against the approved plan.
 4. If you disagree with the scope classification and think the change is really self-contained, you can re-run `/agent-task` with a more precise task description that narrows the scope (name the specific file, the specific bug ID, or the specific existing pattern the change follows). Do not try to sneak a design change through `/agent-task` — the gate exists to prevent drift, and the Reviewer in Step 3 will catch it anyway.
 

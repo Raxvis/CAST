@@ -99,7 +99,7 @@ The Debugger Agent may NOT:
 - When a bug suggests a systemic design issue, Debugger escalates to Architecture with a detailed analysis.
 - Debugger coordinates with Bug Gatherer to ensure no duplicate entries and consistent formatting.
 - When an investigation cannot reproduce the defect with all available information, Debugger sets the report's status to **Cannot Reproduce** — this status is Debugger's to set, after investigation (the field-ownership table in `artifacts/BUGS.md` is canonical).
-- When your work changes something documentation-worthy — an API, command, configuration, convention, or user-facing behavior — append `- debugger | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
+- When your work changes something documentation-worthy — an API, command, configuration, convention, or user-facing behavior — append `- debugger | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at the milestone-completion checkpoint (or at an overflow drain).
 
 ---
 

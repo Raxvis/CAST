@@ -17,7 +17,7 @@
 
 # The Engineering Loop
 
-The per-task engineering sequence executed by `/agent-code` and `/agent-task`. The unit of work is a **task file** (an instance of `templates/TASK.md` — `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md`, or `artifacts/one-off/task-{slug}.md`). The orchestrating skill selects the task file and then runs this loop until the task passes Product validation or the loop cap escalates. The loop is defined per task; `/agent-code` may run loops for independent tasks concurrently under its **Parallel Task Execution** rules — parallelism is an orchestration concern and lives there, not here.
+The per-task engineering sequence executed by `/agent-code` and `/agent-task`. The unit of work is a **task file** (an instance of `templates/TASK.md` — `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md`, or `artifacts/one-off/task-{slug}.md`). The orchestrating skill selects the task file and then runs this loop until the task passes validation (Step 4) or the loop cap escalates. The loop is defined per task; `/agent-code` may run loops for independent tasks concurrently under its **Parallel Task Execution** rules — parallelism is an orchestration concern and lives there, not here.
 
 ---
 
@@ -27,7 +27,7 @@ This is the pipeline's minimal-context contract. Every stage — in this loop an
 
 1. **The task file is the handoff medium.** All stage-to-stage communication travels through the task file's **Handoff Log** — an append-only sequence of fixed-format entries (see `templates/TASK.md`). Conversation context is never carried between stages; a stage invocation contains the task file path and nothing else that isn't in the file.
 2. **The read set is closed.** An agent working a task reads exactly: (a) its own agent definition, (b) the task file, (c) the entries in the task file's **Context Manifest**, and (d) whatever the latest Handoff Log entry lists under "Read next". Nothing else — not the milestone directory, not sibling tasks, not full design documents when the manifest cites sections. If an agent finds the manifest insufficient, that is a planning defect: it adds the missing reference to the manifest (so the next stage benefits), notes it in its handoff entry, and continues.
-3. **Handoff entries are capped.** One entry per stage transition, fixed fields (Outcome / Files touched / Read next / Open items), max 10 lines, no narrative recap. Anything longer belongs in the artifact the entry points to — a bug file, a review file, the code itself — with only the pointer in the entry. **One exception:** Reviewer entries and Tester failure entries add one line per finding/failure beyond the fixed fields — for those stages the Handoff Log *is* the canonical record, and dropping findings to fit a cap is never acceptable. They still carry no narrative.
+3. **Handoff entries are capped.** One entry per stage transition, fixed fields (Outcome / Files touched / Read next / Open items), max 10 lines, no narrative recap. Anything longer belongs in the artifact the entry points to — a bug file, a review file, the code itself — with only the pointer in the entry. **Two exceptions:** (a) Reviewer entries and Tester failure entries add one line per finding/failure beyond the fixed fields — for those stages the Handoff Log *is* the canonical record, and dropping findings to fit a cap is never acceptable; (b) a Reviewer approval entry additionally carries the **Acceptance Criteria Check** block (Step 3), one line per criterion. Both exceptions still carry no narrative.
 4. **Findings live in their canonical artifact, pointers travel.** Test failures, review findings, and bug details are written where they canonically live (the task file's Handoff Log for stage findings; a per-bug file for defects); the handoff entry carries the pointer, never a copy.
 5. **Milestone-grain agents have milestone-grain read sets.** The closed read set above governs per-task stages. Stages that are milestone-scoped by role read what their role defines: CEO reads the milestone README, design docs, and Stage 3 reviews; milestone-completion stages read the task files' Headers and the artifacts their templates cite. Even these read only within the milestone's directory plus the cross-milestone root files.
 6. **The reply channel carries routing metadata only.** A stage's final report back to the orchestrator is a single line — `Handoff entry #<n> appended — <outcome>; next: <stage>` — because the Handoff Log entry, not the chat reply, is the report. The orchestrator routes on that line and never re-narrates, summarizes, or re-reads a stage's output into its own context. This is the other half of the minimal-context contract: capped reads going in, one-line replies coming out, so the orchestrator's context stays flat across a whole milestone.
@@ -80,7 +80,7 @@ Launch the **coder** agent with the task file path to:
 
 - Read the task file and its Context Manifest (per the Handoff Protocol — nothing else). On a loop re-entry, start from the latest Handoff Log entry.
 - Implement the task in production code, following the conventions the manifest cites (at minimum `CLAUDE.md` and `docs/CODE_PATTERNS.md`).
-- If the change alters something documentation-worthy (APIs, commands, config, conventions, user-facing behavior), append a `- coder | docs | <note>` entry to the current session in `artifacts/STANDUP.md` per its Entry Grammar — this queue is what Docs Writer drains at the task- and milestone-completion checkpoints.
+- If the change alters something documentation-worthy (APIs, commands, config, conventions, user-facing behavior), append a `- coder | docs | <note>` entry to the current session in `artifacts/STANDUP.md` per its Entry Grammar — this queue is what Docs Writer drains at the milestone-completion checkpoint (and at an overflow drain if the queue grows past its bound; see the orchestrating skill).
 - Commit the pass's changes per the Commit discipline (task-ID-prefixed message; loop-back passes stack). For a Fix Now defect fix, also fill the bug file's Resolution → Commit field with the new hash.
 - Complete the Pre-Handoff Checklist, then append its Handoff Log entry (coder → tester): what was implemented, files touched, the commit, which tests cover the change.
 
@@ -100,9 +100,10 @@ After Tester passes, launch the **reviewer** agent with the task file path to:
 
 - Review the **diff** — the commits recorded in the task's Handoff Log since the last Reviewer approval (per the Commit discipline), read via `git show`/`git diff` — against the task file (description, acceptance criteria) and the manifest's convention and design references. Read surrounding files only where the diff demands it; re-reading whole files the task did not touch is a minimal-context violation.
 - Classify every finding as a **Defect** (incorrect behaviour, broken functionality, violated contract) or an **Issue** (structural problem, convention violation, maintainability concern), and append its Handoff Log entry listing every finding with its classification.
+- **On approving a clean version, append the Acceptance Criteria Check** to the same entry: one line per criterion in the task file's Acceptance Criteria section, verbatim, each marked `Met — <evidence pointer>` (a commit hash, test name, or file:line), `Not met — <what is missing>`, or `Product judgment — <what needs deciding>`. Use **Product judgment** for any criterion Reviewer cannot settle from the diff and tests alone: subjective wording, UX quality, scope questions, or a criterion whose satisfaction depends on requirements Reviewer does not own. Reviewer never marks a criterion Met on assumption — unverifiable means Product judgment.
 - If there are no findings, proceed to Step 4.
 
-Within Step 3 (including the routing below), when a finding or its resolution changes something documentation-worthy (APIs, commands, config, conventions, user-facing behavior), the resolving agent appends a `- <agent> | docs | <note>` entry to the current session in `artifacts/STANDUP.md` — Docs Writer drains these at the completion checkpoints.
+Within Step 3 (including the routing below), when a finding or its resolution changes something documentation-worthy (APIs, commands, config, conventions, user-facing behavior), the resolving agent appends a `- <agent> | docs | <note>` entry to the current session in `artifacts/STANDUP.md` — Docs Writer drains these at the milestone-completion checkpoint (or at an overflow drain).
 
 ### Step 3a — Defects → Bug Gatherer → Product → Debugger
 
@@ -127,9 +128,20 @@ Step 3a and Step 3b may run in parallel when the findings are independent. A tas
 
 (Tester failures are not Defects in this sense — they route back to Coder directly at Step 2, without Bug Gatherer or triage.)
 
-## Step 4 — Product Validation
+## Step 4 — Validation
 
-After Reviewer approves, launch the **product** agent with the task file path to validate the task against its acceptance criteria. In `/agent-code`, Product validates against the task file's criteria, applying the Task Validation Checklist in `templates/MILESTONE_VALIDATION.md` as the *criteria*; the outcome is recorded as the task file's Status (Header) plus a `progress` entry in `artifacts/STANDUP.md` — no per-task validation document is produced (the validation *document* is milestone-grain only, written at the milestone-completion checkpoint). In `/agent-task`, the task description itself serves as the acceptance criteria. If any criterion is not met, append the handoff entry citing the failed criterion and return to Coder (loop back to Step 1).
+Every task's acceptance criteria are checked, criterion by criterion, before the task closes. **Who** performs the check depends on what Reviewer's Acceptance Criteria Check (Step 3) reported — Product is spawned when its judgment is actually needed, not as a formality on every task.
+
+**Step 4a — Clean close (no agent launch).** When Reviewer's approval entry marks **every** criterion `Met` with an evidence pointer, the orchestrator closes the task itself: set the task file's Status to Complete in its Header and append a `progress` entry to `artifacts/STANDUP.md` naming the task and citing Reviewer's entry number (`- reviewer | progress | Task <id>: all N acceptance criteria met (handoff #<n>) — closed`). Reviewer's entry is the validation record. No Product spawn.
+
+**Step 4b — Product validation (agent launch).** Launch the **product** agent with the task file path whenever any of these hold:
+
+- Reviewer's check reports **any** criterion as `Not met` or `Product judgment`;
+- a criterion was added or amended mid-task (Task-amendment rule);
+- the task carries a CEO Approval Condition in its Context Manifest;
+- the task **resolved a filed bug** — a Fix Now defect fixed during this task's loop, or a bug the task was opened to fix. The bug's Verified → Closed transition is Product-owned per the field-ownership table in `artifacts/BUGS.md`, and Step 4a launches no agent that could make it. Product validates against the task file's criteria, applying the Task Validation Checklist in `templates/MILESTONE_VALIDATION.md` as the *criteria*, and disposes of every flagged criterion. In `/agent-task`, the task description itself serves as the acceptance criteria. The outcome is recorded as the task file's Status (Header) plus a `progress` entry in `artifacts/STANDUP.md` — no per-task validation document is produced (the validation *document* is milestone-grain only, written at the milestone-completion checkpoint). If Product finds any criterion unmet, it appends the handoff entry citing the failed criterion and the task returns to Coder (loop back to Step 1).
+
+**Product retains milestone-grain oversight either way.** At the `/agent-code` milestone-completion checkpoint Product writes the validation record covering every task in the milestone — including those closed via 4a — so no task escapes Product review; 4a moves the per-task spawn off the hot loop, it does not remove Product from the milestone. A task closed via 4a whose criteria Product later judges unmet at that checkpoint re-enters the loop like any other Fix Now finding.
 
 ---
 

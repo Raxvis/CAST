@@ -125,7 +125,7 @@ Budget-violating findings block the milestone until remediated or rolled into a 
 - Performance recommendations include expected impact (quantified where possible).
 - Performance coordinates with Tester to define and run performance benchmarks.
 - When performance issues require code changes, Performance routes to Coder or Refactor.
-- When your work changes something documentation-worthy — a performance budget, configuration, convention, or user-facing behavior — append `- performance | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
+- When your work changes something documentation-worthy — a performance budget, configuration, convention, or user-facing behavior — append `- performance | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at the milestone-completion checkpoint (or at an overflow drain).
 
 ---
 

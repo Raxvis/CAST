@@ -26,12 +26,19 @@ See `CLAUDE.md` for the full project overview and `docs/PRD.md` for requirements
    through T-5 — each stage reading only its task file's Context Manifest and
    appending to its Handoff Log. Two bugs were filed along the way as per-bug
    files under `milestone-1-task-crud/bugs/`, indexed in `artifacts/BUGS.md`.
+   Every Reviewer approval carries an **Acceptance Criteria Check** — one line
+   per criterion with its evidence. T-5 closed on that alone (Step 4a: 7/7 Met,
+   no Product spawn); T-1 through T-4 still routed to Product (Step 4b) because
+   each carries a CEO Approval Condition, and T-4 shows a `Product judgment`
+   flag and how Product disposed of it.
 4. The milestone-completion checkpoint fired on 2026-04-10: Product re-triaged
    the Deferred BUG-002 (held Deferred into M2 — Deferred is an open, held
    state, not terminal) and wrote the completion record ("Complete with
-   Deferrals") and the milestone validation record; the UI agent reviewed the
-   implemented command surface (UX review, APPROVED WITH NOTES); Docs Writer
-   drained the `docs` queue; and Validator wrote the milestone retrospective.
+   Deferrals") and the milestone validation record covering all five tasks; the
+   UI agent reviewed the implemented command surface (UX review, APPROVED WITH
+   NOTES); Docs Writer drained all four queued `docs` entries in one pass; and
+   Validator recorded every task outcome plus the milestone outcome and wrote
+   the retrospective. The per-task checkpoints launched no agents at all.
 
 ## Where to Start Reading
 

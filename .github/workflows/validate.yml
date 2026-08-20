@@ -266,9 +266,13 @@ jobs:
           check_headings() {
             inst=$1; tmpl="skills/cast-init/assets/templates/$2"
             if [ ! -f "$tmpl" ]; then echo "missing template: $tmpl (needed by $inst)"; fail=1; return; fi
+            # Accept both "(required)" and "(required, scales)" — the scales marker
+            # (added in 2.2.0) means a section's DEPTH may collapse to one N/A line,
+            # never that the heading may be absent. Matching only "(required)" would
+            # silently drop every scaling section from this check.
             while IFS= read -r req; do
               grep -qxF "$req" "$inst" || { echo "$inst is missing required section: '$req' (from $2)"; fail=1; }
-            done < <(grep -E '^## .*\(required\)' "$tmpl" | sed 's/ (required)$//')
+            done < <(grep -E '^## .*\(required(, scales)?\)' "$tmpl" | sed -E 's/ \(required(, scales)?\)$//')
           }
           while IFS= read -r f; do
             case "$f" in

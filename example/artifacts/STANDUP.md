@@ -36,9 +36,9 @@ where `<skill>` is the pipeline skill running (`agent-plan`, `agent-code`, or `a
 | `decision` | A decision worth surfacing beyond the agent's own Decisions Log | Free text |
 | `blocker` | A blocker encountered (or resolved) | Free text; name the blocking dependency or agent |
 
-**The Docs Writer queue** is the set of `docs` entries not yet marked as drained. Docs Writer drains the queue at task- and milestone-completion checkpoints and marks each drained entry by appending ✅ to its line. An entry without ✅ is still pending.
+**The Docs Writer queue** is the set of `docs` entries not yet marked as drained. Docs Writer drains it at the `/agent-code` milestone-completion checkpoint (the primary drain), at an **overflow drain** when 10 or more entries are pending at a task-completion checkpoint, and at the `/agent-task` completion checkpoint — marking each drained entry by appending ✅ to its line. An entry without ✅ is still pending. The queue is deliberately allowed to span several tasks: each entry carries its own context, so a batched drain reads the same as an immediate one.
 
-Entries under a session heading are appended in the order they happen (oldest first). The Milestone 1 sessions below are a worked example: `docs` entries are queued by the agent that spots the documentation need, and each Docs Writer drain entry names the checkpoint and a count that matches the ✅ marks it just added.
+Entries under a session heading are appended in the order they happen (oldest first). The Milestone 1 sessions below are a worked example: `docs` entries are queued by the agent that spots the documentation need — two during planning, one during T-3, one during T-5 — and all four sit queued until the single milestone-completion drain, whose count matches the ✅ marks it just added. The queue never reached the 10-entry overflow bound, so no mid-milestone drain fired.
 
 ---
 
@@ -49,12 +49,11 @@ Entries under a session heading are appended in the order they happen (oldest fi
 - coder | progress | T-5 complete: argv parser in `src/cli.ts`, entrypoint wiring in `src/index.ts`, `--help` output
 - reviewer | loop | Task T-5: loop 1/3
 - tester | progress | Full-suite gate: 42 tests passing, 100% line coverage on `src/commands/`
-- reviewer | progress | T-5 approved — no findings
+- reviewer | progress | T-5 approved — no findings; Acceptance Criteria Check: 7/7 Met with evidence
 - coder | docs | CLAUDE.md Architecture section needs the final `src/cli.ts` dispatch flow documented ✅
 - bug-gatherer | progress | BUG-002 filed in `artifacts/BUGS.md` (initial severity Low): `done <id>` silently succeeds on a non-existent task ID, found during manual smoke testing
 - product | decision | BUG-002 triaged Low and set Deferred — does not affect correctness of normal flows; fix pairs with an M2 error-signaling task
-- product | progress | T-5 validated against acceptance criteria; Status set to Complete — all five tasks Complete
-- docs-writer | progress | Drained 1 docs entry at the T-5 task-completion checkpoint
+- reviewer | progress | T-5 closed at Step 4a — all 7 criteria Met, no Product spawn; Status set to Complete — all five tasks Complete
 - product | progress | Milestone-completion checkpoint: all three CEO Approval Conditions Verified (1 and 2 by Reviewer, 3 by Product)
 - product | decision | Deferred re-triage at the milestone-completion checkpoint: BUG-002 held Deferred into M2 with updated rationale; re-triaged again at M2 `/agent-plan` Stage 1
 - product | progress | Completion record written: `artifacts/milestone-1-task-crud/reviews/completion.md` — Status: Complete with Deferrals (BUG-002 under Known Issues)
@@ -62,8 +61,8 @@ Entries under a session heading are appended in the order they happen (oldest fi
 - ui | progress | UX review written: `artifacts/milestone-1-task-crud/reviews/ux.md` — APPROVED WITH NOTES (BUG-002 noted)
 - security | progress | Implementation review clean: `artifacts/milestone-1-task-crud/reviews/security-impl.md` — parameterized bindings confirmed at every query site in the milestone diff (flagged Yes at planning)
 - performance | progress | Measured check complete: `artifacts/milestone-1-task-crud/reviews/performance-impl.md` — all four budgets within target; AGENT_STATE budget table updated
-- docs-writer | progress | Milestone-completion drain: no pending docs entries remained
-- validator | progress | Retrospective written: `artifacts/milestone-1-task-crud/reviews/retrospective.md`; AGENT_STATE dashboards updated
+- docs-writer | progress | Milestone-completion drain: 4 pending docs entries drained (2 queued during planning, 1 during T-3, 1 during T-5)
+- validator | progress | Milestone-completion pass: all 5 task outcomes plus the milestone outcome recorded in AGENT_STATE; retrospective written: `artifacts/milestone-1-task-crud/reviews/retrospective.md`
 - agent-code | progress | Run complete: M1 closed — 5/5 tasks Complete, 42 tests passing, all CEO Approval Conditions Verified, BUG-002 held Deferred
 
 ### 2026-04-09 — agent-code — milestone-1-task-crud
@@ -71,10 +70,11 @@ Entries under a session heading are appended in the order they happen (oldest fi
 - coder | progress | T-1 complete: `Task` type, SQLite schema, idempotent migration runner with WAL mode and `idx_tasks_completed`
 - reviewer | loop | Task T-1: loop 1/3
 - reviewer | progress | T-1 approved at merge; Approval Condition 2 checked (WAL pragma and index present in the migration)
+- reviewer | progress | T-1 Acceptance Criteria Check: 7/7 Met — routed to Product anyway (Step 4b: task carries CEO Conditions 1 and 2)
 - product | progress | T-1 validated against acceptance criteria; Status set to Complete
-- docs-writer | progress | Drained 2 docs entries at the T-1 task-completion checkpoint (both queued during planning)
 - coder | progress | T-2 complete: `add` command using `.prepare().run(params)` bindings per Approval Condition 1
 - reviewer | loop | Task T-2: loop 1/3
+- reviewer | progress | T-2 Acceptance Criteria Check: 6/6 Met — routed to Product anyway (Step 4b: task carries CEO Condition 1)
 - product | progress | T-2 validated against acceptance criteria; Status set to Complete
 - coder | blocker | T-3 first-run crash on a fresh install: `SqliteError: no such table: tasks` when `list` runs before any other command
 - reviewer | progress | T-3 finding classified as a Defect → routed to Bug Gatherer
@@ -86,10 +86,10 @@ Entries under a session heading are appended in the order they happen (oldest fi
 - tester | progress | T-3 suite green, including the new fresh-install first-run regression test
 - product | progress | T-3 validated; Approval Condition 3 remediation confirmed; Status set to Complete
 - coder | docs | CLAUDE.md Common Pitfalls + Persistence sections need the first-run migration behaviour from BUG-001 ✅
-- docs-writer | progress | Drained 1 docs entry at the T-3 task-completion checkpoint
 - coder | progress | T-4 complete: `done` and `delete` commands with parameterized statements
 - reviewer | loop | Task T-4: loop 1/3
-- product | progress | T-4 validated against acceptance criteria; Status set to Complete — T-5 remains for the next session
+- reviewer | progress | T-4 Acceptance Criteria Check: 6/7 Met, criterion 6 flagged Product judgment (`done` missing-id coverage pending BUG-002)
+- product | progress | T-4 validated; criterion 6 disposed as in-scope for M2; Status set to Complete — T-5 remains for the next session
 
 ### 2026-04-08 — agent-plan — milestone-1-task-crud
 

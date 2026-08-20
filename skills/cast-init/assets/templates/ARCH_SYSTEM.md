@@ -14,6 +14,22 @@
   - Status values: Draft / In Review / Approved / Implemented
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.
+
+  SECTION SCALING:
+  Required sections must be PRESENT in every instance, but their depth scales with
+  the milestone. A section marked (required, scales) collapses to a single line —
+  `N/A — <one-clause reason>` — whenever the milestone does not exercise it. The
+  remaining required sections are always filled properly. Optional sections are
+  omitted entirely unless their trigger fires.
+
+  Filling a section the milestone does not exercise is a defect, not thoroughness:
+  every line here is read by the CEO at review and by each task's Coder through a
+  Context Manifest anchor, so speculative content costs real context on every
+  downstream stage and invites implementation against requirements nobody set.
+
+  Under Module Specifications, delete the [MODULE_x] blocks you do not use — write
+  one block per module the milestone actually touches, not three because the
+  template shows three.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
@@ -156,7 +172,7 @@
 
 ---
 
-## Message Flow (required)
+## Message Flow (required, scales)
 
 [Describe the sequence of events for the primary use case of this system.]
 
@@ -191,7 +207,7 @@ Actor / Source          Action                         Result
 [FINAL_STATE]
 ```
 
-### State Storage (required)
+### State Storage (required, scales)
 
 | State Field | Type | Persisted | Owner Module |
 |-------------|------|-----------|-------------|
@@ -201,7 +217,7 @@ Actor / Source          Action                         Result
 
 ---
 
-## Integration Points (required)
+## Integration Points (required, scales)
 
 | External System | Relationship | Data Exchanged | Direction |
 |----------------|-------------|---------------|----------|
@@ -211,7 +227,7 @@ Actor / Source          Action                         Result
 
 ---
 
-## Performance Budget (required)
+## Performance Budget (required, scales)
 
 | Metric | Target | Notes |
 |--------|--------|-------|
@@ -232,7 +248,7 @@ Actor / Source          Action                         Result
 | 2 | [Scenario] | [MODULE_B], [MODULE_C] | [Outcome] |
 | 3 | Edge: [Scenario] | [All] | [Outcome] |
 
-### Manual Testing Checklist (required)
+### Manual Testing Checklist (required, scales)
 
 - [ ] [End-to-end scenario covering happy path]
 - [ ] [Edge case scenario]

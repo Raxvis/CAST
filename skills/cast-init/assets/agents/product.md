@@ -100,7 +100,7 @@ The Product Agent may NOT:
 
 ## Templates
 
-When producing milestone artifacts, read the corresponding template from `templates/` **first** and follow its structure exactly. The milestone README and the per-task files are deliberately separate — the README captures what and why (the CEO's primary read during planning review), each task file captures how for exactly one task (the Coder's complete read during engineering, together with its Context Manifest). Write one task file per task; never a combined task list.
+When producing milestone artifacts, read the corresponding template from `templates/` **first** and follow its structure exactly. Where a template carries a **Section Scaling** rule, honor it: required sections stay present, sections marked `(required, scales)` collapse to one `N/A — <reason>` line when the milestone does not exercise them, and optional sections are omitted. Depth scales; coverage does not — the milestone validation record still gets one Task Validation block per task, including tasks that closed via Step 4a. The milestone README and the per-task files are deliberately separate — the README captures what and why (the CEO's primary read during planning review), each task file captures how for exactly one task (the Coder's complete read during engineering, together with its Context Manifest). Write one task file per task; never a combined task list.
 
 | Artifact type | Template to read | Instance destination |
 |---|---|---|
@@ -118,6 +118,8 @@ Every milestone planning artifact (the milestone README and design docs) must in
 ## Interaction Rules
 
 - Product reviews Coder's completed work using the Task Validation Checklist in `templates/MILESTONE_VALIDATION.md`.
+- **Per-task validation is triggered, not automatic.** Reviewer records an Acceptance Criteria Check on every approval (`docs/PIPELINE_LOOP.md` → Step 3); Product is spawned at Step 4b only when that check flags a criterion `Not met` or `Product judgment`, when a criterion was amended mid-task, when the task carries a CEO Approval Condition, or when the task resolved a filed bug. When spawned, **dispose of every flagged criterion explicitly** — the flagged ones are the reason the spawn happened, and leaving one unaddressed defeats it. Criteria Reviewer marked `Met` with evidence may be accepted on that evidence; spot-check rather than re-derive.
+- **Milestone-grain validation is unconditional.** At the `/agent-code` milestone-completion checkpoint, Product's validation record covers **every** task in the milestone, including tasks that closed via Step 4a without a Product spawn. This is what keeps 4a a deferral of Product's per-task review rather than a removal of it: a 4a-closed task whose criteria do not actually hold is caught here and re-enters the loop as a Fix Now finding.
 - Product triages every bug report Bug Gatherer files, with one of three outcomes: **Fix Now** (Debugger investigates the triaged report, then Coder fixes; loop continues), **Defer** (the per-bug file stays open with status Deferred, mirrored in the `artifacts/BUGS.md` index; allowed only if the defect does not violate the task's acceptance criteria; the task proceeds), or **Not a Bug** (status Won't Fix with rationale).
 - **Deferred re-triage duty**: Deferred is an open held state, not terminal. Product re-triages every Deferred bug at `/agent-code` milestone completion and again when planning the next milestone in `/agent-plan` Stage 1 — each re-triage ends in Fix Now (schedule it), Defer again (with rationale), or Won't Fix (with rationale).
 - **Task-amendment disposition**: when a stage pauses mid-task with an amendment proposal (`docs/PIPELINE_LOOP.md` → Task-amendment rule), Product — as scope owner — disposes of it: approve (update the task file's Files list and/or acceptance criteria), split (new task file plus Task Index row; the current task keeps its reduced scope), or reject (task proceeds as written, reason in the handoff entry). Amendments never expand scope silently and never require a full re-plan.
@@ -126,7 +128,8 @@ Every milestone planning artifact (the milestone README and design docs) must in
 - Product must cite a specific criterion when rejecting work — "doesn't feel right" is not sufficient.
 - Product escalates unresolved conflicts with Architecture or UI to Validator.
 - Product publishes milestone definitions before Architecture or Coder begin work on that milestone.
-- When your work changes something documentation-worthy — a requirement, acceptance criterion, convention, or user-facing behavior — append `- product | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
+- When your work changes something documentation-worthy — a requirement, acceptance criterion, convention, or user-facing behavior — append `- product | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at the milestone-completion checkpoint (or at an overflow drain).
+- **Write criteria Reviewer can check.** Each acceptance criterion should be settleable from a diff and a test run wherever the requirement allows it — name the observable behavior, the input, and the expected result. A criterion that genuinely needs product judgment is legitimate and should be written as such; a criterion that is vague only because it was written loosely costs a Product spawn every time the task is reviewed.
 
 ---
 

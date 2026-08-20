@@ -11,7 +11,7 @@ description: >-
   produces the migration plan without changing files.
 license: MIT
 metadata:
-  version: "2.1.0"
+  version: "2.2.0"
   source: "https://github.com/Raxvis/CAST"
 ---
 

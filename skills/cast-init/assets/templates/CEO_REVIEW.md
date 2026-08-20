@@ -10,11 +10,11 @@
   - Fill in every Inputs Reviewed path — all six inputs are mandatory; write "None"
     only when a review stage produced no findings file. Exception: the UI Spec row
     reads "N/A — no ui agent installed" when the project has no ui agent (Stage 2b
-    was skipped), and in /agent-plan single-task mode a skipped stage's row reads
-    "N/A — single-task mode, stage not run".
+    was skipped), and in /agent-plan light mode a skipped stage's row reads
+    "N/A — light mode, stage not run".
   - Work through all six checklist sections. Do not skip any. Section 3 accepts
-    "N/A — no ui agent installed" as its content in no-ui projects; in single-task
-    mode, Sections 3, 4, and 5 accept "N/A — single-task mode, stage not run" for
+    "N/A — no ui agent installed" as its content in no-ui projects; in light
+    mode, Sections 3, 4, and 5 accept "N/A — light mode, stage not run" for
     stages that were skipped (a flagged-in stage gets a real section).
   - Record Revision Requests when returning REVISION REQUIRED, and Approval Conditions
     (with a Verified By owner) when returning APPROVED WITH CONDITIONS.

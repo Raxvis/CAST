@@ -109,10 +109,18 @@ on first invocation rather than throwing — this is the path BUG-001 surfaced.
 
 ### 8. reviewer -> product — 2026-04-09
 
-- **Outcome**: Clean review — no Defects, no Issues. Conditions 1 and 3 verified on the `list` path.
+- **Outcome**: Clean review — no Defects, no Issues. Conditions 1 and 3 verified on the `list` path. All 7 criteria Met; routing to Product anyway (Step 4b — this task carries CEO Approval Conditions and resolved BUG-001).
 - **Files touched**: None
 - **Read next**: Manifest only
 - **Open items**: None
+- **Acceptance Criteria Check**:
+  - [1] `acme-todo list` on an empty DB prints a header row and no tasks. — Met — `list.test.ts` › "empty DB prints header only" (`7c25d8e`)
+  - [2] `acme-todo list` on a fresh machine creates the DB, runs migrations, and prints the empty list (fixes BUG-001). — Met — `list.test.ts` › "fresh machine first run" (red against `5b82c7d`, green at `a8f3d12`)
+  - [3] `--all` flag includes completed tasks; without it, only open tasks print. — Met — `list.test.ts` › "--all includes completed"
+  - [4] Output format is exactly `ID  TITLE  STATUS  CREATED`. — Met — `src/commands/list.ts:31`; `list.test.ts` › "column format"
+  - [5] Query uses parameterized binding for the `completed` filter. — Met — `src/commands/list.ts:22`
+  - [6] Vitest suite covers: empty DB, mixed open/completed, `--all` flag, first-run migration. — Met — 7 tests in `7c25d8e`
+  - [7] No linter or type-check errors introduced. — Met — `pnpm typecheck` clean at `7c25d8e`
 
 ### 9. product — task complete — 2026-04-09
 

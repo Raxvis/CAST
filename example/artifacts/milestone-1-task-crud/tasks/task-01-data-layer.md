@@ -83,10 +83,19 @@ and must enable WAL mode plus an index on `completed` to satisfy CEO Condition 2
 
 ### 4. reviewer -> product — 2026-04-09
 
-- **Outcome**: Clean review — no Defects, no Issues. CEO Conditions 1 and 2 verified in the migration.
+- **Outcome**: Clean review — no Defects, no Issues. CEO Conditions 1 and 2 verified in the migration. All 8 criteria Met; routing to Product anyway (Step 4b — this task carries CEO Approval Conditions).
 - **Files touched**: None
 - **Read next**: Manifest only
 - **Open items**: None
+- **Acceptance Criteria Check**:
+  - [1] `Task` type exported from `src/types/task.ts` with all 5 fields. — Met — `src/types/task.ts:3-9` (`3f6c2a9`)
+  - [2] `runMigrations` is safe to invoke repeatedly — second call is a no-op. — Met — `migrations.test.ts` › "second call is a no-op" (`b7d41e0`)
+  - [3] `PRAGMA journal_mode = WAL` is set on the connection. — Met — `src/db/migrations.ts:18`; `migrations.test.ts` › "WAL pragma set"
+  - [4] Index `idx_tasks_completed` exists on the `completed` column after migration. — Met — `src/db/schema.ts:24`; `migrations.test.ts` › "index present"
+  - [5] Parent directory for `~/.acme-todo/tasks.db` is created if missing. — Met — `src/db/schema.ts:11` (`mkdirSync` recursive)
+  - [6] Honors `ACME_TODO_DB` environment variable for the DB path. — Met — `migrations.test.ts` › "env override"
+  - [7] No linter or type-check errors introduced. — Met — `pnpm typecheck` clean at `b7d41e0`
+  - [8] Vitest unit tests cover the idempotency of `runMigrations`. — Met — 6 tests in `b7d41e0`
 
 ### 5. product — task complete — 2026-04-09
 

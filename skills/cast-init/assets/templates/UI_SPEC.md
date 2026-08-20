@@ -16,6 +16,23 @@
   - Status values: Draft / In Review / Approved / Implemented
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.
+
+  SECTION SCALING:
+  Required sections must be PRESENT in every instance, but their depth scales with
+  the work. A section marked (required, scales) collapses to a single line —
+  `N/A — <one-clause reason>` — whenever this screen does not exercise it. The
+  remaining required sections are always filled properly. Optional sections are
+  omitted entirely unless their trigger fires.
+
+  SPEC ONLY WHAT THE MILESTONE TOUCHES. A milestone's ui.md covers the screens its
+  tasks introduce or change — identified by the per-task `Needs UI Spec` flags.
+  Do not spec screens the milestone does not touch, and for a cosmetic change to an
+  existing screen, spec the delta rather than re-describing the whole screen.
+
+  Filling a section this screen does not exercise is a defect, not thoroughness:
+  the CEO reads every line at review and each task's Coder reads it through a
+  Context Manifest anchor, so speculative content costs real context downstream
+  and invites implementation against requirements nobody set.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
@@ -90,7 +107,7 @@
 
 ---
 
-## Visual Style (required)
+## Visual Style (required, scales)
 
 | Property | Value | Theme Key |
 |----------|-------|-----------|
@@ -142,7 +159,7 @@
 | `[fieldName]` | [Store / API / Props] | [type] | [Any transformation needed] |
 | `[fieldName]` | [Store / API / Props] | [type] | [Any transformation needed] |
 
-### Writes / Actions (required)
+### Writes / Actions (required, scales)
 
 | Action | Trigger | Effect |
 |--------|---------|--------|
@@ -183,7 +200,7 @@
 
 ---
 
-## Edge Cases (required)
+## Edge Cases (required, scales)
 
 | Case | Expected Behavior |
 |------|------------------|

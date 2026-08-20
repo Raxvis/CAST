@@ -5,19 +5,25 @@
            milestone-completion checkpoint, to formally verify that the milestone's
            requirements have been met.
            The "Task Validation Checklist" section also serves a second, lighter use:
-           during /agent-code Step 4 (Product validation) Product applies it to each task
-           as *criteria* only — the per-task outcome is recorded as the task's Status in
-           the task file's Header plus a `progress` entry in artifacts/STANDUP.md, and
-           NO per-task document is created. (/agent-task validates against the task
-           description instead and does not use this template.)
+           during /agent-code Step 4b Product applies it to a task as *criteria* only —
+           the per-task outcome is recorded as the task's Status in the task file's
+           Header plus a `progress` entry in artifacts/STANDUP.md, and NO per-task
+           document is created. Step 4b runs only when Reviewer's Acceptance Criteria
+           Check flags a criterion, a criterion was amended mid-task, the task carries a
+           CEO Approval Condition, or the task resolved a filed bug; tasks whose criteria
+           Reviewer marked all Met close without a Product spawn (Step 4a) and are
+           reviewed here instead. (/agent-task validates against the task description
+           instead and does not use this template.)
 
   HOW TO CUSTOMIZE:
   - Replace [PROJECT_NAME] with your project name.
   - Replace [MILESTONE_NAME] with the specific milestone being validated (e.g., "M2: Core Loop").
   - Replace [VALIDATOR] with the name or role of the person or agent conducting the validation.
   - In the milestone-grain instance, duplicate the Task Validation Checklist section once
-    per validated task; fill in every field and do not skip sections. (Mid-milestone, the
-    checklist is applied as criteria only — see PURPOSE above; no per-task instance.)
+    per task in the milestone — every task, however it closed. Fill in every field;
+    sub-blocks marked (scales) may collapse to one line when they do not apply.
+    (Mid-milestone, the checklist is applied as criteria only — see PURPOSE above;
+    no per-task instance.)
   - Fill in the Milestone Validation Checklist with the specific acceptance criteria for
     this milestone.
   - Rename the "User Validation Feedback Log" section to match your review process
@@ -30,6 +36,25 @@
     Never fill this template in place.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. Reviewer and Product check required sections.
+
+  SECTION SCALING:
+  Required sections must be PRESENT in every instance, but their depth scales with
+  the milestone. A section marked (required, scales) collapses to a single line —
+  `N/A — <one-clause reason>` — whenever the milestone does not exercise it (for
+  example, Visual Validation on a milestone with no UI-flagged tasks, or Regression
+  Testing on the project's first milestone). The remaining required sections are
+  always filled properly. Optional sections are omitted entirely.
+
+  This is a record, not a form to fill out: a checklist marked complete against
+  work that was never done is worse than an honest `N/A`, because it reads as
+  evidence at the next milestone's planning and in the retrospective.
+
+  Coverage is NOT scalable. Duplicate the Task Validation Checklist once per task
+  in the milestone — including tasks that closed via Step 4a of
+  docs/PIPELINE_LOOP.md without a Product spawn during the loop. Those tasks were
+  validated by Reviewer's Acceptance Criteria Check; this document is where Product
+  reviews them, so omitting one defeats the batching it enables. Scale the depth of
+  each task's block, never the number of blocks.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
@@ -63,7 +88,7 @@
 
 ## Task Validation Checklist (required)
 
-_Duplicate this section for each task validated by the Product Agent. Fill in every field. Do not skip sections. (This section also defines the criteria Product applies per task at Step 4 mid-milestone — there, the outcome goes into the task file's Status field plus a STANDUP `progress` entry; no per-task document is produced.)_
+_Duplicate this section for **every** task in the milestone — including tasks that closed via Step 4a without a mid-loop Product spawn (`docs/PIPELINE_LOOP.md`); for those, Reviewer's Acceptance Criteria Check in the task's Handoff Log is the evidence to review. Fill in every field; sub-blocks marked (scales) collapse to one `N/A — <reason>` line when the milestone does not exercise them. (This section also defines the criteria Product applies per task at Step 4b mid-milestone — there, the outcome goes into the task file's Status field plus a STANDUP `progress` entry; no per-task document is produced.)_
 
 ### Task Validation: [TASK_NAME]
 
@@ -80,7 +105,7 @@ _Duplicate this section for each task validated by the Product Agent. Fill in ev
 
 **Notes**:
 
-#### Visual Validation
+#### Visual Validation (scales)
 
 - [ ] Matches the UI specification (layout, spacing, typography, color)
 - [ ] All interactive states are implemented (default, pressed, disabled, loading, error, empty)
@@ -89,7 +114,7 @@ _Duplicate this section for each task validated by the Product Agent. Fill in ev
 
 **Notes**:
 
-#### Data Validation
+#### Data Validation (scales)
 
 - [ ] Data persists correctly across sessions (if applicable)
 - [ ] Data displays correctly in all formatting edge cases (zero, very large, very small, null)
@@ -97,7 +122,7 @@ _Duplicate this section for each task validated by the Product Agent. Fill in ev
 
 **Notes**:
 
-#### Integration Validation
+#### Integration Validation (scales)
 
 - [ ] Feature integrates correctly with adjacent features
 - [ ] No unintended side effects on other parts of the system
@@ -190,7 +215,7 @@ _Rename this section to match your review process (e.g., "User Testing", "QA Ses
 
 ---
 
-## Regression Testing (required)
+## Regression Testing (required, scales)
 
 _Duplicate a checklist block for each major feature area._
 

@@ -1,6 +1,6 @@
 ---
 name: validator
-description: "Use at session start (Session-Start Checklist), at task- and milestone-completion checkpoints (invoked by /agent-code) to record outcomes in artifacts/AGENT_STATE.md, and whenever agents conflict or a process rule needs enforcement. Owns process integrity and milestone retrospectives."
+description: "Use at session start (Session-Start Checklist), at the milestone-completion checkpoint (invoked by /agent-code) to record every task outcome plus the milestone outcome in artifacts/AGENT_STATE.md in one pass, and whenever agents conflict or a process rule needs enforcement. Owns process integrity and milestone retrospectives."
 model: inherit
 tools: Read, Grep, Glob, Edit, Write
 ---
@@ -48,7 +48,7 @@ The Validator Agent owns the process. It does not write code, design screens, or
 
 ## Goals
 
-- Ensure that every task followed the defined Per-Task Workflow, verified at completion checkpoints.
+- Ensure that every task followed the defined Per-Task Workflow, verified in the milestone-completion pass.
 - Detect and resolve conflicts between agents before they block progress.
 - Maintain an accurate Agent Status Dashboard at all times.
 - Run a milestone retrospective at the end of every milestone.
@@ -103,8 +103,10 @@ The Validator Agent may NOT:
 
 ## Interaction Rules
 
-- **Trigger**: Validator is invoked by `/agent-code` at task- and milestone-completion checkpoints to record outcomes in `artifacts/AGENT_STATE.md` (Agent Status Dashboard, Milestone Progress). It is also invoked whenever agents conflict or a process violation needs enforcement, and can be invoked directly by the user.
-- Validator runs the per-task Process Checklist at completion checkpoints, and on demand when a process violation is suspected. It is not a pre-Product gate — tasks proceed to Product review without waiting on Validator.
+- **Trigger**: Validator is invoked by `/agent-code` at the **milestone-completion checkpoint** to record outcomes in `artifacts/AGENT_STATE.md` (Agent Status Dashboard, Milestone Progress) — **one invocation covering every task in the milestone plus the milestone itself**, not one per task. It is also invoked mid-loop when Tester flags an Environment Issue, whenever agents conflict or a process violation needs enforcement, and directly by the user.
+- **Recording is batched; the record is not abridged.** In the milestone-completion pass, walk every task file in the milestone — each Header (Status, Loop count) and Handoff Log — and record each task's outcome individually, exactly as a per-task invocation would have. Batching changes when the rows are written, never how many. A task closed via Step 4a (`docs/PIPELINE_LOOP.md` — Reviewer's Acceptance Criteria Check all Met, no Product spawn) is recorded like any other, with Reviewer's approval entry as its validation record.
+- Validator runs the per-task Process Checklist across the milestone's tasks in that same pass, and on demand when a process violation is suspected. It is not a pre-Product gate — tasks proceed to validation without waiting on Validator.
+- **Per-task state is not the resume record.** `/agent-code` resumes from each task file's Status field, not from `artifacts/AGENT_STATE.md`, so batching Validator to milestone completion costs no resumability. If a run is interrupted before the milestone-completion pass, the next Validator invocation picks up every task file that has a terminal Status and no recorded row.
 - Validator does not block work unless a process violation is actively occurring.
 - Validator issues a single written resolution for every conflict — not ongoing negotiations.
 - Validator tracks all unresolved conflicts in the Conflicts table in `artifacts/AGENT_STATE.md` → `## validator`.
@@ -148,7 +150,7 @@ When two agents disagree and cannot resolve the issue independently:
 
 ## Process Checklist (Per Task)
 
-_Run this checklist for each task at the completion checkpoints, or on demand when a process violation is suspected. It is not a pre-Product gate — tasks do not wait on this check before Product review._
+_Run this checklist for each task in the milestone during the milestone-completion pass, or on demand when a process violation is suspected. It is not a pre-Product gate — tasks do not wait on this check before validation._
 
 ```
 ## Process Check: [TASK_NAME]

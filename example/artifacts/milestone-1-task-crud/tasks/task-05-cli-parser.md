@@ -78,16 +78,24 @@ that opens the DB, runs migrations, dispatches, and closes the DB.
 - **Read next**: Manifest only
 - **Open items**: None
 
-### 4. reviewer -> product — 2026-04-10
+### 4. reviewer -> orchestrator — 2026-04-10
 
-- **Outcome**: Clean review — no Defects, no Issues. Migration-before-dispatch guard confirmed (Condition 3 regression-proof).
+- **Outcome**: Clean review — no Defects, no Issues. Migration-before-dispatch guard confirmed (Condition 3 regression-proof). All 7 acceptance criteria Met; no Product spawn needed (Step 4a).
 - **Files touched**: None
 - **Read next**: Manifest only
 - **Open items**: None
+- **Acceptance Criteria Check**:
+  - [1] `acme-todo --help` prints usage listing all four commands. — Met — `cli.test.ts` › "prints usage for --help" (`2b6d0e7`)
+  - [2] `acme-todo` with no args prints usage and exits non-zero. — Met — `cli.test.ts` › "no args exits 1 with usage"
+  - [3] Unknown command prints usage and exits non-zero. — Met — `cli.test.ts` › "unknown command exits 1"
+  - [4] `list --all` is parsed correctly (flag routed to `runList`). — Met — `src/cli.ts:41`; `cli.test.ts` › "routes --all to runList"
+  - [5] `src/index.ts` always calls `runMigrations` before dispatching. — Met — `src/index.ts:12` (unconditional, ahead of the switch); `cli.test.ts` › "migrations run before dispatch"
+  - [6] Vitest suite covers parser happy paths, `--help`, and unknown-command error. — Met — 8 tests added in `2b6d0e7`
+  - [7] No linter or type-check errors introduced. — Met — `pnpm typecheck` and lint clean at `8e51f9a`
 
-### 5. product — task complete — 2026-04-10
+### 5. orchestrator — task closed (Step 4a) — 2026-04-10
 
-- **Outcome**: All acceptance criteria met; Status set to Complete. Milestone-completion checkpoint fires (all five tasks Complete).
+- **Outcome**: Every criterion Met with evidence in entry #4; task closed without a Product spawn. Status set to Complete. Milestone-completion checkpoint fires (all five tasks Complete) — Product reviews this task in the milestone validation record like every other.
 - **Files touched**: This file (Header Status)
 - **Read next**: —
 - **Open items**: None

@@ -31,7 +31,7 @@ _Be specific. Reference tasks, agents, or decisions that were particularly effec
 - CEO Approval Condition 3 was written defensively during planning and caught BUG-001 during T-3 implementation — the fix landed in the same session instead of becoming a post-release hotfix.
 - The Defect routing on BUG-001 worked end to end in one session: Reviewer classified it, Bug Gatherer filed it, Product triaged fix-now, Debugger produced three costed alternatives, and Coder shipped the recommended fix (`a8f3d12`).
 - T-1 shipping first as a hard dependency gate kept T-2/T-3/T-4 from colliding — the three parallel tasks touched only their own command files.
-- The Docs Writer queue kept documentation current without a dedicated docs pass: all 4 queued `docs` entries were drained at task-completion checkpoints, and the milestone-completion drain found nothing pending.
+- The Docs Writer queue kept documentation current without a dedicated docs pass: all 4 queued `docs` entries drained in the single milestone-completion pass. The queue never approached the 10-entry overflow bound, so the milestone cost one Docs Writer invocation instead of one per task.
 
 ---
 

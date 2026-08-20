@@ -28,9 +28,13 @@
   - Handoff Log: append-only, newest last. Every stage transition appends exactly one
     entry in the fixed format. No narrative recaps — max 10 lines per entry; anything
     longer belongs in the artifact the entry points to (bug file, review file, code).
-    Exception: Reviewer entries and Tester failure entries add one line per
+    Exceptions: (a) Reviewer entries and Tester failure entries add one line per
     finding/failure beyond the fixed fields — for those stages this log IS the
-    canonical record; never drop findings to fit the cap.
+    canonical record; never drop findings to fit the cap; (b) a Reviewer approval
+    entry also carries the Acceptance Criteria Check block — one line per
+    acceptance criterion, each Met (with evidence) / Not met / Product judgment.
+    That block is what decides whether the task closes directly or spawns Product
+    (docs/PIPELINE_LOOP.md → Step 4).
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted.
 -->
@@ -100,6 +104,13 @@ _Append-only; newest last. One entry per stage transition, fixed format, max 10 
 - **Commit**: [hash — only when this stage committed code per the Commit discipline in `docs/PIPELINE_LOOP.md`; omit the line otherwise]
 - **Read next**: [file/section references the next agent needs BEYOND the Context Manifest, or "Manifest only"]
 - **Open items**: [blockers, questions, or "None"]
+
+_Reviewer approval entries add the criteria block below the fixed fields (omit it in every other entry):_
+
+- **Acceptance Criteria Check**:
+  - [1] [criterion text, verbatim] — Met — [evidence: commit, test name, or file:line]
+  - [2] [criterion text, verbatim] — Product judgment — [what needs deciding]
+  - [3] [criterion text, verbatim] — Not met — [what is missing]
 
 ---
 

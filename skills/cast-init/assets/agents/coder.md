@@ -99,7 +99,7 @@ The Coder Agent may NOT:
 - Coder completes and attaches the Pre-Handoff Checklist when submitting any task for review.
 - Coder does not ask for approval to fix obvious bugs — but does document the fix in the checklist.
 - Coder does not modify architecture documents directly; it raises Open Questions to Architecture.
-- When your work changes something documentation-worthy — an API, command, configuration, convention, or user-facing behavior — append `- coder | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
+- When your work changes something documentation-worthy — an API, command, configuration, convention, or user-facing behavior — append `- coder | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at the milestone-completion checkpoint (or at an overflow drain).
 
 ---
 

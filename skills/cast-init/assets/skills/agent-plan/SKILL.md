@@ -3,9 +3,11 @@ name: agent-plan
 description: >-
   Run the CAST Planning Stage end-to-end for a feature or milestone: Product →
   Architecture + UI → Security + Performance → CEO verdict. Use when the user asks to
-  plan a feature or milestone, or invokes /agent-plan. Supports a single-task light
-  mode (Product + Architecture + CEO only) for one-task features. Produces planning
-  documents under artifacts/ and a CEO sign-off; writes no code.
+  plan a feature or milestone, or invokes /agent-plan. Auto-engages a light mode
+  (Product + Architecture + CEO only) for small features — 3 tasks or fewer with no new
+  screens, no security surface, no applicable performance budget, and nothing
+  cross-cutting. Produces planning documents under artifacts/ and a CEO sign-off; writes
+  no code.
 ---
 
 <!-- TEMPLATE INSTRUCTIONS
@@ -67,20 +69,30 @@ This skill orchestrates the **Planning Stage** of the agent workflow. It runs th
 
 **Milestone numbering.** Unless the invocation input names an existing milestone to re-plan, allocate `{N}` as the highest `milestone-{N}-*` directory number already present under `artifacts/` plus one (`1` if there are none). Allocate it once, before Stage 1; Stage 1 creates the milestone directory `artifacts/milestone-{N}-{slug}/` and every artifact of the run is written inside it.
 
-### Single-Task Mode (light)
+### Light Mode
 
-Between `/agent-task` (no design content at all) and a full planning run there is a real middle tier: one well-understood feature that needs a small number of genuine design decisions. Single-task mode plans it without full ceremony — the opinion stands (design work gets planned, engineering still requires a CEO verdict); only the ceremony scales with the work.
+Between `/agent-task` (no design content at all) and a full planning run there is a real middle tier: a small, well-understood feature that needs a handful of genuine design decisions. Light mode plans it without full ceremony — the opinion stands (design work gets planned, engineering still requires a CEO verdict); only the ceremony scales with the work.
 
-**Entering the mode.** Run single-task mode when the user asks for it (e.g. `/agent-plan single: <feature>`), or when Stage 1 scoping concludes the work decomposes to exactly one task. If Stage 1 finds more than one task, or a new screen set, or cross-cutting change, continue in full mode — do not force a multi-task feature through the light path.
+Light mode was originally the single-task path; it now covers small multi-task features too, because a two- or three-task milestone with no new screens and no security or performance surface pays for five planning stages and gets one stage's worth of design. `/agent-plan single: <feature>` remains an accepted invocation and is the one-task case of this mode.
+
+**Entering the mode.** Run light mode when the user asks for it (`/agent-plan light: <feature>`, or `/agent-plan single: <feature>` for the one-task case), **or automatically when Stage 1 scoping concludes that every one of the following holds**:
+
+1. The work decomposes to **3 tasks or fewer**.
+2. It introduces **no new screen set** — no new screens, and no change to the interaction model of existing ones. (A cosmetic change to one existing screen does not disqualify; a new screen does.)
+3. It is **not security-sensitive** — it does not touch authentication or authorization, input handling, secrets or sensitive data, and adds no new dependency.
+4. **No performance budget applies** to it — the architecture document sets no budget this work exercises, and it introduces no hot path, no new persistence or network round trip, and no unbounded data growth.
+5. It is **not cross-cutting** — no change to a shared contract, module boundary, or convention that other milestones' code depends on.
+
+Any one of these failing means full mode. **Judge them from Stage 1's output, not from the invocation text** — a feature request that sounds small often is not, and the point of the gate is to catch that before four stages are skipped. When a condition is genuinely borderline, choose full mode: a wrongly-full plan costs stages, a wrongly-light one ships an unreviewed design decision.
 
 **What changes:**
 
 - **Stages run:** Stage 1 (Product) → Stage 2a (Architecture) → Stage 2c → Stage 4 (CEO). Stages 2b (UI), 3a (Security), and 3b (Performance) are skipped by default.
-- **Stage 1** creates the milestone directory exactly as in full mode — same layout, so `/agent-code` consumes it unchanged — with exactly one task file. Every required README section is still present (lean is fine; absent is not). Stage 1 also sets the flags that pull skipped stages back in: **Needs UI Spec** = Yes on the task pulls in Stage 2b; security-sensitive scope (auth, input handling, new dependencies, sensitive data) pulls in Stage 3a; applicable performance budgets pull in Stage 3b. A pulled-in stage runs exactly as in full mode, including its completion-flag line.
-- **Stage 4 (CEO)** reviews as usual; the skipped stages' checklist sections and input rows read "N/A — single-task mode, stage not run" (permitted by `templates/CEO_REVIEW.md`). The verdict line, Approval Conditions, and the post-verdict Product backfill work identically.
+- **Stage 1** creates the milestone directory exactly as in full mode — same layout, so `/agent-code` consumes it unchanged — with one task file per task. Every required README section is still present (lean is fine; absent is not). Stage 1 also sets the flags that pull skipped stages back in: **Needs UI Spec** = Yes on any task pulls in Stage 2b; security-sensitive scope (auth, input handling, new dependencies, sensitive data) pulls in Stage 3a; applicable performance budgets pull in Stage 3b. A pulled-in stage runs exactly as in full mode, including its completion-flag line. These flags are the safety net under the entry conditions above: a stage wrongly skipped at scoping time is pulled back the moment a task declares its need.
+- **Stage 4 (CEO)** reviews as usual; the skipped stages' checklist sections and input rows read "N/A — light mode, stage not run" (permitted by `templates/CEO_REVIEW.md`). The verdict line, Approval Conditions, and the post-verdict Product backfill work identically. **The CEO is the backstop:** if the plan in front of it clearly needed a skipped stage, the correct verdict is REVISION REQUIRED naming that stage, which re-runs it and re-reviews.
 - **Downstream:** a skipped Security/Performance stage leaves no flag line in a review file (the file does not exist), so the `/agent-code` milestone-completion checkpoint skips the corresponding implementation review automatically.
 
-Record the mode in the Stage 1 checkpoint entry (`- agent-plan | progress | Stage 1 complete (single-task mode): ...`) so a resumed run knows which stages to expect.
+Record the mode and why it was chosen in the Stage 1 checkpoint entry — `- agent-plan | progress | Stage 1 complete (light mode: 2 tasks, no new screens, no security or perf surface): ...` — so a resumed run knows which stages to expect and a later reader can audit the call.
 
 **Stage checkpoints.** At the start of the run, add a session heading `### YYYY-MM-DD — agent-plan — milestone-{N}-{slug}` to `artifacts/STANDUP.md`. After each stage completes, append a checkpoint entry under it using that file's Entry Grammar, e.g. `- architect | progress | Stage 2a complete: artifacts/milestone-{N}-{slug}/architecture.md`. These checkpoints are what let an interrupted planning run resume at the right stage. Planning stages may also enqueue documentation work in their checkpoint entries: when a stage's output changes something documentation-worthy (APIs, commands, config, conventions, user-facing behavior), append a `- <agent> | docs | <note>` entry under the session heading — Docs Writer drains these at the next `/agent-code` or `/agent-task` completion checkpoint.
 

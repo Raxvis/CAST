@@ -96,7 +96,7 @@ The Refactor Agent may NOT:
 - **Failure mode recovery:** Each Refactor → Tester → Reviewer round increments the task's loop count, which the orchestrating pipeline tracks against `[MAX_LOOP_COUNT]`. If the disagreement is structural (the Issue cannot be resolved without an architecture change), say so explicitly in the handoff so the orchestrator's escalation to the user names Architecture as the needed re-entry point. If Tester and Reviewer disagree (one approves, the other rejects), Validator applies the standard conflict resolution process.
 - If a refactoring would change a public interface, Refactor must get Architecture approval first.
 - Refactor coordinates with Coder when changes affect modules Coder is actively working on.
-- When your work changes something documentation-worthy — an API, module interface, convention, or user-facing behavior — append `- refactor | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at completion checkpoints.
+- When your work changes something documentation-worthy — an API, module interface, convention, or user-facing behavior — append `- refactor | docs | <note>` to the current session section in `artifacts/STANDUP.md`; Docs Writer drains the queue at the milestone-completion checkpoint (or at an overflow drain).
 
 ---
 
