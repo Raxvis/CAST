@@ -376,7 +376,10 @@ jobs:
           for f in skills/cast-init/assets/templates/*.md; do
             [ "$(basename "$f")" = "README.md" ] && continue
             while IFS= read -r h; do
-              echo "$h" | grep -qE '\((required|optional)\)' || { echo "UNMARKED [$f]: $h"; fail=1; }
+              # "(required, scales)" (2.2.0) is a required marker with a depth
+              # qualifier — the section must still be present; only its depth may
+              # collapse to one N/A line. Accept it alongside the bare markers.
+              echo "$h" | grep -qE '\((required(, scales)?|optional)\)' || { echo "UNMARKED [$f]: $h"; fail=1; }
             done < <(grep -E '^## ' "$f")
           done
           [ "$fail" -eq 0 ] && echo "all marked"
