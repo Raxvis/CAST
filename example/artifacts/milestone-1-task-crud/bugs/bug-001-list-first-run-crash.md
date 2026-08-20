@@ -22,13 +22,12 @@
 - **Regression**: No — the first-run path never worked; migration execution lived only in the `add` command path.
 - **Related Issues**: CEO Approval Condition 3 (`../reviews/ceo.md`).
 
-## Investigation (written by Debugger)
+## Investigation (written by Coder before the fix)
 
 - **Root Cause**: Assumption leak — the original architecture assumed the SQLite database file would already be initialized by some earlier step before any command handler touched it. Migration execution lived in the `add` command path implicitly (because `add` was the command used during development), so `list` had no migration entry point and issued `SELECT * FROM tasks` against a database that had never had its migrations run.
 - **Affected Module(s)**: `src/commands/list.ts`, `src/db/connection.ts` (all command entry paths by extension).
-- **Alternative Solutions**: (a) Run migrations once in the CLI dispatcher (`src/cli.ts`) before dispatching — single call site, but hides the dependency from command handlers and their tests. (b) Extract an idempotent `ensureMigrations(db)` and call it at the top of every command entry path — explicit per handler, testable in isolation, smallest diff. (c) Make migration automatic inside the connection factory — most foolproof, but a larger structural change than a bug fix warrants.
-- **Recommended Fix**: Option (b). It is the smallest explicit change and keeps each command self-sufficient; revisit option (c) as a Milestone 2 refactor.
-- **Assigned To**: Coder
+- **Alternatives Considered**: (a) Run migrations once in the CLI dispatcher (`src/cli.ts`) before dispatching — single call site, but hides the dependency from command handlers and their tests. (b) Extract an idempotent `ensureMigrations(db)` and call it at the top of every command entry path — explicit per handler, testable in isolation, smallest diff. (c) Make migration automatic inside the connection factory — most foolproof, but a larger structural change than a bug fix warrants.
+- **Approach Chosen**: Option (b). It is the smallest explicit change and keeps each command self-sufficient; revisit option (c) as a Milestone 2 refactor.
 - **Investigation Date**: 2026-04-09
 
 ## Resolution (written by Coder at fix time)
@@ -41,7 +40,7 @@
 
 ## Notes
 
-Discovered by Coder during T-3 and resolved within the same session. This fix is the exact remediation CEO Approval Condition 3 demanded ("`list` must handle a missing database file by running migrations on first invocation rather than throwing an error"). Tester confirmed the fix in the T-3 suite run; Product verified the condition during Milestone 1 validation on 2026-04-10 by running `rm -rf ~/.acme-todo && acme list` and confirming the empty-state message and exit 0, then closed the bug at milestone sign-off.
+Discovered by Coder during T-3 and resolved within the same session. This fix is the exact remediation CEO Approval Condition 3 demanded ("`list` must handle a missing database file by running migrations on first invocation rather than throwing an error"). Coder's red→green evidence (red at `9d4b1c7`, green at `a8f3d12`) confirmed the fix and Reviewer verified it against the pre-fix commit; Product verified the condition during Milestone 1 validation on 2026-04-10 by running `rm -rf ~/.acme-todo && acme list` and confirming the empty-state message and exit 0, then closed the bug at milestone sign-off.
 
 ---
 

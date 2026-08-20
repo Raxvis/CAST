@@ -18,7 +18,7 @@
 
 # [PROJECT_NAME] — Agent Model Optimization Guide
 
-This document is the single source of truth for which Claude model each CAST agent runs on, how the supported models differ in behavior, and how to move the roster between them. Each agent file carries only a compact **Model Configuration** section — the frontmatter `model:` setting (default `inherit`, meaning the agent runs on the session model), a one-line recommended effort, and a short **Rules (all models)** block holding that role's binding behavioral constraints (no subagents, structured-output handoffs, silence-is-not-a-clean-report for review roles, plus role-specific discipline). The model ladder table, effort rules (`xhigh` requires Opus 4.7+), per-model behavior profiles, and upgrade checklists live only in this file — a model change never requires editing per-agent sections: switch the session model (or the frontmatter pin, if you set one), substituting effort when running 4.6.
+This document is the single source of truth for which Claude model each CAST agent runs on, how the supported models differ in behavior, and how to move the roster between them. Each agent file carries only a compact **Model Configuration** section — the frontmatter `model:` setting (default `inherit`, meaning the agent runs on the session model), a one-line effort default with the cases that warrant raising it, a pointer to `docs/STAGE_CONTRACT.md`, and a short **Rules** block holding that role's binding constraints. The model ladder table, effort rules (`xhigh` requires Opus 4.7+), per-model behavior profiles, and upgrade checklists live only in this file — a model change never requires editing per-agent sections: switch the session model (or the frontmatter pin, if you set one), substituting effort when running 4.6.
 
 ---
 
@@ -48,27 +48,30 @@ Do not pin models older than Opus 4.6 — the agent prompts in this template ass
 
 Every agent's YAML frontmatter sets `model: inherit` — each agent runs on the model of the invoking session, with Claude Opus 5 as the preferred executing model (Opus 4.8 / 4.7 / 4.6 supported). Differentiation between roles comes from **reasoning effort**, not model tier (the pre-v0.11.0 template used Opus 4.6 / Sonnet 4.6 / Haiku 4.5 tiers; see Upgrade Paths below if you are migrating an older install).
 
-| Agent | Default model | Recommended effort | Why |
-|---|---|---|---|
-| Product | `inherit` | `high` | Requirements synthesis and acceptance-criteria validation. |
-| Architect | `inherit` | `xhigh` | Hardest design reasoning in the pipeline. |
-| UI | `inherit` | `high` | Spec authoring anchored to concrete style-guide tokens. |
-| Security | `inherit` | `high` | Coverage-first vulnerability review. |
-| Performance | `inherit` | `high` | Measurement-anchored bottleneck review. |
-| CEO | `inherit` | `high` | Multi-document synthesis and gating verdict. |
-| Coder | `inherit` | `xhigh` | Best coding/agentic setting on Opus 4.7+. |
-| Tester | `inherit` | `high` | Test generation and faithful failure reporting. |
-| Reviewer | `inherit` | `xhigh` | Recall-critical bug finding. |
-| Debugger | `inherit` | `xhigh` | Root-cause analysis, intermittent failures. |
-| Refactor | `inherit` | `high` | Behavior-preserving, tightly scoped changes. |
-| Bug Gatherer | `inherit` | `low` | Mechanical, structured intake. |
-| Docs Writer | `inherit` | `low` | Scoped documentation updates. |
-| Release | `inherit` | `low` | Checklist execution. |
-| Validator | `inherit` | `low` | Rule enforcement against written process. |
+| Agent | Default model | Default effort | Raise to | Why |
+|---|---|---|---|---|
+| Product | `inherit` | `high` planning / `low` triage | — | Requirements synthesis is `high`; disposing of one flagged criterion or a batch of bug triages is not. |
+| Architect | `inherit` | `high` | `xhigh` for a new subsystem, schema migration, or cross-cutting contract change | Hardest design reasoning in the pipeline — but most milestones extend an existing design. |
+| UI | `inherit` | `high` | — | Spec authoring anchored to concrete style-guide tokens. |
+| Risk | `inherit` | `high` | — | Coverage-first review through two lenses. |
+| CEO | `inherit` | `high` | — | Multi-document synthesis and gating verdict. |
+| Coder | `inherit` | `medium` | `high` for a plan-flagged complex task or a non-obvious defect | See the effort note below — this is the biggest single change in v3's model policy. |
+| Reviewer | `inherit` | `high` | `xhigh` on security-flagged milestones or plan-flagged complex tasks | Recall-critical, and the only independent check in the loop. |
+| Docs Writer | `inherit` | `low` | — | Scoped documentation updates against a queue. |
 
-**Effort notes:** `xhigh` requires Opus 4.7 or newer — when the executing model is Opus 4.6 (session model or explicit pin), substitute `high`. On Opus 5 the `low` and `medium` settings are unusually strong, so the utility agents' `low` recommendation is genuinely cheap *and* good — on Opus 5, dropping effort is often a better cost lever than dropping model tier. In Claude Code, effort follows session settings; when driving agents via the Claude API or Agent SDK, set `output_config: {effort: "..."}` per request (on Opus 5, remember `thinking: {type: "disabled"}` is only accepted at effort `high` or below).
+### Effort notes
 
-**Right-sizing for cost:** `inherit` keeps every agent on the session model, but per-agent pins are the roster's main cost lever — match model capability to each role's workload. A sensible split: keep the judgment-heavy gates (CEO, Architect, Reviewer, Security) on the most capable model available (e.g. `claude-opus-5`, or a Fable/Mythos-class model if your account serves one); run the planning-and-implementation loop (Product, UI, Performance, Coder, Tester, Debugger, Refactor) on Sonnet (`claude-sonnet-5`); and pin the four utility agents (Bug Gatherer, Docs Writer, Release, Validator) to Haiku (`claude-haiku-4-5`, $1 / $5 per MTok) — their work is structured writing against templates and checklist execution. On an all-Opus-5 roster, effort right-sizing (utility agents at `low`, mid-loop agents at `medium`/`high`) captures much of the same saving without a model split. Claude Code also accepts the `opus` / `sonnet` / `haiku` aliases in agent frontmatter. The behavior profiles below cover the Opus family.
+**`xhigh` is opt-in in v3, not a standing default.** CAST v2 set `xhigh` on four roles (Architect, Coder, Reviewer, Debugger). On Opus 5 that is the most expensive setting in the family — extended thinking is **on by default**, and lowering effort **does not shorten the response**, so a standing `xhigh` buys reasoning tokens without buying concision back. Opus 5's `low` and `medium` are strong enough that the mid-loop stages do not need it for ordinary work, and the table's "Raise to" column names the cases that do. Raise deliberately, per milestone or per task; do not restore it as a default.
+
+**Coder at `medium`** is the change most likely to raise an eyebrow. The reasoning: v3's Coder implements against a task file that already carries the design decisions (made by Architect at `high`), an explicit Files list, and acceptance criteria — the hard thinking happened upstream, and what remains is execution against a spec. The safety net is not effort, it is the loop: Reviewer runs at `high` and reads the diff independently. Spending `xhigh` on the stage that writes code and `high` on the stage that checks it inverts where the leverage is.
+
+**`xhigh` requires Opus 4.7 or newer** — when the executing model is Opus 4.6, substitute `high`.
+
+In Claude Code, effort follows session settings; when driving agents via the Claude API or Agent SDK, set `output_config: {effort: "..."}` per request (on Opus 5, `thinking: {type: "disabled"}` is only accepted at effort `high` or below).
+
+**Right-sizing for cost:** `inherit` keeps every agent on the session model, but per-agent pins are the roster's other cost lever — match model capability to each role's workload. A sensible split: keep the judgment-heavy gates (CEO, Architect, Reviewer, Risk) on the most capable model available (e.g. `claude-opus-5`, or a Fable/Mythos-class model if your account serves one); run Product, UI, and Coder on Sonnet (`claude-sonnet-5`); and pin Docs Writer to Haiku (`claude-haiku-4-5`, $1 / $5 per MTok) — its work is reconciling a queue against templates. On an all-Opus-5 roster, effort right-sizing per the table above captures much of the same saving without a model split. Claude Code also accepts the `opus` / `sonnet` / `haiku` aliases in agent frontmatter.
+
+**Spawn count beats both.** Before tuning effort or pins, count the spawns. Each subagent launch pays a cold context — the agent definition, project memory, the task file, the manifest — before it does any work, and each distinct agent *type* is a separate prompt-cache prefix that must be written before it can be read. v3 cut a clean task from six spawns to two and the roster from fifteen types to eight for exactly this reason; it is a larger saving than any effort or model change, and it compounds on every loop-back. If you extend the roster, extend it knowing that.
 
 ---
 
@@ -81,8 +84,8 @@ Each supported model executes the same agent definitions differently. The per-ag
 - **Self-verifies without being told.** Opus 5 re-checks its own work — re-reading diffs, re-running tests, validating output against the ask — unprompted. Delete verification scaffolding from custom prompts ("double-check your changes", "re-read the file before handing off"): it duplicates work the model already does and inflates cost. The CAST agent prompts assume this; do not re-add checking ceremony when tuning them.
 - **Expands task scope.** The strongest drift in the family toward fixing adjacent problems it notices along the way. The minimal-change discipline in the Coder/Refactor prompts and the task-file Files list are load-bearing on Opus 5 — keep both, and treat out-of-scope discoveries as handoff-log notes, not silent fixes. (This is 4.6's overengineering tendency in a new form; 4.7/4.8 did not need the guardrail as much.)
 - **Delegates to subagents readily — the reverse of 4.7/4.8.** Where 4.8 needed imperative "invoke agent X now" instructions, Opus 5 will spawn subagents on its own initiative. The CAST agents' `tools:` lists (which omit `Task`) make ad-hoc delegation impossible at the agent level; at the orchestrator level, the pipeline skills' "spawn only the agents each stage names" restriction is load-bearing on Opus 5 (as it was on 4.6). Keep the explicit stage invocations anyway — they define *which* agent runs, not just *that* one runs.
-- **Longer responses, and lowering effort does not shorten them.** Verbosity must be constrained by prompt, not effort setting. The capped Handoff Log entries and one-line reply-channel rule in the v2 Handoff Protocol are the mechanism — keep them, and prompt for conciseness explicitly anywhere output length matters.
-- **Follows reporting filters literally — same coverage-first rule as 4.7/4.8.** Severity filters still depress review recall. Review-type agents (Reviewer, Security, Performance, Tester) must report everything with severity + confidence and let downstream stages filter.
+- **Longer responses, and lowering effort does not shorten them.** Verbosity must be constrained by prompt, not effort setting. The capped Handoff Log entries and one-line reply-channel rule in `docs/STAGE_CONTRACT.md` are the mechanism — keep them, and prompt for conciseness explicitly anywhere output length matters.
+- **Follows reporting filters literally — same coverage-first rule as 4.7/4.8.** Severity filters still depress review recall. Review-type agents (Reviewer, Risk) must report everything with severity + confidence and let downstream stages filter.
 - **Thinking is on by default** (unlike every 4.x model) and can be disabled only at effort `high` or below. **Full effort ladder with unusually strong `low`/`medium`** — see the effort notes above.
 - **API/platform requirements:** separate rate-limit bucket from the Opus 4.x pool; 512-token prompt-cache minimum; fast mode at $10 / $50 per MTok (Claude API only); safety classifiers may return `stop_reason: "refusal"`. Details under "Opus 5 additional requirements" above.
 
@@ -92,7 +95,7 @@ Each supported model executes the same agent definitions differently. The per-ag
 - **More deliberate — asks more often.** Pauses on minor decisions (naming, defaults, equivalent approaches) and offers follow-up work after finishing. Agent prompts should grant autonomy on small choices and reserve questions for scope changes and destructive actions.
 - **Conservative about reaching for tools, subagents, and memory.** It will not use a capability unless told *when* to use it. The explicit "invoke agent X now" stage instructions in the CAST commands are load-bearing — keep them imperative.
 - **Best with the full task up front.** Give complete specs in a single well-specified turn and run at `high`/`xhigh` effort; this is where its long-horizon advantage shows.
-- **Follows reporting filters literally.** "Only report high-severity issues" measurably depresses recall even though its bug-finding improved. Review-type agents (Reviewer, Security, Performance, Tester) must report everything with severity + confidence and let downstream stages filter.
+- **Follows reporting filters literally.** "Only report high-severity issues" measurably depresses recall even though its bug-finding improved. Review-type agents (Reviewer, Risk) must report everything with severity + confidence and let downstream stages filter.
 - **Warmer, clearer prose** than 4.7 — re-check any style instructions written to counter 4.7's terseness; they may now overcorrect.
 
 ### Claude Opus 4.7
@@ -137,8 +140,8 @@ Re-run `/cast-doctor` after any model change: upgrades unlock previously bar-blo
 ### Opus 4.6 → Opus 4.7
 
 1. **Model:** switch the session model to Opus 4.7 (agents default to `model: inherit`); if you pinned explicitly, change `model: claude-opus-4-6` → `model: claude-opus-4-7` in each agent file.
-2. **Effort:** stages previously capped at `high` can move to `xhigh` (Coder, Reviewer, Debugger, Architect).
-3. **Prompts — add explicit triggering.** 4.7 under-reaches for tools and subagents where 4.6 over-reached. Verify every tool use and delegation the pipeline depends on is stated imperatively ("run the test suite now", "invoke the debugger agent"), not implied.
+2. **Effort:** `xhigh` becomes available. In v3 it is opt-in per the Default Roster Assignment table's "Raise to" column — do not apply it as a standing default.
+3. **Prompts — add explicit triggering.** 4.7 under-reaches for tools and subagents where 4.6 over-reached. Verify every tool use and delegation the pipeline depends on is stated imperatively ("run the test suite now", "invoke the reviewer agent"), not implied.
 4. **Prompts — expect terser output.** If handoff documents come back thin, mark required sections as mandatory rather than lengthening instructions.
 5. **Review agents:** confirm coverage-first reporting language is present (report all findings with severity + confidence; filter downstream).
 6. **API callers only:** `budget_tokens` and `temperature`/`top_p`/`top_k` are removed on 4.7 (HTTP 400) — use `thinking: {type: "adaptive"}` and prompt-based steering. 4.7 also switches tokenizers (~same text, more tokens) — re-baseline any `max_tokens` and compaction thresholds.

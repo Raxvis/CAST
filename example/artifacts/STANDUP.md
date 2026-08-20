@@ -48,21 +48,21 @@ Entries under a session heading are appended in the order they happen (oldest fi
 
 - coder | progress | T-5 complete: argv parser in `src/cli.ts`, entrypoint wiring in `src/index.ts`, `--help` output
 - reviewer | loop | Task T-5: loop 1/3
-- tester | progress | Full-suite gate: 42 tests passing, 100% line coverage on `src/commands/`
+- coder | progress | T-5 test results: `pnpm test` — 42 passed, 0 failed (100% line coverage on `src/commands/`)
 - reviewer | progress | T-5 approved — no findings; Acceptance Criteria Check: 7/7 Met with evidence
 - coder | docs | CLAUDE.md Architecture section needs the final `src/cli.ts` dispatch flow documented ✅
-- bug-gatherer | progress | BUG-002 filed in `artifacts/BUGS.md` (initial severity Low): `done <id>` silently succeeds on a non-existent task ID, found during manual smoke testing
+- reviewer | progress | BUG-002 filed (`bugs/bug-002-done-silent-success.md`, initial severity Low): `done <id>` silently succeeds on a non-existent task ID
 - product | decision | BUG-002 triaged Low and set Deferred — does not affect correctness of normal flows; fix pairs with an M2 error-signaling task
-- reviewer | progress | T-5 closed at Step 4a — all 7 criteria Met, no Product spawn; Status set to Complete — all five tasks Complete
+- reviewer | progress | T-5 closed at Step 3a — all 7 criteria Met, no Product spawn; Status set to Complete — all five tasks Complete
 - product | progress | Milestone-completion checkpoint: all three CEO Approval Conditions Verified (1 and 2 by Reviewer, 3 by Product)
 - product | decision | Deferred re-triage at the milestone-completion checkpoint: BUG-002 held Deferred into M2 with updated rationale; re-triaged again at M2 `/agent-plan` Stage 1
 - product | progress | Completion record written: `artifacts/milestone-1-task-crud/reviews/completion.md` — Status: Complete with Deferrals (BUG-002 under Known Issues)
 - product | progress | Validation record written: `artifacts/milestone-1-task-crud/reviews/validation.md` — Approved with Notes
 - ui | progress | UX review written: `artifacts/milestone-1-task-crud/reviews/ux.md` — APPROVED WITH NOTES (BUG-002 noted)
-- security | progress | Implementation review clean: `artifacts/milestone-1-task-crud/reviews/security-impl.md` — parameterized bindings confirmed at every query site in the milestone diff (flagged Yes at planning)
-- performance | progress | Measured check complete: `artifacts/milestone-1-task-crud/reviews/performance-impl.md` — all four budgets within target; AGENT_STATE budget table updated
+- risk | progress | Implementation review complete: `artifacts/milestone-1-task-crud/reviews/risk-impl.md` — security lens: parameterized bindings confirmed at every query site; performance lens: both budgets met (list 31ms p50 vs 100ms target); AGENT_STATE budget table updated. No findings filed.
 - docs-writer | progress | Milestone-completion drain: 4 pending docs entries drained (2 queued during planning, 1 during T-3, 1 during T-5)
-- validator | progress | Milestone-completion pass: all 5 task outcomes plus the milestone outcome recorded in AGENT_STATE; retrospective written: `artifacts/milestone-1-task-crud/reviews/retrospective.md`
+- product | progress | Retrospective written: `artifacts/milestone-1-task-crud/reviews/retrospective.md`
+- agent-code | progress | Milestone outcome and 5 Decisions Log rows recorded in `artifacts/AGENT_STATE.md`; no archival needed (first milestone)
 - agent-code | progress | Run complete: M1 closed — 5/5 tasks Complete, 42 tests passing, all CEO Approval Conditions Verified, BUG-002 held Deferred
 
 ### 2026-04-09 — agent-code — milestone-1-task-crud
@@ -70,20 +70,18 @@ Entries under a session heading are appended in the order they happen (oldest fi
 - coder | progress | T-1 complete: `Task` type, SQLite schema, idempotent migration runner with WAL mode and `idx_tasks_completed`
 - reviewer | loop | Task T-1: loop 1/3
 - reviewer | progress | T-1 approved at merge; Approval Condition 2 checked (WAL pragma and index present in the migration)
-- reviewer | progress | T-1 Acceptance Criteria Check: 7/7 Met — routed to Product anyway (Step 4b: task carries CEO Conditions 1 and 2)
+- reviewer | progress | T-1 Acceptance Criteria Check: 7/7 Met — routed to Product anyway (Step 3b: task carries CEO Conditions 1 and 2)
 - product | progress | T-1 validated against acceptance criteria; Status set to Complete
 - coder | progress | T-2 complete: `add` command using `.prepare().run(params)` bindings per Approval Condition 1
 - reviewer | loop | Task T-2: loop 1/3
-- reviewer | progress | T-2 Acceptance Criteria Check: 6/6 Met — routed to Product anyway (Step 4b: task carries CEO Condition 1)
+- reviewer | progress | T-2 Acceptance Criteria Check: 6/6 Met — routed to Product anyway (Step 3b: task carries CEO Condition 1)
 - product | progress | T-2 validated against acceptance criteria; Status set to Complete
-- coder | blocker | T-3 first-run crash on a fresh install: `SqliteError: no such table: tasks` when `list` runs before any other command
-- reviewer | progress | T-3 finding classified as a Defect → routed to Bug Gatherer
-- bug-gatherer | progress | BUG-001 filed in `artifacts/BUGS.md` (initial severity High)
-- product | progress | BUG-001 triaged fix-now (final severity High) — first-run experience is a milestone acceptance criterion
-- debugger | progress | BUG-001 root cause: migrations only ran on the `add` path; recommended per-command `ensureMigrations()` (option b of three)
-- coder | progress | BUG-001 fixed (`a8f3d12`): `ensureMigrations()` wired into every command entry path — the exact remediation Approval Condition 3 demanded
-- reviewer | loop | Task T-3: loop 2/3
-- tester | progress | T-3 suite green, including the new fresh-install first-run regression test
+- coder | progress | T-3 test results: `pnpm test` — 17 passed, 1 failed; fresh-machine first-run case fails with `SqliteError: no such table: tasks`. Handed off with the failure rather than fixing blind.
+- reviewer | progress | T-3 finding classified as a Defect; BUG-001 filed (`bugs/bug-001-list-first-run-crash.md`, suggested severity High)
+- product | progress | BUG-001 triaged Fix Now (final severity High) — first-run experience is a milestone acceptance criterion
+- reviewer | loop | Task T-3: loop 1/3
+- coder | progress | BUG-001 investigated before fixing: root cause is migrations running only on the `add` path; chose a central `ensureMigrations()` at every command entry over patching `list` alone (Investigation written to the bug file). Fixed in `a8f3d12` — the exact remediation Approval Condition 3 demanded
+- coder | progress | T-3 test results: `pnpm test` — 24 passed, 0 failed; regression test confirmed red at `9d4b1c7` and green at `a8f3d12`
 - product | progress | T-3 validated; Approval Condition 3 remediation confirmed; Status set to Complete
 - coder | docs | CLAUDE.md Common Pitfalls + Persistence sections need the first-run migration behaviour from BUG-001 ✅
 - coder | progress | T-4 complete: `done` and `delete` commands with parameterized statements
@@ -98,8 +96,7 @@ Entries under a session heading are appended in the order they happen (oldest fi
 - architect | docs | docs/GLOSSARY.md needs entries for the migration runner, WAL mode, and `schema_version` ✅
 - ui | progress | Stage 2b complete: `artifacts/milestone-1-task-crud/ui.md` — every command surface, exit code, and error message
 - ui | docs | CLAUDE.md Domain-Specific Patterns needs the stdout/stderr and exit-code contract recorded ✅
-- security | progress | Stage 3 complete: 2 findings (1 Critical — SQL injection risk across command handlers; 1 Medium — unvalidated `ACME_TODO_DB` env var) in `artifacts/milestone-1-task-crud/reviews/security.md`
-- performance | progress | Stage 3 complete: 2 findings (WAL mode not enabled; missing index on `completed`) in `artifacts/milestone-1-task-crud/reviews/performance.md`
+- risk | progress | Stage 3 complete: `artifacts/milestone-1-task-crud/reviews/risk.md` — security lens 1 High (SQL injection across command handlers) + 1 Low + 1 Informational; performance lens 2 Medium (missing index on `completed`, migration cost on every invocation) + 1 Informational. Both flags set Yes.
 - ceo | decision | Verdict: APPROVED WITH CONDITIONS — three conditions (parameterized SQL; WAL + index; migration on first invocation) in `artifacts/milestone-1-task-crud/reviews/ceo.md`; no revision requests
 - ceo | progress | Stage 4 complete: engineering may begin
 

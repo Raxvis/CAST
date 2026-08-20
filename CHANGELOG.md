@@ -8,6 +8,103 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [3.0.0] — 2026-08-19
+
+**Breaking.** The roster goes from 15 agents to 8, the engineering loop from four stages to two, and every agent file is rewritten. A clean task's fixed setup cost drops from ~72,000 tokens (v2.1) to **~10,000**.
+
+### Why this release exists
+
+A performance audit of v2.2 measured what a stage actually pays before it does any work:
+
+| Item | Tokens | Paid |
+|---|---|---|
+| `docs/PIPELINE_LOOP.md` (every agent's Rules block cited it) | ~5,050 | every spawn |
+| root `CLAUDE.md` | ~2,130 | every spawn |
+| `@docs/CODE_PATTERNS.md` (unconditional memory import) | ~2,070 | every spawn |
+| Agent definition | 1,300–4,073 | every spawn |
+
+Two things stood out. **The largest single item in every stage's context was the document that existed to keep context small** — `PIPELINE_LOOP.md` had grown to 5K tokens of routing rules, loop counters, and circuit breakers that no stage acts on. And **six of the fifteen agents were paying a full cold context to re-derive context another agent already held.**
+
+The organising idea of v3: **a role earns its own agent when it brings *independence* — a different reader examining work someone else did, where the risk is self-serving judgment.** Reviewer reading Coder's diff is independence and is worth its spawn. A separate agent writing tests for code another agent just wrote is not independence; it is a second pass by an equally-invested party at full cold-context cost. Every merge below is a case of the second kind, and **every gate the merged agent enforced is preserved as an evidence requirement.**
+
+### Changed — the roster: 15 agents → 8
+
+`product`, `architect`, `ui`, `risk`, `ceo`, `coder`, `reviewer`, `docs-writer`.
+
+| Removed | Merged into | Reasoning |
+|---|---|---|
+| `tester` | `coder` | It re-read the same task file and the same diff Coder had just written, in order to test it. The gate survives, stronger: Coder's handoff entry must carry the **verbatim tail** of the `[TEST_CMD]` run, and Reviewer **rejects the entry unread** if it is missing or failing. Paraphrased results ("all green") are a missing block. The red→green proof on defect fixes is unchanged. |
+| `refactor` | `coder` | "Behavior-preserving restructuring within the flagged Issue" is Coder's own job on a loop-back. A separate 1,942-token definition plus a spawn to do what Coder does. |
+| `debugger` | `coder` | Two cold contexts on one defect, the second re-deriving the first's context. Root-cause investigation is now a step inside Coder's defect pass, required whenever the mechanism is not obvious from the diff — with root cause, affected modules, and the alternatives considered written to the bug file **before** any code changes. |
+| `bug-gatherer` | `reviewer` | It re-read the task to transcribe a finding Reviewer had already written into a template. Its documented five-step workflow ended with "read the report back to the reporter and ask if it is accurate" — impossible for a subagent with no channel to Reviewer. Reviewer holds the finding and writes the bug file. |
+| `security` + `performance` | `risk` (new) | Two agents reading the same architecture document in the same parallel round, producing two files of the same shape, each ending in one flag line. **The two lenses stay distinct in the output** — that is what mattered; the second spawn was not. One review at `reviews/risk.md` with a Security section, a Performance section, and both flag lines. |
+| `validator` | `product` + orchestrator | Its bookkeeping (AGENT_STATE rows, archival) is orchestrator file-writing. The retrospective went to Product. Its conflict-resolution protocol had time-based triggers — "after 7 days blocked", "conflicts older than 14 days", "questions pending more than 2 sessions" — that can never fire in a pipeline where a milestone runs in one or two sessions. Unresolved specialist disagreements now escalate to **the user**, which is whose decision they were. |
+| `release` | `/cast-release` skill | Checklist execution against files the session can already read. An agent spawn to run a checklist is a spawn spent on ceremony. Same gates, now in-session. |
+
+Each merge target explains its own history in a comment block, so a reader who wonders where Tester went finds the answer in `coder.md`.
+
+### Changed — the engineering loop: 4 stages → 2
+
+```
+v2:  Coder → Tester → Reviewer → Product        4 spawns (clean task)
+v3:  Coder(+test+commit) → Reviewer → [Product?]  2 spawns
+```
+
+`docs/PIPELINE_LOOP.md` Step 4 renumbered to Step 3 (3a clean close / 3b Product validation — unchanged in behavior from 2.2.0). Coder handles all three return paths in **one pass**: Fix Now defects, Reviewer Issues, and Product criteria rejections. Findings of different kinds from one review are resolved together, not one round trip each.
+
+Loop-backs are where this compounds: a 2-loop task went from 8–10 spawns to 4–6, and every one reuses the same two agent types, so it hits a warm prompt-cache prefix.
+
+### Added — `docs/STAGE_CONTRACT.md`
+
+**The split that fixes the biggest measured cost.** ~83 lines carrying the closed read set, the handoff-entry format, and the one-line reply — the only process document an agent reads. `PIPELINE_LOOP.md` keeps the routing, loop counters, commit discipline, and circuit breakers, and is read by the orchestrating **skill only**. Both files say so explicitly; the skills are told never to pass the loop doc into a stage. This alone removes ~4,000 tokens from every spawn.
+
+### Added — `/cast-release`
+
+Verifies the gates (milestone closed, tests pass, build succeeds, no blocking bugs — **Deferred counts as open** — risk flags cleared), derives the semantic version from what actually shipped, updates `docs/CHANGELOG.md`, and writes a release record with a GO/NO-GO. Does not tag, push, or publish: that stays the user's command.
+
+### Fixed — four contradictions the audit surfaced
+
+These were live bugs, not just inefficiency:
+
+1. **Every agent was told to violate the read-set rule.** All 15 files ended with "Live state lives in `artifacts/AGENT_STATE.md` → `## <agent>`. **Read that section on activation**" — while the Handoff Protocol said the read set is closed: task file, manifest, "Read next", **"Nothing else."** Removed. `AGENT_STATE.md` is now orchestrator-written, no agent reads it, and it shrank from 506 lines of per-agent tables to four tables with no other home (Decisions Log, Milestone Progress, Performance Budget Tracking, Open Questions). The removed tables duplicated state that already had an owner — Current Work is the task file's Status field, the review queue is the Handoff Log, Future Work is the README's out-of-scope list.
+2. **Coder carried 90 lines of verification scaffolding that CAST's own model policy says to delete.** `MODEL_OPTIMIZATION.md`'s Opus 5 profile: *"Delete verification scaffolding from custom prompts... it duplicates work the model already does and inflates cost."* `coder.md` then required a Pre-Handoff Checklist with ~40 boxes including "I am confident this implementation matches the specification" and "I have read the relevant architecture document(s) in full" — self-attestation from a model that self-verifies, duplicating Reviewer's checklist. Gone, along with Refactor's 47-line equivalent.
+3. **Dead human-team process.** Validator's day-count escalation ladder and Architect's ASCII Gantt chart of "Coder Sprint A/B/C" with "Architecture must complete a document at least one work session before Coder begins". None of it could ever fire.
+4. **The unconditional import contradicted the Context Inference Bar.** `CODE_PATTERNS.md` was imported into every session *and every subagent* while being largely the mechanical restatement — naming, file layout, function ordering — that the same document says Opus 4.8+ and Sonnet 5+ infer from the codebase. The Memory Imports list now **ships empty**, with guidance on what earns a slot (a non-obvious domain convention, a glossary whose terms appear nowhere in the source) and what does not.
+
+### Changed — effort policy retuned for Opus 5
+
+`xhigh` is **opt-in**, not a standing default on four roles. On Opus 5 it is the most expensive setting in the family — thinking is on by default and lowering effort *does not shorten the response* — so a standing `xhigh` buys reasoning tokens without buying concision back. New defaults: Architect/UI/Risk/CEO/Reviewer `high`, **Coder `medium`**, Product `high` at planning and `low` for triage, Docs Writer `low`. Each agent names the cases that warrant raising it.
+
+Coder at `medium` is the change most likely to raise an eyebrow. The reasoning: Coder implements against a task file that already carries the design decisions (made by Architect at `high`), an explicit Files list, and acceptance criteria — the hard thinking happened upstream. The safety net is the loop, not the effort setting: Reviewer runs at `high` and reads the diff independently. Spending `xhigh` on the stage that writes code and `high` on the stage that checks it inverts where the leverage is.
+
+`MODEL_OPTIMIZATION.md` also now states the ordering explicitly: **spawn count dominates both model tier and effort.**
+
+### Changed — agent files rewritten (~52 lines each of org chart removed)
+
+Purpose / Goals / Authority / Inputs / Outputs averaged 52 lines per agent restating what the Rules block and the task file already carried — documentation *about* a role, loaded as instruction *to* it, on every spawn. Replaced with a compact Role, the duties, and a Boundaries list keeping only the binding "may not" constraints. Agent files went from 130–239 lines to 68–157.
+
+### Removed — `## Revision History` tables
+
+A hand-maintained changelog on ten document types, restating what `git log` already recorded, read in full by the CEO on every re-review. `git log --follow <path>` and `git diff` cannot drift from the file the way a table can — and they give the CEO a real diff to re-review against instead of a claimed one (a table entry could always claim a fix the body never received). The one thing a revision must still do explicitly survives: re-check the manifest rows it returned, because a moved anchor silently defeats the minimal-context contract.
+
+### Changed — CEO read set narrowed
+
+The most expensive planning stage. It read "every Stage 1–3 artifact" in full; it now reads the README in full, each task file's Header/Description/Criteria/Manifest, the architecture document's **Decisions Log** and boundaries (body sections only where a question lands), the UI spec's interaction states, and `reviews/risk.md` in full. A cross-cutting review examines decisions and the interfaces between them — which is why the Decisions Log and the manifests come first.
+
+### Changed — templates, CI, fixture
+
+- **Templates**: `(required, scales)` markers from 2.2.0 retained; Revision History blocks removed; `CEO_REVIEW.md` merges Sections 4 and 5 into a single **Risk Posture**; `TASK.md` documents the Test Results block.
+- **CI**: agent count 15 → 8, plus a guard that fails if any of the seven removed agents reappears — a resurrected file would register a subagent the pipelines no longer invoke, carrying instructions that contradict the v3 loop.
+- **`example/`**: regenerated for the v3 flow. The `list` defect (BUG-001) now shows the honest-failure handoff (Coder hands off a failing test run rather than fixing blind), Reviewer filing the bug directly, Product triaging, and Coder investigating with alternatives recorded before fixing — the whole defect loop in four spawns.
+
+### Migration
+
+**Existing v2 installs keep working.** The pipelines are Markdown; an install still running v2 files simply pays the old per-task cost. To adopt:
+
+1. **Re-run `/cast-init`.** It refreshes CAST-owned files, preserves your content, and — new in v3 — proposes **Delete** for each v2 agent it finds *while naming where that agent's duties went*, so you can see nothing was dropped.
+2. **In-flight milestones need no special handling.** The directory layout is unchanged. A milestone planned under v2 has the same shape, and the first `/agent-code` run under v3 resumes from each task file's Status field as before.
+3. **Two things to check by hand** if you adopt mid-milestone: a v2 milestone has `reviews/security.md` and `reviews/performance.md` rather than `reviews/risk.md` — `/agent-code`'s milestone-completion checkpoint reads flag lines from `risk.md` and will skip the implementation review if it is absent. Either run `/agent-plan` Stage 3 to produce it, or merge the two files by hand. And the Memory Imports list now ships empty: if your project genuinely needs `CODE_PATTERNS.md` in every session, re-add the bare `@docs/CODE_PATTERNS.md` line.
+
 ## [2.2.0] — 2026-08-19
 
 Pipeline throughput: fewer subagent launches per task and per milestone, with every gate preserved.

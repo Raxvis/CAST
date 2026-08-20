@@ -63,68 +63,57 @@ on first invocation rather than throwing — this is the path BUG-001 surfaced.
 - **Read next**: Manifest only
 - **Open items**: None
 
-### 2. coder -> bug-gatherer — 2026-04-09
+### 2. coder -> reviewer — 2026-04-09
 
-- **Outcome**: First-run smoke check crashed — `SqliteError: no such table: tasks` when `list` is the first-ever command. Defect, needs filing before the task can proceed.
-- **Files touched**: `src/commands/list.ts` (in progress)
-- **Read next**: Terminal transcript in the 2026-04-09 session of `artifacts/STANDUP.md`
-- **Open items**: Defect blocks acceptance criterion 2 (first-run path)
+- **Outcome**: `list` implemented with the `--all` flag and the column formatter. 5 tests added. **The fresh-machine first-run case fails** — `SqliteError: no such table: tasks` when `list` is the first-ever command. Handing off with the failure rather than fixing blind: criterion 2 is the one it breaks, and it is a real defect in the migration design, not a test bug.
+- **Files touched**: `src/commands/list.ts`, `src/commands/list.test.ts`
+- **Commit**: `9d4b1c7`
+- **Test Results**: `pnpm test` — `Test Files  3 passed | 1 failed (4)` / `Tests  17 passed | 1 failed (18)` / `FAIL  src/commands/list.test.ts > fresh machine first run` / `SqliteError: no such table: tasks`
+- **Read next**: Manifest only
+- **Open items**: First-run path broken; blocks acceptance criterion 2
 
-### 3. bug-gatherer -> product — 2026-04-09
+### 3. reviewer -> product — 2026-04-09
 
-- **Outcome**: Filed BUG-001 (severity High) with repro steps.
+- **Outcome**: Test Results block present and honest — reviewed the diff anyway since Coder flagged the failure deliberately. One finding, classified **Defect**: first-run crash. Filed as BUG-001 (suggested severity High — the first-run experience is a milestone acceptance criterion and CEO Condition 3 names it). No Issues.
 - **Files touched**: `../bugs/bug-001-list-first-run-crash.md`, `artifacts/BUGS.md` (index row)
 - **Read next**: `../bugs/bug-001-list-first-run-crash.md`
-- **Open items**: Awaiting triage
+- **Open items**: Awaiting Product triage
+- Finding 1 — **Defect**, High — `list` on a machine with no database file throws instead of creating it. Violates criterion 2 and CEO Condition 3. Filed BUG-001.
 
-### 4. product -> debugger — 2026-04-09
+### 4. product -> coder — 2026-04-09
 
-- **Outcome**: Triaged Fix Now — first-run experience violates CEO Condition 3.
+- **Outcome**: BUG-001 triaged **Fix Now** (final severity High). The first-run experience is a milestone acceptance criterion — this cannot ship deferred. Loop count set to 1.
 - **Files touched**: `../bugs/bug-001-list-first-run-crash.md` (Severity final, status Triaged)
 - **Read next**: `../bugs/bug-001-list-first-run-crash.md`
 - **Open items**: None
 
-### 5. debugger -> coder — 2026-04-09
+### 5. coder -> reviewer — 2026-04-09
 
-- **Outcome**: Root cause found (migration execution lived only in the `add` path); recommended extracting idempotent `ensureMigrations(db)` called at the top of every command entry path. Loop count set to 1.
-- **Files touched**: `../bugs/bug-001-list-first-run-crash.md` (Investigation section, status In Progress)
-- **Read next**: `../bugs/bug-001-list-first-run-crash.md` § Investigation
-- **Open items**: None
-
-### 6. coder -> tester — 2026-04-09
-
-- **Outcome**: `list` implemented and BUG-001 fixed (commit `a8f3d12`) — `ensureMigrations()` wired into all four command paths.
-- **Files touched**: `src/commands/list.ts`, `src/db/connection.ts`
+- **Outcome**: Investigated before changing code (mechanism was not obvious from the diff — the symptom is in `list`, the cause is in `add`). Root cause: migration execution lived only on the `add` path, so any other command run first hits an empty database. Chose a central `ensureMigrations(db)` called at every command entry over patching `list` alone — the latter leaves the next new command with the same bug. Investigation written to the bug file; fixed and BUG-001 Resolution → Commit filled.
+- **Files touched**: `src/commands/list.ts`, `src/db/connection.ts`, `src/commands/list.test.ts`, `../bugs/bug-001-list-first-run-crash.md`
 - **Commit**: `a8f3d12`
-- **Read next**: Manifest only — include the first-run migration case in the suite
-- **Open items**: None
-
-### 7. tester -> reviewer — 2026-04-09
-
-- **Outcome**: 7 tests added; `pnpm test` green including the fresh-machine first-run case. BUG-001 fix confirmed.
-- **Files touched**: `src/commands/list.test.ts`
-- **Commit**: `7c25d8e`
+- **Test Results**: `pnpm test` — `Test Files  4 passed (4)` / `Tests  24 passed (24)` / `Duration  2.41s`. Red→green proof: checked out `9d4b1c7` (pre-fix), ran `list.test.ts > fresh machine first run` → `FAIL  SqliteError: no such table: tasks`; returned to `a8f3d12` → `PASS`.
 - **Read next**: Manifest only
 - **Open items**: None
 
-### 8. reviewer -> product — 2026-04-09
+### 6. reviewer -> product — 2026-04-09
 
-- **Outcome**: Clean review — no Defects, no Issues. Conditions 1 and 3 verified on the `list` path. All 7 criteria Met; routing to Product anyway (Step 4b — this task carries CEO Approval Conditions and resolved BUG-001).
+- **Outcome**: Clean review — no Defects, no Issues. Red→green evidence verified against `9d4b1c7`. Conditions 1 and 3 verified on the `list` path. All 7 criteria Met; routing to Product anyway (Step 3b — this task carries CEO Approval Conditions and resolved BUG-001, whose Verified → Closed transition is Product-owned).
 - **Files touched**: None
 - **Read next**: Manifest only
 - **Open items**: None
 - **Acceptance Criteria Check**:
-  - [1] `acme-todo list` on an empty DB prints a header row and no tasks. — Met — `list.test.ts` › "empty DB prints header only" (`7c25d8e`)
-  - [2] `acme-todo list` on a fresh machine creates the DB, runs migrations, and prints the empty list (fixes BUG-001). — Met — `list.test.ts` › "fresh machine first run" (red against `5b82c7d`, green at `a8f3d12`)
+  - [1] `acme-todo list` on an empty DB prints a header row and no tasks. — Met — `list.test.ts` › "empty DB prints header only" (`a8f3d12`)
+  - [2] `acme-todo list` on a fresh machine creates the DB, runs migrations, and prints the empty list (fixes BUG-001). — Met — `list.test.ts` › "fresh machine first run" (red at `9d4b1c7`, green at `a8f3d12`)
   - [3] `--all` flag includes completed tasks; without it, only open tasks print. — Met — `list.test.ts` › "--all includes completed"
   - [4] Output format is exactly `ID  TITLE  STATUS  CREATED`. — Met — `src/commands/list.ts:31`; `list.test.ts` › "column format"
   - [5] Query uses parameterized binding for the `completed` filter. — Met — `src/commands/list.ts:22`
-  - [6] Vitest suite covers: empty DB, mixed open/completed, `--all` flag, first-run migration. — Met — 7 tests in `7c25d8e`
-  - [7] No linter or type-check errors introduced. — Met — `pnpm typecheck` clean at `7c25d8e`
+  - [6] Vitest suite covers: empty DB, mixed open/completed, `--all` flag, first-run migration. — Met — 7 tests in `a8f3d12`
+  - [7] No linter or type-check errors introduced. — Met — `pnpm typecheck` clean at `a8f3d12`
 
-### 9. product — task complete — 2026-04-09
+### 7. product — task complete — 2026-04-09
 
-- **Outcome**: All acceptance criteria met; Status set to Complete. BUG-001 advanced to Verified (Closed at milestone sign-off).
+- **Outcome**: All acceptance criteria met; Status set to Complete. BUG-001 advanced Fixed → Verified (Closed at milestone sign-off).
 - **Files touched**: This file (Header Status), `../bugs/bug-001-list-first-run-crash.md`, `artifacts/BUGS.md` (index row)
 - **Read next**: —
 - **Open items**: None

@@ -43,17 +43,17 @@ artifacts/
     arch-{slug}.md                 # Supplemental module/system/schema docs (as needed)
     ui-{slug}.md                   # Supplemental screen/component specs (as needed)
     reviews/
-      security.md                  # Security review (/agent-plan Stage 3)
-      performance.md               # Performance review (/agent-plan Stage 3)
+      risk.md                  # Security review (/agent-plan Stage 3)
+      risk.md               # Performance review (/agent-plan Stage 3)
       ceo.md                       # CEO planning verdict (/agent-plan Stage 4)
       ux.md                        # UX review (milestone completion; UI-flagged milestones only)
-      security-impl.md             # Security implementation review (milestone completion;
-                                   #   only when security.md flagged the milestone)
-      performance-impl.md          # Measured performance check (milestone completion;
-                                   #   only when performance.md flagged budgets)
+      risk-impl.md             # Security implementation review (milestone completion;
+                                   #   only when risk.md flagged the milestone)
+      risk-impl.md          # Measured performance check (milestone completion;
+                                   #   only when risk.md flagged budgets)
       validation.md                # Milestone validation record (Product, milestone completion)
       completion.md                # Milestone completion report (Product, milestone completion)
-      retrospective.md             # Milestone retrospective (Validator, milestone completion)
+      retrospective.md             # Milestone retrospective (the orchestrator, milestone completion)
     tasks/
       task-{T}-{slug}.md           # ONE FILE PER TASK — self-contained: description,
                                    #   acceptance criteria, Context Manifest, Handoff Log
@@ -62,21 +62,21 @@ artifacts/
 
   one-off/                         # /agent-task work (no milestone)
     task-{slug}.md                 # One-off task file (same shape as milestone task files)
-    archive/                       # Complete one-off task files (moved by Validator at
+    archive/                       # Complete one-off task files (moved by the orchestrator at
                                    #   milestone-completion checkpoints)
     bugs/
       bug-{XXX}-{slug}.md          # Bugs filed from one-off work (never archived — the
                                    #   BUGS.md index points at them)
 
-  archive/                         # Bounded-file overflow (created on first use by Validator
+  archive/                         # Bounded-file overflow (created on first use by the orchestrator
     STANDUP.md                     #   at milestone completion): session sections and stale
-    AGENT_STATE.md                 #   state rows relocated verbatim — see validator.md →
+    AGENT_STATE.md                 #   state rows relocated verbatim — see orchestrator.md →
                                    #   Archival Duty. History stays greppable here.
 ```
 
 Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-created for them). `/cast-init` scaffolds only the root files and the `one-off/` directory.
 
-**Why per-task and per-bug files?** Each task file is a complete, isolated unit of work: an agent can execute it by reading that one file plus the exact references its Context Manifest lists — nothing else. Handoffs between agents are compact entries appended to the task file's Handoff Log, not conversation context or whole-directory re-reads. This is the pipeline's minimal-context contract; the full protocol lives in `docs/PIPELINE_LOOP.md` → "Handoff Protocol".
+**Why per-task and per-bug files?** Each task file is a complete, isolated unit of work: an agent can execute it by reading that one file plus the exact references its Context Manifest lists — nothing else. Handoffs between agents are compact entries appended to the task file's Handoff Log, not conversation context or whole-directory re-reads. This is the pipeline's minimal-context contract; the full contract lives in `docs/STAGE_CONTRACT.md` — the only process document an agent reads.
 
 ---
 
@@ -90,17 +90,17 @@ Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-creat
 | UI specification | `milestone-{N}-{slug}/ui.md` | UI (`/agent-plan` Stage 2) |
 | Supplemental arch docs (module/system/schema) | `milestone-{N}-{slug}/arch-{slug}.md` | Architect (during planning or engineering) |
 | Supplemental UI specs (screen/component) | `milestone-{N}-{slug}/ui-{slug}.md` | UI (during planning or engineering) |
-| Security review findings | `milestone-{N}-{slug}/reviews/security.md` | Security (`/agent-plan` Stage 3) |
-| Performance review findings | `milestone-{N}-{slug}/reviews/performance.md` | Performance (`/agent-plan` Stage 3) |
+| Security review findings | `milestone-{N}-{slug}/reviews/risk.md` | Security (`/agent-plan` Stage 3) |
+| Performance review findings | `milestone-{N}-{slug}/reviews/risk.md` | Performance (`/agent-plan` Stage 3) |
 | CEO planning verdict | `milestone-{N}-{slug}/reviews/ceo.md` | CEO (`/agent-plan` Stage 4) |
 | UX review of implemented screens | `milestone-{N}-{slug}/reviews/ux.md` | UI (milestone completion; UI-flagged milestones only) |
-| Security implementation review | `milestone-{N}-{slug}/reviews/security-impl.md` | Security (milestone completion; only when `reviews/security.md` flagged the milestone) |
-| Measured performance check | `milestone-{N}-{slug}/reviews/performance-impl.md` | Performance (milestone completion; only when `reviews/performance.md` flagged budgets) |
+| Security implementation review | `milestone-{N}-{slug}/reviews/risk-impl.md` | Security (milestone completion; only when `reviews/risk.md` flagged the milestone) |
+| Measured performance check | `milestone-{N}-{slug}/reviews/risk-impl.md` | Performance (milestone completion; only when `reviews/risk.md` flagged budgets) |
 | Milestone validation record | `milestone-{N}-{slug}/reviews/validation.md` | Product (milestone completion) |
 | Milestone completion report | `milestone-{N}-{slug}/reviews/completion.md` | Product (milestone completion) |
-| Milestone retrospective | `milestone-{N}-{slug}/reviews/retrospective.md` | Validator (milestone completion) |
-| Per-bug report | `milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` (or `one-off/bugs/` for `/agent-task` work) | Bug Gatherer files; Product, Debugger, Coder, Tester advance it |
-| Bug index (ID assignment, one-line status per bug, regression checklist) | `artifacts/BUGS.md` | Bug Gatherer adds rows; owners update status column |
+| Milestone retrospective | `milestone-{N}-{slug}/reviews/retrospective.md` | the orchestrator (milestone completion) |
+| Per-bug report | `milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` (or `one-off/bugs/` for `/agent-task` work) | Reviewer files; Product triages and closes; Coder investigates, fixes, and verifies |
+| Bug index (ID assignment, one-line status per bug, regression checklist) | `artifacts/BUGS.md` | Reviewer adds rows; owners update status column |
 | One-off task file | `one-off/task-{slug}.md` | `/agent-task` |
 | Session progress log | Entries in `artifacts/STANDUP.md` | Any agent / user |
 | Agent working state (Current Work, Decisions Logs, dashboards) | The agent's own section in `artifacts/AGENT_STATE.md` | Each agent |

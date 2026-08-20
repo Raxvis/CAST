@@ -23,13 +23,6 @@
 
 # UX Review: [SCREEN_OR_COMPONENT_NAME]
 
-## Revision History (required)
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | [DATE] | ui | Initial review |
-
----
 
 ## Header (required)
 

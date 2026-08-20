@@ -1,6 +1,6 @@
 <!-- TEMPLATE INSTRUCTIONS
   FILE: MILESTONE_RETROSPECTIVE.md
-  PURPOSE: Milestone retrospective template. The Validator Agent copies this skeleton at the
+  PURPOSE: Milestone retrospective template. The Product Agent copies this skeleton at the
            end of each milestone to record what went well, what didn't, process issues, and
            metrics, and to generate improvement actions for the next milestone.
 
@@ -10,8 +10,8 @@
   - Copy this template to `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` for each
     milestone. Never fill this template in place.
   - Every section in this template is required and must be non-empty in every instance.
-    Validator checks all sections.
-  - Every metric maps to a recorded source — see validator.md → Metric Sources. Fill from
+    Product checks all sections.
+  - Every metric maps to a recorded source — see product.md → Duty 5. Fill from
     the sources; do not estimate.
 -->
 
@@ -19,18 +19,11 @@
 
 # Milestone Retrospective: [MILESTONE_NAME]
 
-## Revision History (required)
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | [DATE] | validator | Initial retrospective |
-
----
 
 ## Header (required)
 
 **Date**: [DATE]
-**Facilitator**: Validator Agent
+**Facilitator**: Product Agent
 **Participants**: [LIST_AGENTS_ACTIVE_THIS_MILESTONE]
 
 ---
@@ -76,18 +69,18 @@ _If no process issues occurred, replace this table with "No process issues."_
 
 ## Metrics (required)
 
-_Fill each metric from its recorded source (validator.md → Metric Sources) — do not estimate._
+_Fill each metric from its recorded source (product.md → Duty 5) — do not estimate._
 
 | Metric | Value | Source |
 |---|---|---|
 | Tasks planned | [N] | Task Index in `artifacts/milestone-{N}-{slug}/README.md` (count of task files) |
 | Tasks completed | [N] | Status fields across `artifacts/milestone-{N}-{slug}/tasks/task-*.md` |
 | Tasks rejected by Product | [N] | Handoff Logs across `artifacts/milestone-{N}-{slug}/tasks/task-*.md` (Product → Coder return entries) — note average rejections per task |
-| Process violations | [N] | Process Violations table in `artifacts/AGENT_STATE.md` → `## validator` |
-| Conflicts escalated to Validator | [N] | Conflicts table in `artifacts/AGENT_STATE.md` → `## validator` |
-| Architecture doc revisions | [N] | `## Revision History` table in `artifacts/milestone-{N}-{slug}/architecture.md` |
-| UI spec revisions | [N] | `## Revision History` table in `artifacts/milestone-{N}-{slug}/ui.md` |
-| Manifest patches during engineering | [N] | Handoff Log entries across `artifacts/milestone-{N}-{slug}/tasks/task-*.md` noting a Context Manifest addition (the insufficient-manifest fallback in `docs/PIPELINE_LOOP.md` → Handoff Protocol). Each one is a planning defect the CEO gate missed — a high count is itself an improvement action |
+| Loop-backs, and what caused them | [N] | `Loop count` Headers across `tasks/task-*.md` plus the `loop` entries in `artifacts/STANDUP.md` |
+| Escalations to the user | [N] | `blocker` entries in `artifacts/STANDUP.md` for this milestone |
+| Architecture doc revisions | [N] | `git log --follow artifacts/milestone-{N}-{slug}/architecture.md` |
+| UI spec revisions | [N] | `git log --follow artifacts/milestone-{N}-{slug}/ui.md` |
+| Manifest patches during engineering | [N] | Handoff Log entries across `artifacts/milestone-{N}-{slug}/tasks/task-*.md` noting a Context Manifest addition (the insufficient-manifest fallback in `docs/STAGE_CONTRACT.md`). Each one is a planning defect the CEO gate missed — a high count is itself an improvement action |
 
 ---
 

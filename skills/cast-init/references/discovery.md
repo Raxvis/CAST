@@ -15,7 +15,7 @@ Crawl the project and map everything relevant. Use Read, Glob, and Grep. Build a
 
 Look outside `.claude/` too. Agentic workflows are sometimes scattered:
 
-- **Glob patterns**: `agents/*.md`, `agent-*.md`, `planner.md`, `coder.md`, `reviewer.md`, `architect.md`, `designer.md`, `tester.md`, `qa.md`, `bug*.md`, `prd*.md`, `roadmap*.md`, `specs/**/*.md`, `workflow/**/*.md`
+- **Glob patterns**: `agents/*.md`, `agent-*.md`, `planner.md`, `coder.md`, `reviewer.md`, `architect.md`, `designer.md`, `tester.md`, `qa.md`, `validator.md`, `bug*.md`, `prd*.md`, `roadmap*.md`, `specs/**/*.md`, `workflow/**/*.md`
 - **Directory patterns**: `features/`, `milestones/`, `specs/`, `artifacts/`, `workflow/`, `agents/`, `planning/`, `engineering/`
 - **Legacy pre-0.3.0 CAST**: the old name for `artifacts/` was `features/`. If the project has a `features/` directory with files matching CAST's naming patterns (`milestone-*.md`, `arch-milestone-*.md`, `ceo-review-*.md`), treat it as a CAST install that needs renaming.
 - **Legacy pre-2.0 CAST (by-type layout)**: v1 grouped artifacts by type (`artifacts/milestones/`, `artifacts/architecture/`, `artifacts/ui-specs/`, `artifacts/reviews/`, single-file `BUGS.md` tracker). If these subdirectories exist, record every milestone number and file found — Phase 3 proposes the migration to the v2 milestone-grouped layout (`dispositions.md` → Artifacts directory).

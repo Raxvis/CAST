@@ -2,14 +2,6 @@
 
 **Status**: Complete (CEO: APPROVED WITH CONDITIONS 2026-04-08; completed 2026-04-10)
 
-## Revision History
-
-| Rev | Date | Agent | Change |
-|-----|------|-------|--------|
-| v1 | 2026-04-08 | product | Initial milestone definition |
-| v2 | 2026-04-10 | product | Status set Complete at milestone sign-off |
-
----
 
 ## Header
 

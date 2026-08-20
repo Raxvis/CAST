@@ -1,12 +1,5 @@
 # Acme Todo — Milestone Validation Report
 
-## Revision History
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | 2026-04-10 | product | Initial version |
-
----
 
 ## Header
 
@@ -14,7 +7,7 @@
 |-------|-------|
 | **Milestone** | M1: Task CRUD + SQLite Persistence |
 | **Validation Date** | 2026-04-10 |
-| **Validator** | Product Agent |
+| **Validated by** | Product Agent |
 | **Status** | Complete |
 
 ---
@@ -27,7 +20,7 @@ All five M1 tasks (T-1 through T-5) were validated against their acceptance crit
 
 ## Task Validation Checklist
 
-_The checklist below was applied per task at `/agent-code` Step 4 as criteria (outcome recorded in the tasks file and `artifacts/STANDUP.md`); this document records the milestone-grain pass over all five tasks._
+_The checklist below was applied per task at `/agent-code` Step 3b as criteria (outcome recorded in the tasks file and `artifacts/STANDUP.md`); this document records the milestone-grain pass over all five tasks._
 
 ### Task Validation: T-1 — Task type, SQLite schema, migration runner
 
@@ -238,7 +231,7 @@ _The checklist below was applied per task at `/agent-code` Step 4 as criteria (o
 - [ ] **APPROVED WITH NOTES** — Task is complete. Non-blocking issues noted above.
 - [ ] **REJECTED** — Task is returned to Coder. See Issues Found for required changes.
 
-**Sign-Off Notes**: Approved 2026-04-09 after the BUG-001 fix passed Tester and Reviewer on loop 2.
+**Sign-Off Notes**: Approved 2026-04-09 after the BUG-001 fix came back green with red→green evidence and Reviewer approved on loop 1.
 
 ---
 

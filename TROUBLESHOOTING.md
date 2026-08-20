@@ -6,7 +6,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## Which pipeline should I use — `/agent-plan`, `/agent-code`, or `/agent-task`?
 
-**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes (plus `/cast-doctor`, the maintenance skill — not a pipeline), and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → Security + Performance → CEO). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Tester → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
+**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes (plus `/cast-doctor` and `/cast-release`, the maintenance skills — not pipelines), and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → Risk → CEO). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
 
 **Fix.** Use the table below to pick a pipeline, then read the narrative note after it.
 
@@ -204,7 +204,7 @@ Common problems adopting or running this template, with the most likely cause an
 **Fix.**
 1. Use `/agent-plan` and `/agent-code` as the canonical entry points. They exist specifically to sequence the agents correctly.
 2. If you must invoke an agent directly, give it the task file as input ("Work `artifacts/milestone-3-search/tasks/task-04-index-rebuild.md` — read only its Context Manifest and latest handoff entry.").
-3. Escalate conflicts per the repo's `skills/cast-init/assets/agents/README.md` → Conflict Resolution Priority: **Product > Architecture > UI**. The Validator agent arbitrates the dispute by applying that hierarchy — it does not sit in the hierarchy and does not override anyone; Product has final say on scope.
+3. Escalate conflicts per the repo's `skills/cast-init/assets/agents/README.md` → Conflict Resolution Priority: **Product > Architecture > UI**. v3 has no Validator agent — when the hierarchy does not settle it, the orchestrator escalates to you. Product has final say on scope.
 
 ---
 
@@ -216,7 +216,7 @@ Common problems adopting or running this template, with the most likely cause an
 1. Open `artifacts/milestone-{N}-{slug}/reviews/ceo.md` and read the "Revision Requests" table (the verdict itself is the single `**Verdict**:` line). Every revision is addressed to a specific agent with a cited section.
 2. Re-run only the affected planning stage — but note a revised architecture re-passes Stage 3 (both Security and Performance) before the CEO sees it again, so the CEO never re-reviews against stale findings.
 3. Only then re-run Stage 4 (CEO). The CEO does not rewrite plans; it reviews them.
-4. If you disagree with a CEO revision, escalate per the conflict resolution hierarchy (Product > Architecture > UI) — Validator arbitrates but does not override, and the CEO does not override Product on business intent.
+4. If you disagree with a CEO revision, escalate per the conflict resolution hierarchy (Product > Architecture > UI) — the CEO does not override Product on business intent, and an unresolved disagreement comes to you rather than to another agent.
 
 ---
 

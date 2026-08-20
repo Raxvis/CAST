@@ -17,8 +17,8 @@ See `CLAUDE.md` for the full project overview and `docs/PRD.md` for requirements
 
 1. `/agent-plan` ran on 2026-04-08, producing the Milestone 1 directory
    (`artifacts/milestone-1-task-crud/`): the milestone README, one task file
-   per task under `tasks/`, the architecture and UI specs, and the
-   security/performance/CEO reviews under `reviews/`.
+   per task under `tasks/`, the architecture and UI specs, and the risk and
+   CEO reviews under `reviews/`.
 2. The CEO verdict was **APPROVED WITH CONDITIONS** (three conditions covering
    parameterized SQL, WAL mode plus an index on `completed`, and migration
    on first invocation).
@@ -26,19 +26,22 @@ See `CLAUDE.md` for the full project overview and `docs/PRD.md` for requirements
    through T-5 — each stage reading only its task file's Context Manifest and
    appending to its Handoff Log. Two bugs were filed along the way as per-bug
    files under `milestone-1-task-crud/bugs/`, indexed in `artifacts/BUGS.md`.
-   Every Reviewer approval carries an **Acceptance Criteria Check** — one line
-   per criterion with its evidence. T-5 closed on that alone (Step 4a: 7/7 Met,
-   no Product spawn); T-1 through T-4 still routed to Product (Step 4b) because
-   each carries a CEO Approval Condition, and T-4 shows a `Product judgment`
-   flag and how Product disposed of it.
+   Every Coder handoff carries a **verbatim test-results block** (the test gate
+   — Reviewer rejects an entry without one), and every Reviewer approval carries
+   an **Acceptance Criteria Check**, one line per criterion with its evidence.
+   T-5 closed on that alone (Step 3a: 7/7 Met, no Product spawn); T-1 through
+   T-4 still routed to Product (Step 3b) because each carries a CEO Approval
+   Condition, and T-4 shows a `Product judgment` flag and how Product disposed
+   of it.
 4. The milestone-completion checkpoint fired on 2026-04-10: Product re-triaged
    the Deferred BUG-002 (held Deferred into M2 — Deferred is an open, held
    state, not terminal) and wrote the completion record ("Complete with
    Deferrals") and the milestone validation record covering all five tasks; the
    UI agent reviewed the implemented command surface (UX review, APPROVED WITH
    NOTES); Docs Writer drained all four queued `docs` entries in one pass; and
-   Validator recorded every task outcome plus the milestone outcome and wrote
-   the retrospective. The per-task checkpoints launched no agents at all.
+   Product wrote the retrospective, and the orchestrator recorded the milestone
+   outcome and the Decisions Log rows. The per-task checkpoints launched no
+   agents at all.
 
 ## Where to Start Reading
 
@@ -55,18 +58,19 @@ Read these in order for the clearest picture:
    milestone completion), each with per-stage field ownership.
 6. **`artifacts/milestone-1-task-crud/tasks/task-03-list-command.md`** — the
    clearest worked task file: a seeded Context Manifest and a Handoff Log that
-   walks the full defect loop (BUG-001: coder → bug-gatherer → product →
-   debugger → coder → tester → reviewer → product).
+   walks the full defect loop (BUG-001: coder -> reviewer files the bug ->
+   product triages Fix Now -> coder investigates, fixes, and proves the test
+   red -> reviewer approves).
 7. **`artifacts/milestone-1-task-crud/reviews/validation.md`** — Product's
    milestone-grain validation record (Approved with Notes), and its companion
    completion report (`reviews/completion.md`, "Complete with Deferrals").
 8. **`artifacts/milestone-1-task-crud/reviews/ux.md`** — the UI agent's review of
    the implemented command surface against the approved spec.
-9. **`artifacts/milestone-1-task-crud/reviews/retrospective.md`** — the Validator's
+9. **`artifacts/milestone-1-task-crud/reviews/retrospective.md`** — Product's
    retrospective, with every metric filled from a recorded fixture source.
 10. **`artifacts/AGENT_STATE.md`** — every agent's live working state after
-    Milestone 1 closed: current work, decision logs, and the validator's
-    dashboards, one section per agent.
+    Milestone 1 closed: the Decisions Log, milestone progress, and the measured
+    performance budgets. No agent reads this file.
 11. **`artifacts/STANDUP.md`** — the rolling session log across the three days,
     written in the canonical Entry Grammar (typed one-liner entries under
     dated session headings, with loop counters and the ✅-marked Docs Writer
@@ -74,7 +78,7 @@ Read these in order for the clearest picture:
 
 ## Directory Layout
 
-- `CLAUDE.md` — populated project root context, stamped `Adopted with CAST v2.0.0`
+- `CLAUDE.md` — populated project root context, stamped `Adopted with CAST v3.0.0`
 - `docs/` — PRD, CONCEPT, GLOSSARY (only these; see Deliberate Omissions below)
 - `artifacts/` — all live milestone work, grouped by milestone:
   - `AGENT_STATE.md`, `BUGS.md` (bug index), `STANDUP.md` — the cross-milestone state files
@@ -84,9 +88,10 @@ Read these in order for the clearest picture:
     - `tasks/task-01…05-*.md` — one isolated file per task, each with its
       Context Manifest and Handoff Log
     - `bugs/bug-001…002-*.md` — one file per bug filed during the milestone
-    - `reviews/` — security, performance, and CEO planning reviews, plus the
-      milestone-completion UX review, validation and completion records, and
-      the retrospective
+    - `reviews/` — the risk review (security + performance lenses) and the CEO
+      planning verdict, plus the milestone-completion UX review, the risk
+      implementation review, the validation and completion records, and the
+      retrospective
   - `one-off/` — where `/agent-task` work would land (empty in this fixture)
 
 ## Deliberate Omissions
@@ -94,7 +99,7 @@ Read these in order for the clearest picture:
 - **No `.claude/` directory.** In a real populated project this would hold
   the installed agent files (`.claude/agents/*.md`) and skills
   (`.claude/skills/agent-plan/SKILL.md`, `agent-code`, `agent-task`,
-  `cast-doctor`). Including them here would just duplicate the template
+  `cast-doctor`, `cast-release`). Including them here would just duplicate the template
   payload verbatim.
 - **No `artifacts/DOCTOR.md`.** `/cast-doctor` (the install health check) has
   not been run in this fixture's timeline; its report is created on first run.

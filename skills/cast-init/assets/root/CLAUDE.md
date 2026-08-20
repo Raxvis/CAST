@@ -168,27 +168,28 @@ Adopted with CAST v[CAST_VERSION]
 
 ## Memory Imports
 
-These documents are loaded into Claude Code's context at every session start. They
-provide the baseline context all agents need. Keep this list lean — every import is
-paid in every session. The Directory Conventions section above already covers where
-files live; agents read the detailed reference docs on demand by path (the planning
-stage reads `docs/PRD.md` on demand regardless of whether it is imported here).
+Bare `@path` lines below are loaded into context at every session start **and into every
+subagent the pipeline spawns**. That second part is what makes this list expensive: an
+import is paid once per session plus once per stage, so a 250-line document costs more
+across one milestone than most agent definitions do.
 
-<!-- Core context — keep this -->
-@docs/CODE_PATTERNS.md
+**This list ships empty on purpose.** CAST v2 imported `docs/CODE_PATTERNS.md`
+unconditionally, which contradicted its own Context Inference Bar
+(`docs/MODEL_OPTIMIZATION.md`): on Opus 4.8+ and Sonnet 5+, conventions that merely restate
+what the codebase already shows — naming, file layout, function ordering — are inferred from
+the code, and writing them down again buys nothing but weight. Agents that need conventions
+get them through each task's Context Manifest, which cites *sections* rather than files.
 
-<!-- Topic-specific context — add a bare import line (like the one above) for the
-     one(s) that match your project type, and ignore the rest. These files ship with
-     the template and can be edited freely: `@docs/FRONTEND.md`, `@docs/BACKEND.md`,
-     `@docs/CLI.md`, `@docs/MOBILE.md`. Paths in backticks here are inert — an import
-     only fires as a bare `@path` line, so copy one out to activate it. -->
+**Add an import only when a document is needed unprompted in most sessions and cannot be
+inferred from the code.** Good candidates: a genuinely non-obvious domain convention, a
+project glossary whose terms appear nowhere in the source, a compliance constraint. Then
+delete it again if `/cast-doctor` flags it as inferable.
 
-<!-- On-demand reference — agents read these by path when a task calls for them
-     (coder/docs-writer: FILE_CONVENTIONS; coder/reviewer: ERROR_HANDLING; tester:
-     TEST_FRAMEWORK; navigation: docs/README.md, artifacts/README.md). Add an import
-     line only if your sessions repeatedly need one unprompted:
-     `@docs/FILE_CONVENTIONS.md`, `@docs/ERROR_HANDLING.md` -->
+<!-- Add bare import lines here, e.g.:
+     @docs/CODE_PATTERNS.md      — conventions a reader could NOT infer from the code
+     @docs/GLOSSARY.md           — domain terms that appear nowhere in the source
+     @docs/FRONTEND.md | BACKEND.md | CLI.md | MOBILE.md  — your project type's patterns
 
-<!-- Add once they contain real project content (at install time these are placeholder
-     skeletons — importing them pays for hundreds of skeleton lines per session):
-     `@docs/PRD.md`, `@docs/CONCEPT.md`, `@docs/ADDITIONAL.md`, `@docs/GLOSSARY.md` -->
+     Paths in comments are inert; an import only fires as a bare `@path` line at the
+     left margin. Everything else is read on demand by path: FILE_CONVENTIONS,
+     ERROR_HANDLING, TEST_FRAMEWORK, PRD, CONCEPT, docs/README.md, artifacts/README.md. -->

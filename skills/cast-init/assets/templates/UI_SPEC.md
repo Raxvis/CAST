@@ -39,13 +39,6 @@
 
 # [PROJECT_NAME] — UI Spec: [COMPONENT_OR_SCREEN_NAME]
 
-## Revision History (required)
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | [YYYY-MM-DD] | ui | Initial version |
-
----
 
 | Field | Value |
 |-------|-------|

@@ -24,13 +24,6 @@
 
 # [PROJECT_NAME] — [MILESTONE_NAME]
 
-## Revision History (required)
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | [YYYY-MM-DD] | product | Initial version |
-
----
 
 ## Header (required)
 

@@ -7,15 +7,15 @@
 
   HOW TO CUSTOMIZE:
   - Replace [MILESTONE_NAME] with the milestone under review.
-  - Fill in every Inputs Reviewed path — all six inputs are mandatory; write "None"
+  - Fill in every Inputs Reviewed path — all five inputs are mandatory; write "None"
     only when a review stage produced no findings file. Exception: the UI Spec row
     reads "N/A — no ui agent installed" when the project has no ui agent (Stage 2b
     was skipped), and in /agent-plan light mode a skipped stage's row reads
     "N/A — light mode, stage not run".
-  - Work through all six checklist sections. Do not skip any. Section 3 accepts
+  - Work through all five checklist sections. Do not skip any. Section 3 accepts
     "N/A — no ui agent installed" as its content in no-ui projects; in light
-    mode, Sections 3, 4, and 5 accept "N/A — light mode, stage not run" for
-    stages that were skipped (a flagged-in stage gets a real section).
+    mode, Sections 3 and 4 accept "N/A — light mode, stage not run" for stages
+    that were skipped (a flagged-in stage gets a real section).
   - Record Revision Requests when returning REVISION REQUIRED, and Approval Conditions
     (with a Verified By owner) when returning APPROVED WITH CONDITIONS.
   - Record the verdict as the single `**Verdict**:` line in the Verdict section, with
@@ -31,13 +31,6 @@
 
 # CEO Review: [MILESTONE_NAME]
 
-## Revision History (required)
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | [DATE] | ceo | Initial review |
-
----
 
 ## Header (required)
 
@@ -48,12 +41,11 @@
 - Task Breakdown: [PATH_TO_TASKS_DOC]
 - Architecture: [PATH_TO_ARCH_DOC]
 - UI Spec: [PATH_TO_UI_SPEC — or "N/A — no ui agent installed" for no-ui projects]
-- Security Findings: [PATH_OR_NONE]
-- Performance Findings: [PATH_OR_NONE]
+- Risk Review: [PATH_OR_NONE]
 
 **Review Cycle**: [v1 for first review; v2, v3, etc. for re-reviews of revised plans]
 
-On any re-review, read the `## Revision History` table at the top of every input file FIRST. Identify which of your prior Revision Requests have been addressed and which have not. An entry in the revision history is not the same as a fix — verify the body of each file reflects the claimed change.
+On any re-review, run `git log`/`git diff` on the changed input files FIRST to see what actually moved, then verify the body reflects the claimed change. A revision claimed is not a revision made.
 
 ---
 
@@ -92,27 +84,22 @@ _If the project installed no `ui` agent, write "N/A — no ui agent installed" a
 
 ---
 
-## 4. Security Posture (required)
+## 4. Risk Posture (required)
 
-- [ ] All Critical and High findings have a remediation plan inside this milestone.
+_Both lenses of the Risk review. If a lens found nothing, say so — an empty lens is a result._
+
+- [ ] Every Critical and High security finding has a remediation plan inside this milestone.
 - [ ] No Critical finding is deferred to "future work" without explicit Product acceptance.
 - [ ] New dependencies introduced by the architecture have been reviewed.
-
-**Notes**:
-
----
-
-## 5. Performance Budget (required)
-
-- [ ] The milestone respects the project's performance budgets.
-- [ ] Hot paths are identified and have a measurement plan.
+- [ ] The milestone respects the project's performance budgets; hot paths have a measurement plan.
 - [ ] No budget violation is deferred without explicit Product acceptance.
+- [ ] Both flag lines in `reviews/risk.md` are set, and their values match what the plan actually touches.
 
 **Notes**:
 
 ---
 
-## 6. Cross-Cutting Risks (required)
+## 5. Cross-Cutting Risks (required)
 
 - [ ] No UI requirement contradicts the architecture.
 - [ ] No architecture decision contradicts a Product acceptance criterion.

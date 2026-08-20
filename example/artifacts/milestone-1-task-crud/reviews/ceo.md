@@ -1,12 +1,5 @@
 # Acme Todo — CEO Review: Milestone 1 (Task CRUD + SQLite Persistence)
 
-## Revision History
-
-| Rev | Date | Agent | Change |
-|-----|------|-------|--------|
-| v1 | 2026-04-08 | ceo | Initial CEO review |
-
----
 
 ## Header
 
@@ -17,8 +10,7 @@
 - Task Breakdown: `artifacts/milestone-1-task-crud/tasks/`
 - Architecture: `artifacts/milestone-1-task-crud/architecture.md`
 - UI Spec: `artifacts/milestone-1-task-crud/ui.md`
-- Security Findings: `artifacts/milestone-1-task-crud/reviews/security.md`
-- Performance Findings: `artifacts/milestone-1-task-crud/reviews/performance.md`
+- Risk Review: `artifacts/milestone-1-task-crud/reviews/risk.md`
 
 **Review Cycle**: v1 — first review of this plan; no prior Revision Requests to re-verify.
 
@@ -54,7 +46,7 @@
 
 ---
 
-## 4. Security Posture
+## 4. Risk Posture
 - [x] All Critical and High findings have a remediation plan inside this milestone.
 - [x] No Critical finding is deferred to "future work" without explicit Product acceptance.
 - [x] New dependencies introduced by the architecture have been reviewed.
@@ -63,7 +55,7 @@
 
 ---
 
-## 5. Performance Budget
+### Performance lens
 - [x] The milestone respects the project's performance budgets.
 - [x] Hot paths are identified and have a measurement plan.
 - [x] No budget violation is deferred without explicit Product acceptance.
@@ -72,7 +64,7 @@
 
 ---
 
-## 6. Cross-Cutting Risks
+## 5. Cross-Cutting Risks
 - [x] No UI requirement contradicts the architecture.
 - [x] No architecture decision contradicts a Product acceptance criterion.
 - [x] No security/performance finding invalidates a task in the milestone.

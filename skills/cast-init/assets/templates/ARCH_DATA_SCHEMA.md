@@ -21,13 +21,6 @@
 
 # [PROJECT_NAME] — Architecture Spec: [SCHEMA_NAME] Data Schema
 
-## Revision History (required)
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | [YYYY-MM-DD] | architect | Initial version |
-
----
 
 | Field | Value |
 |-------|-------|

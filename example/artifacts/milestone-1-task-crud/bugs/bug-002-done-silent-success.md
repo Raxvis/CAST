@@ -23,7 +23,7 @@
 
 ## Notes
 
-Filed by Bug Gatherer during Milestone 1 manual smoke testing. Triaged by Product on 2026-04-10 and set Deferred (no Debugger investigation — deferral decided at triage). Reason for deferral: does not affect correctness of normal flows; usability papercut that can wait. Deferred is an open held state, not terminal: Product re-triaged this entry at the M1 milestone-completion checkpoint on 2026-04-10 and held it Deferred into M2 (paired with the M2 error-signaling task); it will be re-triaged again at the M2 `/agent-plan` Stage 1. The fix will likely check the `changes` field returned by `better-sqlite3`'s `.run()` result and error out when `changes === 0`.
+Filed by Reviewer during Milestone 1 manual smoke testing. Triaged by Product on 2026-04-10 and set Deferred (no investigation — deferral decided at triage). Reason for deferral: does not affect correctness of normal flows; usability papercut that can wait. Deferred is an open held state, not terminal: Product re-triaged this entry at the M1 milestone-completion checkpoint on 2026-04-10 and held it Deferred into M2 (paired with the M2 error-signaling task); it will be re-triaged again at the M2 `/agent-plan` Stage 1. The fix will likely check the `changes` field returned by `better-sqlite3`'s `.run()` result and error out when `changes === 0`.
 
 ---
 

@@ -21,7 +21,7 @@
 
 This file serves as a lightweight continuity log. Before starting each session, read the most recent session section. During and after each session, append entries using the Entry Grammar below.
 
-To stay lightweight, the log is bounded: at milestone-completion checkpoints, Validator moves session sections older than the just-completed milestone to `artifacts/archive/STANDUP.md` (see `validator.md` → Archival Duty). The live file keeps the current milestone's sessions plus a tail; archived sessions remain greppable in the archive file.
+To stay lightweight, the log is bounded: at the milestone-completion checkpoint the orchestrating skill moves session sections older than the just-completed milestone to `artifacts/archive/STANDUP.md` (see `/agent-code` → Milestone-completion checkpoint). The live file keeps the current milestone's sessions plus a tail; archived sessions remain greppable in the archive file.
 
 ---
 
@@ -62,12 +62,12 @@ Example session section:
 
 - reviewer | loop | Task M2-T01: loop 2/[MAX_LOOP_COUNT]
 - coder | docs | docs/CODE_PATTERNS.md needs the new debounce pattern documented ✅
-- product | progress | M2-T01 validated against acceptance criteria; Status set to Complete
-- docs-writer | progress | Drained 1 docs entry
-- tester | blocker | Task M2-T02 blocked: fixture server port collision in CI
+- reviewer | progress | M2-T01 closed at Step 3a — all 5 criteria Met, no Product spawn; Status set to Complete
+- coder | blocker | Task M2-T02 Environment Issue: fixture server port collision in CI
+- docs-writer | progress | Milestone-completion drain: 1 docs entry drained
 ```
 
-Entries under a session heading are appended in the order they happen (oldest first). In the example: the loop counter and the queued docs entry are written during task M2-T01, Product validates, Docs Writer drains the one pending `docs` entry at the task-completion checkpoint (marking it ✅ — the drained count matches the ✅ entries), then Tester hits a blocker on M2-T02.
+Entries under a session heading are appended in the order they happen (oldest first). In the example: the loop counter and the queued docs entry are written during task M2-T01; Reviewer's criteria check closes the task without a Product spawn; Coder hits an environment problem on M2-T02; and the queued `docs` entry drains at milestone completion (marked ✅ — the drained count matches the ✅ entries).
 
 ---
 

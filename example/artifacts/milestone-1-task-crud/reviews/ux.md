@@ -1,12 +1,5 @@
 # UX Review: Acme Todo Command Surface (Milestone 1)
 
-## Revision History
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | 2026-04-10 | ui | Initial review |
-
----
 
 ## Header
 

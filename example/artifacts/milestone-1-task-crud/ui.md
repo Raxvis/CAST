@@ -1,12 +1,5 @@
 # Acme Todo — UI Spec: Milestone 1 CLI Surface
 
-## Revision History
-
-| Rev | Date | Agent | Change |
-|-----|------|-------|--------|
-| v1 | 2026-04-08 | ui | Initial UI spec |
-
----
 
 | Field | Value |
 |-------|-------|

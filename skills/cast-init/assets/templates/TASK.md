@@ -9,7 +9,9 @@
            A task file must be executable in isolation: an agent picking it up reads THIS
            file plus exactly the references in its Context Manifest — nothing else. Handoffs
            are compact entries appended to the Handoff Log, not conversation context. The
-           full protocol lives in docs/PIPELINE_LOOP.md → "Handoff Protocol".
+           full contract lives in docs/STAGE_CONTRACT.md — the only process document an
+           agent reads. Routing lives in docs/PIPELINE_LOOP.md, read by the
+           orchestrating skill only.
 
   HOW TO CUSTOMIZE:
   - Replace [PROJECT_NAME] with your project name.
@@ -28,13 +30,14 @@
   - Handoff Log: append-only, newest last. Every stage transition appends exactly one
     entry in the fixed format. No narrative recaps — max 10 lines per entry; anything
     longer belongs in the artifact the entry points to (bug file, review file, code).
-    Exceptions: (a) Reviewer entries and Tester failure entries add one line per
-    finding/failure beyond the fixed fields — for those stages this log IS the
-    canonical record; never drop findings to fit the cap; (b) a Reviewer approval
-    entry also carries the Acceptance Criteria Check block — one line per
-    acceptance criterion, each Met (with evidence) / Not met / Product judgment.
-    That block is what decides whether the task closes directly or spawns Product
-    (docs/PIPELINE_LOOP.md → Step 4).
+    Exceptions: (a) Coder entries carry a Test Results block with the VERBATIM tail
+    of the test run — Reviewer rejects an entry without it, unread, and that is the
+    test gate; (b) Reviewer entries add one line per finding — for that stage this
+    log IS the canonical record, so never drop findings to fit the cap; (c) a
+    Reviewer approval entry also carries the Acceptance Criteria Check block — one
+    line per criterion, each Met (with evidence) / Not met / Product judgment. That
+    block decides whether the task closes directly or spawns Product
+    (docs/PIPELINE_LOOP.md → Step 3).
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted.
 -->
@@ -101,7 +104,8 @@ _Append-only; newest last. One entry per stage transition, fixed format, max 10 
 
 - **Outcome**: [one line — what was done or decided]
 - **Files touched**: [paths, or "None"]
-- **Commit**: [hash — only when this stage committed code per the Commit discipline in `docs/PIPELINE_LOOP.md`; omit the line otherwise]
+- **Commit**: [hash — only when this stage committed code; omit the line otherwise]
+- **Test Results**: [Coder entries only — `[TEST_CMD]` followed by the verbatim tail of the run. Omit the line in every other entry.]
 - **Read next**: [file/section references the next agent needs BEYOND the Context Manifest, or "Manifest only"]
 - **Open items**: [blockers, questions, or "None"]
 

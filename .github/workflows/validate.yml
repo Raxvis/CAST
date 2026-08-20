@@ -63,7 +63,12 @@ jobs:
           done
           count=$(ls skills/cast-init/assets/agents/*.md | grep -cv README.md)
           echo "agent files: $count"
-          [ "$count" -eq 15 ] || { echo "expected 15 agents, found $count"; fail=1; }
+          [ "$count" -eq 8 ] || { echo "expected 8 agents, found $count"; fail=1; }
+          # v3 merged seven v2 agents away. A resurrected file would register a subagent
+          # the pipelines no longer invoke, whose instructions contradict the v3 loop.
+          for gone in tester refactor debugger bug-gatherer validator security performance release; do
+            [ ! -e "skills/cast-init/assets/agents/$gone.md" ] || { echo "removed-in-v3 agent is back: $gone.md"; fail=1; }
+          done
           exit $fail
 
       - name: Payload READMEs agree with the canonical roster (names, tiers, skills)
@@ -290,8 +295,8 @@ jobs:
               */reviews/completion.md)             check_headings "$f" MILESTONE_COMPLETION.md ;;
               */reviews/validation.md)             check_headings "$f" MILESTONE_VALIDATION.md ;;
               */reviews/retrospective.md)          check_headings "$f" MILESTONE_RETROSPECTIVE.md ;;
-              */reviews/security.md|*/reviews/performance.md) ;;  # planning reviews carry no template contract
-              */reviews/security-impl.md|*/reviews/performance-impl.md) ;;  # completion reviews: same agent-defined formats
+              */reviews/risk.md) ;;                # risk review: agent-defined format (both lenses + two flag lines), no template
+              */reviews/risk-impl.md) ;;           # risk implementation review: same agent-defined format
               *) echo "unrecognized example artifact: $f — add a path pattern here or fix the filename"; fail=1 ;;
             esac
           done < <(find example/artifacts -type f -name '*.md' | sort)

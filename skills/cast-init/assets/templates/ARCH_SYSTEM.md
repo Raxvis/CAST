@@ -36,13 +36,6 @@
 
 # [PROJECT_NAME] — Architecture Spec: [SYSTEM_NAME]
 
-## Revision History (required)
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | [YYYY-MM-DD] | architect | Initial version |
-
----
 
 | Field | Value |
 |-------|-------|

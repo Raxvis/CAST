@@ -1,18 +1,11 @@
 # Milestone Retrospective: M1: Task CRUD + SQLite Persistence
 
-## Revision History
-
-| # | Date | Agent | Reason |
-|---|---|---|---|
-| v1 | 2026-04-10 | validator | Initial retrospective |
-
----
 
 ## Header
 
 **Date**: 2026-04-10
-**Facilitator**: Validator Agent
-**Participants**: product, architect, ui, security, performance, ceo, coder, tester, reviewer, debugger, bug-gatherer, docs-writer, validator
+**Facilitator**: Product Agent
+**Participants**: product, architect, ui, risk, ceo, coder, reviewer, docs-writer
 
 ---
 
@@ -29,7 +22,7 @@
 _Be specific. Reference tasks, agents, or decisions that were particularly effective._
 
 - CEO Approval Condition 3 was written defensively during planning and caught BUG-001 during T-3 implementation — the fix landed in the same session instead of becoming a post-release hotfix.
-- The Defect routing on BUG-001 worked end to end in one session: Reviewer classified it, Bug Gatherer filed it, Product triaged fix-now, Debugger produced three costed alternatives, and Coder shipped the recommended fix (`a8f3d12`).
+- The Defect routing on BUG-001 worked end to end in one session and in four spawns: Coder handed off the honest failure, Reviewer classified it and filed the bug, Product triaged Fix Now, and Coder investigated (three costed alternatives recorded in the bug file) and shipped the fix with red→green proof (`a8f3d12`).
 - T-1 shipping first as a hard dependency gate kept T-2/T-3/T-4 from colliding — the three parallel tasks touched only their own command files.
 - The Docs Writer queue kept documentation current without a dedicated docs pass: all 4 queued `docs` entries drained in the single milestone-completion pass. The queue never approached the 10-entry overflow bound, so the milestone cost one Docs Writer invocation instead of one per task.
 
@@ -47,23 +40,23 @@ _Be specific and honest. This is not a blame log — it is a process improvement
 
 ## Process Issues
 
-No process issues. (Process Violations and Conflicts tables in `artifacts/AGENT_STATE.md` → `## validator` are both empty; every handoff followed the pipeline loop.)
+No process issues. (Process Violations and Conflicts tables in `artifacts/AGENT_STATE.md` → `## product` are both empty; every handoff followed the pipeline loop.)
 
 ---
 
 ## Metrics
 
-_Fill each metric from its recorded source (validator.md → Metric Sources) — do not estimate._
+_Fill each metric from its recorded source (product.md → Metric Sources) — do not estimate._
 
 | Metric | Value | Source |
 |---|---|---|
 | Tasks planned | 5 | Summary table in `artifacts/milestone-1-task-crud/tasks/` |
 | Tasks completed | 5 | Summary table in `artifacts/milestone-1-task-crud/tasks/` |
 | Tasks rejected by Product | 0 | Summary table in `artifacts/milestone-1-task-crud/tasks/` — average rejections per task: 0 |
-| Process violations | 0 | Process Violations table in `artifacts/AGENT_STATE.md` → `## validator` |
-| Conflicts escalated to Validator | 0 | Conflicts table in `artifacts/AGENT_STATE.md` → `## validator` |
-| Architecture doc revisions | 1 | `## Revision History` table in `artifacts/milestone-1-task-crud/architecture.md` |
-| UI spec revisions | 1 | `## Revision History` table in `artifacts/milestone-1-task-crud/ui.md` |
+| Process violations | 0 | Process Violations table in `artifacts/AGENT_STATE.md` → `## product` |
+| Escalations to the user | 0 | Conflicts table in `artifacts/AGENT_STATE.md` → `## product` |
+| Architecture doc revisions | 1 | `git log --follow artifacts/milestone-1-task-crud/architecture.md` |
+| UI spec revisions | 1 | `git log --follow artifacts/milestone-1-task-crud/ui.md` |
 | Manifest patches during engineering | 0 | Handoff Log entries across `artifacts/milestone-1-task-crud/tasks/task-*.md` — no stage had to add a missing Context Manifest reference this milestone |
 
 ---
@@ -77,4 +70,4 @@ _The Disposition column stays empty at retrospective time. Product fills it duri
 | 1 | Fix BUG-002: `done <id>` must error non-zero when the ID does not exist; un-skip the reserved Vitest case | coder | M2 | |
 | 2 | Make "error on missing id" a standard acceptance criterion for every id-based mutation command | product | M2 planning (Stage 1) | |
 | 3 | Add filesystem prerequisites (DB parent-directory creation) to the architecture review checklist | architect | M2 planning (Stage 2a) | |
-| 4 | Automate the performance benchmark suite so budget tracking is populated during engineering, not after close | tester | M2 | |
+| 4 | Automate the performance benchmark suite so budget tracking is populated during engineering, not after close | coder | M2 | |

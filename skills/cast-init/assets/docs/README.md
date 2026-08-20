@@ -49,7 +49,8 @@ These documents describe how the project is built and the conventions that gover
 | `FILE_CONVENTIONS.md` | Rules governing where each type of file and document belongs in the repository. Read before creating any new file. |
 | `ERROR_HANDLING.md` | Guidelines for handling errors across all error categories. Defines principles, patterns, and user-facing message standards. |
 | `TEST_FRAMEWORK.md` | Testing strategy, test runner setup, file conventions, coverage requirements, and best practices. |
-| `PIPELINE_LOOP.md` | The canonical engineering-loop contract (Coder → Tester → Reviewer → validation, Defect/Issue routing, the Acceptance Criteria Check that decides whether validation spawns Product, loop-counter rules) consumed by `/agent-code` and `/agent-task`. |
+| `STAGE_CONTRACT.md` | **The only process document an agent reads.** The closed read set, the handoff-entry format, the one-line reply. Deliberately short — every line is paid on every stage of every task. |
+| `PIPELINE_LOOP.md` | The canonical engineering-loop contract (Coder → Reviewer → validation, Defect/Issue routing, commit discipline, test gate, loop counters), read by the orchestrating **skill** only. Never passed into a stage — that split is why a v3 stage costs a fraction of a v2 one. |
 | `MODEL_OPTIMIZATION.md` | Model policy for the agent roster: the Claude Opus ladder (Opus 5 preferred), per-model behavior profiles, the Context Inference Bar (gates `/cast-doctor`'s Tier B documentation prunes), and the upgrade checklists through Opus 4.8 → Opus 5. |
 
 ---
@@ -96,16 +97,16 @@ life of the project rather than per-work-item artifacts.
 
 | File | Description |
 |------|-------------|
-| `CHANGELOG.md` | Chronological log of notable changes across releases and milestones. Maintained by the release agent. |
+| `CHANGELOG.md` | Chronological log of notable changes across releases and milestones. Maintained by the `/cast-release` skill. |
 | `ASSETS.md` | Registry of all project assets (images, fonts, etc.) with status and source information. |
 | `MVP_LAUNCH.md` | Checklist and criteria for the initial public release. |
 
 Live work tracking — the active bug tracker and the rolling session log — lives in
 `artifacts/`, not here:
 
-- `artifacts/BUGS.md` — global bug index; per-bug files live beside the work that surfaced them (Bug Gatherer files, Debugger investigates)
+- `artifacts/BUGS.md` — global bug index; per-bug files live beside the work that surfaced them (Reviewer files them, Product triages, Coder investigates and fixes)
 - `artifacts/STANDUP.md` — rolling session progress log
-- `artifacts/AGENT_STATE.md` — live working state for every agent (Current Work, Decisions Logs, dashboards)
+- `artifacts/AGENT_STATE.md` — project state written by the orchestrating skill (Decisions Log, milestone progress, performance budgets, open questions). **No agent reads it.**
 
 ---
 
@@ -128,7 +129,7 @@ appropriate `artifacts/` subdirectory first.
 | `templates/MILESTONE_VALIDATION.md` | Template for per-task validation checklists and milestone acceptance records | `artifacts/milestone-{N}-{slug}/reviews/validation.md` |
 | `templates/CEO_REVIEW.md` | Template for the CEO's planning-stage review and verdict | `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |
 | `templates/UX_REVIEW.md` | Template for UI's UX review of a milestone's implemented screens — written once per milestone at the `/agent-code` milestone-completion checkpoint, only for milestones with UI-flagged tasks | `artifacts/milestone-{N}-{slug}/reviews/ux.md` |
-| `templates/MILESTONE_RETROSPECTIVE.md` | Template for the milestone retrospective, written by Validator at the `/agent-code` milestone-completion checkpoint | `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` |
+| `templates/MILESTONE_RETROSPECTIVE.md` | Template for the milestone retrospective, written by Product at the `/agent-code` milestone-completion checkpoint | `artifacts/milestone-{N}-{slug}/reviews/retrospective.md` |
 
 ---
 

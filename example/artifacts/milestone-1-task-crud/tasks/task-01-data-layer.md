@@ -65,25 +65,18 @@ and must enable WAL mode plus an index on `completed` to satisfy CEO Condition 2
 - **Read next**: Manifest only
 - **Open items**: None
 
-### 2. coder -> tester — 2026-04-09
+### 2. coder -> reviewer — 2026-04-09
 
-- **Outcome**: Data layer implemented — `Task` type, schema DDL, idempotent `runMigrations` with WAL and `idx_tasks_completed`.
-- **Files touched**: `src/types/task.ts`, `src/db/schema.ts`, `src/db/migrations.ts`
-- **Commit**: `3f6c2a9`
-- **Read next**: Manifest only — cover `runMigrations` idempotency and the `ACME_TODO_DB` override
-- **Open items**: None
-
-### 3. tester -> reviewer — 2026-04-09
-
-- **Outcome**: 6 unit tests added; `pnpm test` green (idempotency, WAL pragma, index presence, env override).
-- **Files touched**: `src/db/migrations.test.ts`
+- **Outcome**: Data layer implemented — `Task` type, schema DDL, idempotent `runMigrations` with WAL and `idx_tasks_completed`. 6 unit tests added covering idempotency, the WAL pragma, index presence, and the `ACME_TODO_DB` override.
+- **Files touched**: `src/types/task.ts`, `src/db/schema.ts`, `src/db/migrations.ts`, `src/db/migrations.test.ts`
 - **Commit**: `b7d41e0`
+- **Test Results**: `pnpm test` — `Test Files  1 passed (1)` / `Tests  6 passed (6)` / `Duration  0.61s`
 - **Read next**: Manifest only
 - **Open items**: None
 
-### 4. reviewer -> product — 2026-04-09
+### 3. reviewer -> product — 2026-04-09
 
-- **Outcome**: Clean review — no Defects, no Issues. CEO Conditions 1 and 2 verified in the migration. All 8 criteria Met; routing to Product anyway (Step 4b — this task carries CEO Approval Conditions).
+- **Outcome**: Clean review — no Defects, no Issues. CEO Conditions 1 and 2 verified in the migration. All 8 criteria Met; routing to Product anyway (Step 3b — this task carries CEO Approval Conditions).
 - **Files touched**: None
 - **Read next**: Manifest only
 - **Open items**: None
@@ -97,7 +90,7 @@ and must enable WAL mode plus an index on `completed` to satisfy CEO Condition 2
   - [7] No linter or type-check errors introduced. — Met — `pnpm typecheck` clean at `b7d41e0`
   - [8] Vitest unit tests cover the idempotency of `runMigrations`. — Met — 6 tests in `b7d41e0`
 
-### 5. product — task complete — 2026-04-09
+### 4. product — task complete — 2026-04-09
 
 - **Outcome**: All acceptance criteria met; Status set to Complete.
 - **Files touched**: This file (Header Status)

@@ -136,7 +136,7 @@ Phase separation: <None / Implicit / Explicit>
 2. Your project has both frontend (React) and backend (Express) code. Should I install both `docs/FRONTEND.md` and `docs/BACKEND.md`? (Recommended: yes.)
 3. Your project is a React Native app. Should I install `docs/FRONTEND.md` and `docs/MOBILE.md` as a pair? (Recommended: yes — mobile projects need both the shared UI patterns and the mobile-specific delta.)
 4. You have a `features/` directory with 12 files matching CAST's pre-0.3.0 naming. Confirm renaming to `artifacts/` and updating all cross-references?
-5. CAST installs 15 agents by default, including `validator` (owns process integrity, conflict resolution, milestone tracking) and `release` (owns changelog and version bumping). Your project doesn't currently have either. Should I install both, install only one, or skip both? (Recommended: install both. Skip only if you're certain you don't need them — CAST installs them by default.)
+5. CAST installs 8 agents by default. This project is backend/CLI-only with no user interface — should I skip the `ui` agent and its two templates (`UI_SPEC.md`, `UX_REVIEW.md`)? (Recommended: skip. `/agent-plan` detects the absence and skips its UI stage automatically, so the pipeline stays runnable. Everything else installs.)
 ```
 
 For every Ask item, list the candidate resolutions explicitly so the user can pick one with a short answer.
