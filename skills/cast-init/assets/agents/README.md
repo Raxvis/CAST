@@ -10,7 +10,7 @@ Per-agent models and tool lists are pre-configured in each agent file's YAML fro
 not placeholders. The `tools:` line is deliberate enforcement — every list omits the Task
 tool, which makes "do not spawn subagents" a hard guarantee rather than an instruction.
 Every agent defaults to `model: inherit` (it runs on the session model); role
-differentiation comes from recommended reasoning effort. See docs/MODEL_OPTIMIZATION.md.
+differentiation comes from the frontmatter `effort:` key. See docs/MODEL_OPTIMIZATION.md.
 -->
 
 # [PROJECT_NAME] — Agent System Overview
@@ -33,7 +33,7 @@ Eight specialist agents. Each owns a domain, hands work off through files rather
 | Coder | `coder.md` | T1 | Owns every change to production code and its tests. Implements, tests, commits; handles every loop-back — defect fixes (investigating root cause when needed), Issue restructuring, and criteria rejections. |
 | Reviewer | `reviewer.md` | T1 | The independent gate. Verifies the test-results block, reviews the diff, classifies findings as Defects (filing each as a bug file) or Issues, and records the per-criterion Acceptance Criteria Check. |
 | Architect | `architect.md` | T2 | Owns system design: module boundaries, data schemas, cross-module contracts, the performance budget. Returns the manifest rows each task needs. |
-| Docs Writer | `docs-writer.md` | T2 | Owns `docs/`. Drains the documentation queue at milestone completion, at an overflow drain, and at `/agent-task` completion. |
+| Docs Writer | `docs-writer.md` | T2 | Owns `docs/`. Drains the documentation queue at milestone completion, at an overflow drain, and at `/agent-task` completion — launched only when entries are pending. |
 | UI | `ui.md` | T3 | Owns visual design, layout, interaction states, accessibility. Performs the milestone UX review. Optional for backend/CLI-only projects. |
 | Risk | `risk.md` | T3 | Reviews the architecture through the security lens and the performance lens in one pass. Sets the two flags that decide whether implementation reviews run at milestone completion. |
 | CEO | `ceo.md` | T3 | The planning gate. Reads across every planning artifact for what falls *between* the specialists, and issues APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED. |

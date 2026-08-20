@@ -53,7 +53,7 @@ where `<skill>` is the skill running (`agent-plan`, `agent-code`, `agent-task`, 
 | `decision` | A decision worth surfacing beyond the agent's own Decisions Log | Free text |
 | `blocker` | A blocker encountered (or resolved) | Free text; name the blocking dependency or agent |
 
-**The Docs Writer queue** is the set of `docs` entries not yet marked as drained. Docs Writer drains it at the `/agent-code` milestone-completion checkpoint (the primary drain), at an **overflow drain** when 10 or more entries are pending at a task-completion checkpoint, and at the `/agent-task` completion checkpoint — marking each drained entry by appending ✅ to its line. An entry without ✅ is still pending. The queue is deliberately allowed to span several tasks: each entry carries its own context, so a batched drain reads the same as an immediate one, and the pending count is what `/agent-code` checks against the overflow bound.
+**The Docs Writer queue** is the set of `docs` entries not yet marked as drained. Docs Writer drains it at the `/agent-code` milestone-completion checkpoint (the primary drain), at an **overflow drain** when 10 or more entries are pending at a task-completion checkpoint, and at the `/agent-task` completion checkpoint — every drain runs only when at least one entry is pending, and marks each drained entry by appending ✅ to its line. An entry without ✅ is still pending. The queue is deliberately allowed to span several tasks: each entry carries its own context, so a batched drain reads the same as an immediate one, and the pending count is what `/agent-code` checks against the overflow bound.
 
 Example session section:
 

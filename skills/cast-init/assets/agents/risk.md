@@ -2,6 +2,7 @@
 name: risk
 description: "Use as the /agent-plan Stage 3 review of an architecture — examines it through the security lens and the performance lens in one pass, files findings with severity and remediation, and sets the two flags that decide whether implementation reviews run at milestone completion. Also runs those implementation reviews."
 model: inherit
+effort: high
 tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
@@ -96,7 +97,7 @@ A `No` on either line is a commitment that the corresponding check can be skippe
 
 ### Implementation review format
 
-Same two lens sections, reviewing the **milestone's implementation diff** — the commits made under this milestone's task IDs — plus, for each planned control from your planning review, whether it actually appears in the diff. For the performance lens, **measure**: run the relevant path against the budget and record Current vs. Target. Update the live budget table's Current/Status columns in `artifacts/AGENT_STATE.md`.
+Same two lens sections, reviewing the **milestone's implementation diff** — the commits made under this milestone's task IDs — plus, for each planned control from your planning review, whether it actually appears in the diff. For the performance lens, **measure**: run the relevant path against the budget and record Current vs. Target in `risk-impl.md`. The orchestrator transcribes those rows into the live budget table (`artifacts/AGENT_STATE.md` is orchestrator-written; no agent touches it).
 
 ---
 

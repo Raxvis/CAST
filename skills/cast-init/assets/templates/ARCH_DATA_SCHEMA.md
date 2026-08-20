@@ -11,7 +11,6 @@
     Field Definitions table with actual field details.
   - Replace [PERSISTENCE_LAYER] with your storage mechanism.
   - Update the Example Data section with realistic placeholder values.
-  - The Acceptance Checklist is the contract for implementation — keep it accurate.
   - Status values: Draft / In Review / Approved / Implemented
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.
@@ -223,27 +222,6 @@ const value = data.[DOMAIN_ENTITY].[field];
   save(get());
 }
 ```
-
----
-
-## Acceptance Checklist (required)
-
-- [ ] All fields defined in the Field Definitions table are implemented
-- [ ] Default schema function returns a valid, complete structure
-- [ ] All validation rules are enforced on load
-- [ ] Save function writes all fields correctly
-- [ ] Load function handles missing data gracefully (falls back to default)
-- [ ] Load function handles corrupt data gracefully (falls back to default)
-- [ ] Migration function handles all defined version transitions
-- [ ] Example data matches the schema definition
-- [ ] No linter or type-check errors
-- [ ] Code reviewed and merged
-
----
-
-## CEO Verdict (required)
-
-Gated by the CEO planning review — see `artifacts/milestone-{N}-{slug}/reviews/ceo.md`. Do not sign off here.
 
 ---
 

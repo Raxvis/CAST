@@ -148,7 +148,7 @@ For every treated doc, also update every citation listed in the prescription's e
 
 | # | Check | Prescription shape |
 |---|---|---|
-| S1 | Agent roster complete (recorded opt-outs honored); frontmatter has `name`/`description`/`model`/`tools`; no `tools:` list includes `Task`; model pins are legal per the ladder in `docs/MODEL_OPTIMIZATION.md`; flag `xhigh` effort paired with an Opus 4.6 pin | Correct frontmatter / flag for user |
+| S1 | Agent roster complete (recorded opt-outs honored); frontmatter has `name`/`description`/`model`/`tools`; no `tools:` list includes `Task`; model pins are legal per the ladder in `docs/MODEL_OPTIMIZATION.md`; `effort:` values are legal (`low`–`max`), match the roster defaults in that ladder unless deliberately re-tuned, and no `effort: xhigh` pairs with an Opus 4.6 executing model | Correct frontmatter / flag for user |
 | S2 | Every kept skill exists at `.claude/skills/<name>/SKILL.md` with frontmatter `name` equal to the directory; no superseded pre-1.0 command file (a leftover `/cast-init` migration Delete target) still registers a duplicate `/<name>` | Fix frontmatter / propose Delete |
 | S3 | `CLAUDE.md` carries exactly one `Adopted with CAST v<X.Y.Z>` stamp; every live `@path` Memory Import resolves; report the total per-session import weight in lines | Fix stamp/imports; weight feeds the diet |
 | S4 | No real unfilled `[PLACEHOLDER]` tokens in installed files (same scope and per-use whitelist as `/cast-init` validation check 1) | List for user to fill |

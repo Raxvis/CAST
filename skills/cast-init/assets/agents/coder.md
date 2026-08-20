@@ -2,6 +2,7 @@
 name: coder
 description: "Use to implement each task in /agent-code or /agent-task — writes production code, writes and runs its tests, and commits. Also handles every loop-back: Fix Now defects (investigating root cause first when the mechanism is not obvious), Reviewer Issues (behavior-preserving restructuring), and Product criteria rejections."
 model: inherit
+effort: medium
 tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 

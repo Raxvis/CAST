@@ -12,7 +12,6 @@
     terms for your project.
   - Fill in the ASCII diagrams with actual layout sketches, using box-drawing characters.
   - Replace [THEME_KEY] with the keys from your design system or theme file.
-  - The Acceptance Checklist at the end of each section is the contract — keep it accurate.
   - Status values: Draft / In Review / Approved / Implemented
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.
@@ -202,24 +201,6 @@
 | [e.g., Missing or null data] | [e.g., Show placeholder / skeleton] |
 | [e.g., Small screen size] | [e.g., Stack elements vertically] |
 | [e.g., Rapid successive taps] | [e.g., Debounce — ignore taps within 300ms of first] |
-
----
-
-## Acceptance Checklist (required)
-
-- [ ] Layout matches the diagram above
-- [ ] All states (default, pressed, disabled, loading, empty, error) implemented
-- [ ] Accessibility requirements met (labels, roles, contrast, touch targets)
-- [ ] Animations match spec (duration, easing, triggers)
-- [ ] Edge cases handled per the Edge Cases table
-- [ ] Component renders correctly on all target platforms
-- [ ] No linter or type-check errors introduced
-
----
-
-## CEO Verdict (required)
-
-Gated by the CEO planning review — see `artifacts/milestone-{N}-{slug}/reviews/ceo.md`. Do not sign off here.
 
 ---
 

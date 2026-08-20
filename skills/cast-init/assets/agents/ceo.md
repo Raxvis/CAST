@@ -2,6 +2,7 @@
 name: ceo
 description: "Use as the final planning-stage gate once Product, Architecture, UI, and Risk have completed their milestone outputs — issues APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED before engineering begins."
 model: inherit
+effort: high
 tools: Read, Grep, Glob, Edit, Write
 ---
 

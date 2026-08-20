@@ -132,13 +132,14 @@ A task does not advance to Step 3 until Reviewer has approved a clean version �
 
 Every task's acceptance criteria are checked, criterion by criterion, before it closes. **Who** performs the check depends on Reviewer's Acceptance Criteria Check.
 
-**Step 3a — Clean close (no agent launch).** When Reviewer marks **every** criterion `Met` with an evidence pointer, the orchestrator closes the task itself: set the task file's Status to Complete and append a `progress` entry to `artifacts/STANDUP.md` citing Reviewer's entry number. Reviewer's entry is the validation record. If the task resolved a filed bug, the orchestrator also flips that bug's status `Verified` → `Closed` (mirroring the index row) per the field-ownership table in `artifacts/BUGS.md` — a transcription of recorded facts, not a judgment.
+**Step 3a — Clean close (no agent launch).** When Reviewer marks **every** criterion — and, for a condition-bearing task, every CEO Approval Condition line — `Met` with an evidence pointer, the orchestrator closes the task itself: set the task file's Status to Complete and append a `progress` entry to `artifacts/STANDUP.md` citing Reviewer's entry number. Reviewer's entry is the validation record. If the task resolved a filed bug, the orchestrator also flips that bug's status `Verified` → `Closed` (mirroring the index row) per the field-ownership table in `artifacts/BUGS.md` — a transcription of recorded facts, not a judgment.
 
 **Step 3b — Product validation (agent launch).** Launch the **product** agent whenever any of these hold:
 
-- Reviewer's check reports any criterion `Not met` or `Product judgment`;
-- a criterion was added or amended mid-task (Task-amendment rule);
-- the task carries a CEO Approval Condition in its Context Manifest.
+- Reviewer's check reports any criterion — or any CEO Approval Condition line — `Not met` or `Product judgment`;
+- a criterion was added or amended mid-task (Task-amendment rule).
+
+(A CEO Approval Condition no longer forces a per-task spawn by itself: Reviewer's check carries one line per condition the task's manifest cites, an evidenced line closes at 3a, and Product remains the verifier of record for every condition at the milestone close.)
 
 Product validates against the task file's criteria and disposes of every flagged criterion. If any criterion is unmet, it appends the handoff entry citing the failure and the task returns to Coder.
 

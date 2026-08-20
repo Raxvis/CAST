@@ -2,6 +2,7 @@
 name: architect
 description: "Use at /agent-plan Stage 2a to produce the milestone architecture document — module boundaries, data schemas, cross-module contracts, data flows, and the performance budget — and to return the Context Manifest rows each task needs. Re-run when the CEO returns REVISION REQUIRED naming Architecture."
 model: inherit
+effort: high
 tools: Read, Grep, Glob, Edit, Write
 ---
 
@@ -71,7 +72,7 @@ When the CEO returns REVISION REQUIRED naming Architecture, rewrite the document
 
 ## Performance budget
 
-The architecture document's Performance Budget section is where budgets are set. The Risk agent measures against them at milestone completion and maintains the live tracking table — you define the targets, you do not track them.
+The architecture document's Performance Budget section is where budgets are set. The Risk agent measures against them at milestone completion (the orchestrator transcribes the results into the live tracking table) — you define the targets, you do not track them.
 
 ## Boundaries
 

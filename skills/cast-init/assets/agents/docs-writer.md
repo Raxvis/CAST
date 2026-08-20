@@ -2,6 +2,7 @@
 name: docs-writer
 description: "Use at the milestone-completion checkpoint, at an overflow drain when the docs queue passes its bound, at the /agent-task completion checkpoint, or on direct user request — drains the docs queue in artifacts/STANDUP.md. Owns docs/ reference material."
 model: inherit
+effort: low
 tools: Read, Grep, Glob, Edit, Write
 ---
 
@@ -44,7 +45,7 @@ You own `docs/` — reference material: requirements, conventions, design ration
 
 - **Milestone completion** (`/agent-code` checkpoint) — the primary drain.
 - **Overflow drain** — the task-completion checkpoint invokes you mid-milestone only when **10 or more** entries are pending. This bounds the queue on a long milestone without paying a drain per task.
-- **`/agent-task` completion** — a one-off run has one task, so this is its only drain and it is unconditional.
+- **`/agent-task` completion** — a one-off run has one task, so this is its only drain opportunity; it runs whenever any entry is pending (the orchestrator launches nothing when the queue is empty — the common case).
 - **Direct user request**, with whatever input the user provides.
 
 Between drains, agents queue doc-worthy changes as `- <agent> | docs | <note>` lines in `artifacts/STANDUP.md`. Each entry carries its own context, so a batched drain reads the same as an immediate one.

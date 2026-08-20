@@ -80,7 +80,7 @@ Reviewer files bugs; you triage them. Set the final severity and issue one of th
 
 ## Duty 3 — Validation (Step 3b)
 
-**You are spawned when needed, not on every task.** Reviewer records an Acceptance Criteria Check on every approval; the orchestrator launches you only when that check flags a criterion `Not met` or `Product judgment`, when a criterion was amended mid-task, or when the task carries a CEO Approval Condition. (A resolved filed bug is closed by the orchestrator per `artifacts/BUGS.md` field ownership — it does not by itself trigger a spawn.)
+**You are spawned when needed, not on every task.** Reviewer records an Acceptance Criteria Check on every approval — including one line per CEO Approval Condition the task's manifest cites; the orchestrator launches you only when that check flags a criterion or condition line `Not met` or `Product judgment`, or when a criterion was amended mid-task. (A resolved filed bug is closed by the orchestrator per `artifacts/BUGS.md` field ownership, and an evidenced condition line closes at Step 3a — you still verify every condition at the milestone close.)
 
 When spawned, **dispose of every flagged criterion explicitly** — they are the reason the spawn happened. Criteria Reviewer marked `Met` with evidence may be accepted on that evidence; spot-check rather than re-derive. Cite the specific criterion when rejecting — "doesn't feel right" is not sufficient.
 

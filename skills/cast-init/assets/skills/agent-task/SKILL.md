@@ -123,7 +123,7 @@ Deltas specific to this skill:
 
 After the task passes validation (Step 3a or 3b):
 
-1. Run `[TEST_CMD]` one final time to confirm everything still passes.
+1. If any commit landed after Coder's last full-suite run, run `[TEST_CMD]` once more to confirm everything still passes; otherwise skip it — the test-gate rule already required Coder's final pass to run the full suite, no stage after Coder modifies code, and the verbatim block in the Handoff Log is the record.
 2. Set the task file's Status to Complete in its Header.
 3. Append an entry to `artifacts/STANDUP.md` using that file's Entry Grammar: a session heading `### YYYY-MM-DD — agent-task — <task summary>` (if this run has not added one yet) and a `- <product|reviewer> | progress | <task summary, any bug ID resolved>` line — attributed to whichever stage closed the task.
 4. **Docs Writer (conditional).** Count the pending `docs` entries in `artifacts/STANDUP.md` (lines of the form `- <agent> | docs | <note>` without ✅ — see that file's Entry Grammar). If **one or more** are pending, invoke the **docs-writer** agent to drain them all (it marks each with ✅) — a one-off run has exactly one task, so this checkpoint is its only drain opportunity. If the queue is empty — the common case for a one-off task — launch nothing.

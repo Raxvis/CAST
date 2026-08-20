@@ -57,7 +57,7 @@ The argument text the user provided when invoking this skill (e.g. `/agent-plan 
 
 This skill orchestrates the **Planning Stage** of the agent workflow. It runs the agents in the order below, each building on the previous agent's output. All outputs are planning documents under `artifacts/` — no production code is modified and nothing is written to `docs/`.
 
-**Pass inputs forward.** Each stage's "Input to pass" means include the content in the agent's invocation — read each artifact once as it is produced and hand it to the consuming stages. Do not make every agent independently re-open files the orchestrator has already read; an agent re-reads a file itself only when it needs sections that were not supplied.
+**Pass paths, not bodies.** Each stage's "Input to pass" means name the artifact paths (plus section pointers where a stage needs only part of one) in the agent's invocation — the stage reads its own inputs. Do not read stage outputs into your own context to paste them forward: a subagent is cold either way, so pasting pays an extra copy per receiving stage *and* permanently bloats this orchestrating context, which stage replies are designed to keep flat. Inline content belongs in an invocation only when you produced it yourself (the feature request, manifest-row corrections, revision notes).
 
 **Stage replies are routing metadata.** Per `docs/STAGE_CONTRACT.md`, each stage's final report is a short completion notice (artifact written, one-line outcome) — plus, for Stages 2a/2b, the per-task manifest-rows block described below. Do not relay or summarize document contents between stages; the documents on disk are the record.
 
@@ -118,7 +118,7 @@ After Product completes, launch the **architect** agent to:
 4. **Return a Manifest Rows block** in its completion report: for each affected task, the specific `architecture.md` sections (by anchor) that task needs and why — one proposed Context Manifest row per line, in the manifest's table format. Do **not** edit the task files directly: Stage 2b runs in parallel and edits to the same files would collide; the orchestrator applies both agents' rows in Stage 2c.
 5. Reference prior milestones' architecture documents (`artifacts/milestone-*/architecture.md`) for consistency and name any new dependencies in the Decisions Log.
 
-Input to pass: the milestone README and task files from Stage 1.
+Input to pass: the paths of the milestone README and task files from Stage 1.
 
 ### Stage 2b — UI
 
@@ -131,7 +131,7 @@ In parallel with Architecture, launch the **ui** agent to:
 5. **Return a Manifest Rows block** in its completion report: for each affected task, the specific `ui.md` sections (by anchor) that task needs and why — one proposed Context Manifest row per line. Do **not** edit the task files directly (Stage 2a runs in parallel; the orchestrator applies both agents' rows in Stage 2c).
 6. Reference prior milestones' UI specs (`artifacts/milestone-*/ui.md`) for consistency.
 
-Input to pass: the milestone README and the task files from Stage 1 (the `Needs UI Spec` flags live in each task file's Header). Coordinate state-shape questions with the architect agent if they arise.
+Input to pass: the paths of the milestone README and the task files from Stage 1 (the `Needs UI Spec` flags live in each task file's Header). Coordinate state-shape questions with the architect agent if they arise.
 
 **This stage is conditional in full mode too**, on the same flag light mode uses: run it only when at least one task file's Header has **Needs UI Spec** = Yes. A full-mode backend milestone with no UI-flagged task would otherwise pay a UI launch for a spec no manifest cites. Skip with a checkpoint note (`- agent-plan | progress | Stage 2b skipped: no UI-flagged tasks`); the CEO reviews the skip like any light-mode skip ("N/A" input row), and a task that later declares **Needs UI Spec** = Yes pulls the stage back in.
 
@@ -164,7 +164,7 @@ When it runs, launch the **risk** agent once to review the architecture through 
    A Yes on either commits `/agent-code` to a `reviews/risk-impl.md` at milestone completion. When unsure, answer Yes.
 6. Any **Critical** finding blocks the milestone until remediated or rolled into a CEO Approval Condition. Any finding that breaks a performance budget must be resolved or explicitly accepted by Product before CEO review.
 
-Input to pass: the milestone definition, architecture document, and UI specification.
+Input to pass: the paths of the milestone definition, architecture document, and UI specification.
 
 **Stage trigger:** Stage 4 starts after Stage 3 completes. If Risk requires architectural changes, return to Stage 2a for revision and re-run Stage 3 against the revised architecture.
 

@@ -10,7 +10,6 @@
   - Replace [DOMAIN_ENTITY], [RESOURCE_TYPE], [CORE_MECHANIC], [STATE_LIBRARY],
     [PERSISTENCE_LAYER], [FRAMEWORK] with domain- and stack-specific terms.
   - Fill in the Component Diagram and Data Flow with real details for your system.
-  - The Acceptance Checklist is the contract — keep it accurate and up to date.
   - Status values: Draft / In Review / Approved / Implemented
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.
@@ -222,26 +221,6 @@ _Every decision that chose between real alternatives, and **every new dependency
 | # | Decision | Alternatives considered | Rationale |
 |---|----------|------------------------|-----------|
 | 1 | [Decision] | [What else was considered] | [Why this one] |
-
----
-
-## Acceptance Checklist (required)
-
-- [ ] All modules implemented per their specifications
-- [ ] Data flow matches the described sequence end-to-end
-- [ ] All integration test cases pass
-- [ ] All manual testing checklist items verified
-- [ ] Performance budget met for all metrics
-- [ ] State persists correctly across sessions
-- [ ] No regressions in adjacent systems
-- [ ] No linter or type-check errors
-- [ ] Code reviewed and merged
-
----
-
-## CEO Verdict (required)
-
-Gated by the CEO planning review — see `artifacts/milestone-{N}-{slug}/reviews/ceo.md`. Do not sign off here.
 
 ---
 
