@@ -4,7 +4,7 @@
 ## Header
 
 **Date**: 2026-04-08
-**Reviewer**: CEO Agent (claude-opus-5, `/agent-plan` Stage 4)
+**Reviewer**: CEO Agent (claude-opus-5, `/agent-plan` Stage 3 — cross-cutting verdict, Part 2 of the same launch that produced `reviews/risk.md`)
 **Inputs Reviewed**:
 - Milestone: `artifacts/milestone-1-task-crud/README.md`
 - Task Breakdown: `artifacts/milestone-1-task-crud/tasks/`
@@ -86,9 +86,9 @@
 
 | # | Condition | Verified By | Verified At |
 |---|---|---|---|
-| 1 | **Security**: All SQL queries must use parameterized bindings (no string concatenation into SQL). Verified by Reviewer during code review. | Reviewer | |
-| 2 | **Performance**: SQLite WAL mode must be enabled in the migration, and an index must be created on the `completed` column. Verified by Reviewer inspecting the migration. | Reviewer | |
-| 3 | **Error handling**: `list` must handle a missing database file by running migrations on first invocation rather than throwing an error. Verified by Product during validation. | Product | |
+| 1 | **Security**: All SQL queries must use parameterized bindings (no string concatenation into SQL). Verified by Reviewer during code review. | Reviewer | 2026-04-10 |
+| 2 | **Performance**: SQLite WAL mode must be enabled in the migration, and an index must be created on the `completed` column. Verified by Reviewer inspecting the migration. | Reviewer | 2026-04-10 |
+| 3 | **Error handling**: `list` must handle a missing database file by running migrations on first invocation rather than throwing an error. Verified by Product during validation. | Product | 2026-04-10 |
 
 ---
 

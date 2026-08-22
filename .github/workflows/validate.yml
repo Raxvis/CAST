@@ -109,6 +109,80 @@ jobs:
           [ "$fail" -eq 0 ] && echo "payload READMEs agree with the roster"
           exit $fail
 
+      - name: Prose agent counts match the payload (manifests, SKILL.md, README)
+        run: |
+          # The v3.0.0 "8 agents" / "15 agents" drift lived in description prose no
+          # check read. Derive the count from disk and assert every surface that
+          # states a number states this one.
+          count=$(ls skills/cast-init/assets/agents/*.md | grep -cv README.md)
+          echo "agents on disk: $count"
+          fail=0
+          check_num() { # file, extended-regex with one capture-ish numeric token
+            f=$1; re=$2
+            n=$(grep -oE "$re" "$f" | grep -oE '[0-9]+' | head -1)
+            [ -z "$n" ] && { echo "$f: no match for /$re/ — count claim removed? update this check"; fail=1; return; }
+            [ "$n" = "$count" ] || { echo "$f: claims $n agents, payload has $count"; fail=1; }
+          }
+          check_num .claude-plugin/plugin.json      '[0-9]+ specialist subagents'
+          check_num .claude-plugin/marketplace.json '[0-9]+ agents'
+          check_num skills/cast-init/SKILL.md       '[0-9]+ specialist subagents'
+          # README: the badge and every "N-agent"/"N specialist subagents" prose claim.
+          badge=$(grep -oE 'agents-[0-9]+' README.md | grep -oE '[0-9]+' | head -1)
+          [ "$badge" = "$count" ] || { echo "README badge says $badge agents, payload has $count"; fail=1; }
+          # (^| ) keeps "v2 agents" (historical version refs) from matching as "2 agents".
+          for n in $(grep -ohE '(^| )[0-9]+(-agent| specialist subagents| agents)' README.md skills/cast-init/SKILL.md | grep -oE '[0-9]+' | sort -u); do
+            [ "$n" = "$count" ] || { echo "README/SKILL.md contains a '$n agents' claim; payload has $count"; fail=1; }
+          done
+          exit $fail
+
+      - name: Install references cover every payload doc and skill
+        run: |
+          # v3.0.0 shipped with docs/STAGE_CONTRACT.md absent from dispositions.md's
+          # mapping table and cast-release absent from execution.md/validation.md's
+          # skill lists — plan-driven installs silently omitted them. Derive both
+          # sets from disk.
+          fail=0
+          disp=skills/cast-init/references/dispositions.md
+          for f in skills/cast-init/assets/docs/*.md; do
+            b=$(basename "$f"); [ "$b" = "README.md" ] && continue
+            grep -qF "docs/$b" "$disp" || { echo "$disp has no row for docs/$b"; fail=1; }
+          done
+          for d in skills/cast-init/assets/skills/*/; do
+            s=$(basename "$d")
+            grep -qF "\`$s\`" skills/cast-init/references/execution.md \
+              || { echo "references/execution.md never installs skill $s"; fail=1; }
+            grep -qF "\`$s\`" skills/cast-init/references/validation.md \
+              || { echo "references/validation.md never verifies skill $s"; fail=1; }
+          done
+          [ "$fail" -eq 0 ] && echo "install references complete"
+          exit $fail
+
+      - name: No stale planning-stage numbering (CEO is Stage 3; there is no Stage 4)
+        run: |
+          # v3 renumbered the CEO review to Stage 3 and folded the Risk stage into it.
+          # Any live "Stage 4" is drift; CHANGELOG.md history legitimately keeps old
+          # numbering and is excluded by scope.
+          hits=$(grep -rn 'Stage 4' README.md CLAUDE.md TROUBLESHOOTING.md skills/ example/ .claude-plugin/ || true)
+          if [ -n "$hits" ]; then
+            echo "Stale 'Stage 4' references (v3 planning ends at Stage 3):"; echo "$hits"; exit 1
+          fi
+          echo "clean"
+
+      - name: No resurrected per-task CEO-condition trigger
+        run: |
+          # v3 removed "a CEO Approval Condition forces Step 3b / launches Product".
+          # docs/PIPELINE_LOOP.md is canonical (evidenced condition lines close at 3a).
+          # [^.;]* keeps the match inside one clause — README's correct "…Condition
+          # line) Met with evidence…; a flagged criterion…launches Product" spans a
+          # semicolon and must not match. The second alternative catches the trigger
+          # stated from the 3b side ("Step 3b runs when the task carries a…").
+          hits=$(grep -rniE '(CEO Approval Condition[^.;]*(launches|forces|routes to) (Product|Step 3b|3b)|Step 3b[^.;]*carries a CEO Approval Condition)' \
+            README.md CLAUDE.md TROUBLESHOOTING.md skills/ example/ || true)
+          if [ -n "$hits" ]; then
+            echo "Removed v2 trigger resurrected (see docs/PIPELINE_LOOP.md Step 3a/3b):"; echo "$hits"; exit 1
+          fi
+          echo "clean"
+
       - name: Payload and example contain no pre-1.0 references
         run: |
           hits=$(grep -rln 'PROMPT\.md\|\.claude/commands\|slash command' \
@@ -164,42 +238,36 @@ jobs:
           #            <(grep -oE '\| `\[[A-Z][A-Z0-9_]*\]`' README.md | grep -oE '[A-Z][A-Z0-9_]*' | sort -u)
           allow="
             ABBR_1 ABBR_2 ABBR_3 ABBR_4 ABBR_5 ACCESSIBILITY_STANDARD ACTION ACTION_1 ACTION_2
-            ACTION_OR_RULE_CHANGE ACTUAL_APPROACH ACTUAL_DURATION AGENT ANDROID ANY_TYPE ASSET_CATEGORY
-            ASSET_NAME AUDIT_DATE AUTHOR BENEFIT BUSINESS_OUTCOME CAST CHANGE_SUMMARY CHECK_1 CHECK_2
-            CHECK_3 CHECK_NAME_1 CHECK_NAME_2 CHECK_NAME_3 COLOR_CONSTANT COMMAND COMPONENT_CATEGORY
-            COMPONENT_NAME_1 COMPONENT_NAME_2 COMPONENT_NAME_3 COMPONENT_OR_SCREEN_NAME COMPONENT_PATH
-            CONCEPT_TITLE CONSTANT CONSTANT_NAME CORRECT_BEHAVIOR COST COVERAGE_OUTPUT_DIRECTORY
-            CRASH_REPORTER CURRENT_VERSION CUSTOM_METRIC DATE DECIMAL_PLACES DECISION_TITLE DEFAULT
-            DEFAULT_SAVE_FUNCTION DEFAULT_VALUE DESCRIPTION DETAIL DIFFERENCE_AND_REASON_IF_SIGNIFICANT
-            DOC_REFERENCE DOMAIN_NOT_FOUND DOMAIN_SPECIFIC DURATION ELEMENT EPSILON ESTIMATED_EFFORT
-            EXAMPLE_CONSTANT
-            EXAMPLE_MODULE_NAME EXPECTED_ERROR_MESSAGE FAMILY FEATURE_AREA FEATURE_AREA_1
-            FEATURE_AREA_2 FEATURE_NAME FEATURE_OR_AREA_1 FEATURE_OR_AREA_2 FIELD_NAME FILE_1 FILE_2
-            FILE_PATTERN FILTER_FLAG FINAL_STATE FIXED_TIMESTAMP FORMAT FULL_TERM_1 FULL_TERM_2
-            FULL_TERM_3 FULL_TERM_4 FULL_TERM_5 HEADER_HEIGHT HEX HOME HOOK_CATEGORY HOOK_PATH
-            HOW_MEASURED ID_TYPE INCORRECT_BEHAVIOR INITIAL_STATE INVALID_CONDITION IOS ISSUE_1 ISSUE_2
-            ITEM_1 ITEM_2 ITEM_3 ITEM_TITLE KEY_BEHAVIOR KEY_DIFFERENTIATOR LEVEL LIMIT
-            LIST_AGENTS_ACTIVE_THIS_MILESTONE LIST_KEY_BEHAVIORS_TESTED LIST_TESTS M1_NAME M2_NAME
-            M3_NAME M4_NAME M5_NAME MAX_RETRY_COUNT MEASURABLE_BEHAVIOR MEMBER METRIC_1 METRIC_2
-            MILESTONE_1 MILESTONE_2 MILESTONE_3 MILESTONE_NAME MILESTONE_OR_DATE MIN_ANDROID_VERSION
-            MIN_IOS_VERSION MINIMUM_SPEC_DEVICE MISSING_INPUT_CONDITION MOBILE_FRAMEWORK MODULE
-            MODULE_1 MODULE_2 MODULE_3 MODULE_4 MODULE_5 MODULE_A MODULE_B MODULE_C MODULE_CONSTANT
-            MODULE_NAME NAME NOTE NOTES OPERATION_NAME OS_LIST OTHER_TERM PARTICIPANT_ROLES
-            PATH_OR_NONE PATH_TO_ARCH_DOC PATH_TO_MILESTONE_DOC PATH_TO_TASKS_DOC
-            PERFORMANCE_METRIC PERSISTENCE PERSISTENCE_MODULE_PATH PILLAR_1 PILLAR_2 PILLAR_3
-            PLACEHOLDER PLATFORM PLATFORM_A PLATFORM_B POST_LAUNCH_ITEM_1
-            POST_LAUNCH_ITEM_2 POST_LAUNCH_ITEM_3 POST_LAUNCH_ITEM_4 PRIMARY_USER_SEGMENT PRINCIPLE_1
-            PRINCIPLE_2 PRINCIPLE_3 PRODUCT_TYPE PURE_LOGIC_CATEGORY PURE_LOGIC_PATH QUESTION RATE
-            REASON REQUIREMENTS_REFERENCE RETRY_DELAY REVENUE ROOT_CAUSE ROUTES ROUTES_FILE
-            SAFE_DEFAULT_VALUE SCHEMA SCHEMA_NAME SCREEN SCREEN_NAME SCREEN_OR_COMPONENT_NAME SIZE
-            SOLUTION_DESCRIPTION SOURCE_ROOT SPACING_CONSTANT SPACING_UNIT SPEC_NAME_OR_LINK
-            SPEC_SECTION SPECIFIED_APPROACH STATE_A STATE_B STATE_C STATE_LAYER STATE_STORE_CATEGORY
-            STATUS_TYPE STORAGE_KEY STORE_PATH SUPPORTING_TYPE SYSTEM SYSTEM_NAME TARGET
-            TARGET_PLATFORM_LIST TASK_NAME TASK_OR_ISSUE_NAME TASK_REFERENCE TERM TERM_NAME
-            TEST_DESCRIPTION_PATTERN TEST_DIRECTORY TEST_FILE_EXTENSION TEST_ROOT TEST_WATCH_CMD
-            THEME_FILE THEME_KEY TIME TIMEOUT_MS TYPE UNKNOWN_TYPE USE_LOOP_HOOK USER_NEED USER_TYPE
-            UTILITY_CATEGORY UTILITY_PATH VALUE VALUE_A VALUE_B VALUE_C VERSION VERSION_1
-            VERSION_2 VERSION_OR_MILESTONE VERSIONING_SCHEME WEB WEIGHT
+            ACTION_OR_RULE_CHANGE ACTUAL_DURATION AGENT ANDROID ANY_TYPE ASSET_CATEGORY ASSET_NAME
+            AUDIT_DATE AUTHOR BENEFIT BUSINESS_OUTCOME CAST CHECK_1 CHECK_2 COLOR_CONSTANT
+            COMPONENT_CATEGORY COMPONENT_OR_SCREEN_NAME COMPONENT_PATH CONCEPT_TITLE CONSTANT COST
+            COVERAGE_OUTPUT_DIRECTORY CRASH_REPORTER CURRENT_VERSION CUSTOM_METRIC DATE
+            DECIMAL_PLACES DECISION_TITLE DEFAULT_SAVE_FUNCTION DEFAULT_VALUE DETAIL
+            DIFFERENCE_AND_REASON_IF_SIGNIFICANT DOMAIN_NOT_FOUND DOMAIN_SPECIFIC DURATION EPSILON
+            ESTIMATED_EFFORT EXAMPLE_CONSTANT EXAMPLE_MODULE_NAME EXPECTED_ERROR_MESSAGE
+            FEATURE_AREA_1 FEATURE_NAME FEATURE_OR_AREA_1 FEATURE_OR_AREA_2 FILE_PATTERN
+            FILTER_FLAG FINAL_STATE FIXED_TIMESTAMP FORMAT FULL_TERM_1 FULL_TERM_2 FULL_TERM_3
+            FULL_TERM_4 FULL_TERM_5 HEADER_HEIGHT HOME HOOK_CATEGORY HOOK_PATH HOW_MEASURED ID_TYPE
+            INITIAL_STATE INVALID_CONDITION IOS ISSUE_1 ITEM_1 ITEM_2 ITEM_TITLE KEY_DIFFERENTIATOR
+            LEVEL LIMIT M1_NAME M2_NAME M3_NAME M4_NAME M5_NAME MAX_RETRY_COUNT MEASURABLE_BEHAVIOR
+            MEMBER METRIC_1 METRIC_2 MILESTONE_1 MILESTONE_NAME MILESTONE_OR_DATE
+            MIN_ANDROID_VERSION MIN_IOS_VERSION MINIMUM_SPEC_DEVICE MISSING_INPUT_CONDITION
+            MOBILE_FRAMEWORK MODULE MODULE_1 MODULE_2 MODULE_3 MODULE_4 MODULE_5 MODULE_A MODULE_B
+            MODULE_C MODULE_CONSTANT MODULE_NAME NAME NOTE NOTES OPERATION_NAME OS_LIST OTHER_TERM
+            PARTICIPANT_ROLES PATH_TO_ARCH_DOC PATH_TO_MILESTONE_DOC PERFORMANCE_METRIC
+            PERSISTENCE_MODULE_PATH PILLAR_1 PILLAR_2 PILLAR_3 PLACEHOLDER PLATFORM PLATFORM_A
+            PLATFORM_B POST_LAUNCH_ITEM_1 POST_LAUNCH_ITEM_2 POST_LAUNCH_ITEM_3 POST_LAUNCH_ITEM_4
+            PRIMARY_USER_SEGMENT PRINCIPLE_1 PRINCIPLE_2 PRINCIPLE_3 PRODUCT_TYPE
+            PURE_LOGIC_CATEGORY PURE_LOGIC_PATH QUESTION RATE REQUIREMENTS_REFERENCE RETRY_DELAY
+            REVENUE ROOT_CAUSE ROUTES ROUTES_FILE SAFE_DEFAULT_VALUE SCHEMA_NAME SCREEN_NAME
+            SCREEN_OR_COMPONENT_NAME SIZE SOLUTION_DESCRIPTION SOURCE_ROOT SPACING_CONSTANT
+            SPACING_UNIT SPEC_NAME_OR_LINK STATE_A STATE_B STATE_C STATE_LAYER STATE_STORE_CATEGORY
+            STATUS_TYPE STORAGE_KEY STORE_PATH SUPPORTING_TYPE SYSTEM_NAME TARGET
+            TARGET_PLATFORM_LIST TASK_NAME TASK_REFERENCE TERM TERM_NAME TEST_DESCRIPTION_PATTERN
+            TEST_DIRECTORY TEST_FILE_EXTENSION TEST_ROOT TEST_WATCH_CMD THEME_FILE THEME_KEY TIME
+            TIMEOUT_MS UNKNOWN_TYPE USE_LOOP_HOOK USER_NEED USER_TYPE UTILITY_CATEGORY UTILITY_PATH
+            VALUE VALUE_A VALUE_B VALUE_C VERSION VERSION_1 VERSION_2 VERSION_OR_MILESTONE
+            VERSIONING_SCHEME WEB
           "
           allow_flat=" $(printf '%s' "$allow" | tr '\n' ' ') "
           fail=0

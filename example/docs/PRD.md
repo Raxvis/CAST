@@ -146,7 +146,8 @@ An `--all` flag also includes completed tasks.
 
 - [x] `acme done <id>` sets `completed=true` and `completedAt` to the
       current ISO timestamp.
-- [x] Exit code is 0 on success, 1 if the ID does not exist.
+- [ ] Exit code is 0 on success, 3 if the ID does not exist. — not met at
+      the M1 close: `done` exits 0 silently (BUG-002, Deferred to M2).
 - [ ] An informative error is printed when the ID does not exist (tracked
       as BUG-002, deferred to Milestone 2).
 
@@ -166,7 +167,7 @@ An `--all` flag also includes completed tasks.
 **Acceptance Criteria:**
 
 - [x] `acme delete <id>` removes the row.
-- [x] Exit code is 0 on success, 1 if the ID does not exist.
+- [x] Exit code is 0 on success, 3 if the ID does not exist.
 - [x] An informative error is printed when the ID does not exist.
 
 **Out of scope for MVP:** Soft delete, undo, bulk delete.

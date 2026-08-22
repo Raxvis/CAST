@@ -21,7 +21,7 @@
 | # | Finding | Budget / Metric | Severity | Module / Path | Remediation |
 |---|---|---|---|---|---|
 | P1 | `list` filters on `completed` with no index. At the PRD's 100-task target this is immaterial, but the budget is stated as "warm `list` under 100ms" and the query is the only one that scales with task count. | Warm `list` < 100ms @ 100 tasks | Medium | `architecture.md` § Data Schema | Create `idx_tasks_completed` in the migration. Cheap now, and it is the difference between a table scan and an index seek once a user accumulates a few thousand rows. |
-| P2 | Migrations run on every command invocation. Idempotent, but if implemented as "run every statement and ignore errors" it adds startup cost to every command in a CLI whose entire budget is 100ms. | Warm command latency < 100ms | Medium | `architecture.md` § Module: db | Gate on `PRAGMA user_version`; the no-op path must be a single pragma read, not a series of caught exceptions. |
+| P2 | Migrations run on every command invocation. Idempotent, but if implemented as "run every statement and ignore errors" it adds startup cost to every command in a CLI whose entire budget is 100ms. | Warm command latency < 100ms | Medium | `architecture.md` § Module: db | Gate on the `schema_version` table; the no-op path must be a single version read, not a series of caught exceptions. |
 | P3 | WAL mode is specified. Correct for durability under `kill -9` and it also removes reader/writer contention. | — | Informational | `architecture.md` § Module: db | No action. |
 
 **Budget source**: `architecture.md` § Performance Budget, itself derived from `docs/PRD.md` § Non-Functional Requirements.

@@ -18,8 +18,7 @@
 Implement the two mutation-by-id commands. `done <id>` sets `completed = 1` and
 `completedAt = new Date().toISOString()` on the row with the given id. `delete <id>`
 removes the row. Both must error cleanly (non-zero exit, human-readable message)
-when the id does not exist. Note: BUG-002 (silent success on missing id for `done`)
-was filed during validation and is deferred to M2.
+when the id does not exist.
 
 ---
 
@@ -32,12 +31,12 @@ was filed during validation and is deferred to M2.
 
 ## Acceptance Criteria
 
-- [x] `acme-todo done 1` on an existing task sets `completed` and `completedAt`.
-- [x] `acme-todo delete 1` on an existing task removes the row.
+- [x] `acme done 1` on an existing task sets `completed` and `completedAt`.
+- [x] `acme delete 1` on an existing task removes the row.
 - [x] Both commands use parameterized statements bound to the id argument.
 - [x] `delete` with a non-existent id exits non-zero with a clear error.
 - [x] Non-integer id argument prints a usage error.
-- [x] Vitest suite covers happy path and missing-id path for `delete` (and for `done` once BUG-002 is fixed in M2).
+- [ ] Vitest suite covers happy path and missing-id path for both `delete` and `done`. — `delete` covered; `done`'s missing-id path disposed to M2 by Product (Handoff entry #4)
 - [x] No linter or type-check errors introduced.
 
 ---
@@ -67,32 +66,32 @@ was filed during validation and is deferred to M2.
 - **Outcome**: `done` and `delete` implemented with parameterized statements; `delete` errors on missing id. 6 tests added covering both happy paths, the `delete` missing-id error, and the non-integer usage error.
 - **Files touched**: `src/commands/done.ts`, `src/commands/delete.ts`, `src/commands/done.test.ts`, `src/commands/delete.test.ts`
 - **Commit**: `4f7a2c9`
-- **Test Results**: `pnpm test` — `Test Files  5 passed (5)` / `Tests  34 passed (34)` / `Duration  3.10s`
+- **Test Results**: `pnpm test` — `Test Files  5 passed (5)` / `Tests  23 passed (23)` / `Duration  3.10s`
 - **Read next**: Manifest only
 - **Open items**: None
 
 ### 3. reviewer -> product — 2026-04-09
 
-- **Outcome**: Clean review — no Defects, no Issues. Condition 1 verified on both mutation paths. Criterion 6 flagged Product judgment; routing to Product (Step 3b — this task also carries a CEO Approval Condition).
+- **Outcome**: Clean review — no Defects, no Issues. Condition 1 verified on both mutation paths and its line is Met with evidence. Criterion 6 flagged Product judgment; a flagged criterion is what sends validation to Product, so this task closes at Step 3b rather than as an orchestrator-only 3a close.
 - **Files touched**: None
 - **Read next**: Manifest only
 - **Open items**: None
 - **Acceptance Criteria Check**:
-  - [1] `acme-todo done 1` on an existing task sets `completed` and `completedAt`. — Met — `done.test.ts` › "marks task done" (`4f7a2c9`)
-  - [2] `acme-todo delete 1` on an existing task removes the row. — Met — `delete.test.ts` › "removes row"
+  - [1] `acme done 1` on an existing task sets `completed` and `completedAt`. — Met — `done.test.ts` › "marks task done" (`4f7a2c9`)
+  - [2] `acme delete 1` on an existing task removes the row. — Met — `delete.test.ts` › "removes row"
   - [3] Both commands use parameterized statements bound to the id argument. — Met — `src/commands/done.ts:16`, `src/commands/delete.ts:14`
-  - [4] `delete` with a non-existent id exits non-zero with a clear error. — Met — `delete.test.ts` › "missing id exits 1 with message"
+  - [4] `delete` with a non-existent id exits non-zero with a clear error. — Met — `delete.test.ts` › "missing id exits 3 with message"
   - [5] Non-integer id argument prints a usage error. — Met — `delete.test.ts` › "non-integer id usage error"
-  - [6] Vitest suite covers happy path and missing-id path for `delete` (and for `done` once BUG-002 is fixed in M2). — Product judgment — the `done` missing-id path is deliberately uncovered pending BUG-002; whether that leaves the criterion satisfied for this milestone is a scope call
+  - [6] Vitest suite covers happy path and missing-id path for both `delete` and `done`. — Product judgment — `done` does not signal a missing id at all, so there is nothing for a test to assert and the path is deliberately uncovered; whether that leaves the criterion satisfied for this milestone is a scope call
   - [7] No linter or type-check errors introduced. — Met — `pnpm typecheck` clean at `4f7a2c9`
 
-### 4. product — task complete — 2026-04-10
+### 4. product — task complete — 2026-04-09
 
-- **Outcome**: Criterion 6 disposed — the `done` missing-id coverage gap is in scope for M2, not this task, so the criterion holds as written; all others accepted on Reviewer's evidence. Status set to Complete. During milestone smoke testing Reviewer filed BUG-002 (`done` silent success on missing id) — triaged Low and Deferred to M2; does not violate this task's criteria.
-- **Files touched**: This file (Header Status), `../bugs/bug-002-done-silent-success.md`, `artifacts/BUGS.md` (index row)
+- **Outcome**: Criterion 6 disposed — `done`'s missing-id signalling, and therefore its test, is in scope for M2's error-signalling work rather than this task; the criterion holds as written and the gap is carried into the milestone validation record. All other criteria accepted on Reviewer's evidence. Status set to Complete — T-5 remains for the next session.
+- **Files touched**: This file (Header Status, criterion 6 annotation)
 - **Read next**: —
-- **Open items**: BUG-002 held Deferred (re-triage at M2 planning)
+- **Open items**: `done` missing-id signalling carried to M2
 
 ---
 
-_Last updated: 2026-04-10_
+_Last updated: 2026-04-09_

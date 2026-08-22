@@ -47,7 +47,7 @@ In the Claude Code session, type:
 
 ## Step 3 — Check the installed skills as "tab completion" smoke checks
 
-Type `/agent` and check that the three pipeline skills auto-complete, then `/cast` for the maintenance skill (on current Claude Code versions, skills are invocable as `/<name>`):
+Type `/agent` and check that the three pipeline skills auto-complete, then `/cast` for the two maintenance skills, `/cast-doctor` and `/cast-release` (on current Claude Code versions, skills are invocable as `/<name>`):
 
 ```
 /agent-plan
@@ -101,9 +101,10 @@ If you ran Step 4 or Step 5, a few files are now in `artifacts/`. Delete them be
 
 ```
 rm -rf artifacts/milestone-1-*
+rm -rf artifacts/one-off/*
 ```
 
-(Everything a planning run writes — reviews included — lives inside that one milestone directory.)
+(Everything a planning run writes — reviews included — lives inside that one milestone directory; everything `/agent-task` writes lives under `artifacts/one-off/`. The second command empties that directory without removing it — `/cast-init` scaffolds it, so keep it. Both commands are safe to run even if only one of the two steps was executed.)
 
 ---
 
@@ -140,7 +141,7 @@ Each probe is a single prompt to launch the named agent explicitly. Each takes u
 
 - **Probe passes with a reasonable output:** the agent file is loaded and the model is responding consistently with the role definition.
 - **Probe returns generic output that could come from any agent:** the role definition is not being loaded. Check that `.claude/agents/<name>.md` has valid frontmatter (see Step 2).
-- **Probe returns a "model not available" error:** your account does not have access to the pinned model. Override the `model:` line in the agent's frontmatter to a model you have access to.
+- **Probe returns a "model not available" error:** a stock install ships every agent as `model: inherit`, so this can only happen if you pinned an explicit model — either in that agent's frontmatter or as the session model. Change the pin to a model your account serves.
 - **Probe returns output that contradicts the agent's role definition:** the model is not reading the agent body carefully enough. Try a more capable model tier, or tighten the agent's Interaction Rules section to be more prescriptive.
 
 ---

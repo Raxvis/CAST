@@ -9,9 +9,9 @@
            the per-task outcome is recorded as the task's Status in the task file's Header
            plus a `progress` entry in artifacts/STANDUP.md, and NO per-task document is
            created. Step 3b runs only when Reviewer's Acceptance Criteria Check flags a
-           criterion, a criterion was amended mid-task, or the task carries a CEO Approval
-           Condition; tasks whose criteria Reviewer marked all Met close without a Product
-           spawn (Step 3a) and are reviewed here instead. (/agent-task validates against
+           criterion or a CEO Approval Condition line, or a criterion was amended mid-task;
+           tasks whose criteria and condition lines Reviewer marked all Met close without a
+           Product spawn (Step 3a) and are reviewed here instead. (/agent-task validates against
            the task description instead and does not use this template.)
 
   HOW TO CUSTOMIZE:
@@ -34,7 +34,8 @@
   - Instance destination: artifacts/milestone-{N}-{slug}/reviews/close.md.
     Never fill this template in place.
   - Sections marked (required) must be present and non-empty in every instance;
-    (optional) sections may be omitted. Reviewer and Product check required sections.
+    (optional) sections may be omitted. Product fills them; the orchestrator pre-checks
+    that every required section is present before accepting the close record.
 
   SECTION SCALING:
   Required sections must be PRESENT in every instance, but their depth scales with
@@ -55,7 +56,8 @@
   number of rows.
 -->
 
-<!-- Placeholders — see README.md → Placeholder Reference -->
+<!-- Placeholders: bracketed UPPER_SNAKE_CASE tokens are project values filled at
+     adoption; bracketed lowercase names are per-use fill-ins. -->
 
 # [PROJECT_NAME] — [MILESTONE_NAME] Close Record
 
@@ -94,7 +96,7 @@ Features and changes completed in this milestone.
 Items originally planned for this milestone that were moved to a future milestone.
 
 | # | Item | Reason for Deferral | Moved To |
-|---|------|--------------------| ---------|
+|---|------|--------------------|---------|
 | 1 | [Item name] | [Why it was deferred] | [Target milestone] |
 
 _If nothing was deferred, replace this table with "Nothing deferred."_

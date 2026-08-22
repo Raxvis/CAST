@@ -11,6 +11,8 @@
     [PERSISTENCE_LAYER], [FRAMEWORK] with domain- and stack-specific terms.
   - Fill in the Component Diagram and Data Flow with real details for your system.
   - Status values: Draft / In Review / Approved / Implemented
+  - Instance destination: artifacts/milestone-{N}-{slug}/architecture.md — the milestone
+    architecture document. Never fill this template in place.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.
 
@@ -26,12 +28,13 @@
   Context Manifest anchor, so speculative content costs real context on every
   downstream stage and invites implementation against requirements nobody set.
 
-  Under Module Specifications, delete the [MODULE_x] blocks you do not use — write
-  one block per module the milestone actually touches, not three because the
-  template shows three.
+  Module Specifications ships as ONE [MODULE_A] block. Duplicate it once per module the
+  milestone actually touches (see the note under that section) — one block per real
+  module, and none for a module the milestone does not touch.
 -->
 
-<!-- Placeholders — see README.md → Placeholder Reference -->
+<!-- Placeholders: bracketed UPPER_SNAKE_CASE tokens are project values filled at
+     adoption; bracketed lowercase names are per-use fill-ins. -->
 
 # [PROJECT_NAME] — Architecture Spec: [SYSTEM_NAME]
 
@@ -139,7 +142,7 @@ Actor / Source          Action                         Result
 [MODULE_A]         →   [Processing step]          →   [Effect]
 [MODULE_B]         →   [Processing step]          →   [Effect]
 [STATE_LAYER]      →   [State update]             →   [UI re-render]
-[PERSISTENCE]      →   [Save operation]           →   [Data persisted]
+[PERSISTENCE_LAYER] →  [Save operation]           →   [Data persisted]
 ```
 
 ---
@@ -177,7 +180,7 @@ Actor / Source          Action                         Result
 
 | External System | Relationship | Data Exchanged | Direction |
 |----------------|-------------|---------------|----------|
-| [UI Layer] | Consumers system output | [data type] | System → UI |
+| [UI Layer] | Consumes system output | [data type] | System → UI |
 | [Other System] | [Description] | [data type] | Bidirectional |
 | [PERSISTENCE_LAYER] | Reads/writes save data | [data type] | Bidirectional |
 

@@ -8,7 +8,6 @@
 
   HOW TO CUSTOMIZE:
   - Replace [PROJECT_NAME] with your project name.
-  - [MAX_LOOP_COUNT] is substituted by /cast-init at install (default: 3).
   - Add a new session section at the TOP of the Log section (newest first).
   - Use this log to maintain continuity between sessions and as a lightweight audit trail.
 -->
@@ -60,12 +59,12 @@ Example session section:
 ### 2026-04-09 — agent-code — milestone-2-search-ui
 
 - coder | docs | docs/CODE_PATTERNS.md needs the new debounce pattern documented ✅
-- reviewer | progress | M2-T01 closed at Step 3a — all 5 criteria Met, no Product spawn; Status set to Complete
+- agent-code | progress | M2-T01 closed at Step 3a — all 5 criteria Met, no Product spawn; Status set to Complete
 - coder | blocker | Task M2-T02 Environment Issue: fixture server port collision in CI
 - docs-writer | progress | Milestone-completion drain: 1 docs entry drained
 ```
 
-Entries under a session heading are appended in the order they happen (oldest first). In the example: the queued docs entry is written during task M2-T01; Reviewer's criteria check closes the task without a Product spawn; Coder hits an environment problem on M2-T02; and the queued `docs` entry drains at milestone completion (marked ✅ — the drained count matches the ✅ entries).
+Entries under a session heading are appended in the order they happen (oldest first). In the example: the queued docs entry is written during task M2-T01; the orchestrator closes that task at Step 3a on Reviewer's criteria check, without a Product spawn; Coder hits an environment problem on M2-T02; and the queued `docs` entry drains at milestone completion (marked ✅ — the drained count matches the ✅ entries).
 
 ---
 

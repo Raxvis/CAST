@@ -16,10 +16,15 @@
   - Instance destination: artifacts/milestone-{N}-{slug}/reviews/ux.md — one instance per
     milestone. Never fill this template in place.
   - Sections marked (required) must be present and non-empty in every instance;
-    (optional) sections may be omitted. Reviewer and Product check required sections.
+    (optional) sections may be omitted. Product reads the instance at sign-off; the
+    orchestrator pre-checks that every required section is present.
+  - Each row of Issues Found is also filed as its own bug file (templates/BUG_REPORT.md)
+    and indexed in artifacts/BUGS.md — the verdict records the assessment, the bug files
+    are what Product triages.
 -->
 
-<!-- Placeholders — see README.md → Placeholder Reference -->
+<!-- Placeholders: bracketed UPPER_SNAKE_CASE tokens are project values filled at
+     adoption; bracketed lowercase names are per-use fill-ins. -->
 
 # UX Review: [SCREEN_OR_COMPONENT_NAME]
 
@@ -89,7 +94,9 @@
 
 ## Issues Found (required)
 
-| # | Element / Area | Issue | Severity | Action Required |
+Every row here is also filed as its own bug file (`templates/BUG_REPORT.md`) and indexed in `artifacts/BUGS.md`; put the bug ID in the last column. UI does not fix these and does not route them to Coder directly — Product triages the filed bugs.
+
+| # | Element / Area | Issue | Severity | Bug ID |
 |---|---|---|---|---|
 | | | | | |
 
@@ -97,6 +104,6 @@
 
 ## Verdict (required)
 
-- [ ] **APPROVED** — Implementation matches spec. No changes required.
-- [ ] **APPROVED WITH NOTES** — Minor issues noted. Follow-up in next pass.
-- [ ] **CHANGES REQUIRED** — See Issues Found. Coder must revise before Product review.
+- [ ] **APPROVED** — Implementation matches spec. Nothing filed.
+- [ ] **APPROVED WITH NOTES** — Minor issues filed as bugs; none blocks the milestone in UI's judgment.
+- [ ] **CHANGES REQUIRED** — See Issues Found. Every row is filed as a bug for Product triage; UI's verdict does not override Product's sign-off.

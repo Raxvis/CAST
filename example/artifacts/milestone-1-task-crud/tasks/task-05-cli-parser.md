@@ -15,7 +15,7 @@
 
 ## Description
 
-Wire all four commands behind a single `acme-todo` entrypoint. Implement a minimal
+Wire all four commands behind a single `acme` entrypoint. Implement a minimal
 custom argv parser in `src/cli.ts` — no `commander`, no `yargs`. Supported routes:
 `add <title>`, `list [--all]`, `done <id>`, `delete <id>`, `--help` / `-h`.
 Unknown commands print usage and exit non-zero. `src/index.ts` is the Node entrypoint
@@ -32,9 +32,9 @@ that opens the DB, runs migrations, dispatches, and closes the DB.
 
 ## Acceptance Criteria
 
-- [x] `acme-todo --help` prints usage listing all four commands.
-- [x] `acme-todo` with no args prints usage and exits non-zero.
-- [x] Unknown command (e.g. `acme-todo frobnicate`) prints usage and exits non-zero.
+- [x] `acme --help` prints usage listing all four commands.
+- [x] `acme` with no args prints usage and exits non-zero.
+- [x] Unknown command (e.g. `acme frobnicate`) prints usage and exits non-zero.
 - [x] `list --all` is parsed correctly (flag routed to `runList`).
 - [x] `src/index.ts` always calls `runMigrations` before dispatching — this is what
       makes Condition 3 / BUG-001 impossible to regress.
@@ -67,7 +67,7 @@ that opens the DB, runs migrations, dispatches, and closes the DB.
 - **Outcome**: Parser and entrypoint implemented; `runMigrations` called unconditionally before dispatch. 7 tests added covering `--help`, no-args, unknown-command, and `--all` routing. Final pass, so the full suite ran.
 - **Files touched**: `src/cli.ts`, `src/index.ts`, `src/cli.test.ts`
 - **Commit**: `2b6d0e7`
-- **Test Results**: `pnpm test` — `Test Files  6 passed (6)` / `Tests  42 passed (42)` / `Duration  4.20s`
+- **Test Results**: `pnpm test` — `Test Files  6 passed (6)` / `Tests  30 passed (30)` / `Duration  4.20s`
 - **Read next**: Manifest only
 - **Open items**: None
 
@@ -78,8 +78,8 @@ that opens the DB, runs migrations, dispatches, and closes the DB.
 - **Read next**: Manifest only
 - **Open items**: None
 - **Acceptance Criteria Check**:
-  - [1] `acme-todo --help` prints usage listing all four commands. — Met — `cli.test.ts` › "prints usage for --help" (`2b6d0e7`)
-  - [2] `acme-todo` with no args prints usage and exits non-zero. — Met — `cli.test.ts` › "no args exits 1 with usage"
+  - [1] `acme --help` prints usage listing all four commands. — Met — `cli.test.ts` › "prints usage for --help" (`2b6d0e7`)
+  - [2] `acme` with no args prints usage and exits non-zero. — Met — `cli.test.ts` › "no args exits 1 with usage"
   - [3] Unknown command prints usage and exits non-zero. — Met — `cli.test.ts` › "unknown command exits 1"
   - [4] `list --all` is parsed correctly (flag routed to `runList`). — Met — `src/cli.ts:41`; `cli.test.ts` › "routes --all to runList"
   - [5] `src/index.ts` always calls `runMigrations` before dispatching. — Met — `src/index.ts:12` (unconditional, ahead of the switch); `cli.test.ts` › "migrations run before dispatch"

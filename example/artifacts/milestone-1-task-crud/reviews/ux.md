@@ -37,7 +37,7 @@ Acme Todo is a CLI, so the layout-oriented items below are read against terminal
 
 - [x] The primary action is visually dominant — `list` output leads with the ID column, the value every follow-up command needs
 - [x] Secondary and tertiary elements are appropriately de-emphasized — status and timestamp columns trail the title
-- [x] Empty and error states are visually distinct from the default state — empty `list` is header-only on stdout; errors go to stderr with an `Error:` prefix
+- [x] Empty and error states are visually distinct from the default state — empty `list` is header-only on stdout; errors go to stderr with the spec's `acme: ` prefix
 
 ## Consistency
 
@@ -70,7 +70,7 @@ Acme Todo is a CLI, so the layout-oriented items below are read against terminal
 
 | # | Element / Area | Issue | Severity | Action Required |
 |---|---|---|---|---|
-| 1 | `done` command, error state | `acme done <id>` with a non-existent ID exits 0 with no output — the spec's Error Messages section requires an stderr message and non-zero exit. Filed as BUG-002; Product re-triaged it at milestone completion and held it Deferred into M2 | Low | Fix in M2 alongside the matching `delete` audit; tracked in `artifacts/BUGS.md` |
+| 1 | `done` command, error state | `acme done <id>` with a non-existent ID exits 0 with no output — the spec's Error Messages section requires an stderr message and non-zero exit. Filed as BUG-002 out of this review, suggested severity Low, for Product triage in the milestone close pass | Low | Fix in M2 alongside the matching `delete` audit; tracked in `artifacts/BUGS.md` |
 
 ---
 
@@ -80,4 +80,4 @@ Acme Todo is a CLI, so the layout-oriented items below are read against terminal
 - [x] **APPROVED WITH NOTES** — Minor issues noted. Follow-up in next pass.
 - [ ] **CHANGES REQUIRED** — See Issues Found. Coder must revise before Product review.
 
-The implemented command surface matches `artifacts/milestone-1-task-crud/ui.md` in output format, exit codes, stdout/stderr split, and empty-state behavior. The single deviation (BUG-002, `done` silent success) is Low severity, already Deferred by Product with an M2 fix path, and does not block Product sign-off.
+The implemented command surface matches `artifacts/milestone-1-task-crud/ui.md` in output format, exit codes, stdout/stderr split, and empty-state behavior. The single deviation (BUG-002, `done` silent success) is Low severity with a clear M2 fix path, and does not block Product sign-off.

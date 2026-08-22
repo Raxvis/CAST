@@ -3,7 +3,9 @@
   PURPOSE: Topic-specific reference for native and cross-platform mobile apps —
   iOS, Android, React Native, Expo, Flutter, SwiftUI, Jetpack Compose. Covers
   the mobile-specific delta on top of the universal UI patterns in docs/FRONTEND.md.
-  Loaded into Claude Code's context via an @docs/... memory import in the project's root CLAUDE.md.
+  Read on demand — agents open it when a task's Context Manifest cites it; the root CLAUDE.md
+  Memory Imports block ships empty, and an adopter who wants this file in every session adds
+  a bare @docs/MOBILE.md line there.
 
   WHO NEEDS THIS FILE:
   - Keep this file if your project ships a native or cross-platform mobile app on
@@ -13,8 +15,8 @@
     shared across every rendered surface (screens, components, navigation,
     performance), and MOBILE covers only the mobile-specific concerns on top.
   - Delete this file if your project is web-only, desktop-only, a headless backend,
-    a library, a CLI, or a data pipeline with no mobile target. Also remove the
-    @docs/MOBILE.md import line from root CLAUDE.md.
+    a library, a CLI, or a data pipeline with no mobile target. Also remove any
+    @docs/MOBILE.md import line you added to root CLAUDE.md.
 
   HOW TO CUSTOMIZE:
   - Replace every [PLACEHOLDER] token with project-specific values.
@@ -113,7 +115,7 @@ Connectivity on mobile is intermittent by default, not an edge case. Subways, el
 
 ## Local Storage and Secrets
 
-Mobile has three tiers of local storage with different durability, security, and size limits. Choose the right tier for the data.
+Mobile has four tiers of local storage with different durability, security, and size limits. Choose the right tier for the data.
 
 | Tier | Purpose | Typical size | Backed up? | Survives reinstall? |
 |---|---|---|---|---|

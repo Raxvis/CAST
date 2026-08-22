@@ -104,4 +104,4 @@ Report to the user: the version and why, the gate results, the changelog entry, 
 
 ## Scope boundaries
 
-This skill does not write production code, change acceptance criteria, or close bugs — a bug reaches `Closed` through Product, not through a release. If a gate fails, report it and stop; do not fix it here.
+This skill does not write production code, change acceptance criteria, or close bugs — a bug reaches `Closed` when the orchestrating pipeline flips it `Verified` → `Closed` after the resolving task passes validation, never through a release. If a gate fails, report it and stop; do not fix it here.

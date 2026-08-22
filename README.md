@@ -8,9 +8,9 @@
 
 # CAST — Claude Agent Staged Team
 
-> **A multi-agent workflow template for Claude Code.** Eight specialist subagents, three pipeline skills plus two maintenance skills, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
+> **A multi-agent workflow template for Claude Code.** Seven specialist subagents, three pipeline skills plus two maintenance skills, and a CEO-gated planning pipeline — shipped as plain Markdown via a single `/cast-init` skill, no framework to install, no runtime to maintain.
 
-![Template version](https://img.shields.io/badge/template-v3.0.0-blue)
+![Template version](https://img.shields.io/badge/template-v3.0.1-blue)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-required-9cf)
 ![Agents](https://img.shields.io/badge/agents-7-orange)
 
@@ -73,7 +73,7 @@ One-off task — /agent-task  (no planning stage, for small self-contained chang
 - **A fully populated `example/` fixture** so you can see exactly what a real planning run produces.
 - **An agnostic `CLAUDE.md`** with opt-in topic docs (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) for project-type-specific patterns.
 
-Current template version: `v3.0.0` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
+Current template version: `v3.0.1` — see [`CHANGELOG.md`](CHANGELOG.md) for the version history and migration notes.
 
 ---
 
@@ -187,7 +187,7 @@ Each subdirectory defines one pipeline skill that orchestrates a multi-agent wor
 
 Reference material only. These are not agent definitions and not work artifacts — they are shared knowledge that multiple agents and human contributors reference: domain rules, quality standards, coding conventions, and reusable document templates. Agents must read from `docs/` but must not write work artifacts to `docs/`.
 
-**Topic-specific reference docs.** Four files in `docs/` are scoped to a project type rather than being universal: `FRONTEND.md`, `BACKEND.md`, `CLI.md`, and `MOBILE.md`. Keep the one(s) that match your project and delete the rest. The shipped `root/CLAUDE.md` is agnostic and names all four as inert backticked paths in its import block — a Claude Code import only fires as a bare `@path` line, so after install copy the relevant one(s) out as bare lines (e.g. `@docs/BACKEND.md`) to load those patterns into session context.
+**Topic-specific reference docs.** Four files in `docs/` are scoped to a project type rather than being universal: `FRONTEND.md`, `BACKEND.md`, `CLI.md`, and `MOBILE.md`. Keep the one(s) that match your project and delete the rest. The shipped `root/CLAUDE.md` is agnostic, and its Memory Imports block ships **empty on purpose** — imports load into every session and every subagent spawn, so nothing is imported by default. These four are candidates you add yourself: after install, add a bare `@docs/<FILE>.md` line (e.g. `@docs/BACKEND.md`) at the left margin of that block for the one(s) you keep. A Claude Code import only fires as a bare `@path` line — a path inside backticks or an HTML comment is inert.
 
 - **`docs/FRONTEND.md`** — user-facing visual interfaces (web, mobile, desktop GUI, game UI). Covers navigation, state management, UI components, performance, input handling, platform differences.
 - **`docs/BACKEND.md`** — API servers, background workers, data pipelines. Covers request boundaries, persistence, error handling and HTTP status codes, auth, middleware, observability, background jobs.
@@ -198,7 +198,7 @@ A project that spans two types (e.g., a full-stack web app with a backend API an
 
 ### artifacts/
 
-Work artifacts produced by the agents during `/agent-plan` and `/agent-code`, grouped by milestone: each milestone directory holds its definition README, architecture and UI specifications, reviews (security, performance, CEO, UX, validation, completion, retrospective), per-task files, and per-bug files. Cross-milestone state lives at the artifacts root. See `artifacts/README.md` for the full directory structure.
+Work artifacts produced by the agents during `/agent-plan` and `/agent-code`, grouped by milestone: each milestone directory holds its definition README, architecture and UI specifications, reviews (`risk.md`, `ceo.md`, `ux.md`, `risk-impl.md`, `close.md`), per-task files, and per-bug files. Cross-milestone state lives at the artifacts root. See `artifacts/README.md` for the full directory structure.
 
 ---
 
@@ -300,7 +300,7 @@ Project-specific content in every template file is marked with `[UPPER_SNAKE_CAS
 | Placeholder | Description | Example value |
 |---|---|---|
 | `[SESSION_TYPE]` | Type of user validation session | playtest, usability test, A/B test |
-| `[MAX_LOOP_COUNT]` | Maximum Defect/Issue loop iterations in the engineering pipeline before escalating to the user (used in `docs/PIPELINE_LOOP.md`, `templates/TASK.md`, and both the `agent-plan` and `agent-code` pipeline skills) | 3 |
+| `[MAX_LOOP_COUNT]` | Maximum Defect/Issue loop iterations in the engineering pipeline before escalating to the user (used in `docs/PIPELINE_LOOP.md`, `templates/TASK.md`, `artifacts/STANDUP.md`, `agents/product.md`, and the `agent-code` and `agent-task` pipeline skills) | 3 |
 
 ### Agents
 
@@ -332,7 +332,7 @@ A common source of confusion: this repo is a **template**, not a framework. Sett
 - **The pipeline skills are orchestration scripts written in Markdown.** `/agent-plan` and `/agent-code` tell Claude Code to invoke a specific sequence of subagents. They are not compiled, not executable, and not testable outside Claude Code. Reading them is reading their full behavior.
 - **The workflow is Claude Code-specific.** Copilot CLI, Gemini CLI, Cursor, and other AI tools do not honor `.claude/agents/`. Porting the template to another tool requires manual adaptation — read each agent file as a prompt and invoke it however that tool supports role prompts. (The `SKILL.md` format itself is portable across a growing set of agents, but the subagent roster and orchestration are Claude Code conventions.)
 - **No code is written by installing this template.** You get a directory layout, agent role files, pipeline skill definitions, document templates, and empty work-artifact scaffolding. Your first real output appears after you run `/agent-plan` on a feature.
-- **Templates contain nested placeholders.** Some files (bug report forms, milestone validation records) include their own fill-in-per-use placeholders like `[DATE]`, `[MILESTONE_NAME]`, `[TASK_NAME]`. These are not bugs in your customization — they are deliberate sub-templates filled in each time the form is used.
+- **Templates contain nested placeholders.** Some files (bug report forms, the milestone close record `templates/MILESTONE_CLOSE.md`, which agents instantiate as `reviews/close.md`) include their own fill-in-per-use placeholders like `[DATE]`, `[MILESTONE_NAME]`, `[TASK_NAME]`. These are not bugs in your customization — they are deliberate sub-templates filled in each time the form is used.
 
 Common problems you may hit during adoption or first use — a pipeline skill not recognized, subagent not delegating, `features/` references after upgrade, CEO returning REVISION REQUIRED — are covered in [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md). Skim it before filing a new issue.
 
@@ -449,7 +449,7 @@ All payload paths below are relative to `skills/cast-init/assets/` in this repo.
 |---|---|
 | `skills/cast-init/SKILL.md` | The `/cast-init` adoption workflow: seven phases from discovery to the final report |
 | `skills/cast-init/references/discovery.md` | Phase 1 checklists and the adoption-inventory template |
-| `skills/cast-init/references/roster.md` | Canonical 8-agent roster, tiers, alias tables, and the pipeline-skills mapping |
+| `skills/cast-init/references/roster.md` | Canonical 7-agent roster, tiers, alias tables, and the pipeline-skills mapping |
 | `skills/cast-init/references/dispositions.md` | Per-file disposition tables for docs/templates/artifacts/root and the plan-file format |
 | `skills/cast-init/references/execution.md` | Phase 5 install mechanics and customization-preservation rules |
 | `skills/cast-init/references/validation.md` | Phase 6 validation checklist and the Phase 7 report template |

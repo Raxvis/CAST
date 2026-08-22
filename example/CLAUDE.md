@@ -7,23 +7,20 @@ Acme Todo is a CLI tool built with **standalone Node.js (Node 20+)**. Targets
 command-line todo tracker that stores tasks in SQLite and supports add, list,
 done, and delete.
 
-## Tech Stack
+## Stack & Commands
 
 - **Framework**: None (standalone Node CLI binary)
 - **Language**: TypeScript (strict mode)
 - **Runtime**: Node.js 20+
 - **Persistence**: SQLite via `better-sqlite3`
 - **Platforms**: macOS, Linux, Windows
-- **Build**: `pnpm dev` (dev) / `pnpm build` (production)
-
-## Build & Test
-
+- **Packages**: pnpm
 - **Dev command**: `pnpm dev`
   - Runs the CLI directly from source via `tsx`
   - Pass subcommands after `--`, e.g. `pnpm dev -- add "buy milk"`
 - **Type check**: `pnpm typecheck`
 - **Tests**: `pnpm test` (Vitest)
-- **Production build**: `pnpm build` (emits `dist/cli.js` and the `acme` bin)
+- **Production build**: `pnpm build` (compiles `src/` to `dist/`; the `acme` bin is `dist/index.js`)
 - **Debug**: `NODE_OPTIONS=--inspect-brk pnpm dev -- <cmd>`, or structured
   `console.error` logging to stderr
 
@@ -137,8 +134,8 @@ export async function run(argv: readonly string[]): Promise<number> {
     case 'list':   return listCommand(db, rest)
     case 'done':   return doneCommand(db, rest)
     case 'delete': return deleteCommand(db, rest)
-    case '--help':
-    case undefined: printUsage(); return 0
+    case '--help': printUsage(); return 0
+    case undefined: printUsage(); return 1   // bare `acme` is a usage error
     default: printUsage(); return 1
   }
 }
@@ -147,7 +144,8 @@ export async function run(argv: readonly string[]): Promise<number> {
 ## Domain-Specific Patterns
 
 - **Exit codes**: `0` on success, `1` on user error (missing arg, unknown
-  command, task ID not found), `2` reserved for internal errors.
+  command, bare invocation), `2` reserved for internal errors, `3` when the
+  named task ID does not exist.
 - **Stdout vs stderr**: All normal command output goes to stdout. Errors,
   warnings, and usage on failure go to stderr.
 - **Time format**: All timestamps stored as ISO-8601 UTC strings. Never
@@ -167,16 +165,14 @@ environment variable.
 - A missing database file is not an error; the migration runner will create
   the file and apply the schema on the first invocation (CEO Condition 3).
 
-## Git Workflow
+## Git & Dependencies
 
 - **Branching**: Feature branches off `main`, merged via pull request.
 - **Branch naming**: `feature/description`, `fix/description`, `refactor/description`.
 - **Commits**: Short imperative messages (e.g., "Add done command", "Fix list crash on first run").
 - **Ignore**: `dist/`, `node_modules/`, `*.db`, `.DS_Store` (already in `.gitignore`).
 
-## Dependencies
-
-Manage with `pnpm`. Add new dependencies:
+Dependencies are managed with `pnpm`. Add new ones:
 
 ```bash
 pnpm add <package>           # runtime dependency
@@ -230,27 +226,21 @@ Adopted with CAST v3.0.0
 
 ## Memory Imports
 
-These documents are loaded into Claude Code's context at every session start.
-They provide the baseline context all agents need. The list is kept lean —
-every import is paid in every session. The Directory Conventions section above
-already covers where files live; agents read the detailed reference docs on
-demand by path (the planning stage reads `docs/PRD.md` on demand regardless of
-whether it is imported here).
+Bare `@path` lines below load into every session **and every subagent spawn** — the most
+expensive real estate in the project. The list ships **empty**; an import is added only
+for a document needed unprompted in most sessions **and** not inferable from the code
+(rationale: `docs/DESIGN_RATIONALE.md` → "Memory Imports ship empty").
 
-<!-- Core context — keep this. In a real install the always-on core import is
-     a bare "@docs/CODE_PATTERNS.md" line; this fixture omits that doc for
-     brevity (see README.md → Deliberate Omissions), so the line is not active
-     here. For a CLI project like this one, the topic-specific import would be
-     "@docs/CLI.md" (also omitted from the fixture). -->
+Acme Todo has added exactly one line to that empty default. `docs/PRD.md` ships as a
+placeholder skeleton and stays out of the list until it holds real content — importing a
+skeleton pays for hundreds of placeholder lines every session. This project's PRD is
+populated (v0.1.0, Approved) and every planning session reaches for it, so it earns
+its line:
 
-<!-- docs/PRD.md ships as a placeholder skeleton and stays gated (import left
-     inert) until it contains real project content — importing a skeleton pays
-     for hundreds of placeholder lines per session. Acme Todo's PRD is
-     populated (v0.1.0, Approved), so its import is active: -->
 @docs/PRD.md
 
-<!-- On-demand reference — agents read these by path when a task calls for them
-     (coder/docs-writer: FILE_CONVENTIONS; coder/reviewer: ERROR_HANDLING; coder:
-     TEST_FRAMEWORK; navigation: docs/README.md, artifacts/README.md). Add an
-     import line ("@docs/FILE_CONVENTIONS.md", "@docs/ERROR_HANDLING.md") only
-     if sessions repeatedly need one unprompted. -->
+<!-- Comments here are inert: an import only fires as a bare `@path` line at the left
+     margin. Everything else stays on-demand and is read by path when a task calls for
+     it — `docs/FILE_CONVENTIONS.md`, `docs/ERROR_HANDLING.md`, `docs/README.md`,
+     `artifacts/README.md`. Add a line here only if sessions repeatedly need one
+     unprompted. -->

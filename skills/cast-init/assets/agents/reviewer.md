@@ -31,7 +31,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `high`. Raise to `xhigh` on security-flagged milestones or when the plan marked the task complex.
+**Effort:** `high`, fixed in frontmatter. A security-flagged milestone or a plan-flagged complex task is called out in the invocation prompt instead; a permanent re-pin to `xhigh` is a human edit to this file.
 
 **Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format. That file is the only process document you read.
 
@@ -71,12 +71,13 @@ List every finding, with its classification, in your handoff entry — one line 
 
 ### 4. File each Defect as a bug
 
-Create `bugs/bug-{XXX}-{slug}.md` from `templates/BUG_REPORT.md` beside the task (`artifacts/one-off/bugs/` for `/agent-task` work), and add its one-line row to the index in `artifacts/BUGS.md`. Then:
+Create `bugs/bug-{XXX}-{slug}.md` from `templates/BUG_REPORT.md` beside the task (`artifacts/one-off/bugs/` for `/agent-task` work). Then:
 
-- **IDs** are `BUG-XXX`, sequential across the project, zero-padded, never reused — the next free ID is one greater than the highest in the index.
+- **IDs** are `BUG-XXX`, sequential across the project, zero-padded, never reused.
+- **The index row depends on how the task is running.** In serial execution you also append the bug's one-line row to the index in `artifacts/BUGS.md`, taking the next free ID — one greater than the highest already there. When the invocation says the task is running in parallel, write the bug file only: use the ID the invocation assigned you, and put the would-be index row in your handoff entry's Open items for the orchestrator to apply. Two concurrent filings would otherwise race the ID.
 - **Status on filing is always `New`.** The lifecycle and field ownership at the top of `artifacts/BUGS.md` are canonical; the entry format is `templates/BUG_REPORT.md`.
 - **Symptoms, not diagnoses.** Steps to reproduce, expected result, actual result. Root-cause analysis belongs to whoever fixes it.
-- **Suggest a severity** from the canonical scale at the top of `artifacts/BUGS.md` (you are in that file adding the index row anyway); Product sets the final one. When unsure, round up.
+- **Suggest a severity** from the canonical scale at the top of `artifacts/BUGS.md`; Product sets the final one. When unsure, round up.
 - **One bug per report**, and check the index for an existing report of the same symptom before filing — a duplicate is filed with status `Duplicate` referencing the original.
 - **Do not fill** the Investigation or Resolution fields. Those are Coder's, at fix time.
 

@@ -13,6 +13,8 @@
   - Fill in the ASCII diagrams with actual layout sketches, using box-drawing characters.
   - Replace [THEME_KEY] with the keys from your design system or theme file.
   - Status values: Draft / In Review / Approved / Implemented
+  - Instance destination: artifacts/milestone-{N}-{slug}/ui.md — the milestone UI spec, or
+    ui-{slug}.md for a supplemental screen/component spec. Never fill this template in place.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.
 
@@ -34,7 +36,8 @@
   and invites implementation against requirements nobody set.
 -->
 
-<!-- Placeholders — see README.md → Placeholder Reference -->
+<!-- Placeholders: bracketed UPPER_SNAKE_CASE tokens are project values filled at
+     adoption; bracketed lowercase names are per-use fill-ins. -->
 
 # [PROJECT_NAME] — UI Spec: [COMPONENT_OR_SCREEN_NAME]
 
@@ -53,7 +56,7 @@
 
 [Describe what this component or screen does, when it is shown, and why it exists. 2–4 sentences.]
 
-**Related documents:** This screen's data comes from `[MODULE_NAME]` (see `ARCH_MODULE.md`). If this screen uses a specific data schema, see the related `ARCH_DATA_SCHEMA.md` document.
+**Related documents:** This screen's data comes from `[MODULE_NAME]` (see the milestone's `architecture.md`, or the supplemental `arch-{slug}.md` covering that module). If this screen uses a specific data schema, see the supplemental `arch-{slug}.md` that documents it.
 
 ---
 

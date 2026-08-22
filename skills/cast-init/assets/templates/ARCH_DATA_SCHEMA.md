@@ -7,16 +7,20 @@
   HOW TO CUSTOMIZE:
   - Replace [PROJECT_NAME], [SCHEMA_NAME], [AUTHOR], [VERSION], [DATE] with actual values.
   - Replace [DOMAIN_ENTITY] with the domain object being modeled (e.g., "UserProfile", "Order").
-  - Replace [FIELD_NAME], [TYPE], [REQUIRED/OPTIONAL], [DEFAULT], [DESCRIPTION] in the
-    Field Definitions table with actual field details.
+  - Fill the Field Definitions table row by row: `[field]` becomes the real field name,
+    [type] its type, the Required column is literally Yes or No, Default is a value or
+    "—", and [Description] is one clause. Keep the `version` and `[timestampField]` rows.
   - Replace [PERSISTENCE_LAYER] with your storage mechanism.
   - Update the Example Data section with realistic placeholder values.
   - Status values: Draft / In Review / Approved / Implemented
+  - Instance destination: artifacts/milestone-{N}-{slug}/arch-{slug}.md — a supplemental
+    instance linked from the milestone's architecture.md. Never fill this template in place.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.
 -->
 
-<!-- Placeholders — see README.md → Placeholder Reference -->
+<!-- Placeholders: bracketed UPPER_SNAKE_CASE tokens are project values filled at
+     adoption; bracketed lowercase names are per-use fill-ins. -->
 
 # [PROJECT_NAME] — Architecture Spec: [SCHEMA_NAME] Data Schema
 
@@ -36,7 +40,7 @@
 
 [Describe what data this schema represents, what it is used for, and why it is structured this way. 2–4 sentences.]
 
-**Related documents:** See `ARCH_MODULE.md` for the module that owns this schema. If this data is displayed in a UI, see the related `UI_SPEC.md` document.
+**Related documents:** See the milestone's `architecture.md` (or the supplemental `arch-{slug}.md`) for the module that owns this schema. If this data is displayed in a UI, see the milestone's `ui.md` (or the supplemental `ui-{slug}.md` covering it).
 
 ### Format (required)
 

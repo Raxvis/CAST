@@ -17,8 +17,9 @@ For each CAST reference doc and document template, determine the disposition fro
 | `docs/FILE_CONVENTIONS.md` | **Always install** — load-bearing for docs/artifacts split | Rename + merge with CAST's enforcement rules |
 | `docs/ERROR_HANDLING.md` | Skip (optional) | Rename |
 | `docs/TEST_FRAMEWORK.md` | Skip (optional) | Rename |
+| `docs/STAGE_CONTRACT.md` | **Always install** — the stage contract every agent reads: the closed read set, the handoff-entry format, and the one-line reply. Every agent file points at it, and both engineering skills execute against it | Install CAST version — it is loaded on every stage of every task and is already at its floor; preserve any user-added handoff fields as notes rather than editing the contract |
 | `docs/PIPELINE_LOOP.md` | **Always install** — the engineering-loop contract consumed by /agent-code and /agent-task | Install CAST version; preserve user loop customizations as notes |
-| `docs/MODEL_OPTIMIZATION.md` | **Always install** — referenced by every agent's Model Configuration section | Install CAST version; preserve any user-added model pins as notes |
+| `docs/MODEL_OPTIMIZATION.md` | **Always install** — the model and effort policy the pipeline skills cite for per-model profiles, and the source of the Context Inference Bar that gates `/cast-doctor`'s Tier-B documentation prunes | Install CAST version; preserve any user-added model pins as notes |
 | `docs/CHANGELOG.md` | Skip (optional) | Preserve — note the `/cast-release` skill will maintain going forward |
 | `docs/ASSETS.md` | Skip (optional) | Preserve |
 | `docs/MVP_LAUNCH.md` | Skip (optional) | Preserve |
@@ -30,7 +31,7 @@ For each CAST reference doc and document template, determine the disposition fro
 | `templates/ARCH_SYSTEM.md` | **Always install** | Same |
 | `templates/ARCH_DATA_SCHEMA.md` | **Always install** | Same |
 | `templates/UI_SPEC.md` | Install if and only if the `ui` agent is installed — skipped together with it under the backend/CLI-only opt-out in `roster.md` | Same |
-| `templates/CEO_REVIEW.md` | **Always install** — consumed by /agent-plan Stage 4 | Same |
+| `templates/CEO_REVIEW.md` | **Always install** — consumed by /agent-plan Stage 3 | Same |
 | `templates/UX_REVIEW.md` | Install if and only if the `ui` agent is installed (pairs with `templates/UI_SPEC.md`; the two templates and the agent are skipped together per the opt-out in `roster.md`) | Same |
 | `templates/README.md` | **Always install** — the in-directory index mapping each template to its producing agent and artifact destination. Unlike the template skeletons, it installs with placeholder substitution and scaffolding strip (it is documentation, not a template) | Update to CAST format, preserving user-added rows |
 | `docs/FRONTEND.md` | Install if project type is frontend, mobile, or mixed | Prompt user if ambiguous |
@@ -103,7 +104,7 @@ Phase separation: <None / Implicit / Explicit>
 1. **Create** `.claude/agents/ceo.md`
    - Source: `<CAST_SOURCE>/agents/ceo.md`
    - Substitutions: `[PROJECT_NAME]` → `<detected>`
-   - Rationale: CAST requires CEO for /agent-plan Stage 4; no existing equivalent found.
+   - Rationale: CAST requires CEO for /agent-plan Stage 3; no existing equivalent found.
 
 ### Rename + Update (N actions)
 1. **Rename + Update** `planner.md` → `.claude/agents/product.md`

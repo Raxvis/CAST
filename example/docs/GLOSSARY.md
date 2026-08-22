@@ -66,8 +66,8 @@ runs.
 
 **Exit Code**
 The process exit status. `0` means success, `1` means a user error (missing
-argument, unknown **Subcommand**, **Task ID** not found), `2` is reserved
-for internal errors.
+argument, unknown **Subcommand**, bare invocation), `2` is reserved for
+internal errors, and `3` means the requested **Task ID** does not exist.
 
 **Migration**
 A schema change applied by `src/db/migrations.ts`. Migrations run
@@ -77,6 +77,12 @@ a missing database file is created on first use (per CEO Condition 3).
 **Parameterized Query**
 A SQL statement that uses `?` placeholders rather than string concatenation
 for user input. Required for every query per CEO Condition 1.
+
+**Schema Version**
+The integer recorded in the single-row `schema_version` table, naming the
+highest **Migration** already applied to the database file. The migration
+runner reads it on every invocation; when it already equals the current
+version the run is a no-op.
 
 **Subcommand**
 The second argv token after the binary name, identifying which action to

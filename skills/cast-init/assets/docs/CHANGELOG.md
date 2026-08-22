@@ -8,6 +8,8 @@
   - Add entries in reverse-chronological order (newest at the top).
   - Use the format: `[YYYY-MM-DD] - Title` with sub-bullets for Added/Changed/Removed/Fixed.
   - Keep the Upcoming Documentation Work section updated with planned documentation tasks.
+    Owner is Docs Writer for every row — the work reaches it as `docs:` queue entries, which
+    it drains at the task- and milestone-completion checkpoints.
   - Prioritize upcoming work as: High (needed now), Medium (needed soon), Low (nice to have).
 -->
 
@@ -47,6 +49,10 @@ Each entry follows this structure:
 ---
 
 ## Upcoming Documentation Work
+
+Owner is **Docs Writer** for every row below. Work reaches it as `docs:` queue entries, which
+it drains at the task- and milestone-completion checkpoints; the Owner column names the human
+or agent who requested the entry when that is worth recording.
 
 ### High Priority
 

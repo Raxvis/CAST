@@ -20,8 +20,8 @@
 
 Ship the first usable slice of Acme Todo: a CLI that can add, list, complete, and
 delete tasks, with state persisted in a local SQLite database. After this milestone,
-a user can run `acme-todo add "buy milk"`, `acme-todo list`, `acme-todo done 1`,
-and `acme-todo delete 1` from any Node 20+ shell and have their tasks survive
+a user can run `acme add "buy milk"`, `acme list`, `acme done 1`,
+and `acme delete 1` from any Node 20+ shell and have their tasks survive
 across invocations.
 
 ---
@@ -47,7 +47,7 @@ loop available.
 - Task state persists across CLI invocations via SQLite at `~/.acme-todo/tasks.db`
   (overridable via `ACME_TODO_DB`).
 - All 5 planned tasks (T-1 through T-5) land with passing Vitest suites.
-- First-run experience works: running `acme-todo list` on a fresh machine creates
+- First-run experience works: running `acme list` on a fresh machine creates
   the database and prints an empty list rather than crashing.
 - `pnpm typecheck` and `pnpm test` both pass clean on macOS, Linux, and Windows
   (Node 20+).
@@ -96,11 +96,11 @@ No internal milestone dependencies — this is the first implementation mileston
 
 - [x] `pnpm build` produces a runnable CLI entrypoint.
 - [x] `pnpm test` passes with coverage for all four commands and the migration runner.
-- [x] `acme-todo add "write tests"` prints the new task ID and exits 0.
-- [x] `acme-todo list` shows open tasks in the format `ID  TITLE  STATUS  CREATED`.
-- [x] `acme-todo list --all` includes completed tasks.
-- [x] `acme-todo done <id>` marks a task complete and sets `completedAt`.
-- [x] `acme-todo delete <id>` removes the row.
+- [x] `acme add "write tests"` prints the new task ID and exits 0.
+- [x] `acme list` shows open tasks in the format `ID  TITLE  STATUS  CREATED`.
+- [x] `acme list --all` includes completed tasks.
+- [x] `acme done <id>` marks a task complete and sets `completedAt`.
+- [x] `acme delete <id>` removes the row.
 - [ ] `done` and `delete` both exit non-zero with a clear error if the id does not exist. — `delete` does; `done` does not (BUG-002, Deferred to M2)
 - [x] First invocation against a missing database file succeeds (migrations run automatically).
 - [x] All three CEO Approval Conditions verified (see below).
@@ -126,15 +126,18 @@ Dependency graph: T-1 blocks T-2/T-3/T-4 (parallel), which all block T-5.
 ## CEO Approval Conditions
 
 The CEO approved this milestone with three conditions (APPROVED WITH CONDITIONS,
-2026-04-08). Coder tracked each condition during engineering; Reviewer and Product
-verified at completion. Tasks a condition names carry a `../README.md § CEO Approval
-Conditions` row in their Context Manifest.
+2026-04-08); the rows below are transcribed from that review's Approval Conditions
+table, `Verified By` included. Coder tracked each condition during engineering, and
+Reviewer's Acceptance Criteria Check carried one line per condition a task's manifest
+cited. Product confirmed the evidence for all three while writing `reviews/close.md`
+on 2026-04-10 and flipped each row to Verified. Tasks a condition names carry a
+`../README.md § CEO Approval Conditions` row in their Context Manifest.
 
-| Condition | Source | Status |
-|-----------|--------|--------|
-| 1. All SQL queries use parameterized bindings — no string concatenation into SQL (Security) | `reviews/ceo.md` | Verified (Reviewer, 2026-04-10) |
-| 2. WAL mode enabled in the migration + index on the `completed` column (Performance) | `reviews/ceo.md` | Verified (Reviewer, 2026-04-10) |
-| 3. `list` handles a missing database file by running migrations on first invocation (Error handling) | `reviews/ceo.md` | Verified (Product, 2026-04-10) |
+| # | Condition | Source | Verified By | Verified At | Status |
+|---|-----------|--------|-------------|-------------|--------|
+| 1 | All SQL queries use parameterized bindings — no string concatenation into SQL (Security) | `reviews/ceo.md` | Reviewer | 2026-04-10 | Verified |
+| 2 | WAL mode enabled in the migration + index on the `completed` column (Performance) | `reviews/ceo.md` | Reviewer | 2026-04-10 | Verified |
+| 3 | `list` handles a missing database file by running migrations on first invocation (Error handling) | `reviews/ceo.md` | Product | 2026-04-10 | Verified |
 
 See `reviews/ceo.md` for the full verdict.
 

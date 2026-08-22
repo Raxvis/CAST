@@ -21,15 +21,15 @@ Acme Todo is a CLI tool with no visual UI. This spec defines the user-facing tex
 
 ## Command Surface
 
-Binary name: `acme-todo`.
+Binary name: `acme`.
 
 | Command | argv pattern | Description |
 |---------|-------------|-------------|
-| `add` | `acme-todo add <title...>` | Create a pending task. All positional args after `add` are joined with a single space to form the title. |
-| `list` | `acme-todo list [--all]` | List pending tasks. `--all` includes completed tasks. |
-| `done` | `acme-todo done <id>` | Mark task `<id>` as done and stamp `completedAt`. |
-| `delete` | `acme-todo delete <id>` | Permanently delete task `<id>`. |
-| `--help` | `acme-todo --help` (also `-h`, or bare `acme-todo`) | Print the help screen and exit 0. |
+| `add` | `acme add <title...>` | Create a pending task. All positional args after `add` are joined with a single space to form the title. |
+| `list` | `acme list [--all]` | List pending tasks. `--all` includes completed tasks. |
+| `done` | `acme done <id>` | Mark task `<id>` as done and stamp `completedAt`. |
+| `delete` | `acme delete <id>` | Permanently delete task `<id>`. |
+| `--help` | `acme --help` (also `-h`) | Print the help screen to stdout and exit 0. A bare `acme` prints the same screen to stderr and exits 1 — see Output Formats. |
 
 Arguments are case-sensitive. The command name is always the first positional arg. Unknown commands exit 1 with a "unknown command" error.
 
@@ -41,7 +41,7 @@ For a CLI, the "layout" is the anatomy of a rendered `list` screen. Every labele
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│ $ acme-todo list --all                    ← invocation     │
+│ $ acme list --all                          ← invocation     │
 │ ID  TITLE                    STATUS   CREATED               │
 │ ▲   ▲                        ▲        ▲                     │
 │ │   │                        │        └ CREATED col (10)    │
@@ -63,7 +63,7 @@ Single-line outputs (`add`, `done`, `delete`) have no columnar layout; their exa
 ### `add` success
 
 ```
-$ acme-todo add buy milk
+$ acme add buy milk
 Added task #7: buy milk
 ```
 
@@ -72,7 +72,7 @@ The id shown is the SQLite autoincrement value of the new row. Trailing whitespa
 ### `list` (pending only — default)
 
 ```
-$ acme-todo list
+$ acme list
 ID  TITLE                                     STATUS   CREATED
 7   buy milk                                  pending  2026-04-08
 8   renew passport                            pending  2026-04-08
@@ -92,7 +92,7 @@ Columns are separated by exactly two spaces. No vertical bars or box-drawing cha
 ### `list --all` (includes completed)
 
 ```
-$ acme-todo list --all
+$ acme list --all
 ID  TITLE                                     STATUS   CREATED
 7   buy milk                                  done     2026-04-08
 8   renew passport                            pending  2026-04-08
@@ -104,7 +104,7 @@ Row 7 shows the `done` status literal. Row 9 demonstrates the 40-char truncation
 ### `done` success
 
 ```
-$ acme-todo done 7
+$ acme done 7
 Marked task #7 as done.
 ```
 
@@ -113,18 +113,18 @@ Idempotent on already-done tasks: re-running prints the same message and exits 0
 ### `delete` success
 
 ```
-$ acme-todo delete 7
+$ acme delete 7
 Deleted task #7.
 ```
 
 ### `--help`
 
 ```
-$ acme-todo --help
-acme-todo — a minimal command-line todo tracker
+$ acme --help
+acme — a minimal command-line todo tracker
 
 USAGE
-  acme-todo <command> [args]
+  acme <command> [args]
 
 COMMANDS
   add <title...>    Create a new pending task
@@ -140,7 +140,8 @@ STORAGE
   Override:         set ACME_TODO_DB to an absolute file path
 ```
 
-`acme-todo` with no args prints the same screen and exits 0.
+`acme` with no args prints the same screen to **stderr** and exits 1: a bare
+invocation is a usage error, not a request for help.
 
 ---
 
@@ -153,9 +154,9 @@ The GUI state vocabulary maps onto per-invocation outcomes for a CLI. Every comm
 | Default (success) | Command completed its effect | Success string on stdout (see Output Formats), exit 0 |
 | Empty | `list` matched zero rows | Header line only, no rows, exit 0 — deliberately no "No tasks" string, so output stays pipe-friendly |
 | Loading / First-run | DB file absent on invocation | Migrations run transparently, then the command proceeds as Default or Empty (CEO Condition 3); no user-visible "loading" output |
-| Error (user) | Bad arguments or unknown command | `acme-todo: `-prefixed message on stderr, exit 1 |
-| Error (not found) | `done`/`delete` on a missing id | `acme-todo: task <id> not found` on stderr, exit 3 |
-| Error (internal) | I/O or database failure | `acme-todo: database error: ...` on stderr, exit 2 |
+| Error (user) | Bad arguments, unknown command, or a bare invocation | `acme: `-prefixed message on stderr — or, for a bare invocation, the help screen on stderr — exit 1 |
+| Error (not found) | `done`/`delete` on a missing id | `acme: task <id> not found` on stderr, exit 3 |
+| Error (internal) | I/O or database failure | `acme: database error: ...` on stderr, exit 2 |
 | Idempotent repeat | `done` on an already-done task | Same success string, exit 0, `completedAt` untouched |
 
 There are no Pressed/Disabled states — a CLI has no persistent interactive surface in v1 (no prompts, no TTY-dependent behavior).
@@ -164,35 +165,36 @@ There are no Pressed/Disabled states — a CLI has no persistent interactive sur
 
 ## Error Messages and Exit Codes
 
-All error output is written to **stderr**, prefixed with `acme-todo: `. stdout is never used for errors, so `command 2>/dev/null` silences them cleanly.
+All error output is written to **stderr**, prefixed with `acme: `. stdout is never used for errors, so `command 2>/dev/null` silences them cleanly.
 
 | Exit code | Meaning | Example stderr |
 |-----------|---------|----------------|
 | `0` | Success | — |
 | `1` | User error | see rows below |
-| `2` | Unknown / internal error | `acme-todo: database error: disk I/O error` |
-| `3` | Task not found | `acme-todo: task 42 not found` |
+| `2` | Unknown / internal error | `acme: database error: disk I/O error` |
+| `3` | Task not found | `acme: task 42 not found` |
 
 Concrete user-error messages (exit 1):
 
 | Condition | stderr |
 |-----------|--------|
-| `add` with no title | `acme-todo: add: missing required argument <title>` |
-| `done` / `delete` with no id | `acme-todo: done: missing required argument <id>` |
-| Non-numeric id | `acme-todo: done: expected numeric id, got "abc"` |
-| Unknown command | `acme-todo: unknown command: foo (try --help)` |
-| Unknown flag on `list` | `acme-todo: list: unknown option --verbose` |
+| `add` with no title | `acme: add: missing required argument <title>` |
+| `done` / `delete` with no id | `acme: done: missing required argument <id>` |
+| Non-numeric id | `acme: done: expected numeric id, got "abc"` |
+| Unknown command | `acme: unknown command: foo (try --help)` |
+| Unknown flag on `list` | `acme: list: unknown option --verbose` |
+| Bare invocation (no subcommand) | the `--help` screen, written to stderr |
 
 Internal errors (exit 2) include a short prefix and the underlying message:
 
 ```
-acme-todo: database error: unable to open database file
+acme: database error: unable to open database file
 ```
 
 Task-not-found (exit 3) distinguishes "you asked for a specific row that does not exist" from other user errors, so scripts can react programmatically:
 
 ```
-acme-todo: task 42 not found
+acme: task 42 not found
 ```
 
 ---
@@ -235,17 +237,17 @@ Formatting rules:
 
 | Action | Trigger | Effect |
 |--------|---------|--------|
-| Insert task | `acme-todo add <title...>` | New row with `completed = 0`, `createdAt = now`; new id printed |
-| Mark done | `acme-todo done <id>` | Sets `completed = 1`, stamps `completedAt` if null |
-| Delete task | `acme-todo delete <id>` | Removes the row permanently |
+| Insert task | `acme add <title...>` | New row with `completed = 0`, `createdAt = now`; new id printed |
+| Mark done | `acme done <id>` | Sets `completed = 1`, stamps `completedAt` if null |
+| Delete task | `acme delete <id>` | Removes the row permanently |
 | Run migrations | Any command on a missing/stale DB | Creates the DB file and schema before the command's own query (CEO Condition 3) |
 
 ---
 
 ## Accessibility
 
-- **Piped output.** Output format does not depend on `process.stdout.isTTY`. Running `acme-todo list | grep milk` produces identical bytes to running `acme-todo list` directly.
-- **No interactive prompts in v1.** Commands never call `readline` or wait for stdin. A user automating `acme-todo` from a cron job or shell script can rely on zero-input execution.
+- **Piped output.** Output format does not depend on `process.stdout.isTTY`. Running `acme list | grep milk` produces identical bytes to running `acme list` directly.
+- **No interactive prompts in v1.** Commands never call `readline` or wait for stdin. A user automating `acme` from a cron job or shell script can rely on zero-input execution.
 - **Screen reader friendly.** Plain text, left-to-right, one record per line, no control characters — reads naturally via any assistive terminal.
 - **Stable exit codes.** Scripts can branch on `$?` without parsing stderr strings.
 
@@ -285,7 +287,7 @@ Target platforms: macOS, Linux, Windows.
 - [ ] No ANSI escape codes in any output
 - [ ] All error messages match the strings in the Error Messages table
 - [ ] Exit codes follow the 0 / 1 / 2 / 3 contract
-- [ ] `acme-todo list` on a fresh machine succeeds (no missing-DB error)
+- [ ] `acme list` on a fresh machine succeeds (no missing-DB error)
 - [ ] Output is identical when piped vs when attached to a TTY
 - [ ] Verified on macOS, Linux, and Windows
 

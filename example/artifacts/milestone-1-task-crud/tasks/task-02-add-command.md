@@ -30,7 +30,7 @@ inserts a new row into `tasks` with `completed = 0`, `createdAt = new Date().toI
 
 ## Acceptance Criteria
 
-- [x] `acme-todo add "buy milk"` prints the new task id to stdout and exits 0.
+- [x] `acme add "buy milk"` prints the new task id to stdout and exits 0.
 - [x] Insert uses a prepared statement with bound parameters (no string interpolation).
 - [x] Missing title argument prints an error and exits non-zero.
 - [x] Inserted row has `completed = false` and a valid ISO `createdAt`.
@@ -75,7 +75,7 @@ inserts a new row into `tasks` with `completed = 0`, `createdAt = new Date().toI
 - **Read next**: Manifest only
 - **Open items**: None
 - **Acceptance Criteria Check**:
-  - [1] `acme-todo add "buy milk"` prints the new task id to stdout and exits 0. — Met — `add.test.ts` › "prints new id, exits 0" (`e3a94f0`)
+  - [1] `acme add "buy milk"` prints the new task id to stdout and exits 0. — Met — `add.test.ts` › "prints new id, exits 0" (`e3a94f0`)
   - [2] Insert uses a prepared statement with bound parameters (no string interpolation). — Met — `src/commands/add.ts:14` (`.prepare().run(params)`); `add.test.ts` › "binds params"
   - [3] Missing title argument prints an error and exits non-zero. — Met — `add.test.ts` › "missing title exits 1"
   - [4] Inserted row has `completed = false` and a valid ISO `createdAt`. — Met — `add.test.ts` › "ISO createdAt, completed false"
