@@ -22,7 +22,7 @@ This is **CAST — Claude Agent Staged Team**, a multi-agent AI-assisted develop
 
 ## The docs/templates/artifacts Split
 
-This is a hard rule enforced across the template: **`docs/` is documentation, `templates/` is reusable document skeletons, `artifacts/` is work**. When editing templates or writing new content, every path reference in a template file must respect this split. Agents read reference material from `docs/`, read document templates from `templates/`, and write instances of that work to `artifacts/`. Never introduce a path that writes work output to `docs/` or `templates/`, or a path that looks up a template under `docs/` or `artifacts/`.
+This is a hard rule enforced across the template: **`docs/` is documentation, `templates/` is reusable document skeletons, `artifacts/` is work**. When editing templates or writing new content, every path reference in a template file must respect this split. Agents read reference material from `docs/`, read document templates from `templates/`, and write instances of that work to `artifacts/`. Never introduce a path that writes work output to `docs/` or `templates/`, or a path that looks up a template under `docs/` or `artifacts/`. There is exactly one documented carve-out: `docs/CHANGELOG.md` is a long-lived project register maintained by the `/cast-release` skill (see `skills/cast-init/assets/root/CLAUDE.md` → Directory Conventions). Do not add others.
 
 ## Placeholder Convention
 
@@ -60,7 +60,7 @@ When editing templates, preserve placeholder tokens — do not replace them with
 - Agent files include YAML frontmatter (`name`, `description`) for Claude Code subagent registration; they are self-contained and removing one does not break others
 - Keep `skills/cast-init/SKILL.md` under 500 lines — move detail into `skills/cast-init/references/` (progressive disclosure)
 - Payload pipeline skills (`assets/skills/<name>/SKILL.md`) must keep frontmatter `name` equal to the directory name, and their `[PLACEHOLDER]` tokens intact
-- `assets/root/CLAUDE.md` ends with an import block: bare `@docs/<FILE>.md` lines load docs into session context (only `@docs/CODE_PATTERNS.md` is always-on; `@docs/PRD.md` is added once populated), while backticked paths listed there are deliberately inert — a Claude Code import only fires as a bare `@path` line
+- `assets/root/CLAUDE.md` ends with a Memory Imports block that **ships empty on purpose** — imports load into every session and every subagent spawn, so nothing is imported by default. A bare `@docs/<FILE>.md` line at the left margin is how an adopter activates a doc; any path written inside backticks or an HTML comment there is deliberately inert, because a Claude Code import only fires as a bare `@path` line
 
 ## Release and Tagging Policy
 

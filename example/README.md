@@ -24,8 +24,10 @@ See `CLAUDE.md` for the full project overview and `docs/PRD.md` for requirements
    on first invocation).
 3. `/agent-code` ran on 2026-04-09 and 2026-04-10, implementing tasks T-1
    through T-5 — each stage reading only its task file's Context Manifest and
-   appending to its Handoff Log. Two bugs were filed along the way as per-bug
-   files under `milestone-1-task-crud/bugs/`, indexed in `artifacts/BUGS.md`.
+   appending to its Handoff Log. One bug was filed during implementation
+   (BUG-001, in T-3); a second came out of the milestone-completion checkpoint
+   (BUG-002). Both are per-bug files under `milestone-1-task-crud/bugs/`,
+   indexed in `artifacts/BUGS.md`.
    Every Coder handoff carries a **verbatim test-results block** (the test gate
    — Reviewer rejects an entry without one), and every Reviewer approval carries
    an **Acceptance Criteria Check**, one line per criterion with its evidence.
@@ -34,17 +36,19 @@ See `CLAUDE.md` for the full project overview and `docs/PRD.md` for requirements
    spawn); only T-4 routed to Product (Step 3b), and it shows a
    `Product judgment` flag and how Product disposed of it.
 4. The milestone-completion checkpoint fired on 2026-04-10: the UI agent
-   reviewed the implemented command surface (UX review, APPROVED WITH NOTES);
-   the CEO agent ran the risk implementation review (both lenses, no findings);
-   then a single Product launch closed the milestone end-to-end — re-triaging
-   the Deferred BUG-002 (held Deferred into M2 — Deferred is an open, held
-   state, not terminal), writing the close record (`reviews/close.md`,
+   reviewed the implemented command surface (UX review, APPROVED WITH NOTES)
+   and filed BUG-002 out of it; the CEO agent ran the risk implementation
+   review (both lenses, no findings); then a single Product launch closed the
+   milestone end-to-end — triaging that fresh BUG-002 Low and setting it
+   Deferred into M2 (Deferred is an open, held state, not terminal),
+   writing the close record (`reviews/close.md`,
    "Complete with Deferrals") covering per-task validation, milestone
    validation, and the retrospective in one pass, and verifying all three CEO
    Approval Conditions. Docs Writer then drained all four queued `docs`
    entries in one pass, and the orchestrator recorded the milestone outcome
-   and the Decisions Log rows. The per-task checkpoints launched no agents at
-   all.
+   and the Decisions Log rows. The per-task completion checkpoints launched no
+   agent at all: the docs queue never reached its overflow bound, so every
+   entry waited for this single drain.
 
 ## Where to Start Reading
 
@@ -57,8 +61,9 @@ Read these in order for the clearest picture:
    CONDITIONS verdict and the three conditions that shaped implementation.
 5. **`artifacts/BUGS.md`** — the bug index pointing at the two per-bug files
    under `artifacts/milestone-1-task-crud/bugs/`: BUG-001 (closed during M1)
-   and BUG-002 (Deferred — an open, held state re-triaged by Product at
-   milestone completion), each with per-stage field ownership.
+   and BUG-002 (Deferred — an open, held state, filed by the UI agent at the
+   UX review and triaged by Product in the close pass), each with per-stage
+   field ownership.
 6. **`artifacts/milestone-1-task-crud/tasks/task-03-list-command.md`** — the
    clearest worked task file: a seeded Context Manifest and a Handoff Log that
    walks the full defect loop (BUG-001: coder -> reviewer files the bug ->
@@ -76,8 +81,9 @@ Read these in order for the clearest picture:
    measured performance budgets. No agent reads this file.
 10. **`artifacts/STANDUP.md`** — the rolling session log across the three days,
     written in the canonical Entry Grammar (typed one-liner entries under
-    dated session headings, with loop counters and the ✅-marked Docs Writer
-    queue).
+    dated session headings, plus the ✅-marked Docs Writer queue). Loop counts
+    are not mirrored here — they live in each task file's `Loop count` Header,
+    which is why only T-3 shows `1 / 3`.
 
 ## Directory Layout
 
@@ -94,7 +100,6 @@ Read these in order for the clearest picture:
     - `reviews/` — the risk review (security + performance lenses) and the CEO
       planning verdict, plus the milestone-completion UX review, the risk
       implementation review, and the close record
-  - `one-off/` — where `/agent-task` work would land (empty in this fixture)
 
 ## Deliberate Omissions
 
@@ -110,4 +115,14 @@ Read these in order for the clearest picture:
 - **No full `docs/` set.** Only `PRD.md`, `CONCEPT.md`, and `GLOSSARY.md`
   are included. The other documentation templates (`CODE_PATTERNS.md`,
   `FILE_CONVENTIONS.md`, `ERROR_HANDLING.md`, etc.) change only trivially
-  when populated and are omitted for brevity.
+  when populated and are omitted for brevity. `CLAUDE.md` still points at a
+  few of them by path, as a real install would.
+- **No `templates/` directory and no `artifacts/README.md`.** A real install
+  has both — `templates/` holds the document skeletons agents copy into
+  `artifacts/` (this fixture ships the *instances* those skeletons produce,
+  which is the interesting half), and `artifacts/README.md` is the navigation
+  index. `CLAUDE.md` and the artifacts reference them by path; the files
+  themselves are template payload, reproduced verbatim, so they are left out.
+- **No `artifacts/one-off/` directory.** `/agent-task` work would land there,
+  but this fixture's timeline contains no one-off task, and git does not track
+  empty directories — so the path exists only in the conventions text.

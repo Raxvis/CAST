@@ -1,7 +1,8 @@
 <!-- TEMPLATE INSTRUCTIONS
   FILE: AGENT_STATE.md
   PURPOSE: The cross-milestone record that is not a task file: decisions worth carrying
-           forward, milestone progress, and the live performance-budget table.
+           forward, milestone progress, the live performance-budget table, and the open
+           questions awaiting a human answer.
 
   WHAT CHANGED IN v3 — READ THIS BEFORE ADDING A TABLE.
   In v2 this file was 506 lines of per-agent tables (Current Work, Review Queue, Future
@@ -12,10 +13,11 @@
   is the Handoff Log, Future Work is the milestone README's out-of-scope list.
 
   v3 fixed both ends. NO AGENT READS THIS FILE. The orchestrating skill writes it at
-  checkpoints, and only the three things below survived — the ones with no other home.
+  checkpoints, and only the four tables below survived — the ones with no other home:
+  Decisions Log, Milestone Progress, Performance Budget Tracking, and Open Questions.
 
-  If you are about to add a table here, first ask which file already owns that state.
-  Almost always one does.
+  Those four are the sanctioned set: keep all four, and before adding a fifth, ask which
+  file already owns that state. Almost always one does.
 
   HOW TO CUSTOMIZE:
   - Replace [PROJECT_NAME] with your project name.

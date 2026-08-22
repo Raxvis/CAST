@@ -3,7 +3,9 @@
   PURPOSE: Template for a SINGLE bug report file. One instance per bug:
            artifacts/milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md for bugs found during
            pipeline work, artifacts/one-off/bugs/bug-{XXX}-{slug}.md for /agent-task work.
-           Reviewer creates the instance and adds a row to the global index in
+           The filer — Reviewer at a task's review step, UI from the milestone UX review,
+           or the CEO from the risk implementation review — creates the instance and adds a
+           row to the global index in
            artifacts/BUGS.md, which also carries the canonical lifecycle, severity scale,
            and field-ownership rules — this template only defines the file's shape.
 
@@ -13,19 +15,21 @@
   - The ID comes from artifacts/BUGS.md (sequential across the project, never reused).
   - The file never moves; its Status field advances per the lifecycle in artifacts/BUGS.md,
     and the owner mirrors each status change into the index row in the same step.
-  - Sections marked (required) are written at filing by Reviewer. The Investigation
+  - Sections marked (required) are written at filing by whichever agent files the bug
+    (Reviewer, UI, or the CEO). The Investigation
     and Resolution sections are appended later by their owners (see the field-ownership
     table in artifacts/BUGS.md) — leave them out at filing time.
 -->
 
-<!-- Placeholders — see README.md → Placeholder Reference -->
+<!-- Placeholders: bracketed UPPER_SNAKE_CASE tokens are project values filled at
+     adoption; bracketed lowercase names are per-use fill-ins. -->
 
 # BUG-XXX: [Short Title]
 
 ## Report (required)
 
 - **Status**: New / Triaged / In Progress / Fixed / Verified / Closed / Cannot Reproduce / Duplicate / Won't Fix / Deferred
-- **Severity (initial)**: Critical | High | Medium | Low   _(set by Reviewer; Product sets the final severity at triage)_
+- **Severity (initial)**: Critical | High | Medium | Low   _(set by the filer; Product sets the final severity at triage)_
 - **Severity (final)**: Critical | High | Medium | Low   _(set by Product at triage)_
 - **Found during**: [Task ID or milestone reference, or "one-off"]
 - **Description**: [Detailed description of the bug and its impact on the user experience.]

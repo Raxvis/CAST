@@ -1,16 +1,18 @@
 <!-- TEMPLATE INSTRUCTIONS
   FILE: docs/FRONTEND.md
   PURPOSE: Topic-specific reference for projects that render a user-facing interface —
-  web apps, mobile apps, desktop GUIs, or game UIs. Loaded into Claude Code's context
-  via an @docs/... memory import in the project's root CLAUDE.md. Establishes the frontend conventions
-  that human and AI contributors must follow.
+  web apps, mobile apps, desktop GUIs, or game UIs. Read on demand — agents open it when a
+  task's Context Manifest cites it; the root CLAUDE.md Memory Imports block ships empty, and
+  an adopter who wants this file in every session adds a bare @docs/FRONTEND.md line there.
+  Establishes the frontend conventions that human and AI contributors must follow.
 
   WHO NEEDS THIS FILE:
   - Keep this file if your project has ANY user-facing visual interface (React, Vue,
     Svelte, SolidJS, React Native, Expo, SwiftUI, Jetpack Compose, Flutter, a game UI
     layer, an Electron/Tauri desktop shell, etc.).
   - Delete this file if your project is a headless backend, library, CLI, or data
-    pipeline with no rendered UI. Also remove the @docs/FRONTEND.md import line from root CLAUDE.md.
+    pipeline with no rendered UI. Also remove any @docs/FRONTEND.md import line you added
+    to root CLAUDE.md.
 
   HOW TO CUSTOMIZE:
   - Replace every [PLACEHOLDER] token with project-specific values.
@@ -33,7 +35,7 @@ truth for how screens, components, navigation, and user input are structured. Un
 conventions (naming, module layout, error handling) live in `docs/CODE_PATTERNS.md` —
 this file only covers patterns that are specific to rendering a UI and handling user
 interaction. Pure-backend, CLI, and library-only projects should delete this file and
-remove the matching `@docs/FRONTEND.md` import line from the root `CLAUDE.md`.
+remove any `@docs/FRONTEND.md` import line they added to the root `CLAUDE.md`.
 
 > **Note:** Bracketed names in code examples below (e.g., `[MyComponent]`, `[useStore]`)
 > are illustrative example identifiers, not project placeholders. They show naming

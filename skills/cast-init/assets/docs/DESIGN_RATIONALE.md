@@ -111,7 +111,11 @@ Reference specific goals from PRD.md or CONCEPT.md where applicable.]
 
 **Rationale:** A bare `@path` import is loaded at every session start **and into every subagent spawn** — paid once per session plus once per stage, so a 250-line document costs more across one milestone than most agent definitions do. CAST v2 imported `docs/CODE_PATTERNS.md` unconditionally, which contradicted its own Context Inference Bar (`docs/MODEL_OPTIMIZATION.md`): on Opus 4.8+ and Sonnet 5+, conventions that merely restate what the codebase shows — naming, file layout, function ordering — are inferred from the code, and writing them down again buys only weight.
 
-**Trade-off accepted:** A genuinely non-inferable, needed-every-session document (a domain glossary whose terms appear nowhere in the source, a compliance constraint) must be added back by hand — and removed again if `/cast-doctor` later flags it as inferable.
+**Trade-offs accepted:**
+- A genuinely non-inferable, needed-every-session document (a domain glossary whose terms appear nowhere in the source, a compliance constraint) must be added back by hand — and removed again if `/cast-doctor` later flags it as inferable.
+
+**Decided by:** CAST template design
+**Date:** 2026-08
 
 ---
 

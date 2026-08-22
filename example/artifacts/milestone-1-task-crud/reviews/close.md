@@ -14,7 +14,7 @@
 
 ## Summary
 
-M1 shipped the first usable slice of Acme Todo. All five planned tasks (T-1 through T-5) landed and the CLI can now add, list, complete, and delete tasks against a SQLite database at `~/.acme-todo/tasks.db` (or the path in `ACME_TODO_DB`). All three CEO Approval Conditions were verified, and the full Vitest suite is green (42 tests, 100% line coverage on `src/commands/`). One bug (BUG-001, first-run crash) was caught and fixed during implementation; one bug (BUG-002, `done` silent success on a missing id) was discovered during milestone smoke testing, triaged Low, and re-triaged Deferred into M2 at this checkpoint — so the milestone closes as "Complete with Deferrals" rather than clean.
+M1 shipped the first usable slice of Acme Todo. All five planned tasks (T-1 through T-5) landed and the CLI can now add, list, complete, and delete tasks against a SQLite database at `~/.acme-todo/tasks.db` (or the path in `ACME_TODO_DB`). All three CEO Approval Conditions were verified, and the full Vitest suite is green (30 tests, 100% line coverage on `src/commands/`). One bug (BUG-001, first-run crash) was caught and fixed during implementation; one bug (BUG-002, `done` silent success on a missing id) was found and filed by the UI agent at this checkpoint's UX review, then triaged Low and Deferred into M2 in this close pass — so the milestone closes as "Complete with Deferrals" rather than clean.
 
 ---
 
@@ -23,8 +23,8 @@ M1 shipped the first usable slice of Acme Todo. All five planned tasks (T-1 thro
 | # | Item | Description | Task Reference |
 |---|------|-------------|----------------|
 | 1 | Task type + data layer | `Task` interface, SQLite schema, idempotent migration runner with WAL mode and `idx_tasks_completed`. | T-1 |
-| 2 | `add` command | `acme-todo add "<title>"` inserts a row with `completed=false` and prints the new id. | T-2 |
-| 3 | `list` command | `acme-todo list` prints open tasks; `--all` includes completed; first-run creates DB + runs migrations automatically. | T-3 |
+| 2 | `add` command | `acme add "<title>"` inserts a row with `completed=false` and prints the new id. | T-2 |
+| 3 | `list` command | `acme list` prints open tasks; `--all` includes completed; first-run creates DB + runs migrations automatically. | T-3 |
 | 4 | `done` + `delete` commands | `done <id>` sets `completed` and `completedAt`; `delete <id>` removes the row; `delete` errors non-zero on missing id. | T-4 |
 | 5 | CLI argument parser + entrypoint | Minimal custom argv parser in `src/cli.ts`, dispatcher in `src/index.ts`, `--help` output, unknown-command handling. | T-5 |
 
@@ -34,9 +34,9 @@ M1 shipped the first usable slice of Acme Todo. All five planned tasks (T-1 thro
 
 | # | Item | Reason for Deferral | Moved To |
 |---|------|----------------------|----------|
-| 1 | BUG-002: `done <id>` silently succeeds when the given id does not exist | Discovered during milestone smoke testing after freeze; low severity; not a blocker for M1's acceptance criteria. Fix belongs alongside a broader "id-not-found" helper in the data layer. | M2 |
+| 1 | BUG-002: `done <id>` silently succeeds when the given id does not exist | Filed by the UI agent at this checkpoint's UX review, after the code freeze; low severity; not a blocker for M1's acceptance criteria. Fix belongs alongside a broader "id-not-found" helper in the data layer. | M2 |
 
-Deferred is a held-open state, not terminal. Product re-triaged BUG-002 at this milestone-completion checkpoint and held it Deferred into M2 with an updated rationale; it stays open in `artifacts/BUGS.md` and is re-triaged again at the M2 `/agent-plan` Stage 1. This deferral is why the Header Status above reads "Complete with Deferrals".
+Deferred is a held-open state, not terminal. Product triaged BUG-002 Low and set it Deferred into M2 inside this close pass; it stays open in `artifacts/BUGS.md` and is re-triaged at the M2 `/agent-plan` Stage 1. This deferral is why the Header Status above reads "Complete with Deferrals".
 
 ---
 
@@ -46,8 +46,8 @@ Deferred is a held-open state, not terminal. Product re-triaged BUG-002 at this 
 |------|-----------|-------------------|-------------|-------|
 | T-1 — Task type, SQLite schema, migration runner | Step 3a | Handoff entry #3 | APPROVED | All 8 criteria + Condition lines 1 (parameterized SQL) and 2 (WAL + index) Met with evidence; closed without a Product spawn. |
 | T-2 — `add` command | Step 3a | Handoff entry #3 | APPROVED | All 6 criteria + Condition line 1 Met with evidence on the insert path; closed without a Product spawn. |
-| T-3 — `list` command | Step 3a | Handoff entry #6 | APPROVED | All 7 criteria + Condition line 3 Met with evidence after the BUG-001 fix (loop 1/3). Red→green evidence verified against `9d4b1c7` (fail) → `a8f3d12` (pass). BUG-001 advanced Fixed → Verified → Closed at this checkpoint. |
-| T-4 — `done` and `delete` commands | Step 3b | Handoff entry #3 | APPROVED WITH NOTES | Criterion 6 (missing-id coverage for `done`) disposed as in-scope for M2, not this task — held as written. BUG-002 was filed during milestone smoke testing (not against a T-4 criterion) and triaged Low / Deferred. |
+| T-3 — `list` command | Step 3a | Handoff entry #6 | APPROVED | All 7 criteria + Condition line 3 Met with evidence after the BUG-001 fix (loop 1/3). Red→green evidence verified against `9d4b1c7` (fail) → `a8f3d12` (pass). BUG-001 advanced Fixed → Verified → Closed by the orchestrator when this task passed validation; re-reviewed and confirmed here. |
+| T-4 — `done` and `delete` commands | Step 3b | Handoff entry #3 | APPROVED WITH NOTES | Criterion 6 (missing-id coverage for `done`) disposed as in-scope for M2, not this task — held as written. BUG-002, filed later at this checkpoint's UX review, records the same gap as a defect; it was not raised against a T-4 criterion. |
 | T-5 — CLI argument parser wiring | Step 3a | Handoff entry #3 | APPROVED | All 7 criteria Met with evidence; migration-before-dispatch guard confirmed (Condition 3 regression-proof). Closing this task at Step 3a triggered the milestone-completion checkpoint; reviewed here per the batching Step 3a enables. |
 
 ---
@@ -58,11 +58,11 @@ Deferred is a held-open state, not terminal. Product re-triaged BUG-002 at this 
 
 | # | Requirement | Acceptance Criteria | Status | Notes |
 |---|-------------|--------------------|----|-------|
-| F1 | Add tasks | `acme-todo add "buy milk"` prints the new task ID and exits 0; titles preserved verbatim | Pass | |
-| F2 | List tasks | `acme-todo list` prints open tasks as `ID  TITLE  STATUS  CREATED`; `--all` includes completed | Pass | |
-| F3 | Complete tasks | `acme-todo done <id>` sets `completed` and `completedAt` | Pass | Happy path only — see F5 |
-| F4 | Delete tasks | `acme-todo delete <id>` removes the row; errors non-zero on missing ID | Pass | |
-| F5 | Missing-ID signaling | `done` and `delete` both exit non-zero with a clear error when the ID does not exist | Fail | `done` exits 0 silently — BUG-002, re-triaged and held Deferred into M2 |
+| F1 | Add tasks | `acme add "buy milk"` prints the new task ID and exits 0; titles preserved verbatim | Pass | |
+| F2 | List tasks | `acme list` prints open tasks as `ID  TITLE  STATUS  CREATED`; `--all` includes completed | Pass | |
+| F3 | Complete tasks | `acme done <id>` sets `completed` and `completedAt` | Pass | Happy path only — see F5 |
+| F4 | Delete tasks | `acme delete <id>` removes the row; errors non-zero on missing ID | Pass | |
+| F5 | Missing-ID signaling | `done` and `delete` both exit non-zero with a clear error when the ID does not exist | Fail | `done` exits 0 silently — BUG-002, triaged Low and Deferred into M2 |
 | F6 | First-run experience | First invocation against a missing database file runs migrations and succeeds | Pass | Approval Condition 3; BUG-001 regression test in place |
 | F7 | Persistence | Task state survives across CLI invocations via SQLite at `~/.acme-todo/tasks.db` (or `ACME_TODO_DB`) | Pass | |
 
@@ -72,17 +72,17 @@ Deferred is a held-open state, not terminal. Product re-triaged BUG-002 at this 
 |---|-----------|--------------------|----|-------|
 | Q1 | Code quality | `pnpm typecheck` clean; no linter errors; parameterized SQL throughout (Approval Condition 1) | Pass | Verified by Reviewer at every merge |
 | Q2 | Performance | Warm `list` under 100 ms on a 100-task DB; WAL + `idx_tasks_completed` present (Approval Condition 2) | Pass | Measured 31 ms (p50) / 38 ms (p95) warm, 94 ms cold first run — see `reviews/risk-impl.md` and the Performance Budget Tracking table in `artifacts/AGENT_STATE.md` |
-| Q3 | Test coverage | Full Vitest suite green; logic coverage at or above the 80% target | Pass | 42 tests passing; 100% line coverage on `src/commands/` |
+| Q3 | Test coverage | Full Vitest suite green; logic coverage at or above the 80% target | Pass | 30 tests passing; 100% line coverage on `src/commands/` |
 
 ### Critical Path Testing
 
 | # | Scenario | Steps | Expected | Actual | Status |
 |---|----------|-------|----------|--------|--------|
-| T1 | Fresh-install first run | `rm -rf ~/.acme-todo`, then `acme-todo list` | DB created, migrations run, empty list, exit 0 | As expected | Pass |
+| T1 | Fresh-install first run | `rm -rf ~/.acme-todo`, then `acme list` | DB created, migrations run, empty list, exit 0 | As expected | Pass |
 | T2 | Full CRUD cycle | `add "x"` → `list` → `done 1` → `list --all` → `delete 1` | Each step succeeds; state visible at every stage | As expected | Pass |
 | T3 | Missing-ID signaling | `add "x"`, then `done 999` | stderr error, non-zero exit | No output, exit 0 | Fail |
 
-T3's failure is BUG-002 (Low). Product accepted it as non-blocking for M1 and held it Deferred at re-triage; the scenario stays on the regression checklist until the M2 fix lands.
+T3's failure is BUG-002 (Low). Product accepted it as non-blocking for M1 and set it Deferred at triage; the scenario stays on the regression checklist until the M2 fix lands.
 
 ---
 
@@ -91,7 +91,7 @@ T3's failure is BUG-002 (Low). Product accepted it as non-blocking for M1 and he
 ### Data Layer & First Run — Regression Checklist
 
 - [x] Migrations run on a fresh DB file (delete `~/.acme-todo/` and run any command)
-- [x] `acme-todo list` on a machine with no prior state prints the empty-state output and exits 0
+- [x] `acme list` on a machine with no prior state prints the empty-state output and exits 0
 - [x] `PRAGMA journal_mode;` returns `wal` after a migration run
 - [x] `EXPLAIN QUERY PLAN` for the open-tasks query uses `idx_tasks_completed`
 
@@ -107,9 +107,9 @@ T3's failure is BUG-002 (Low). Product accepted it as non-blocking for M1 and he
 
 | ID | Description | Severity | Owner | Tracked In |
 |----|-------------|----------|-------|------------|
-| BUG-002 | `done <id>` silently succeeds when the given id does not exist; should print an error and exit non-zero. Re-triaged by Product at this checkpoint and held Deferred into M2. | Low | Coder | `BUGS.md` / T-4 |
+| BUG-002 | `done <id>` silently succeeds when the given id does not exist; should print `acme: task <id> not found` and exit 3. Filed by the UI agent at this checkpoint's UX review and triaged Low / Deferred into M2 in this close pass. | Low | Coder | `BUGS.md` / T-4 |
 
-BUG-001 (`list` crashed with "no such table: tasks" on first invocation) was fixed in-milestone via CEO Condition 3 and closed at this checkpoint — it is not a known issue.
+BUG-001 (`list` crashed with "no such table: tasks" on first invocation) was fixed in-milestone via CEO Condition 3 and closed when T-3 passed validation — it is not a known issue.
 
 ---
 
@@ -119,7 +119,7 @@ BUG-001 (`list` crashed with "no such table: tasks" on first invocation) was fix
 
 - **Estimated**: ~1.5 engineer-days — from the "Estimated Effort" field in the milestone definition (`artifacts/milestone-1-task-crud/README.md`)
 - **Actual**: 3 sessions across 3 calendar days, 2026-04-08 to 2026-04-10 — from the session dates for this milestone in `artifacts/STANDUP.md` (first to last session)
-- **Delta**: The engineering work itself (2026-04-09 and 2026-04-10) matched the ~1.5-day estimate; the third calendar day is the planning session, which the estimate deliberately excluded. The only unplanned engineering cost was the BUG-001 fix in T-3, which stayed inside the same session (loop 1/3, no escalation).
+- **Delta**: The engineering work itself (2026-04-09 and 2026-04-10) matched the ~1.5-day estimate; the remaining calendar day (2026-04-08) is the planning session, which the estimate deliberately excluded. The only unplanned engineering cost was the BUG-001 fix in T-3, which stayed inside the same session (loop 1/3, no escalation).
 
 ### What Went Well
 
@@ -130,7 +130,7 @@ BUG-001 (`list` crashed with "no such table: tasks" on first invocation) was fix
 
 ### What Didn't Go Well
 
-- BUG-002 (`done` silently succeeds on a missing ID) should have been caught by T-4's acceptance criteria. The criteria required "error if ID not found" for `delete` but left the equivalent for `done` implicit; the gap surfaced only in manual smoke testing during the milestone-completion checkpoint.
+- BUG-002 (`done` silently succeeds on a missing ID) should have been caught by T-4's acceptance criteria. The criteria required "error if ID not found" for `delete` but left the equivalent for `done` implicit; the gap surfaced only in the UI agent's UX review at the milestone-completion checkpoint.
 - The migration runner's directory-creation step for `~/.acme-todo/` was added late, after manual testing on Linux — architecture review did not explicitly cover filesystem prerequisites.
 - The performance budget table could not be populated until after T-5 landed, because the benchmark plan depended on end-to-end CLI wiring. Budget tracking was blind for most of the milestone.
 
@@ -147,8 +147,8 @@ No process issues. Every handoff followed the pipeline loop; nothing was escalat
 | Tasks rejected by Product | 0 | Handoff Logs across `artifacts/milestone-1-task-crud/tasks/task-*.md` (Product → Coder return entries) — average rejections per task: 0 |
 | Loop-backs, and what caused them | 1 | `Loop count` Headers across `tasks/task-*.md` — T-3 looped once (1/3) on BUG-001 (first-run crash, per its Handoff Log), triaged Fix Now, resolved in the same session |
 | Escalations to the user | 0 | `blocker` entries in `artifacts/STANDUP.md` for this milestone — none recorded |
-| Architecture doc revisions | 1 | `git log --follow artifacts/milestone-1-task-crud/architecture.md` |
-| UI spec revisions | 1 | `git log --follow artifacts/milestone-1-task-crud/ui.md` |
+| Architecture doc revisions | 0 | `git log --follow artifacts/milestone-1-task-crud/architecture.md` — one commit, the Stage 2a original; the CEO verdict raised no Revision Requests |
+| UI spec revisions | 0 | `git log --follow artifacts/milestone-1-task-crud/ui.md` — one commit, the Stage 2b original; the CEO verdict raised no Revision Requests |
 | Manifest patches during engineering | 0 | Handoff Log entries across `artifacts/milestone-1-task-crud/tasks/task-*.md` noting a Context Manifest addition — no stage had to add a missing reference this milestone |
 
 ---
@@ -172,7 +172,7 @@ No process issues. Every handoff followed the pipeline loop; nothing was escalat
 **Date**: 2026-04-10
 
 **Notes**:
-> Approved with one note: BUG-002 (`done` silent success on a missing ID, Low) fails criterion F5 / scenario T3. Product re-triaged it at this milestone-completion checkpoint and held it Deferred into M2, where it is paired with an error-signaling task. All three CEO Approval Conditions are Verified (1 and 2 by Reviewer, 3 by Product) — none remain open. The milestone closes as "Complete with Deferrals".
+> Approved with one note: BUG-002 (`done` silent success on a missing ID, Low) fails criterion F5 / scenario T3. The UI agent filed it at this checkpoint's UX review; Product triaged it Low and Deferred it into M2, where it is paired with an error-signaling task. All three CEO Approval Conditions are Verified (1 and 2 by Reviewer, 3 by Product) — none remain open. The milestone closes as "Complete with Deferrals".
 
 ---
 

@@ -10,7 +10,7 @@ This file serves as a lightweight continuity log. Before starting each session, 
 
 ## Entry Grammar
 
-This is the **single canonical format** for everything written to this file. All producers — `/agent-plan` stage checkpoints, `/agent-code` and `/agent-task` completion entries, the loop counters from `docs/PIPELINE_LOOP.md`, and the Docs Writer queue — use it.
+This is the **single canonical format** for everything written to this file. All producers — `/agent-plan` stage checkpoints, `/agent-code` and `/agent-task` completion entries, and the Docs Writer queue — use it. (Loop counts live only in each task file's `Loop count` Header — they are not mirrored here.)
 
 **Session sections** are added newest-first at the top of the Log, headed:
 
@@ -31,7 +31,6 @@ where `<skill>` is the pipeline skill running (`agent-plan`, `agent-code`, or `a
 | Type | Meaning | Note format |
 |---|---|---|
 | `progress` | Work completed — a stage finished, a task validated, an artifact written | Free text; name the artifact path where applicable |
-| `loop` | Engineering-loop cycle counter (see `docs/PIPELINE_LOOP.md`) | `Task <id>: loop <k>/3` |
 | `docs` | Documentation work queued for Docs Writer | Free text naming the doc and the needed change |
 | `decision` | A decision worth surfacing beyond the agent's own Decisions Log | Free text |
 | `blocker` | A blocker encountered (or resolved) | Free text; name the blocking dependency or agent |
@@ -47,18 +46,18 @@ Entries under a session heading are appended in the order they happen (oldest fi
 ### 2026-04-10 — agent-code — milestone-1-task-crud
 
 - coder | progress | T-5 complete: argv parser in `src/cli.ts`, entrypoint wiring in `src/index.ts`, `--help` output
-- coder | progress | T-5 test results: `pnpm test` — 42 passed, 0 failed (100% line coverage on `src/commands/`)
+- coder | progress | T-5 test results: `pnpm test` — 30 passed, 0 failed (100% line coverage on `src/commands/`)
 - reviewer | progress | T-5 approved — no findings; Acceptance Criteria Check: 7/7 Met with evidence
 - coder | docs | CLAUDE.md Architecture section needs the final `src/cli.ts` dispatch flow documented ✅
-- reviewer | progress | BUG-002 filed (`bugs/bug-002-done-silent-success.md`, initial severity Low): `done <id>` silently succeeds on a non-existent task ID
-- product | decision | BUG-002 triaged Low and set Deferred — does not affect correctness of normal flows; fix pairs with an M2 error-signaling task
-- reviewer | progress | T-5 closed at Step 3a — all 7 criteria Met, no Product spawn; Status set to Complete — all five tasks Complete
-- ui | progress | UX review written: `artifacts/milestone-1-task-crud/reviews/ux.md` — APPROVED WITH NOTES (BUG-002 noted)
+- agent-code | progress | T-5 closed at Step 3a — all 7 criteria Met, no Product spawn; Status set to Complete — all five tasks Complete
+- ui | progress | UX review written: `artifacts/milestone-1-task-crud/reviews/ux.md` — APPROVED WITH NOTES (one Low finding on the `done` error state)
+- ui | progress | BUG-002 filed from that review (`artifacts/milestone-1-task-crud/bugs/bug-002-done-silent-success.md`, suggested severity Low): `done <id>` silently succeeds on a non-existent task ID
 - ceo | progress | Risk implementation review complete: `artifacts/milestone-1-task-crud/reviews/risk-impl.md` — security lens: parameterized bindings confirmed at every query site; performance lens: both budgets met (list 31ms p50 vs 100ms target); Current-vs-Target recorded for the orchestrator's budget-table transcription. No findings filed.
-- product | progress | Milestone close: `artifacts/milestone-1-task-crud/reviews/close.md` written in one pass — Deferred re-triage held BUG-002 Deferred into M2 with an updated rationale (re-triaged again at M2 `/agent-plan` Stage 1); all three CEO Approval Conditions Verified (1 and 2 by Reviewer, 3 by Product); Status set to Complete with Deferrals
+- product | decision | BUG-002 triaged Low and set Deferred inside the close pass — does not affect correctness of normal flows; fix pairs with an M2 error-signaling task
+- product | progress | Milestone close: `artifacts/milestone-1-task-crud/reviews/close.md` written in one pass — BUG-002 Deferred into M2 (re-triaged at M2 `/agent-plan` Stage 1); all three CEO Approval Conditions Verified (1 and 2 by Reviewer, 3 by Product); Status set to Complete with Deferrals
 - docs-writer | progress | Milestone-completion drain: 4 pending docs entries drained (2 queued during planning, 1 during T-3, 1 during T-5)
 - agent-code | progress | Milestone outcome and 5 Decisions Log rows recorded in `artifacts/AGENT_STATE.md`; no archival needed (first milestone)
-- agent-code | progress | Run complete: M1 closed — 5/5 tasks Complete, 42 tests passing, all CEO Approval Conditions Verified, BUG-002 held Deferred
+- agent-code | progress | Run complete: M1 closed — 5/5 tasks Complete, 30 tests passing, all CEO Approval Conditions Verified, BUG-002 Deferred into M2
 
 ### 2026-04-09 — agent-code — milestone-1-task-crud
 
@@ -69,15 +68,15 @@ Entries under a session heading are appended in the order they happen (oldest fi
 - coder | progress | T-2 complete: `add` command using `.prepare().run(params)` bindings per Approval Condition 1
 - reviewer | progress | T-2 Acceptance Criteria Check: 6/6 criteria + CEO Condition line 1 Met with evidence
 - agent-code | progress | T-2 closed at Step 3a — no Product spawn; Status set to Complete
-- coder | progress | T-3 test results: `pnpm test` — 17 passed, 1 failed; fresh-machine first-run case fails with `SqliteError: no such table: tasks`. Handed off with the failure rather than fixing blind.
-- reviewer | progress | T-3 finding classified as a Defect; BUG-001 filed (`bugs/bug-001-list-first-run-crash.md`, suggested severity High)
+- coder | progress | T-3 test results: `pnpm test` — 14 passed, 1 failed; fresh-machine first-run case fails with `SqliteError: no such table: tasks`. Handed off with the failure rather than fixing blind.
+- reviewer | progress | T-3 finding classified as a Defect; BUG-001 filed (`artifacts/milestone-1-task-crud/bugs/bug-001-list-first-run-crash.md`, suggested severity High)
 - product | progress | BUG-001 triaged Fix Now (final severity High) — first-run experience is a milestone acceptance criterion
 - coder | progress | BUG-001 investigated before fixing: root cause is migrations running only on the `add` path; chose a central `ensureMigrations()` at every command entry over patching `list` alone (Investigation written to the bug file). Fixed in `a8f3d12` — the exact remediation Approval Condition 3 demanded
-- coder | progress | T-3 test results: `pnpm test` — 24 passed, 0 failed; regression test confirmed red at `9d4b1c7` and green at `a8f3d12`
+- coder | progress | T-3 test results: `pnpm test` — 17 passed, 0 failed; regression test confirmed red at `9d4b1c7` and green at `a8f3d12`
 - agent-code | progress | T-3 closed at Step 3a — criteria + Condition 3 line Met with evidence (remediation in `a8f3d12`); BUG-001 advanced per the field-ownership table; Status set to Complete
 - coder | docs | CLAUDE.md Common Pitfalls + Persistence sections need the first-run migration behaviour from BUG-001 ✅
 - coder | progress | T-4 complete: `done` and `delete` commands with parameterized statements
-- reviewer | progress | T-4 Acceptance Criteria Check: 6/7 Met, criterion 6 flagged Product judgment (`done` missing-id coverage pending BUG-002)
+- reviewer | progress | T-4 Acceptance Criteria Check: 6/7 Met, criterion 6 flagged Product judgment (`done` missing-id path uncovered — the command signals nothing to assert against)
 - product | progress | T-4 validated; criterion 6 disposed as in-scope for M2; Status set to Complete — T-5 remains for the next session
 
 ### 2026-04-08 — agent-plan — milestone-1-task-crud
@@ -89,7 +88,7 @@ Entries under a session heading are appended in the order they happen (oldest fi
 - ui | docs | CLAUDE.md Domain-Specific Patterns needs the stdout/stderr and exit-code contract recorded ✅
 - ceo | progress | Stage 3 (risk lenses) complete: `artifacts/milestone-1-task-crud/reviews/risk.md` — security lens 1 High (SQL injection across command handlers) + 1 Low + 1 Informational; performance lens 2 Medium (missing index on `completed`, migration cost on every invocation) + 1 Informational. Both flags set Yes.
 - ceo | decision | Verdict: APPROVED WITH CONDITIONS — three conditions (parameterized SQL; WAL + index; migration on first invocation) in `artifacts/milestone-1-task-crud/reviews/ceo.md`; no revision requests
-- ceo | progress | Stage 4 complete: engineering may begin
+- ceo | progress | Stage 3 (verdict) complete: engineering may begin
 
 ---
 
@@ -97,11 +96,11 @@ Entries under a session heading are appended in the order they happen (oldest fi
 
 | Document | Purpose |
 |----------|---------|
-| `BUGS.md` | Global bug index (one line per bug → its per-bug file) — reference when reporting blockers |
-| `AGENT_STATE.md` | Project state written by the orchestrator (Decisions Log, milestone progress, performance budgets, open questions) — no agent reads it |
-| `milestone-1-task-crud/tasks/` | Milestone 1 per-task files — reference for planned work |
-| `milestone-1-task-crud/reviews/close.md` | Milestone 1 close record — reference when validating completed work |
-| `milestone-1-task-crud/reviews/ceo.md` | Planning sign-off and Approval Conditions |
+| `artifacts/BUGS.md` | Global bug index (one line per bug → its per-bug file) — reference when reporting blockers |
+| `artifacts/AGENT_STATE.md` | Project state written by the orchestrator (Decisions Log, milestone progress, performance budgets, open questions) — no agent reads it |
+| `artifacts/milestone-1-task-crud/tasks/` | Milestone 1 per-task files — reference for planned work |
+| `artifacts/milestone-1-task-crud/reviews/close.md` | Milestone 1 close record — reference when validating completed work |
+| `artifacts/milestone-1-task-crud/reviews/ceo.md` | Planning sign-off and Approval Conditions |
 
 ---
 

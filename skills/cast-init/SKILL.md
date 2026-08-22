@@ -2,7 +2,7 @@
 name: cast-init
 description: >-
   Install or migrate the CAST multi-agent workflow (Claude Agent Staged Team) into the
-  current project: 8 specialist subagents, three pipeline skills (/agent-plan,
+  current project: 7 specialist subagents, three pipeline skills (/agent-plan,
   /agent-code, /agent-task) plus the /cast-doctor and /cast-release maintenance skills, a
   docs/templates/artifacts scaffold, and a parameterized CLAUDE.md — with project
   detection, a user-approved migration plan, and placeholder substitution. Use when the user says "install CAST", "adopt CAST", "set up CAST",
@@ -11,7 +11,7 @@ description: >-
   produces the migration plan without changing files.
 license: MIT
 metadata:
-  version: "3.0.0"
+  version: "3.0.1"
   source: "https://github.com/Raxvis/CAST"
 ---
 
@@ -47,7 +47,7 @@ Act as an expert migration assistant for the CAST template: adopt CAST into an e
 CAST's canonical structure in a target project is:
 
 - `CLAUDE.md` at project root — top-level context for every session
-- `.claude/agents/` — 8 subagent definitions with YAML frontmatter and per-agent model settings (all `model: inherit` by default — agents run on the session model)
+- `.claude/agents/` — 7 subagent definitions with YAML frontmatter and per-agent model settings (all `model: inherit` by default — agents run on the session model)
 - `.claude/skills/` — three pipeline skills (`/agent-plan`, `/agent-code`, `/agent-task`) plus `/cast-doctor`, the run-anytime install health check and documentation audit, and `/cast-release`, release-prep automation
 - `docs/` — reference material only (PRD, conventions, topic-specific guides)
 - `templates/` — reusable document templates (architecture, UI spec, milestone, task, and bug-report files) copied into `artifacts/` as instances
@@ -56,7 +56,7 @@ CAST's canonical structure in a target project is:
 Two rules are load-bearing:
 
 1. **`docs/` vs `artifacts/` split.** `docs/` is reference material; `artifacts/` is work output. Never put work in `docs/` or reference material in `artifacts/`. Every CAST agent and pipeline enforces this.
-2. **Planning vs engineering phases.** `/agent-plan` runs the planning stage (Product → Architecture + UI → Risk → CEO verdict); `/agent-code` runs the engineering stage (Coder → Reviewer with defect/issue routing); `/agent-task` runs a mini engineering pipeline for one-off work with no planning stage.
+2. **Planning vs engineering phases.** `/agent-plan` runs the planning stage (Product → Architecture + UI → CEO: risk lenses + verdict); `/agent-code` runs the engineering stage (Coder → Reviewer with defect/issue routing); `/agent-task` runs a mini engineering pipeline for one-off work with no planning stage.
 
 ## Safety rules
 
@@ -231,7 +231,7 @@ Write the final report to `artifacts/adoption-report.md` using the template in `
 ## Reference files
 
 - **`references/discovery.md`** — Phase 1 checklists and the inventory template
-- **`references/roster.md`** — 8-agent roster, tiers, alias tables, pipeline-skills mapping
+- **`references/roster.md`** — 7-agent roster, tiers, alias tables, pipeline-skills mapping
 - **`references/dispositions.md`** — docs/templates/artifacts/root disposition tables and the plan-file format
 - **`references/execution.md`** — Phase 5 install mechanics and customization-preservation rules
 - **`references/validation.md`** — Phase 6 checklist and the Phase 7 report template

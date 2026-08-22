@@ -41,7 +41,8 @@
     (optional) sections may be omitted.
 -->
 
-<!-- Placeholders — see README.md → Placeholder Reference -->
+<!-- Placeholders: bracketed UPPER_SNAKE_CASE tokens are project values filled at
+     adoption; bracketed lowercase names are per-use fill-ins. -->
 
 # [M#-T##]: [Task Name]
 
@@ -97,7 +98,7 @@ _The complete read set for this task (`docs/STAGE_CONTRACT.md` §1). Cite sectio
 
 _Append-only; newest last; one entry per stage transition. Entry format, the 10-line cap, and its exceptions (Coder's Test Results block, Reviewer's per-finding lines and Acceptance Criteria Check): `docs/STAGE_CONTRACT.md` §2._
 
-### 1. [from-agent] → [to-agent] — [YYYY-MM-DD]
+### 1. [from-agent] -> [to-agent] — [YYYY-MM-DD]
 
 ---
 

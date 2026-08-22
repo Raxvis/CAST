@@ -31,7 +31,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `medium`. Raise to `high` for a task the plan flagged as complex or a defect whose mechanism is not obvious.
+**Effort:** `medium`, fixed in frontmatter. A plan-flagged complex task or a defect whose mechanism is not obvious is called out in the invocation prompt instead; a permanent re-pin to `high` is a human edit to this file.
 
 **Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format. That file is the only process document you read.
 
@@ -75,11 +75,17 @@ You handle all three return paths. Each is a normal pass: implement, test, commi
 
 | Return path | What it asks for |
 |---|---|
-| **Fix Now defect** (from Product triage) | Fix the defect named in the bug file. Fill the bug file's Resolution → Commit with the fix hash. |
+| **Fix Now defect** (from Product triage) | Fix the defect named in the bug file, then set its Status to `Fixed` and fill the Resolution fields — Commit, Files Changed, Regression Notes. |
 | **Issue** (from Reviewer) | Behavior-preserving restructuring, within the flagged Issue only. Cite the convention or architectural principle that justifies each change. Introduce no abstraction beyond the Issue's scope — extracting shared logic to resolve flagged duplication is in scope; adjacent cleanups are handoff notes. |
 | **Criteria rejection** (from Product) | Address the specific criterion cited. Nothing else. |
 
 Findings of different kinds from one review are resolved in **one pass**, not one pass each.
+
+### The bug file is yours from triage onward
+
+Reviewer files the symptom; every field after that is yours. The ownership table at the top of `artifacts/BUGS.md` is canonical — it lists each field you fill and the Status each step sets. You also maintain that file's **Regression Checklist**, verifying its critical paths after a significant fix or refactor.
+
+Writes to `artifacts/BUGS.md` itself — the index Status cell and the Regression Checklist — follow the shared-root rule: make them directly in serial execution, but when the invocation says the task is running in parallel, record them in your handoff entry's Open items and let the orchestrator apply them. The bug file itself you always write directly.
 
 ### Defect fixes: prove the test red
 
@@ -92,13 +98,14 @@ A regression test that has never failed proves nothing. Before handing off a def
 
 ### Defect fixes: investigate before you change code
 
-When the defect's mechanism is not obvious from the diff — an intermittent failure, a symptom several modules away from its cause, anything you would otherwise attack by guess-and-check against the test suite — investigate first and write the finding into the bug file's **Investigation** section before editing:
+When the defect's mechanism is not obvious from the diff — an intermittent failure, a symptom several modules away from its cause, anything you would otherwise attack by guess-and-check against the test suite — set the bug's Status to `In Progress` and write the finding into the bug file's **Investigation** section before editing:
 
 - **Root cause** — why the defect occurs, not where it surfaces.
 - **Affected modules.**
 - **Approach chosen, and what else you considered** — one line each. Two options are usually enough; the point is to show the chosen fix was chosen, not to enumerate.
+- The remaining Investigation fields the `artifacts/BUGS.md` ownership table assigns you.
 
-Reproduce before you declare it fixed. "Did not reproduce this run" is not "fixed" — say which you mean.
+Reproduce before you declare it fixed. "Did not reproduce this run" is not "fixed" — say which you mean. An investigation that cannot reproduce the defect ends at Status `Cannot Reproduce`, never `Fixed`.
 
 ## Handoff entry
 

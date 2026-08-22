@@ -4,8 +4,9 @@
   This file is intentionally agnostic — it does not assume frontend, backend, CLI,
   mobile, library, or data-pipeline. Topic-specific patterns live in
   docs/FRONTEND.md, docs/BACKEND.md, docs/CLI.md, and docs/MOBILE.md; keep the
-  one(s) that match your project and delete the rest. Mobile projects should
-  import both docs/FRONTEND.md and docs/MOBILE.md.
+  one(s) that match your project and delete the rest. Mobile projects should keep
+  both docs/FRONTEND.md and docs/MOBILE.md. Kept topic docs are read on demand
+  through task Context Manifests — keeping one does not mean importing it.
 
   HOW TO CUSTOMIZE:
   - Replace every [PLACEHOLDER] token with project-specific values.
@@ -13,8 +14,8 @@
     (the "Adopted with CAST v[CAST_VERSION]" line in Directory Conventions) — leave it as-is.
   - See README.md for the full placeholder reference table.
   - Delete sections not relevant to your project (e.g., Persistence for a stateless service).
-  - Update Memory Imports to match your actual docs and to include the topic-specific
-    doc(s) your project needs (FRONTEND, BACKEND, CLI, MOBILE).
+  - Leave Memory Imports empty unless a document is needed unprompted in most sessions
+    AND cannot be inferred from the code — see the note in that section before adding one.
   - Add project-specific patterns under "Domain-Specific Patterns" as they emerge.
   - This comment block is stripped automatically by /cast-init at install.
 -->

@@ -23,7 +23,7 @@ HOW TO CUSTOMIZE:
 
 ## Model Configuration
 
-**Effort:** `high`. Raise to `xhigh` for a milestone introducing a new subsystem, a schema migration, or a cross-cutting contract change.
+**Effort:** `high`, fixed in frontmatter. A milestone introducing a new subsystem, a schema migration, or a cross-cutting contract change is called out in the invocation prompt instead; a permanent re-pin to `xhigh` is a human edit to this file.
 
 **Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format.
 

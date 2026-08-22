@@ -5,8 +5,9 @@
            work); this file assigns IDs and tracks one line per bug so triage sweeps read
            one small file instead of every report. This file is also the SINGLE CANONICAL
            definition of the bug lifecycle, severity scale, and field ownership — agents
-           (Reviewer, Coder, Product, CEO) reference these rules rather
-           than restating them. The per-bug entry format lives in templates/BUG_REPORT.md.
+           (Reviewer, UI, CEO, Coder, Product) reference these rules rather
+           than restating them. Three agents file bugs: Reviewer at a task's review step,
+           UI from the milestone UX review, and the CEO from the risk implementation review. The per-bug entry format lives in templates/BUG_REPORT.md.
 
   HOW TO CUSTOMIZE:
   - Replace [PROJECT_NAME] with your project name throughout.
@@ -40,7 +41,7 @@ Every bug is a standalone file created from `templates/BUG_REPORT.md` and filed 
 
 | Owner | Writes | Status set |
 |---|---|---|
-| **Reviewer** | Creates the bug file from `templates/BUG_REPORT.md` and adds its index row: ID, Description, Expected, Actual, Steps to Reproduce, Platform, Frequency, Evidence, Likely Files, Regression, Related Issues, initial Severity | `New` (or `Duplicate` at filing, when the report duplicates an existing entry — cite the original ID in Related Issues) |
+| **Reviewer** (at a task's review step), **UI** (from the UX review), **CEO** (from the risk implementation review) | Creates the bug file from `templates/BUG_REPORT.md` and adds its index row: ID, Description, Expected, Actual, Steps to Reproduce, Platform, Frequency, Evidence, Likely Files, Regression, Related Issues, initial Severity | `New` (or `Duplicate` at filing, when the report duplicates an existing entry — cite the original ID in Related Issues) |
 | **Product** | Triages: sets final Severity, accepts/rejects/defers; re-triages `Deferred` entries at `/agent-code` milestone completion and `/agent-plan` Stage 1 | `Triaged` (or `Won't Fix` / `Deferred`) |
 | **Coder (investigation)** | Investigation fields: Root Cause, Affected Module(s), Alternative Solutions, Recommended Fix, Assigned To, Investigation Date | `In Progress` (or `Cannot Reproduce` after an investigation that fails to reproduce the bug) |
 | **Coder** | Resolution fields at fix time: Commit, Files Changed, Regression Notes | `Fixed` |

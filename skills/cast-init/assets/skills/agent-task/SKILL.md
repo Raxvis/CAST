@@ -80,7 +80,7 @@ If in doubt, run `/agent-plan` first — for a small feature that needs a few de
 
 ## Model Compatibility
 
-Each stage runs on the model set in that agent's file (default: `inherit` — the session model). Invoke only the agents this pipeline names, exactly as written: keep the task to its stated description (out-of-scope discoveries go in the Handoff Log), honor the bail-out rule above instead of spawning planning agents ad hoc, and never fold a stage into direct work. Effort is per agent file (Coder `medium`, Reviewer `high`; raise Coder to `high` for a fix whose mechanism is not obvious — `xhigh` is rarely warranted for one-off work). Per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
+Each stage runs on the model set in that agent's file (default: `inherit` — the session model). Invoke only the agents this pipeline names, exactly as written: keep the task to its stated description (out-of-scope discoveries go in the Handoff Log), honor the bail-out rule above instead of spawning planning agents ad hoc, and never fold a stage into direct work. Effort is per agent file (Coder `medium`, Reviewer `high`) and fixed at that pin — an invocation cannot raise it. When a fix's mechanism is not obvious, say so in the Coder invocation instead of reaching for more effort; a project whose one-off work is routinely subtle can permanently re-pin `agents/coder.md`, though `xhigh` is rarely warranted here. Per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
 
 ## Input
 

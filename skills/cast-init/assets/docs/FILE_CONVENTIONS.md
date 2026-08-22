@@ -41,6 +41,8 @@ When deciding where a file belongs, ask:
 
 Agents write work outputs to `artifacts/`, read reference material from `docs/`, and read document templates from `templates/`. `/agent-plan`, `/agent-code`, and `/agent-task` all write exclusively under `artifacts/`; none of them should ever write to `docs/` or `templates/`.
 
+Two documented exceptions write to `docs/`, and nothing else does: **Docs Writer**, launched at the task- and milestone-completion checkpoints to drain the `docs:` queue, edits reference docs and registers new ones in `docs/README.md`; and **`/cast-release`**, which maintains `docs/CHANGELOG.md`. Nothing writes to `templates/` — a template is edited by hand when the process itself changes.
+
 ---
 
 ## Directory Structure
@@ -74,6 +76,7 @@ docs/
 
 ```
 templates/
+  README.md                      # Template index — what each skeleton is for and where instances go
   ARCH_MODULE.md                 # Module architecture template
   ARCH_SYSTEM.md                 # System architecture template
   ARCH_DATA_SCHEMA.md            # Data schema template
@@ -213,7 +216,7 @@ Each task file is an instance of `templates/TASK.md`: a self-contained unit of w
 | Specifying UI for a milestone | UI writes `artifacts/milestone-{N}-{slug}/ui.md` |
 | Filing risk findings | CEO writes `artifacts/milestone-{N}-{slug}/reviews/risk.md` (both lenses, its risk pass) |
 | Recording a CEO verdict | CEO writes `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |
-| Logging a bug | Reviewer creates `bugs/bug-{XXX}-{slug}.md` in the current milestone (or `artifacts/one-off/bugs/`) and adds its index row to `artifacts/BUGS.md` |
+| Logging a bug | The filer — Reviewer at a task's review step, UI from the UX review, or the CEO from the risk implementation review — creates `bugs/bug-{XXX}-{slug}.md` in the current milestone (or `artifacts/one-off/bugs/`) and, in serial execution, adds its index row to `artifacts/BUGS.md` (during parallel execution the orchestrator applies the row) |
 | Closing a milestone | Product writes `artifacts/milestone-{N}-{slug}/reviews/close.md` in one pass (per-task validation, milestone validation, completion summary, retrospective) |
 | Reviewing implemented UI at milestone completion | UI writes `artifacts/milestone-{N}-{slug}/reviews/ux.md` (UI-flagged milestones only) |
 | Reviewing the implementation for risk at milestone completion | CEO writes `artifacts/milestone-{N}-{slug}/reviews/risk-impl.md` — security controls verified and budgets measured (only when a `risk.md` flag line says Yes) |

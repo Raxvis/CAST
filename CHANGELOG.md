@@ -8,6 +8,52 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [3.0.1] — 2026-08-21
+
+Post-release integrity pass over 3.0.0, driven by a six-dimension audit (roster/pipeline drift, path integrity, token/CI sync, skill↔agent contracts, documentation staleness, orchestration cost). The 3.0.0 restructure updated the payload skills and `roster.md` but never propagated to the `references/` install docs, the plugin manifests, TROUBLESHOOTING, the un-stripped template instruction blocks, or the example fixture — CI passed throughout because every defect sat in prose no check read. Re-run `/cast-init` (Update in place) to pick up the installer fixes.
+
+### Fixed — the `/cast-init` install path
+
+- **`references/execution.md` walked a 15-agent install list** (rows 1–15) against a 7-row roster, and its post-loop verification re-enumerated "the 15 names". Both now say 7.
+- **`/cast-release` was never installed**: `execution.md`'s skill loop listed four skills and `validation.md` verified the same four, so the omission passed validation silently. Both lists now carry all five, with cast-release's placeholder handling added.
+- **`docs/STAGE_CONTRACT.md` had no row in `dispositions.md`'s mapping table** — the most-referenced doc in the payload (cited by all 7 agents and both engineering skills) was only installed by the bulk-copy fast path, not by a plan-driven install. Row added; `/cast-doctor` and the installer now agree.
+- **The agent-file merge rules described the v2 org-chart structure** (Purpose/Goals/Authority/Inputs/Outputs) that v3 forbids — an Update-in-place would have resurrected v2 sections. Rewritten to the v3 shape (Model Configuration / Role / duties / Boundaries), with v2-only user content routed to AGENT_STATE, the Context Manifest, or a clearly-marked custom appendix.
+- **`execution.md` ordered Memory Imports repopulated with every installed doc** — restoring the exact always-on context cost 3.0.0 removed. The install now leaves the block empty by design (topic docs are named in the Phase 7 report as candidates); `validation.md`'s check 7, which would have failed every install under the corrected rule, was rewritten in the same pass.
+- The CLAUDE.md merge-rule section list matched the v2 template (`Tech Stack`, `Git Workflow`, `File Naming`); now matches the shipped v3 sections.
+
+### Fixed — engineering-loop bounds and guards
+
+- **The test-gate reject path could loop forever**: `PIPELINE_LOOP.md` routed an absent *or failing* Test Results block back to Coder without incrementing the loop counter, contradicting its own failing-tests rule four lines up. The uncounted return is now a once-per-task free retry for a *missing* block only; failures always take the counted path. Mirrored in `agent-code`.
+- **Amendments were exempt from every bound** (loop counter and circuit breaker). Now capped at 2 per task; the third pauses and escalates like the loop cap.
+- **`/agent-code` Pre-Flight demanded `ui.md` whenever the ui agent was installed**, but `/agent-plan` legitimately skips writing it (no UI-flagged task, or light mode) — a false "missing planning artifact" stop. Pre-Flight now keys on task flags, matching the producer.
+- **The milestone UX review launched `ui` without checking it is installed**; it now carries the same guard Stage 2b already had.
+- **Reviewer raced the `BUGS.md` index under parallel execution**: `reviewer.md` unconditionally appended the index row and computed the next ID, while the skill forbade exactly that — a rule Reviewer never read. The conditional now lives in `reviewer.md`, and `STAGE_CONTRACT.md` gained a §7 stating the parallel queue-instead-of-write rule for all shared-root files (it is the one process doc agents read).
+- **"Who closes a bug" had three answers** across the payload; the orchestrator's Verified → Closed flip is now stated everywhere (`cast-release`, `artifacts/README.md`, fixture).
+- **Impossible per-invocation effort raises**: five files told the orchestrator or the agent to "raise effort" for hard tasks, which frontmatter cannot do. All reworded to prompt-emphasis in the invocation plus the permanent re-pin option.
+- Coder's bug-file duties widened to match the canonical `BUGS.md` ownership table (Status transitions, resolution fields, Regression table); `STAGE_CONTRACT.md`'s reply format now carries the planning-stage Manifest Rows exception and the milestone-grain Handoff Log carve-out.
+
+### Fixed — stale 3.0.0 prose (three systemic clusters)
+
+- **"8 agents" (actual: 7)** in `plugin.json`, `marketplace.json` (which still said **15** and omitted `/cast-release`), the `/cast-init` skill description, README, and `MODEL_OPTIMIZATION.md`.
+- **"Stage 4" for the CEO review (actual: Stage 3)** in nine places — `TROUBLESHOOTING` (including a prescription to re-run Risk and CEO as two launches; it is one CEO re-launch), `dispositions.md`, `artifacts/README.md`, `templates/CEO_REVIEW.md` and `templates/README.md` (both ship un-stripped), and the fixture.
+- **Memory Imports described as v2** in nine places (repo CLAUDE.md, README, TROUBLESHOOTING, `docs/README.md`, the FRONTEND/MOBILE/CLI topic docs): all now state the list ships empty and a doc is activated by adding a bare `@docs/…` line.
+- The removed "a CEO Approval Condition forces Step 3b" trigger survived in `skills/README.md` and `MILESTONE_CLOSE.md` (un-stripped, so Product read it and re-introduced the spawn); both now match `PIPELINE_LOOP.md`.
+- The 3.0.0 CHANGELOG entry itself misdescribed shipped v3 (Risk as a shipping role in two effort lists, "8 agent effort lines", and a Stage 3 description from the superseded 8-agent draft); corrected in place.
+- Template hygiene: `MILESTONE_DEFINITION.md`'s condition table gained the Verified By / Verified At columns Product is told to fill (and `Addressed` — which nothing ever set — left the vocabulary); `CEO_REVIEW.md`'s two incompatible skip-string forms unified; `ARCH_MODULE.md`'s "measured by Risk" attributed to the CEO; the ASCII `->` handoff arrow restored in `TASK.md`; instance-destination lines added to the four design templates; the install-unsafe "README.md → Placeholder Reference" pointer replaced with a self-contained note in all ten skeletons; `[PERSISTENCE]` unified to `[PERSISTENCE_LAYER]`.
+- ~25 further single-file corrections across `docs/` and `artifacts/` (contradictory docs-write rules in `FILE_CONVENTIONS.md`, the surviving `PRD.md` Revision History table, `AGENT_STATE.md`'s "three things"/four-tables mismatch, `FIRST_RUN.md`'s missed one-off cleanup, wrong Step 3a attributions, and more — see the PR).
+
+### Fixed — example fixture internal consistency
+
+Binary name unified to `acme` (73 occurrences), exit-code contract 0/1/2/3 propagated to the docs the specs contradicted, the schema-versioning decision now matches what the architecture implements, BUG-002's chronology and filer (UI agent, at the 04-10 UX review) made consistent across seven artifacts, one reconciled test-total series, a phantom commit hash replaced, CEO condition Verified By/At cells filled, revision counts zeroed to match the log, the v2 `loop` STANDUP entry type removed, relative paths repaired, and the condition table converted to the new 6-column shape.
+
+### Added — CI guards for the drift class that survived two releases
+
+- **Prose agent counts**: the count is derived from `ls assets/agents/` and asserted against `plugin.json`, `marketplace.json`, the skill description, the README badge, and every numeric "N agents" claim in README/SKILL.md.
+- **Install-reference completeness**: every `assets/docs/*.md` must have a `dispositions.md` row; every `assets/skills/*` directory must appear in `execution.md` and `validation.md`.
+- **Stage-numbering trap**: any live "Stage 4" outside CHANGELOG history fails.
+- **Removed-trigger trap**: any resurrected "CEO Approval Condition launches/forces Product/3b" phrasing fails.
+- The reverse-token-lint allowlist was pruned of 44 dead entries (240 → 196) so retired names cannot silently readmit future tokens.
+
 ## [3.0.0] — 2026-08-19
 
 **Breaking.** The roster goes from 15 agents to 7, the engineering loop from four stages to two, and every agent file is rewritten. A clean task's fixed setup cost drops from ~72,000 tokens (v2.1) to **~10,000**.
@@ -73,7 +119,7 @@ These were live bugs, not just inefficiency:
 
 ### Changed — effort policy retuned for Opus 5
 
-`xhigh` is **opt-in**, not a standing default on four roles. On Opus 5 it is the most expensive setting in the family — thinking is on by default and lowering effort *does not shorten the response* — so a standing `xhigh` buys reasoning tokens without buying concision back. New defaults: Architect/UI/Risk/CEO/Reviewer `high`, **Coder `medium`**, Product `high` at planning and `low` for triage, Docs Writer `low`. Each agent names the cases that warrant raising it.
+`xhigh` is **opt-in**, not a standing default on four roles. On Opus 5 it is the most expensive setting in the family — thinking is on by default and lowering effort *does not shorten the response* — so a standing `xhigh` buys reasoning tokens without buying concision back. New defaults: Architect/UI/CEO/Reviewer `high`, **Coder `medium`**, Product `high` at planning and `low` for triage, Docs Writer `low`. Each agent names the cases that warrant raising it.
 
 Coder at `medium` is the change most likely to raise an eyebrow. The reasoning: Coder implements against a task file that already carries the design decisions (made by Architect at `high`), an explicit Files list, and acceptance criteria — the hard thinking happened upstream. The safety net is the loop, not the effort setting: Reviewer runs at `high` and reads the diff independently. Spending `xhigh` on the stage that writes code and `high` on the stage that checks it inverts where the leverage is.
 
@@ -112,18 +158,18 @@ The docs-writer drains at both completion checkpoints are now **conditional on a
 
 ### Changed — planning stages are conditional in full mode too
 
-Light mode already gated UI and Risk on the right flags; full mode ran both unconditionally, so a full-mode backend milestone paid a UI launch for a spec no manifest cites. Both modes now use the same tests — Stage 2b runs only when a task is UI-flagged; Stage 3 only when the plan has a security surface or an applicable performance budget (when unsure, run it). The CEO reviews every skip and remains the backstop (REVISION REQUIRED naming the stage). Stage 3 also no longer waits for the orchestrator's manifest application (Risk never reads a manifest) — it starts as soon as 2a/2b complete. A full planning run is now 4–6 launches depending on what the plan actually needs, down from 6 unconditional.
+Light mode already gated UI and Risk on the right flags; full mode ran both unconditionally, so a full-mode backend milestone paid a UI launch for a spec no manifest cites. Both modes now use the same tests — Stage 2b runs only when a task is UI-flagged; the CEO's risk lenses (Stage 3, Part 1) run only when the plan has a security surface or an applicable performance budget (when unsure, run them). The CEO reviews every skip and remains the backstop (REVISION REQUIRED naming the stage). Stage 3 starts after the orchestrator's manifest application (2c) — the CEO's manifest gate reads the applied Context Manifests. A full planning run is now 3–4 launches depending on what the plan actually needs, down from 6 unconditional.
 
 ### Changed — always-on context trimmed again
 
 - The installed root `CLAUDE.md` — paid once per session **and once per subagent spawn** — drops ~80 lines: the 28-line essay explaining why Memory Imports ship empty is now 5 lines plus a `docs/DESIGN_RATIONALE.md` entry; the Tech Stack / Style Conventions / Git Workflow sections that `/cast-doctor`'s own Tier-B table prescribes trimming ship pre-trimmed (the placeholder pseudocode example is gone — a convention example the codebase itself demonstrates better).
-- The `docs/MODEL_OPTIMIZATION.md` pointer is removed from all 8 agent effort lines — a 193-line human-facing policy doc dangling inside a read set the stage contract declares closed, on a model that follows pointers. It stays in `agents/README.md`, where humans read it.
+- The `docs/MODEL_OPTIMIZATION.md` pointer is removed from all 7 agent effort lines — a 193-line human-facing policy doc dangling inside a read set the stage contract declares closed, on a model that follows pointers. It stays in `agents/README.md`, where humans read it.
 - The per-agent "Documentation queue" section (duplicated across 7 agent files) is now one rule in `docs/STAGE_CONTRACT.md`.
 - The ~10-line Model Compatibility block, near-verbatim in all three pipeline skills, collapses to three lines plus the pointer.
 
 ### Changed — per-role effort is now enforced frontmatter
 
-Claude Code agent frontmatter supports `effort: low | medium | high | xhigh | max` (sub-agents docs, Frontmatter Configuration). The roster now ships the key set per role — Coder `medium`, Reviewer/Architect/UI/Risk/CEO `high`, Docs Writer `low` — so the v3 effort policy is platform-enforced instead of advisory prompt guidance. A frontmatter effort is fixed per agent type (the orchestrator cannot raise it per invocation), so the "Raise to" cases are handled by prompt emphasis or a deliberate temporary re-pin; Product ships without the key because its `high` planning / `low` triage split cannot be expressed in one value. `MODEL_OPTIMIZATION.md` names `model:` and `effort:` as the two enforceable per-role levers, and `/cast-doctor` S1 now checks effort-value legality. The right-sizing guidance no longer suggests pinning Docs Writer to Haiku: the Context Inference Bar is applied per document against its **weakest consumer**, and Docs Writer cites `docs/FILE_CONVENTIONS.md` and `docs/README.md` — a Haiku pin would permanently block Tier-B prunes on those docs, forfeiting more than it saves. Sonnet-class is the floor for utility pins; the roster ships all-`inherit` for models either way.
+Claude Code agent frontmatter supports `effort: low | medium | high | xhigh | max` (sub-agents docs, Frontmatter Configuration). The roster now ships the key set per role — Coder `medium`, Reviewer/Architect/UI/CEO `high`, Docs Writer `low` — so the v3 effort policy is platform-enforced instead of advisory prompt guidance. A frontmatter effort is fixed per agent type (the orchestrator cannot raise it per invocation), so the "Raise to" cases are handled by prompt emphasis or a deliberate temporary re-pin; Product ships without the key because its `high` planning / `low` triage split cannot be expressed in one value. `MODEL_OPTIMIZATION.md` names `model:` and `effort:` as the two enforceable per-role levers, and `/cast-doctor` S1 now checks effort-value legality. The right-sizing guidance no longer suggests pinning Docs Writer to Haiku: the Context Inference Bar is applied per document against its **weakest consumer**, and Docs Writer cites `docs/FILE_CONVENTIONS.md` and `docs/README.md` — a Haiku pin would permanently block Tier-B prunes on those docs, forfeiting more than it saves. Sonnet-class is the floor for utility pins; the roster ships all-`inherit` for models either way.
 
 ### Changed — a performance pass over the loop's remaining leaks
 

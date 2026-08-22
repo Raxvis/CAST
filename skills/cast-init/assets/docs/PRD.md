@@ -328,13 +328,6 @@ They are listed here to inform architectural decisions made during MVP developme
 
 [Insert platform-specific notes, constraints, or store submission requirements.]
 
-### C. Revision History
-
-| Version | Change Summary |
-|---------|---------------|
-| [VERSION] | [CHANGE_SUMMARY] |
-| [VERSION] | [CHANGE_SUMMARY] |
-
 ---
 
 _Last updated: [YYYY-MM-DD]_

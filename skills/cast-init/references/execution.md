@@ -62,7 +62,7 @@ If the plan includes a rename of `features/` (or similar) → `artifacts/`, exec
 
 ## 5.4 — Install agent files
 
-Walk the canonical 15-agent list in the order given by the roster table in `roster.md` (rows 1 through 15, top to bottom — that is the install order) and execute the planned action for each. **Do not skip any name on this list.** If the plan has no action for one of these names, that is a bug in the Phase 3 plan — stop and re-enter Phase 3 to add the missing action.
+Walk the canonical 7-agent list in the order given by the roster table in `roster.md` (rows 1 through 7, top to bottom — that is the install order) and execute the planned action for each. **Do not skip any name on this list.** If the plan has no action for one of these names, that is a bug in the Phase 3 plan — stop and re-enter Phase 3 to add the missing action.
 
 For each agent:
 
@@ -73,23 +73,26 @@ For each agent:
 5. If the action is **Update in place**: read the existing file, identify custom sections, replace CAST-owned sections with CAST's current versions, leave custom sections untouched. **Role-mismatch guard**: before merging, compare the existing file's frontmatter `description` (and its evident role) against the roster's Role column for that name. If they diverge — e.g. `.claude/agents/coder.md` exists but is not a coder-role agent — the file is occupying a canonical CAST path without fulfilling the CAST role: never silently update in place. Treat it as an Ask (rename the user's file aside and Create fresh, or merge deliberately), stopping to get the user's answer if the Phase 3 plan did not already resolve it.
 6. Verify YAML frontmatter is valid (`name`, `description`, `model`, `tools` keys present, properly quoted description; `tools` omits `Task`).
 
-After completing the loop, **re-enumerate the 15 names and confirm each `.claude/agents/<name>.md` exists**. If any file is missing, that means the action was skipped. Create it from the canonical template before moving on to 5.5.
+After completing the loop, **re-enumerate the 7 names and confirm each `.claude/agents/<name>.md` exists**. If any file is missing, that means the action was skipped. Create it from the canonical template before moving on to 5.5.
 
 **Standard CAST agent sections** (these are CAST-owned; replace during update):
 
 - Template instructions comment block and placeholder pointer comment (stripped at install per the global rule — remove, never carry over)
+- YAML frontmatter (`name`, `description`, `model`, `effort`, `tools`)
 - Agent Activation blockquote
 - Title heading (`# [PROJECT_NAME] — <Role> Agent`)
-- `**Model**:` line
-- Purpose
-- Goals
-- Authority
-- Inputs
-- Outputs
-- Templates (where applicable)
-- Interaction Rules (CAST's core bullets; merge user additions)
-- State (pointer to `artifacts/AGENT_STATE.md`; agent files no longer carry live tables — see the migration rule in 5.7)
-- Decisions Log / Current Work / Future Work tables, if present in a pre-1.2 file (they migrate to `artifacts/AGENT_STATE.md` per 5.7, not into the new agent file)
+- `## Model Configuration` — the effort default and when to raise it, the pointer to `docs/STAGE_CONTRACT.md`, and the role's binding rules
+- `## Role`
+- The duty sections — `## Duty N — <name>`, or `## What a pass does` and the role-specific sections beside it (output formats, checklists, rubrics)
+- `## Boundaries` (where the role carries one)
+
+Agent files carry **no** Purpose, Goals, Authority, Inputs, or Outputs sections. Those were v2's org-chart sections and v3 removed them deliberately (see `<CAST_SOURCE>/agents/README.md` → Agent File Structure); never re-add them as CAST structure during a merge, and never carry a v2 file's copies forward as if they were CAST-owned.
+
+**Legacy content to migrate, not to install** (found in pre-v3 agent files; none of it belongs in the new file):
+
+- Interaction Rules — superseded by `docs/STAGE_CONTRACT.md`, which every v3 agent reads instead. Genuinely project-specific bullets the user added survive as a custom section (below); CAST's own bullets are dropped.
+- State sections and Decisions Log / Current Work / Future Work tables, if present in a pre-1.2 file — populated rows migrate to `artifacts/AGENT_STATE.md` per 5.7; post-1.2 agent files carry neither the tables nor a pointer to them.
+- Purpose / Goals / Authority / Inputs / Outputs — the role content they restate is already carried by the v3 Role and Model Configuration sections and by the task file. Drop CAST's boilerplate; anything the user wrote that is not restatement goes to the custom section below.
 
 **Custom sections** (preserve verbatim): anything the user added outside the standard set. Common examples:
 
@@ -104,10 +107,10 @@ Place preserved custom sections in a `## Project Customizations (preserved)` sec
 
 ## 5.5 — Install pipeline skills
 
-For each of `agent-plan`, `agent-code`, `agent-task`, `cast-doctor`:
+For each of `agent-plan`, `agent-code`, `agent-task`, `cast-doctor`, `cast-release`:
 
 1. Read from `<CAST_SOURCE>/skills/<name>/SKILL.md`. **Never install `<CAST_SOURCE>/skills/README.md`** — it is payload documentation, not a skill.
-2. Substitute project-specific values including `[PROJECT_NAME]`, `[TEST_CMD]`, and `[MAX_LOOP_COUNT]` (default 3 if not specified). `cast-doctor` carries only `[PROJECT_NAME]` — it never runs project code, so it takes no test command or loop cap.
+2. Substitute project-specific values including `[PROJECT_NAME]`, `[TEST_CMD]`, and `[MAX_LOOP_COUNT]` (default 3 if not specified). `cast-doctor` carries only `[PROJECT_NAME]` — it never runs project code, so it takes no test command or loop cap. `cast-release` carries `[PROJECT_NAME]`, `[TEST_CMD]`, `[BUILD_CMD]`, and `[VERSIONING_SCHEME]` (default: semantic versioning) — but no loop cap. The `[VERSION]`, `[DATE]`, and `[MILESTONE_NAME]` tokens inside its fenced release-record skeleton are per-use form-fill tokens filled per release; leave them.
 3. Write to `.claude/skills/<name>/SKILL.md` (create the directory). Keep the frontmatter `name` field equal to the directory name — Claude Code requires the match.
 4. If updating an existing similar-named pipeline: preserve any project-specific pre-flight or post-completion steps by moving them to an appendix section labelled `## Project-Specific Extensions (preserved from pre-CAST version)`.
 5. **Pre-1.0 migration**: if `.claude/commands/<name>.md` exists (the pipelines were slash commands before CAST v1.0.0), treat it as the existing counterpart — merge its preserved custom sections into the new SKILL.md per rule 4, then propose Delete of the old command file. The delete requires explicit user approval (per the safety rules), but leaving both files registers a duplicate `/<name>`, so flag it clearly rather than silently keeping both.
@@ -141,10 +144,10 @@ Special handling because `CLAUDE.md` is where user project identity lives.
 
 1. If no `CLAUDE.md` exists: read `<CAST_SOURCE>/root/CLAUDE.md`, substitute detected values, write to project root.
 2. If `CLAUDE.md` exists: read it. Identify user content vs CAST content.
-   - **User content** (preserve verbatim): Project Overview, Tech Stack, Common Pitfalls (preserve user additions), Project Structure, Style Conventions, Domain-Specific Patterns, Persistence, Git Workflow, Dependencies, File Naming.
+   - **User content** (preserve verbatim): Project Overview, Stack & Commands, Common Pitfalls (preserve user additions), Project Structure, Style Conventions, Domain-Specific Patterns, Persistence, Git & Dependencies.
    - **CAST content** (install or update): Directory Conventions section (docs/ vs artifacts/), Memory Imports block.
 3. Append the CAST sections if missing; update them if out-of-date.
-4. Update Memory Imports to reference every installed doc, including the detected topic doc(s) (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`). Mobile projects should import both `docs/FRONTEND.md` and `docs/MOBILE.md`.
+4. **Leave the Memory Imports list empty.** The block ships with its explanatory paragraph and an inert comment, and no bare `@path` lines — that is deliberate, not an omission (rationale: `docs/DESIGN_RATIONALE.md` → "Memory Imports ship empty"). Every bare import is paid at session start **and** on every subagent spawn, so the choice belongs to the user, once they know which document they actually reach for unprompted. Do not add the installed topic doc(s) (`docs/FRONTEND.md`, `docs/BACKEND.md`, `docs/CLI.md`, `docs/MOBILE.md`) or any other doc. If the existing `CLAUDE.md` already carries user-written import lines, preserve them verbatim — an empty list is the install default, not something to enforce over a user's own choices. At most, name the installed topic doc(s) in the Phase 7 report as candidates the user could import later.
 5. **Version stamp**: the CAST section carries the line `Adopted with CAST v[CAST_VERSION]` — substitute `[CAST_VERSION]` with this skill's `metadata.version` frontmatter value. This is the canonical stamp Phase 1 reads on later runs to detect the installed version; on an upgrade or forced re-run, replace the old version in that line. Never leave the token unfilled and never drop the line during a merge.
 
 ## 5.9 — Placeholder substitution pass
@@ -163,11 +166,12 @@ After every file is written:
 
 When merging an existing agent file with a CAST template:
 
-1. **Frontmatter**: use CAST's YAML (name, description, model tier). If the existing file has a custom model pin that the user explicitly chose, keep it and note the divergence from CAST defaults in the adoption report.
-2. **Standard sections** (Purpose, Goals, Authority, Inputs, Outputs, Interaction Rules, Templates, State): use CAST's content as the base structure. If the existing file has additional bullets or custom rules inside these sections, merge them as additional bullets at the end of the relevant section.
-3. **Custom appendix sections**: preserve verbatim, placed in the `## Project Customizations (preserved)` section appended at the end of the agent file (see 5.4).
-4. **Tables in Inputs/Outputs**: if the user has added rows, keep them. If CAST has rows the user's file lacks, add them. Never remove a row the user added.
-5. **Decisions Log**: always preserve every existing entry — populated rows move to the agent's section in `artifacts/AGENT_STATE.md` (see 5.7). Then add a new row to that agent's **Decision Log section in `artifacts/AGENT_STATE.md`** (not to the agent file — post-1.2 agent files carry no log tables) noting the CAST adoption: `<date> | Adopted CAST template | N/A | Structure now matches canonical CAST <version> |`. For `<version>`, use the version from this skill's frontmatter (`metadata.version` at the top of SKILL.md). Never hard-code a version number in this row.
+1. **Frontmatter**: use CAST's YAML (name, description, model tier, effort, tools). If the existing file has a custom model pin that the user explicitly chose, keep it and note the divergence from CAST defaults in the adoption report.
+2. **Standard sections** (Model Configuration, Role, the duty sections, Boundaries): use CAST's content as the base structure. If the existing file has additional bullets or custom rules inside a section CAST still has, merge them as additional bullets at the end of that section.
+3. **v2-only sections** (Purpose, Goals, Authority, Inputs, Outputs, Interaction Rules, Templates, State): CAST no longer has them, so there is nothing to merge into. Never re-add them as CAST structure. Route their content instead: state tables and logs to `artifacts/AGENT_STATE.md` (see 5.7); anything that is really per-task input or output to the task file's Context Manifest, where the pipelines look for it; genuinely project-specific rules the user wrote to the custom appendix below, under a heading that names where they came from (e.g. `### Interaction rules (from pre-v3 agent file)`). CAST's own v2 boilerplate is dropped, not relocated.
+4. **Custom appendix sections**: preserve verbatim, placed in the `## Project Customizations (preserved)` section appended at the end of the agent file (see 5.4).
+5. **Tables inside a preserved section**: if the user has added rows, keep them. If CAST has rows the user's file lacks, add them. Never remove a row the user added.
+6. **Decisions Log**: always preserve every existing entry — populated rows move to the agent's section in `artifacts/AGENT_STATE.md` (see 5.7). Then add a new row to that agent's **Decision Log section in `artifacts/AGENT_STATE.md`** (not to the agent file — post-1.2 agent files carry no log tables) noting the CAST adoption: `<date> | Adopted CAST template | N/A | Structure now matches canonical CAST <version> |`. For `<version>`, use the version from this skill's frontmatter (`metadata.version` at the top of SKILL.md). Never hard-code a version number in this row.
 
 ## CLAUDE.md
 
@@ -178,7 +182,7 @@ When merging an existing `CLAUDE.md`:
 3. **Style conventions**: keep the user's version verbatim.
 4. **Common Pitfalls**: preserve user pitfalls; add CAST's universal pitfalls (hidden mutable state, silent error swallowing, etc.) if the user's list is empty or very short.
 5. **Directory Conventions section**: install CAST's version. This is the docs/artifacts split explanation and must appear verbatim.
-6. **Memory Imports block**: install CAST's version, adjusting the import list to match the actual docs installed in this project.
+6. **Memory Imports block**: install CAST's version — explanatory paragraph and inert comment, with the import list left empty (see 5.8.4). Preserve any bare `@path` lines the user already wrote, and add none.
 7. **Domain-specific patterns**: preserve the user's section verbatim if present.
 
 ## Pipeline skills

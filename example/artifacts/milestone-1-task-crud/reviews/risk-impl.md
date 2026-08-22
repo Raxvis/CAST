@@ -2,7 +2,7 @@
 
 **Date**: 2026-04-10
 **Reviewer**: CEO Agent — risk lenses (claude-opus-5, `/agent-code` milestone-completion checkpoint)
-**Diff reviewed**: commits prefixed `M1-T01` … `M1-T05` (`3f6c2a9`…`2b6d0e7`)
+**Diff reviewed**: commits prefixed `M1-T01` … `M1-T05` (`b7d41e0`…`2b6d0e7`)
 **Triggered by**: both flag lines in `risk.md` set to Yes
 
 ---
@@ -26,12 +26,12 @@ Measured on the author's MacBook, Node 20.11, seeded database of 100 tasks, 10 r
 | # | Metric | Target | Current | Status |
 |---|---|---|---|---|
 | P1 | Warm `list` latency @ 100 tasks | < 100ms | 31ms (p50), 38ms (p95) | **Pass** — `idx_tasks_completed` present in the migration and used (`EXPLAIN QUERY PLAN` reports `SEARCH tasks USING INDEX idx_tasks_completed`) |
-| P2 | Warm `add` latency (migration no-op path) | < 100ms | 27ms (p50) | **Pass** — `ensureMigrations()` short-circuits on `PRAGMA user_version` as recommended; no exception-driven path |
+| P2 | Warm `add` latency (migration no-op path) | < 100ms | 27ms (p50) | **Pass** — `ensureMigrations()` short-circuits on a single `schema_version` read as recommended; no exception-driven path |
 | — | Cold first run (creates DB + schema) | not budgeted | 94ms | Recorded for M2's budget-setting |
 
 `artifacts/AGENT_STATE.md` → Performance Budget Tracking updated with the Current and Status columns.
 
-**New findings**: None. P2's remediation was implemented as recommended — the no-op path is a single pragma read.
+**New findings**: None. P2's remediation was implemented as recommended — the no-op path is a single `schema_version` read. The architecture's fifth budget row, DB file size at 1,000 rows, was not exercised: the seeded benchmark tops out at 100 tasks. Carried to M2's budget-setting rather than filed.
 
 ---
 

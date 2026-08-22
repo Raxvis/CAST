@@ -51,7 +51,7 @@ Milestone 1 introduces the foundational layers of Acme Todo: a typed task model,
 
 ```
   ┌────────────────────────────────────────────────────────┐
-  │                     acme-todo CLI                      │
+  │                        acme CLI                        │
   │                                                        │
   │  ┌───────────────┐      ┌────────────────────────┐    │
   │  │  src/index.ts │─────▶│        src/cli.ts      │    │
@@ -178,12 +178,12 @@ Timestamps are stored as ISO 8601 TEXT (see Decisions Log for rationale).
 
 ## Message Flow
 
-Primary use case — `acme-todo add "buy milk"`:
+Primary use case — `acme add "buy milk"`:
 
 ```
 Actor / Source          Action                              Result
 ─────────────────────────────────────────────────────────────────────────────
-USER               →   acme-todo add "buy milk"        →   process starts
+USER               →   acme add "buy milk"             →   process starts
 src/index.ts       →   awaits runCli(argv)             →   owns process.exit
 src/cli.ts         →   routes "add" to commands/add    →   handler invoked
 commands/add.ts    →   validates title, opens DB       →   migrated handle
@@ -248,9 +248,9 @@ Command handlers return a numeric exit code. Conventions:
 | `2` | Unknown / internal error | I/O error, corrupt DB, unhandled exception |
 | `3` | Task not found | `done 99` or `delete 99` when id does not exist |
 
-Every command wraps its body in a `try`/`catch`. Caught `UserError` maps to exit 1; caught `NotFoundError` maps to exit 3; any other thrown value falls through to exit 2, with the message written to `stderr` as `acme-todo: <message>`.
+Every command wraps its body in a `try`/`catch`. Caught `UserError` maps to exit 1; caught `NotFoundError` maps to exit 3; any other thrown value falls through to exit 2, with the message written to `stderr` as `acme: <message>`.
 
-**First-run resilience (CEO Condition 3).** `src/commands/list.ts` must not throw when the database file does not yet exist. Because every command calls `openDatabase()` and `openDatabase` unconditionally calls `runMigrations` after opening the handle, an invocation like `acme-todo list` on a machine with no prior state will transparently create `~/.acme-todo/tasks.db`, run migrations, and print the empty header — never a stack trace. This behavior is called out explicitly in the `list` command's test plan.
+**First-run resilience (CEO Condition 3).** `src/commands/list.ts` must not throw when the database file does not yet exist. Because every command calls `openDatabase()` and `openDatabase` unconditionally calls `runMigrations` after opening the handle, an invocation like `acme list` on a machine with no prior state will transparently create `~/.acme-todo/tasks.db`, run migrations, and print the empty header — never a stack trace. This behavior is called out explicitly in the `list` command's test plan.
 
 ---
 
@@ -258,7 +258,7 @@ Every command wraps its body in a `try`/`catch`. Caught `UserError` maps to exit
 
 Acme Todo is a single-user CLI; there is no server process and no long-lived handle. Each invocation opens the DB, runs one statement, and closes. Still, WAL mode (enabled by migrations) provides two benefits:
 
-1. **Read-while-write.** If the user pipes `acme-todo list` while another shell runs `acme-todo add ...`, the reader sees a consistent snapshot without blocking the writer.
+1. **Read-while-write.** If the user pipes `acme list` while another shell runs `acme add ...`, the reader sees a consistent snapshot without blocking the writer.
 2. **Crash safety.** WAL's checkpointing behavior is more robust against partial writes than the default rollback journal.
 
 No cross-process locking is implemented. SQLite's file-level locking is sufficient for the expected usage pattern (one interactive user, occasional concurrent shells). If we later ship a daemon mode, this section must be revisited.
@@ -282,9 +282,10 @@ There are no network integrations, background services, or other processes in M1
 
 | Metric | Target | Notes |
 |--------|--------|-------|
-| Command latency (cold start) | < 100 ms | Includes Node startup + migration idempotency check |
-| Command latency (warm) | < 50 ms | Second invocation in the same shell session |
-| `list` latency at 1,000 rows | < 100 ms | Must use `idx_tasks_completed`, not a table scan (CEO Condition 2) |
+| Warm `list` latency @ 100 tasks | < 100 ms | The PRD's headline latency requirement. Must use `idx_tasks_completed`, not a table scan (CEO Condition 2) |
+| Warm `add` latency (migration no-op path) | < 100 ms | The idempotency check on an already-migrated DB must be a single `schema_version` read |
+| Cold first run (creates DB + schema) | not budgeted | Node startup dominates and the path runs once per machine; measured at the risk implementation review and recorded for M2 budget-setting |
+| Test suite runtime | < 10 s | The full Vitest suite runs at every handoff, so it has to stay cheap |
 | DB file size at 1,000 rows | < 1 MB | ISO-8601 TEXT timestamps accepted within this budget |
 
 The CEO agent measures these targets at the milestone-completion risk implementation review; the orchestrator fills the Current/Status columns in `artifacts/AGENT_STATE.md` → Performance Budget Tracking.
@@ -307,8 +308,8 @@ The CEO agent measures these targets at the milestone-completion risk implementa
 ### Manual test checklist
 
 - [ ] First invocation on a clean `$HOME` creates `~/.acme-todo/tasks.db` and succeeds
-- [ ] `ACME_TODO_DB=/tmp/other.db acme-todo add test` uses the override path
-- [ ] `acme-todo list` piped to `head` produces plain text
+- [ ] `ACME_TODO_DB=/tmp/other.db acme add test` uses the override path
+- [ ] `acme list` piped to `head` produces plain text
 - [ ] Two concurrent shells (`add` + `list`) do not deadlock
 
 ---
@@ -318,7 +319,7 @@ The CEO agent measures these targets at the milestone-completion risk implementa
 | Date | Decision | Alternatives Considered | Rationale | Impact |
 |------|----------|--------------------------|-----------|--------|
 | 2026-04-08 | Use `better-sqlite3` as the SQLite driver | `node:sqlite` (Node 22 experimental), `sql.js` (WASM), `sqlite3` (async) | Synchronous API fits the CLI model (no event-loop gymnastics), zero runtime deps after install, battle-tested, fastest in benchmarks | Commands stay linear and easy to reason about; prebuilt binaries need to cover macOS/Linux/Windows — verified for Node 20+ |
-| 2026-04-08 | Custom argv parser in `cli.ts` instead of a library | `commander`, `yargs`, `meow`, `sade` | Five commands and a `--help` do not justify a dependency; parser is ~30 LOC; zero surface for supply-chain risk | CLI stays dependency-light; if we add > 10 commands we will revisit |
+| 2026-04-08 | Custom argv parser in `cli.ts` instead of a library | `commander`, `yargs`, `meow`, `sade` | Four commands and a `--help` do not justify a dependency; parser is ~30 LOC; zero surface for supply-chain risk | CLI stays dependency-light; if we add > 10 commands we will revisit |
 | 2026-04-08 | Store timestamps as ISO 8601 TEXT, not INTEGER unix seconds | INTEGER epoch, REAL Julian day | Human-debuggable when inspecting the DB by hand; sortable lexically; round-trips through `Date.toISOString()` without precision loss | Slightly larger rows (~20 bytes vs 8); negligible at expected scale |
 | 2026-04-08 | Enable WAL mode in migrations and add `idx_tasks_completed` | Default rollback journal; no index (table-scan acceptable at small N) | Required by CEO Approval Condition 2; WAL also gives us read-while-write for free; index keeps `list` (filter by `completed = 0`) fast as history grows | Migration runner must set the pragma; adds one B-tree to maintain on writes |
 | 2026-04-08 | Commands return exit codes; `index.ts` owns `process.exit` | Commands call `process.exit` directly | Keeps command functions pure and unit-testable; lets integration tests assert on return values without spawning subprocesses | One extra indirection in `index.ts`; worth it for test ergonomics |

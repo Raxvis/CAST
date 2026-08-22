@@ -22,11 +22,11 @@ Every bug is a standalone file created from `templates/BUG_REPORT.md` and filed 
 
 | Owner | Writes | Status set |
 |---|---|---|
-| **Reviewer** | Creates the bug file from `templates/BUG_REPORT.md` and adds its index row: ID, Description, Expected, Actual, Steps to Reproduce, Platform, Frequency, Evidence, Likely Files, Regression, Related Issues, initial Severity | `New` (or `Duplicate` at filing, when the report duplicates an existing entry — cite the original ID in Related Issues) |
+| **Reviewer** (at the task review step), **UI** (from the UX review), **CEO** (from the risk implementation review) | Creates the bug file from `templates/BUG_REPORT.md` and adds its index row: ID, Description, Expected, Actual, Steps to Reproduce, Platform, Frequency, Evidence, Likely Files, Regression, Related Issues, initial Severity | `New` (or `Duplicate` at filing, when the report duplicates an existing entry — cite the original ID in Related Issues) |
 | **Product** | Triages: sets final Severity, accepts/rejects/defers; re-triages `Deferred` entries at `/agent-code` milestone completion and `/agent-plan` Stage 1 | `Triaged` (or `Won't Fix` / `Deferred`) |
 | **Coder (investigation)** | Investigation fields: Root Cause, Affected Module(s), Approach Chosen, Alternatives Considered, Investigation Date — written before a non-obvious fix | `In Progress` (or `Cannot Reproduce` after an investigation that fails to reproduce the bug) |
 | **Coder** | Resolution fields at fix time: Commit, Files Changed, Regression Notes | `Fixed` |
-| **Coder / Product** | Coder's red→green evidence confirms the fix; Product signs off | `Verified` → `Closed` |
+| **Coder / orchestrator** | Coder's red→green evidence confirms the fix (`Verified`); the orchestrating skill flips `Verified` → `Closed` when the resolving task passes validation — a transcription of facts already on record (red→green evidence, green final suite, task validated), not a judgment. Product re-reviews every closed bug at the milestone close | `Verified` → `Closed` |
 
 A bug file never moves between directories — it stays where it was filed and its **Status** field advances (mirrored in the index).
 

@@ -1,21 +1,21 @@
 <!-- TEMPLATE INSTRUCTIONS
   FILE: CEO_REVIEW.md
   PURPOSE: CEO planning-review template. The CEO Agent copies this skeleton during
-           /agent-plan Stage 4, works through every checklist section against the full
-           set of planning artifacts, and issues the go/no-go verdict that gates the
-           engineering stage.
+           /agent-plan Stage 3 — the same launch that produces reviews/risk.md — works
+           through every checklist section against the full set of planning artifacts,
+           and issues the go/no-go verdict that gates the engineering stage.
 
   HOW TO CUSTOMIZE:
   - Replace [MILESTONE_NAME] with the milestone under review.
-  - Fill in every Inputs Reviewed path — all five inputs are mandatory; write "None"
-    only when a review stage produced no findings file. Exceptions: the UI Spec row
-    reads "N/A — no ui agent installed" when the project has no ui agent, and a
-    conditionally skipped stage's row (light mode, or a full-mode skip) reads
-    "N/A — <stage> skipped: <reason>".
+  - Fill in every Inputs Reviewed path — all five rows are mandatory. Two rows have a
+    fixed non-path form: the UI Spec row reads "N/A — no ui agent installed" when the
+    project has no ui agent, and any conditionally skipped stage's row (light mode, or a
+    full-mode skip — including the Risk Review row when the risk lenses did not run)
+    reads "N/A — skipped: <reason>", the same string agents/ceo.md prescribes.
   - Work through all five checklist sections. Do not skip any. Section 3 accepts
     "N/A — no ui agent installed" as its content in no-ui projects; Sections 3
-    and 4 accept "N/A — <stage> skipped: <reason>" for a conditionally skipped
-    stage (a flagged-in stage gets a real section).
+    and 4 accept "N/A — skipped: <reason>" for a conditionally skipped stage
+    (a flagged-in stage gets a real section).
   - Record Revision Requests when returning REVISION REQUIRED, and Approval Conditions
     (with a Verified By owner) when returning APPROVED WITH CONDITIONS.
   - Record the verdict as the single `**Verdict**:` line in the Verdict section, with
@@ -27,7 +27,8 @@
     (optional) sections may be omitted. The CEO gate checks required sections.
 -->
 
-<!-- Placeholders — see README.md → Placeholder Reference -->
+<!-- Placeholders: bracketed UPPER_SNAKE_CASE tokens are project values filled at
+     adoption; bracketed lowercase names are per-use fill-ins. -->
 
 # CEO Review: [MILESTONE_NAME]
 
@@ -41,7 +42,7 @@
 - Task Breakdown: [PATH_TO_TASKS_DOC — list every tasks/task-{T}-{slug}.md file reviewed]
 - Architecture: [PATH_TO_ARCH_DOC]
 - UI Spec: [PATH_TO_UI_SPEC — or "N/A — no ui agent installed" for no-ui projects]
-- Risk Review: [PATH_OR_NONE]
+- Risk Review: [PATH_TO_RISK_REVIEW — or "N/A — skipped: <reason>" when the risk lenses did not run]
 
 **Review Cycle**: [v1 for first review; v2, v3, etc. for re-reviews of revised plans]
 

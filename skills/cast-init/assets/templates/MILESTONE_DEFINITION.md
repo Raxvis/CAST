@@ -14,13 +14,14 @@
     relevant requirements document (PRD section, feature spec, etc.).
   - Fill in every field in the Header and Body — empty fields are a signal to
     the CEO that planning is incomplete.
-  - Keep this template-instruction block when copying the file; fill in the body,
-    then delete this block from the instance file.
+  - Copy the file with this instruction block intact and use it while filling in the
+    body, then delete the block from the instance before handing the milestone off.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.
 -->
 
-<!-- Placeholders — see README.md → Placeholder Reference -->
+<!-- Placeholders: bracketed UPPER_SNAKE_CASE tokens are project values filled at
+     adoption; bracketed lowercase names are per-use fill-ins. -->
 
 # [PROJECT_NAME] — [MILESTONE_NAME]
 
@@ -120,11 +121,11 @@ _One row per task file under `tasks/`. Deliberately no status column — task st
 
 ## CEO Approval Conditions (required)
 
-_Filled after the CEO verdict (`reviews/ceo.md`). Coder tracks each condition during engineering; Reviewer and Product verify at completion. **Product owns the flip to Verified**: while writing the close record (`reviews/close.md`) at the milestone-completion checkpoint, Product confirms each row's evidence and sets its Status to Verified (with verifier and date) — or leaves it and lists it under the close record's Known Issues. Tasks a condition names carry a `../README.md § CEO Approval Conditions` row in their Context Manifest._
+_Filled after the CEO verdict (`reviews/ceo.md`). The orchestrator transcribes one row per row of that review's Approval Conditions table — the columns line up so nothing is lost: `#`, `Condition`, and `Verified By` come straight across, and `Verified At` holds `—` until the condition is verified. Coder tracks each condition during engineering; Reviewer's Acceptance Criteria Check carries one line per condition a task's manifest cites. **Product owns the flip to Verified**: while writing the close record (`reviews/close.md`) at the milestone-completion checkpoint, Product confirms each row's evidence, sets Status to Verified, and fills Verified At with the date — or leaves the row Open and lists it under the close record's Known Issues. Tasks a condition names carry a `../README.md § CEO Approval Conditions` row in their Context Manifest._
 
-| Condition | Source | Status |
-|-----------|--------|--------|
-| [Condition text, or "None — verdict was APPROVED"] | `reviews/ceo.md` | Open / Addressed / Verified |
+| # | Condition | Source | Verified By | Verified At | Status |
+|---|-----------|--------|-------------|-------------|--------|
+| [1] | [Condition text, or "None — verdict was APPROVED"] | `reviews/ceo.md` | [owner named in the CEO review] | [YYYY-MM-DD, or "—" while Open] | Open / Verified |
 
 ---
 

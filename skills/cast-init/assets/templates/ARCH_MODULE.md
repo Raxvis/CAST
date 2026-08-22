@@ -12,11 +12,14 @@
   - Replace [FRAMEWORK], [LANGUAGE], [STATE_LIBRARY], [PERSISTENCE_LAYER] with your stack.
   - Fill in the Data Model, API Contract, and Integration sections with real details.
   - Status values: Draft / In Review / Approved / Implemented
+  - Instance destination: artifacts/milestone-{N}-{slug}/arch-{slug}.md — a supplemental
+    instance linked from the milestone's architecture.md. Never fill this template in place.
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted. The CEO gate checks required sections.
 -->
 
-<!-- Placeholders — see README.md → Placeholder Reference -->
+<!-- Placeholders: bracketed UPPER_SNAKE_CASE tokens are project values filled at
+     adoption; bracketed lowercase names are per-use fill-ins. -->
 
 # [PROJECT_NAME] — Architecture Spec: [MODULE_NAME]
 
@@ -36,7 +39,7 @@
 
 [Describe what this module does, why it exists, and what problem it solves. 2–4 sentences.]
 
-**Related documents:** If this module has a UI, see the related `UI_SPEC.md` document. If this module defines a data schema, see the related `ARCH_DATA_SCHEMA.md` document.
+**Related documents:** If this module has a UI, see the milestone's `ui.md` (or the supplemental `ui-{slug}.md` covering it). If this module defines a data schema, see the supplemental `arch-{slug}.md` that documents it.
 
 ### Scope (required)
 
@@ -204,7 +207,7 @@ State fields owned or updated by this module's outputs:
 
 ## Performance Budget (required)
 
-Budgets: see the system-level table in the `ARCH_SYSTEM.md` instance and the live Performance Budget Tracking table in `artifacts/AGENT_STATE.md` (measured by Risk at implementation review; transcribed by the orchestrator).
+Budgets: see the system-level table in the milestone's `architecture.md` and the live Performance Budget Tracking table in `artifacts/AGENT_STATE.md` (measured by the CEO at the risk implementation review, recorded in `reviews/risk-impl.md`; transcribed by the orchestrator).
 
 ---
 

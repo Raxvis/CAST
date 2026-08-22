@@ -81,7 +81,7 @@ and must enable WAL mode plus an index on `completed` to satisfy CEO Condition 2
 - **Read next**: Manifest only
 - **Open items**: None
 - **Acceptance Criteria Check**:
-  - [1] `Task` type exported from `src/types/task.ts` with all 5 fields. — Met — `src/types/task.ts:3-9` (`3f6c2a9`)
+  - [1] `Task` type exported from `src/types/task.ts` with all 5 fields. — Met — `src/types/task.ts:3-9` (`b7d41e0`)
   - [2] `runMigrations` is safe to invoke repeatedly — second call is a no-op. — Met — `migrations.test.ts` › "second call is a no-op" (`b7d41e0`)
   - [3] `PRAGMA journal_mode = WAL` is set on the connection. — Met — `src/db/migrations.ts:18`; `migrations.test.ts` › "WAL pragma set"
   - [4] Index `idx_tasks_completed` exists on the `completed` column after migration. — Met — `src/db/schema.ts:24`; `migrations.test.ts` › "index present"

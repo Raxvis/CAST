@@ -7,7 +7,8 @@
   - Replace [PROJECT_NAME] with the name of your project.
   - Add or remove rows if you add or delete templates.
   - Do NOT fill these templates in place — copy each one into artifacts/ first.
-  - Delete this comment block before committing if you prefer a clean index.
+  - This comment block is stripped automatically by /cast-init at install — unlike the
+    template skeletons beside it, this index installs as documentation.
 -->
 
 # [PROJECT_NAME] — Document Templates
@@ -29,13 +30,13 @@ filled in place — copy first, then edit the copy.
 |---|---|---|---|
 | `MILESTONE_DEFINITION.md` | Product | `/agent-plan` Stage 1 | `artifacts/milestone-{N}-{slug}/README.md` — the milestone's highest-order document |
 | `TASK.md` | Product | `/agent-plan` Stage 1 (one instance **per task**); `/agent-task` (one-off tasks) | `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md`, or `artifacts/one-off/task-{slug}.md` |
-| `ARCH_MODULE.md` | Architect | `/agent-plan` Stage 2a | `artifacts/milestone-{N}-{slug}/architecture.md` (or `arch-{slug}.md` for supplemental docs) |
-| `ARCH_SYSTEM.md` | Architect | `/agent-plan` Stage 2a | `artifacts/milestone-{N}-{slug}/architecture.md` (or `arch-{slug}.md` for supplemental docs) |
-| `ARCH_DATA_SCHEMA.md` | Architect | `/agent-plan` Stage 2a | `artifacts/milestone-{N}-{slug}/architecture.md` (or `arch-{slug}.md` for supplemental docs) |
+| `ARCH_SYSTEM.md` | Architect | `/agent-plan` Stage 2a — the milestone architecture document | `artifacts/milestone-{N}-{slug}/architecture.md` |
+| `ARCH_MODULE.md` | Architect | `/agent-plan` Stage 2a — supplemental module depth, when the milestone needs it | `artifacts/milestone-{N}-{slug}/arch-{slug}.md` |
+| `ARCH_DATA_SCHEMA.md` | Architect | `/agent-plan` Stage 2a — supplemental schema depth, when the milestone needs it | `artifacts/milestone-{N}-{slug}/arch-{slug}.md` |
 | `UI_SPEC.md` | UI | `/agent-plan` Stage 2b | `artifacts/milestone-{N}-{slug}/ui.md` (or `ui-{slug}.md` for supplemental screen/component specs) |
-| `BUG_REPORT.md` | Reviewer | Any pipeline, when a defect is filed (one instance **per bug**) | `artifacts/milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md`, or `artifacts/one-off/bugs/bug-{XXX}-{slug}.md`; indexed in `artifacts/BUGS.md` |
+| `BUG_REPORT.md` | Reviewer, UI, or CEO | Any pipeline, when a defect is filed (one instance **per bug**) | `artifacts/milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md`, or `artifacts/one-off/bugs/bug-{XXX}-{slug}.md`; indexed in `artifacts/BUGS.md` |
 | `MILESTONE_CLOSE.md` | Product | `/agent-code` milestone-completion checkpoint, in one launch (per-task validation, milestone validation, completion summary, retrospective; its validation checks double as the *criteria* Product applies per task at Step 3b — per-task outcomes go to the task file's Status plus a STANDUP `progress` entry, with no per-task document) | `artifacts/milestone-{N}-{slug}/reviews/close.md` |
-| `CEO_REVIEW.md` | CEO | `/agent-plan` Stage 4 | `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |
+| `CEO_REVIEW.md` | CEO | `/agent-plan` Stage 3 (the verdict pass of the launch that also writes `reviews/risk.md`) | `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |
 | `UX_REVIEW.md` | UI | `/agent-code` milestone-completion checkpoint (once per milestone; only milestones with UI-flagged tasks) | `artifacts/milestone-{N}-{slug}/reviews/ux.md` |
 
 ---
@@ -47,7 +48,9 @@ filled in place — copy first, then edit the copy.
 2. **Copy** it to the correct location inside the milestone's directory
    (`artifacts/milestone-{N}-{slug}/`) under the naming pattern in
    `docs/FILE_CONVENTIONS.md` — or under `artifacts/one-off/` for `/agent-task` work.
-3. Fill in the copy. Never edit the template in `templates/` directly.
+3. Delete the leading `<!-- TEMPLATE INSTRUCTIONS -->` comment block from the copy — it is
+   guidance for filling the skeleton, not content of the instance.
+4. Fill in the copy. Never edit the template in `templates/` directly.
 
 ---
 

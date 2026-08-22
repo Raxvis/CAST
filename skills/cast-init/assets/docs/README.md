@@ -58,10 +58,10 @@ These documents describe how the project is built and the conventions that gover
 ## Topic-Specific Technical Documents
 
 These four files are scoped to a project type rather than being universal. **Keep the
-one(s) that match your project and delete the rest.** The shipped `CLAUDE.md` lists all
-four as inert backticked paths inside a comment — an import only fires as a bare `@path`
-line, so copy the relevant path out of the comment as its own bare `@docs/X.md` line to
-load the matching patterns into session context.
+one(s) that match your project and delete the rest.** They are read on demand — agents open
+them when a task manifest cites them, and the shipped `CLAUDE.md` Memory Imports block is
+empty. To load one of these into every session instead, add a bare `@docs/<FILE>.md` line
+to that block; an import only fires as a bare `@path` line.
 
 | File | Description |
 |------|-------------|
@@ -104,7 +104,7 @@ life of the project rather than per-work-item artifacts.
 Live work tracking — the active bug tracker and the rolling session log — lives in
 `artifacts/`, not here:
 
-- `artifacts/BUGS.md` — global bug index; per-bug files live beside the work that surfaced them (Reviewer files them, Product triages, Coder investigates and fixes)
+- `artifacts/BUGS.md` — global bug index; per-bug files live beside the work that surfaced them (Reviewer, UI, and the CEO file them, Product triages, Coder investigates and fixes, the orchestrator closes)
 - `artifacts/STANDUP.md` — rolling session progress log
 - `artifacts/AGENT_STATE.md` — project state written by the orchestrating skill (Decisions Log, milestone progress, performance budgets, open questions). **No agent reads it.**
 
@@ -125,7 +125,7 @@ appropriate `artifacts/` subdirectory first.
 | `templates/UI_SPEC.md` | Template for specifying a UI screen or component | `artifacts/milestone-{N}-{slug}/ui.md` or `ui-{slug}.md` |
 | `templates/MILESTONE_DEFINITION.md` | Template for the milestone definition file (what and why) | `artifacts/milestone-{N}-{slug}/README.md` |
 | `templates/TASK.md` | Template for the per-task file (how; one file per task) | `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` |
-| `templates/BUG_REPORT.md` | Template for per-bug reports, filed by Reviewer and indexed in `artifacts/BUGS.md` | `artifacts/milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md`, or `artifacts/one-off/bugs/` |
+| `templates/BUG_REPORT.md` | Template for per-bug reports, filed by Reviewer, UI, or the CEO and indexed in `artifacts/BUGS.md` | `artifacts/milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md`, or `artifacts/one-off/bugs/` |
 | `templates/MILESTONE_CLOSE.md` | Template for the milestone close record — per-task validation, milestone validation, completion summary, and retrospective, written by Product in one pass at the `/agent-code` milestone-completion checkpoint | `artifacts/milestone-{N}-{slug}/reviews/close.md` |
 | `templates/CEO_REVIEW.md` | Template for the CEO's planning-stage review and verdict | `artifacts/milestone-{N}-{slug}/reviews/ceo.md` |
 | `templates/UX_REVIEW.md` | Template for UI's UX review of a milestone's implemented screens — written once per milestone at the `/agent-code` milestone-completion checkpoint, only for milestones with UI-flagged tasks | `artifacts/milestone-{N}-{slug}/reviews/ux.md` |

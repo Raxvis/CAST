@@ -10,7 +10,11 @@ Per-agent models and tool lists are pre-configured in each agent file's YAML fro
 not placeholders. The `tools:` line is deliberate enforcement — every list omits the Task
 tool, which makes "do not spawn subagents" a hard guarantee rather than an instruction.
 Every agent defaults to `model: inherit` (it runs on the session model); role
-differentiation comes from the frontmatter `effort:` key. See docs/MODEL_OPTIMIZATION.md.
+differentiation comes from the frontmatter `effort:` key. Product is the one exception — it
+ships without the key, because its high-planning / low-triage split cannot be expressed as
+one fixed value, so it follows the session effort and its own prompt-body guidance. An
+`effort:` value is fixed for that agent type and cannot be raised per invocation.
+See docs/MODEL_OPTIMIZATION.md.
 -->
 
 # [PROJECT_NAME] — Agent System Overview
@@ -51,7 +55,7 @@ v2 routed conflicts through a Validator agent. v3 escalates to the user: an unre
 
 | Section | Purpose |
 |---|---|
-| **Model Configuration** | Effort default and when to raise it; the pointer to `docs/STAGE_CONTRACT.md`; the role's binding rules |
+| **Model Configuration** | The frontmatter effort pin and what an exceptionally hard task does instead of raising it; the pointer to `docs/STAGE_CONTRACT.md`; the role's binding rules |
 | **Role** | What this agent owns, in a few lines |
 | **Duties / What a pass does** | The actual work, step by step |
 | **Boundaries** | What this agent may **not** do |
@@ -192,10 +196,12 @@ The hard rule: **`docs/` is reference, `templates/` is skeletons, `artifacts/` i
 | Requirements, conventions, design rationale | `docs/` | Docs Writer |
 | Reusable document skeletons | `templates/` | (not modified during work) |
 | Milestone definitions, design docs, reviews, task files, bug files | `artifacts/milestone-{N}-{slug}/` | The producing agent |
-| Bug index, session log, project state | `artifacts/` root | Orchestrator |
+| Bug index, session log, project state | `artifacts/` root | Orchestrator, with one exception below |
 | One-off task work | `artifacts/one-off/` | The producing agent |
 
 No agent writes a work artifact to `docs/` or fills a template in place.
+
+The orchestrator owns `artifacts/BUGS.md` and `artifacts/AGENT_STATE.md` — no agent writes `AGENT_STATE.md` at all. `artifacts/STANDUP.md` is the exception: in serial execution any agent appends its own docs-queue and progress entries directly. **During parallel task execution no stage writes any of the three.** Each records what it would have written in its handoff entry's Open items, and the orchestrator flushes those one write at a time — including bug index rows and the IDs they carry (`/agent-code` → Parallel Task Execution).
 
 ## Templates
 

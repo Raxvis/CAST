@@ -5,7 +5,7 @@
 - **Status**: Closed
 - **Severity (initial)**: High
 - **Severity (final)**: High
-- **Found during**: T-3 (`tasks/task-03-list-command.md`), M1
+- **Found during**: T-3 (`../tasks/task-03-list-command.md`), M1
 - **Description**: On a fresh install, running `acme list` before any other command crashes with a raw `SqliteError: no such table: tasks` stack trace. The first command a fresh-install user runs is often `list` (to confirm the CLI is working), so this breaks the first-run experience outright.
 - **Expected**: `acme list` on a machine with no prior state prints the empty-state message and exits 0.
 - **Actual**: `better-sqlite3` raises `SqliteError: no such table: tasks` and the CLI exits with a raw stack trace.
@@ -40,7 +40,7 @@
 
 ## Notes
 
-Discovered by Coder during T-3 and resolved within the same session. This fix is the exact remediation CEO Approval Condition 3 demanded ("`list` must handle a missing database file by running migrations on first invocation rather than throwing an error"). Coder's red→green evidence (red at `9d4b1c7`, green at `a8f3d12`) confirmed the fix and Reviewer verified it against the pre-fix commit; Product verified the condition during Milestone 1 validation on 2026-04-10 by running `rm -rf ~/.acme-todo && acme list` and confirming the empty-state message and exit 0, then closed the bug at milestone sign-off.
+Discovered by Coder during T-3 and resolved within the same session. This fix is the exact remediation CEO Approval Condition 3 demanded ("`list` must handle a missing database file by running migrations on first invocation rather than throwing an error"). Coder's red→green evidence (red at `9d4b1c7`, green at `a8f3d12`) confirmed the fix and Reviewer verified it against the pre-fix commit; the orchestrator flipped the entry Verified → Closed when T-3 passed validation on 2026-04-09. Product verified CEO Approval Condition 3 during Milestone 1 validation on 2026-04-10 by running `rm -rf ~/.acme-todo && acme list` and confirming the empty-state message and exit 0, and re-reviewed this closure at milestone sign-off.
 
 ---
 

@@ -6,7 +6,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## Which pipeline should I use — `/agent-plan`, `/agent-code`, or `/agent-task`?
 
-**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes (plus `/cast-doctor` and `/cast-release`, the maintenance skills — not pipelines), and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → Risk → CEO). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
+**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes (plus `/cast-doctor` and `/cast-release`, the maintenance skills — not pipelines), and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → CEO (risk lenses + verdict)). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
 
 **Fix.** Use the table below to pick a pipeline, then read the narrative note after it.
 
@@ -150,7 +150,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 **Fix.**
 1. Re-run `/agent-code <milestone>`. Task Selection skips every task whose Status is already Complete or Deferred and picks up at the first remaining task — finished work is not redone.
-2. Do not hand-mark tasks Complete to "help" the resume; only tasks that actually passed Product validation carry that status. If the interruption hit mid-task, that task's Status is unchanged and the whole per-task loop re-runs for it, which is correct.
+2. Do not hand-mark tasks Complete to "help" the resume; that status is only ever written by Step 3 validation. On a clean close (Step 3a — the Reviewer's Acceptance Criteria Check marks every criterion, and every CEO Approval Condition line on condition-bearing tasks, Met with evidence) the orchestrator sets it directly with no Product launch; Product is launched only for flagged tasks (Step 3b) and for the milestone close. If the interruption hit mid-task, that task's Status is unchanged and the whole per-task loop re-runs for it, which is correct.
 3. The resumed run reuses the existing `### YYYY-MM-DD — agent-code — …` session heading in `artifacts/STANDUP.md` for the same milestone and date rather than opening a duplicate.
 4. When the last task lands, the milestone-completion checkpoint (Deferred re-triage, the `reviews/close.md` close record, UX review) fires normally — it keys off "every task Complete or Deferred", not off an unbroken session.
 
@@ -162,7 +162,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 **Fix.**
 1. Re-read the halt message. It should name the specific scope-crossing concern (e.g., "introduces a new module", "changes a data schema", "adds a new CLI subcommand").
-2. Run the planning tier the halt message named. For a small feature needing a few design decisions, `/agent-plan light: "<feature description>"` runs the light mode (Product + Architecture + CEO). For multi-task or cross-cutting scope, `/agent-plan "<feature description>"` runs the full stage (Product → Architecture + UI → Risk → CEO). Either way it ends with a verdict file at `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
+2. Run the planning tier the halt message named. For a small feature needing a few design decisions, `/agent-plan light: "<feature description>"` runs the light mode (Product + Architecture + CEO). For multi-task or cross-cutting scope, `/agent-plan "<feature description>"` runs the full stage (Product → Architecture + UI → CEO (risk lenses + verdict)). Either way it ends with a verdict file at `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
 3. After the CEO issues **APPROVED** or **APPROVED WITH CONDITIONS**, run `/agent-code <milestone>` to execute the engineering stage against the approved plan.
 4. If you disagree with the scope classification and think the change is really self-contained, you can re-run `/agent-task` with a more precise task description that narrows the scope (name the specific file, the specific bug ID, or the specific existing pattern the change follows). Do not try to sneak a design change through `/agent-task` — the gate exists to prevent drift, and the Reviewer in Step 2 will catch it anyway.
 
@@ -210,12 +210,12 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## The CEO agent keeps returning `REVISION REQUIRED`
 
-**Cause.** The CEO applies a cross-cutting review against the CEO_REVIEW template's Risk Posture section (Risk, Architecture, UI) and milestone scope. If any of those have open Critical findings, scope contradictions, or budget violations, the verdict will keep coming back as REVISION REQUIRED until resolved.
+**Cause.** The CEO applies a cross-cutting review against the CEO_REVIEW template's checklist — architectural soundness, UI, its own risk lenses (the Risk Posture section), and cross-cutting risks — plus milestone scope. If any of those have open Critical findings, scope contradictions, or budget violations, the verdict will keep coming back as REVISION REQUIRED until resolved.
 
 **Fix.**
 1. Open `artifacts/milestone-{N}-{slug}/reviews/ceo.md` and read the "Revision Requests" table (the verdict itself is the single `**Verdict**:` line). Every revision is addressed to a specific agent with a cited section.
-2. Re-run only the affected planning stage — but note a revised architecture re-passes Stage 3 (the Risk review, both lenses) before the CEO sees it again, so the CEO never re-reviews against stale findings.
-3. Only then re-run Stage 4 (CEO). The CEO does not rewrite plans; it reviews them.
+2. Re-run only the affected planning stage, then re-launch the CEO once. There is no separate risk stage to re-run: the CEO's re-review reads the diff against the version it already reviewed and re-runs its risk lenses over the changed sections before re-issuing the verdict, so it never signs off against stale findings.
+3. The CEO does not rewrite plans; it reviews them. Fix the plan in the stage that owns it, then send it back through the one CEO launch.
 4. If you disagree with a CEO revision, escalate per the conflict resolution hierarchy (Product > Architecture > UI) — the CEO does not override Product on business intent, and an unresolved disagreement comes to you rather than to another agent.
 
 ---
@@ -228,8 +228,8 @@ Common problems adopting or running this template, with the most likely cause an
 1. Confirm the file is at the project root: `ls CLAUDE.md` should show it in the top-level directory.
 2. Restart your Claude Code session.
 3. If your project has nested subdirectories you work in, note that Claude Code loads `CLAUDE.md` from the root of the currently-open directory. Opening a subdirectory will not pick up the root `CLAUDE.md`.
-4. For large projects, split `CLAUDE.md` into the root file plus bare `@docs/<FILE>.md` import lines pointing at reference material. An import only fires as a bare `@path` line at the start of a line — there is no `@import` keyword, and a path wrapped in backticks or inside a comment is inert. This is what the shipped `root/CLAUDE.md` does: `@docs/CODE_PATTERNS.md` is the one always-on import (plus `@docs/PRD.md` once the PRD has real content), and the topic docs (`FRONTEND`/`BACKEND`/`CLI`/`MOBILE`) are listed as inert backticked paths you copy out as bare lines to activate.
-5. If a doc you "imported" is not in context, check for exactly that mistake: the line reads `` `@docs/FRONTEND.md` `` (backticks — inert) instead of `@docs/FRONTEND.md` (bare — fires).
+4. For large projects, split `CLAUDE.md` into the root file plus bare `@docs/<FILE>.md` import lines pointing at reference material. An import only fires as a bare `@path` line at the start of a line — there is no `@import` keyword, and a path wrapped in backticks or inside an HTML comment is inert.
+5. **If a `docs/` file is not loading, the usual cause is that nothing imports it.** The shipped `root/CLAUDE.md` ends with a Memory Imports block that is **empty on purpose** — imports cost context in every session *and* every subagent spawn, so CAST activates nothing by default. Adding an import is your call: open `CLAUDE.md`, find the Memory Imports block, and add the doc as a bare line at the left margin (`@docs/CODE_PATTERNS.md`), not as `` `@docs/CODE_PATTERNS.md` `` and not inside the example comment — both of those are inert. Reserve imports for docs needed unprompted in most sessions that a model cannot infer from the code; everything else is better read on demand by the agent that needs it.
 
 ---
 

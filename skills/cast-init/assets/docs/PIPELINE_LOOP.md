@@ -42,7 +42,7 @@ Git is part of the loop's contract: every task leaves a commit trail keyed to it
 
 1. **Coder commits its own work** at the end of every pass — that task's production code and test files only, nothing else. The message starts with the task ID: `M{N}-T{TT}: <summary>` (one-off tasks use their slug). This is safe under parallel execution because eligible tasks have disjoint Files lists.
 2. **Loop-back passes stack, never amend.** A fix or refactor pass adds a new commit on top. Never amend or rebase mid-loop — the stacked history is the audit trail the Handoff Log points into.
-3. **The handoff entry names the commit** (the `Commit` field in `templates/TASK.md`). This is how Reviewer finds the code without re-reading whole files.
+3. **The handoff entry names the commit** (the `Commit` field of the handoff-entry format, `docs/STAGE_CONTRACT.md` §2). This is how Reviewer finds the code without re-reading whole files.
 4. **Reviewer reviews the diff, not the tree** — the commits recorded in the Handoff Log since the last Reviewer approval (on the first review, all of the task's commits), via `git show`/`git diff`, plus surrounding context only where the diff demands it.
 5. **Bug fixes cite the fix commit.** When a Fix Now defect is fixed, Coder fills the bug file's Resolution → Commit field with the hash of the stacking fix commit.
 6. **Validation closes the range.** Rolling back a bad task later means reverting the commits prefixed with its ID — no other task is touched.
@@ -65,7 +65,7 @@ When a stage discovers mid-task that the task's scope is wrong — the Files lis
 
 1. The discovering stage pauses and appends a handoff entry (`<stage> -> product`) whose Outcome states the proposed amendment and why.
 2. The orchestrator routes to **Product**, who owns scope, and who disposes of the proposal in one of three ways, appending its own handoff entry: **approve** (update the task file's Files list and/or acceptance criteria in place), **split** (create a new task file plus its Task Index row in the milestone README; the current task keeps its reduced scope), or **reject** (the task proceeds as written, with the reason in the entry).
-3. The loop resumes at the paused stage from Product's entry. Amendments do not increment the loop counter.
+3. The loop resumes at the paused stage from Product's entry. An amendment does not increment the loop counter — but amendments carry their own cap: **at most 2 per task**, counted from the `-> product` amendment entries already in the Handoff Log. A third proposal is not disposed of at all: the orchestrator pauses the task and escalates to the user exactly as the loop cap does, naming the two amendments already applied and what the third asks for. A task needing a third scope correction has a planning defect, not a scope defect, and re-planning is cheaper than a fourth attempt.
 
 The `/agent-plan` escalation remains for genuinely architectural discoveries — a new module, a schema change, cross-cutting design work. The amendment path is for scope corrections *within* the task's design envelope.
 
@@ -86,7 +86,12 @@ Routing facts: **on a loop-back**, Coder handles all three return paths — a Re
 
 ## Step 2 — Reviewer
 
-After Coder hands off, the orchestrator first applies the **test-gate pre-check**: read the latest Coder entry and confirm it carries a Test Results block with verbatim output showing no failures. This is a presence check, never judgment on the tests. Absent or failing: route straight back to Coder without launching Reviewer (a full Reviewer context spent rejecting a missing block is a wasted spawn); this does not increment the loop counter — no work was reviewed.
+After Coder hands off, the orchestrator first applies the **test-gate pre-check**: read the latest Coder entry and confirm it carries a Test Results block with verbatim output showing no failures. This is a presence check, never judgment on the tests. A failed pre-check always routes straight back to Coder without launching Reviewer — a full Reviewer context spent rejecting a missing block is a wasted spawn — but the loop counter treatment differs:
+
+- **The block is missing, and no earlier Coder entry on this task was missing one**: a free retry. Route back **without** incrementing the loop counter — nothing was reviewed and no verification was even attempted. This is the loop's only uncounted return.
+- **The block is missing a second time on the same task, or it is present and shows failures**: the counted path. Increment the loop counter and route back to Step 1, exactly as the failing-tests rule above does.
+
+The free retry is once per task and needs no new field to track it — the Handoff Log already shows whether an earlier Coder entry lacked the block. Without that bound, a Coder that never emits the block would loop past `[MAX_LOOP_COUNT]` forever.
 
 When the block is present, launch the **reviewer** agent with the task file path. Reviewer enforces the same gate as backstop, reviews the diff, files every Defect as a bug file, and hands back an entry you route on: every finding classified **Defect** (incorrect behaviour, broken functionality, violated contract) or **Issue** (structural problem, convention violation, maintainability concern), and — on approving a clean version — the **Acceptance Criteria Check**, one line per criterion (`Met` with evidence / `Not met` / `Product judgment`; details in `agents/reviewer.md`).
 

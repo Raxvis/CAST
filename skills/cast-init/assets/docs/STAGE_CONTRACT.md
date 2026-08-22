@@ -41,7 +41,7 @@ Not the milestone directory. Not sibling task files. Not whole design documents 
 
 ## 2. Your report is the handoff entry, not your reply
 
-Append **one** entry to the task file's Handoff Log:
+Append **one** entry to the Handoff Log of the task file whose path you were given:
 
 ```
 ### N. <from> -> <to> — YYYY-MM-DD
@@ -60,6 +60,8 @@ Two stages exceed the cap, because for them the log *is* the canonical record an
 - **Reviewer** adds one line per finding, plus the Acceptance Criteria Check block on approval.
 - **Coder** adds its test-result block, and one line per failure when tests fail.
 
+**Milestone-grain stages have no task Handoff Log** (§1's carve-out): the planning stages and the milestone-completion stages are given a milestone directory, not a task file. Their report is the artifact their agent file names — a design document, a review, the close record — plus the reply line in §3. The orchestrator writes their checkpoint entry.
+
 ## 3. Your reply is one line
 
 Reply to the orchestrator with exactly:
@@ -68,7 +70,9 @@ Reply to the orchestrator with exactly:
 Handoff entry #<n> appended — <outcome>; next: <stage>
 ```
 
-Nothing else. The orchestrator routes on that line and never re-reads your work into its own context.
+Nothing else — with one exception: **planning stages 2a and 2b** (Architecture and UI) append their **Manifest Rows** block after that line. Those rows exist nowhere else and the orchestrator applies them itself, so the reply is their only channel. Every other stage replies with the line alone.
+
+The orchestrator routes on that line and never re-reads your work into its own context.
 
 ## 4. Findings live in their artifact; pointers travel
 
@@ -82,6 +86,13 @@ Complete your role's work directly. Your `tools:` list omits the Task tool, so t
 
 When your work changes something documentation-worthy — an API, command, configuration, convention, requirement, schema, or user-facing behavior — append `- <your agent name> | docs | <note>` to the current session in `artifacts/STANDUP.md`. Docs Writer drains the queue at completion checkpoints; no other stage edits `docs/`.
 
-## 7. Silence is not a clean report
+## 7. Under parallel execution, queue shared-root writes instead of making them
+
+When your invocation says the task is running **in parallel** with others, do not write `artifacts/STANDUP.md`, the `artifacts/BUGS.md` index, or `artifacts/AGENT_STATE.md` — concurrent stages would race them. Instead:
+
+- Record each would-be write as an Open items line in your handoff entry: `standup: - <agent> | <type> | <note>`, the §6 docs entry included. The orchestrator flushes queued lines in order.
+- **Take any bug ID from your invocation**; do not compute the next one from the index, because a concurrent filing would claim the same number. The per-bug *file* is still yours to write — only its index row is the orchestrator's.
+
+## 8. Silence is not a clean report
 
 If your role produces findings — review findings, test results, risk findings — emit the full result block even when it is empty. "No output" and "nothing found" must be distinguishable to the stage that reads your entry.

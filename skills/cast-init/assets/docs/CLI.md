@@ -2,8 +2,9 @@
   FILE: docs/CLI.md
   PURPOSE: Topic-specific reference for projects whose primary surface is a command-line
   tool or terminal utility — single-binary tools, multi-subcommand utilities, interactive
-  REPLs, and piped filters. Loaded into an AI coding assistant's context at session start
-  so patterns, pitfalls, and conventions are available before the first edit.
+  REPLs, and piped filters. Read on demand — agents open it when a task's Context Manifest
+  cites it; the root CLAUDE.md Memory Imports block ships empty, and an adopter who wants this
+  file in every session adds a bare @docs/CLI.md line there.
 
   WHEN TO KEEP: your project's primary interface is a terminal binary invoked from a
   shell, a script, or a pipe.
@@ -12,8 +13,7 @@
   If it is a long-running service with no terminal surface, keep docs/BACKEND.md instead.
 
   HOW TO CUSTOMIZE:
-  - Replace [PLACEHOLDER] tokens with project-specific values. See README.md for the
-    full placeholder reference table.
+  - Replace every [PLACEHOLDER] token with project-specific values.
   - Keep code blocks as illustrative patterns — the bracket-style identifiers
     (e.g., `[dispatchCommand]`, `[ExitCode]`) are intentional.
   - Add project-specific pitfalls to "Common Pitfalls" as they surface in review.

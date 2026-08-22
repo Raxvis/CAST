@@ -81,7 +81,7 @@ Assets that exist in the project as placeholders and need to be replaced with fi
 Locations in the codebase where emoji, Unicode symbols, or placeholder glyphs are used in place of final visual assets.
 
 | Location | Current Placeholder | Final Asset | Priority |
-|----------|--------------------|-----------| ----------|
+|----------|--------------------|-----------|----------|
 | `[path/to/file]` | [emoji or symbol] | [Asset description] | High / Medium / Low |
 | `[path/to/file]` | [emoji or symbol] | [Asset description] | High / Medium / Low |
 
