@@ -68,16 +68,16 @@ Acme Todo is a CLI, so the layout-oriented items below are read against terminal
 
 ## Issues Found
 
-| # | Element / Area | Issue | Severity | Action Required |
+| # | Element / Area | Issue | Severity | Bug ID |
 |---|---|---|---|---|
-| 1 | `done` command, error state | `acme done <id>` with a non-existent ID exits 0 with no output — the spec's Error Messages section requires an stderr message and non-zero exit. Filed as BUG-002 out of this review, suggested severity Low, for Product triage in the milestone close pass | Low | Fix in M2 alongside the matching `delete` audit; tracked in `artifacts/BUGS.md` |
+| 1 | `done` command, error state | `acme done <id>` with a non-existent ID exits 0 with no output — the spec's Error Messages section requires an stderr message and non-zero exit. Filed out of this review with suggested severity Low, for Product triage in the milestone close pass | Low | BUG-002 |
 
 ---
 
 ## Verdict
 
-- [ ] **APPROVED** — Implementation matches spec. No changes required.
-- [x] **APPROVED WITH NOTES** — Minor issues noted. Follow-up in next pass.
-- [ ] **CHANGES REQUIRED** — See Issues Found. Coder must revise before Product review.
+- [ ] **APPROVED** — Implementation matches spec. Nothing filed.
+- [x] **APPROVED WITH NOTES** — Minor issues filed as bugs; none blocks the milestone in UI's judgment.
+- [ ] **CHANGES REQUIRED** — See Issues Found. Every row is filed as a bug for Product triage; UI's verdict does not override Product's sign-off.
 
 The implemented command surface matches `artifacts/milestone-1-task-crud/ui.md` in output format, exit codes, stdout/stderr split, and empty-state behavior. The single deviation (BUG-002, `done` silent success) is Low severity with a clear M2 fix path, and does not block Product sign-off.
