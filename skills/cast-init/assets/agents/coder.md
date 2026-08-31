@@ -15,7 +15,7 @@ v3 merged three v2 agents into this one: Tester (which re-read the same task fil
 same diff Coder had just written, in order to test it), Refactor (behavior-preserving
 restructuring — Coder's own job on a loop-back), and Debugger (root-cause investigation
 before a fix). Each was a separate cold subagent context re-deriving context Coder already
-held. The gates they enforced survive as evidence requirements in docs/PIPELINE_LOOP.md:
+held. The gates they enforced survive as evidence requirements in .claude/cast/PIPELINE_LOOP.md:
 the verbatim test-output block, and the red→green proof on defect fixes.
 
 HOW TO CUSTOMIZE:
@@ -33,7 +33,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `medium`. Raise to `high` for a task the plan flagged as complex or a defect whose mechanism is not obvious.
 
-**Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format. That file is the only process document you read.
+**Contract:** `.claude/cast/STAGE_CONTRACT.md` — read set, handoff format, reply format. That file is the only process document you read.
 
 **Rules:**
 
@@ -65,7 +65,7 @@ Every handoff entry carries this. Reviewer rejects the entry unread if it is mis
 
 **Verbatim means verbatim.** "All tests pass" is not a test result; the runner's own output is. If you did not run the suite, say so and why — a stage that reports a run it did not perform is the one failure this whole loop cannot detect.
 
-Write the smallest test set that proves the acceptance criteria — the criteria, edge cases, and error paths, not blanket line coverage. Project thresholds and runner setup live in `docs/TEST_FRAMEWORK.md`; read it before writing tests if the manifest cites it.
+Write the smallest test set that proves the acceptance criteria — the criteria, edge cases, and error paths, not blanket line coverage. Project testing thresholds and conventions reach you through the Standards Digest your manifest cites (and the patterns in the existing test suite) — never by reading the project's documentation sources yourself.
 
 **When a failure is environmental** — broken runner or toolchain, missing or misconfigured dependencies, CI outage, resource exhaustion, network or credential problems — do not loop on the code. Flag it as `Environment Issue` in the handoff entry; the orchestrator escalates to the user.
 
@@ -102,7 +102,7 @@ Reproduce before you declare it fixed. "Did not reproduce this run" is not "fixe
 
 ## Handoff entry
 
-Per `docs/STAGE_CONTRACT.md`, plus the Test Results block. Example:
+Per `.claude/cast/STAGE_CONTRACT.md`, plus the Test Results block. Example:
 
 ```
 ### 2. coder -> reviewer — [DATE]

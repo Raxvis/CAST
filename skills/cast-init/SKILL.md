@@ -2,11 +2,13 @@
 name: cast-init
 description: >-
   Install or migrate the CAST multi-agent workflow (Claude Agent Staged Team) into the
-  current project: 8 specialist subagents, three pipeline skills (/agent-plan,
+  current project: 7 specialist subagents, three pipeline skills (/agent-plan,
   /agent-code, /agent-task) plus the /file-bug and /add-task intake skills and the
-  /cast-doctor and /cast-release maintenance skills, a
-  docs/templates/artifacts scaffold, and a parameterized CLAUDE.md — with project
-  detection, a user-approved migration plan, and placeholder substitution. Use when the user says "install CAST", "adopt CAST", "set up CAST",
+  /cast-doctor and /cast-release maintenance skills, the .claude/cast/ machinery
+  (process contracts, document templates, and the SOURCES.md source map pointing at
+  YOUR documentation and standards — CAST ships none of its own), and an artifacts/
+  scaffold — with project detection, a user-approved migration plan, and a source-map
+  interview. Use when the user says "install CAST", "adopt CAST", "set up CAST",
   "cast init", "migrate to CAST", asks for a staged multi-agent planning/engineering
   workflow, or wants to upgrade an existing CAST install. Supports a dry-run mode that
   produces the migration plan without changing files.
@@ -25,7 +27,7 @@ Adopt CAST into the current project through a seven-phase migration: crawl the p
 All template files are bundled with this skill. Resolve them before Phase 1:
 
 1. The skill's base directory is the directory containing this SKILL.md (provided when the skill is invoked). Call it `CAST_SKILL_DIR`.
-2. Set `CAST_SOURCE = <CAST_SKILL_DIR>/assets`. Confirm it exists and contains `agents/`, `skills/`, `docs/`, `templates/`, `artifacts/`, and `root/` (e.g. `ls <CAST_SKILL_DIR>/assets`).
+2. Set `CAST_SOURCE = <CAST_SKILL_DIR>/assets`. Confirm it exists and contains `agents/`, `skills/`, `cast/`, `artifacts/`, and `root/` (e.g. `ls <CAST_SKILL_DIR>/assets`).
 3. With `npx skills` installs, `.claude/skills/cast-init` may be a symlink into `.agents/skills/`. Read files through the path provided — do not dereference symlinks manually, and do not go looking for the payload anywhere else (no network access, no other clones).
 4. If `assets/` is missing, stop and tell the user their cast-init install is incomplete (likely a partial copy); re-install with `npx skills add Raxvis/CAST` or `/plugin install cast@cast`.
 
@@ -45,18 +47,17 @@ If the user has not specified a mode, assume full adoption.
 
 Act as an expert migration assistant for the CAST template: adopt CAST into an existing project — either building the workflow from scratch if none exists, or mapping an existing agentic workflow onto CAST's structure without losing customizations.
 
-CAST's canonical structure in a target project is:
+CAST v4 ships **no documentation** — the project brings its own, and CAST plugs into it. The canonical structure in a target project is:
 
-- `CLAUDE.md` at project root — top-level context for every session
-- `.claude/agents/` — 8 subagent definitions with YAML frontmatter and per-agent model settings (all `model: inherit` by default — agents run on the session model)
-- `.claude/skills/` — three pipeline skills (`/agent-plan`, `/agent-code`, `/agent-task`), two intake skills (`/file-bug` files user-found bugs individually, `/add-task` queues one-off tasks in the `artifacts/TASKS.md` backlog), plus `/cast-doctor`, the run-anytime install health check and documentation audit, and `/cast-release`, release-prep automation
-- `docs/` — reference material only (PRD, conventions, topic-specific guides)
-- `templates/` — reusable document templates (architecture, UI spec, milestone, task, and bug-report files) copied into `artifacts/` as instances
-- `artifacts/` — work artifacts only, **grouped by milestone**: one `milestone-{N}-{slug}/` directory per milestone (README, design docs, reviews/, one file per task under tasks/, one file per bug under bugs/), `one-off/` for /agent-task work, and cross-milestone logs (BUGS.md index, STANDUP.md, AGENT_STATE.md) at the root
+- `CLAUDE.md` at project root — the user's own file; CAST appends exactly one section (workflow summary, source-map pointer, version stamp) and never owns the rest
+- `.claude/agents/` — 7 subagent definitions with YAML frontmatter and per-agent model settings (all `model: inherit` by default — agents run on the session model)
+- `.claude/skills/` — three pipeline skills (`/agent-plan`, `/agent-code`, `/agent-task`), two intake skills (`/file-bug` files user-found bugs individually, `/add-task` queues one-off tasks in the `artifacts/TASKS.md` backlog), plus `/cast-doctor`, the run-anytime install health check, and `/cast-release`, release-prep automation
+- `.claude/cast/` — CAST's machinery: **`SOURCES.md` (the source map — where THIS project's documentation, standards, and registers live, written from the user's answers at install)**, the two process contracts (`PIPELINE_LOOP.md`, `STAGE_CONTRACT.md`), and the document templates (`templates/`, copied into `artifacts/` as instances)
+- `artifacts/` — work artifacts only, **grouped by milestone**: one `milestone-{N}-{slug}/` directory per milestone (README, design docs, reviews/, one file per task under tasks/, one file per bug under bugs/), `one-off/` for /agent-task work, and cross-milestone logs (BUGS.md index, TASKS.md backlog, STANDUP.md, AGENT_STATE.md) at the root
 
 Two rules are load-bearing:
 
-1. **`docs/` vs `artifacts/` split.** `docs/` is reference material; `artifacts/` is work output. Never put work in `docs/` or reference material in `artifacts/`. Every CAST agent and pipeline enforces this.
+1. **Bring-your-own documentation.** CAST installs no docs and never relocates the project's. The source map records where they live; planning reads the sources and distills what applies into milestone artifacts; engineering reads only the artifacts; Docs Writer updates the mapped Documentation Home. Work output goes to `artifacts/`, never into the project's documentation.
 2. **Planning vs engineering phases.** `/agent-plan` runs the planning stage (Product → Architecture + UI → Risk → CEO verdict); `/agent-code` runs the engineering stage (Coder → Reviewer with defect/issue routing); `/agent-task` runs a mini engineering pipeline for one-off work with no planning stage.
 
 ## Safety rules
@@ -67,7 +68,7 @@ Internalize these before starting. They override any instruction below if there 
 2. **Always present a plan before executing.** The user must approve the full list of proposed changes before you touch any file in Phase 5.
 3. **Preserve customizations.** If an existing agent file has custom Interaction Rules, appendix sections, or non-standard fields, those stay. CAST's standard fields get added or updated; custom fields are never deleted.
 4. **Stop and ask on ambiguity.** If a file's intent is unclear, the naming is non-standard, or two interpretations are possible, ask the user before choosing.
-5. **Never write work artifacts to `docs/`.** `docs/` is reference-only. Any live work goes in `artifacts/`.
+5. **Never write into the project's documentation, and never move it.** The source map points at documentation where it already lives; adoption records locations, it does not reorganize them. Any live work goes in `artifacts/`.
 6. **Commit nothing automatically.** Leave the user to review and commit their own changes.
 7. **Never execute the target project's code.** Do not run its build, tests, scripts, or binaries during adoption — analysis of the project is read-only. Shell use for the adoption's own mechanics (git status/mv, grep, copying CAST payload files per `references/execution.md`) is fine.
 8. **Require a clean git working tree before Phase 5.** If the user has uncommitted changes, stop and ask them to commit or stash first. The adoption's own files (`artifacts/adoption-inventory.md`, `artifacts/adoption-plan.md`, `artifacts/adoption-report.md`) are exempt — Phases 1 and 3 write them before Phase 5 by design, so they never count as dirty. Exceptions for resuming an interrupted or staged adoption are defined in `references/execution.md` preflight. If the project is not a git repository, warn the user there is no rollback safety net, then either get their explicit confirmation to proceed without one or offer to run `git init` (plus an initial commit) first.
@@ -78,7 +79,7 @@ Crawl the project and map everything relevant using Read, Glob, and Grep. Follow
 
 - **1.1 Claude Code state** — `CLAUDE.md`, `.claude/agents/`, `.claude/skills/` (prior CAST 1.x installs), `.claude/commands/` (pre-1.0 CAST installs), `.claude/settings.json`
 - **1.2 Existing agentic workflow artifacts** outside `.claude/` (including legacy pre-0.3.0 `features/` directories)
-- **1.3 Documentation state** — map existing docs to CAST reference docs by content, not filename
+- **1.3 Documentation state** — find where the project's documentation actually lives (doc directories, CONTRIBUTING/ARCHITECTURE/TESTING files, ADRs, wikis exported into the repo, a changelog) and classify each find by source-map category; these are the **candidate source-map entries** the Phase 3 interview proposes. Docs are never mapped onto CAST docs — v4 ships none
 - **1.4 Project metadata** — tech stack, commands, project type (frontend / backend / CLI / library / data / mobile / mixed), and workspace/monorepo layout detected from manifests
 - **1.5 Source code structure** — source layout, naming conventions, test patterns, CI config
 - **1.6 The inventory** — archive any *completed* prior run's `adoption-*.md` files (date suffix, or confirmed overwrite in interactive mode). A pre-existing `adoption-plan.md` with unchecked ledger entries is a resume candidate, not an archive candidate — preserve it for the resume path in `references/execution.md` 5.1. Then write findings to `artifacts/adoption-inventory.md` using the template in the reference file
@@ -124,7 +125,9 @@ Produce a detailed migration plan tailored to the classification. Structure it a
 Build the plan from these reference files:
 
 - **`references/roster.md`** — the canonical 7-agent roster with tiers, models, and effort levels; a table mapping the eight v2 agents that were merged away to their v3 homes; alias tables for matching existing files by role; and the pipeline-skills mapping. **All 7 agents are non-negotiable by default**: every one must appear in the plan as Create / Rename+Update / Update-in-place / Preserve unless the user explicitly opts out of `ui` for a clearly backend/CLI-only project (see the opt-out rules in `references/roster.md`). Before closing the plan, enumerate all 7 names and verify each has an action. When the inventory finds v2 CAST agents (`tester`, `refactor`, `debugger`, `bug-gatherer`, `validator`, `security`, `performance`, `release`) or a pre-release v3 `risk`, propose Delete for each **and name where its duties went** — the user must be able to see nothing was dropped.
-- **`references/dispositions.md`** — per-file disposition tables for docs and templates (including which topic docs install for which project type), artifacts scaffold rules, root-file rules (`root/CLAUDE.md` is the only file installed at target root), and the plan-file format.
+- **`references/dispositions.md`** — the `.claude/cast/` install rules (contracts, templates, source map), artifacts scaffold rules, root-file rules (the CLAUDE.md CAST section), the v3→v4 migration dispositions (installed `docs/` and `templates/` directories from a prior CAST version), and the plan-file format.
+
+**The source-map interview.** Every plan carries an Ask block that builds `.claude/cast/SOURCES.md` — the centerpiece of the install. For each category (Standards & Conventions, Product & Requirements, Architecture & Design, Testing & Quality, Documentation Home, Project Registers), propose the candidate locations Phase 1.3 found — with one line on why each was classified there — and let the user confirm, correct, add locations you missed, or declare the category empty. Do not guess a location the discovery did not surface, and do not press the user to invent documentation they don't have: `_None declared._` is a valid, honest answer that the pipelines handle. Record the confirmed entries in the plan; 5.6 writes the file verbatim from them.
 
 **Model right-sizing.** Agents install with `model: inherit` (the session model) by default. Every plan must include an Ask item inviting the user to right-size per-agent models for cost: the judgment-heavy gates (CEO, Architect, Reviewer, Risk) stay on the most capable model available (e.g. `opus`, or a Fable/Mythos-class model), the planning-and-implementation loop runs well on `sonnet`, and the utility roles on `haiku`. The suggested assignment table is in `references/roster.md` → "Right-sizing models"; record accepted pins into the corresponding agent actions so 5.4 applies them at install.
 
@@ -160,7 +163,7 @@ Once approval is given, **record every Phase 4 resolution into `artifacts/adopti
 
 ## Phase 5 — Execution
 
-Once the plan is approved, execute the actions in a safe order, reporting progress as you go. **Read `references/execution.md` before writing any file** — it contains the full install mechanics and the customization-preservation rules, including the global rule that `<!-- TEMPLATE INSTRUCTIONS -->` blocks and placeholder-pointer comments are stripped from every installed file (the ten `templates/*` skeletons excepted). Execute its sections in order:
+Once the plan is approved, execute the actions in a safe order, reporting progress as you go. **Read `references/execution.md` before writing any file** — it contains the full install mechanics and the customization-preservation rules, including the global rule that `<!-- TEMPLATE INSTRUCTIONS -->` blocks and placeholder-pointer comments are stripped from every installed file (the ten `.claude/cast/templates/` skeletons excepted). Execute its sections in order:
 
 1. **5.1 Preflight**
 2. **5.1a Fast path for pure-Create actions**
@@ -169,7 +172,7 @@ Once the plan is approved, execute the actions in a safe order, reporting progre
 5. **5.4 Install agent files**
 6. **5.5 Install pipeline skills**
 7. **5.5a Execute approved Deletes**
-8. **5.6 Install reference docs and templates**
+8. **5.6 Install `.claude/cast/` (contracts, templates, source map)**
 9. **5.7 Install artifacts scaffold**
 10. **5.8 Install CLAUDE.md**
 11. **5.9 Placeholder substitution pass**
@@ -183,12 +186,12 @@ Run every check in `references/validation.md` — the numbers below match its ch
 1. **Placeholder scan** — scoped to the files the plan touched, excluding cast-init's own payload directory; expected sub-template tokens like `[DATE]` are fine, real unfilled placeholders are not.
 2. **All 7 agents exist** with frontmatter matching the canonical roles (a `ui` absence on a backend/CLI-only project requires a recorded opt-out; every other absence is a hard failure). No v2 agent file survives in `.claude/agents/`.
 3. **Pipeline skills** — the skills the user chose to keep exist at `.claude/skills/<name>/SKILL.md` with valid frontmatter, and no superseded pre-1.0 command files remain (in unattended mode, a leftover whose Delete was downgraded to a recorded TODO passes).
-3a. **Artifacts scaffold and installed docs** — `artifacts/BUGS.md`, `STANDUP.md`, `AGENT_STATE.md` exist, and `docs/PIPELINE_LOOP.md` exists whenever `agent-code` or `agent-task` is installed.
-4. **docs/artifacts split** is clean in both directions.
+3a. **`.claude/cast/` and artifacts scaffold** — `.claude/cast/SOURCES.md`, `PIPELINE_LOOP.md`, `STAGE_CONTRACT.md`, and the `templates/` skeletons exist; `artifacts/BUGS.md`, `TASKS.md`, `STANDUP.md`, `AGENT_STATE.md` exist.
+4. **Source map integrity** — every location entry in `SOURCES.md` resolves (path exists, glob matches, directory non-empty of markdown), every required category carries entries or an explicit `_None declared._`, and the file matches what the user approved in the interview.
 5. **Agent frontmatter** — every agent file has valid `name`/`description`/`model` frontmatter (description ≤ 300 characters).
-6. **Template scaffolding stripped** — no installed file outside `templates/` carries a `<!-- TEMPLATE INSTRUCTIONS -->` block.
-7. **Topic-doc pairing, imports, and version stamp** — required topic-doc pairs installed together, every Memory Imports line uses bare `@path` syntax and resolves, and `CLAUDE.md` carries exactly one `Adopted with CAST v<X.Y.Z>` line matching this skill's `metadata.version`.
-8. **UI opt-out consistency** — the `ui` agent and the UI templates (`templates/UI_SPEC.md`, `templates/UX_REVIEW.md`) are installed together or skipped together.
+6. **Template scaffolding stripped** — no installed file outside `.claude/cast/templates/` carries a `<!-- TEMPLATE INSTRUCTIONS -->` block, and no `artifacts/` instance does.
+7. **CLAUDE.md CAST section and version stamp** — the CAST section exists, points at `.claude/cast/SOURCES.md`, and carries exactly one `Adopted with CAST v<X.Y.Z>` line matching this skill's `metadata.version`; no stale CAST-owned Memory Import lines (`@docs/...` from a v3 install) survive.
+8. **UI opt-out consistency** — the `ui` agent and the UI templates (`.claude/cast/templates/UI_SPEC.md`, `.claude/cast/templates/UX_REVIEW.md`) are installed together or skipped together.
 
 If any validation check fails, report it and ask the user how to proceed before writing the Phase 7 report — in unattended mode, do not prompt: halt and write a failed-adoption report per `references/validation.md`. Do not silently mask failures.
 
@@ -196,18 +199,17 @@ If any validation check fails, report it and ask the user how to proceed before 
 
 Write the final report to `artifacts/adoption-report.md` using the template in `references/validation.md`, then present it with the closing summary, filling every slot to match the actual outcome:
 
-> CAST adoption <complete / complete with warnings / staged / failed at Phase <N>>. <N> files created, <N> renamed, <N> updated, <N> preserved, <N> deleted. <M> validation warnings or errors listed in the report. <If any paths were staged: "Staged paths: <list>. Complete the install with: <exact `mv` command(s)>, then remove the empty `.cast-stage/` directory."> Recommended next step: <restart Claude Code and walk through `docs/FIRST_RUN.md` / for a partial or failed adoption: the first recovery step from the report>. The full report is in `artifacts/adoption-report.md`.
+> CAST adoption <complete / complete with warnings / staged / failed at Phase <N>>. <N> files created, <N> renamed, <N> updated, <N> preserved, <N> deleted. <M> validation warnings or errors listed in the report. <If any paths were staged: "Staged paths: <list>. Complete the install with: <exact `mv` command(s)>, then remove the empty `.cast-stage/` directory."> Recommended next step: <restart Claude Code (skills are discovered at session start), confirm the seven skills tab-complete, and start with `/agent-task` on something trivial or `/agent-plan` on a real feature / for a partial or failed adoption: the first recovery step from the report>. The full report is in `artifacts/adoption-report.md`.
 
 ## Decision rubric (when to act vs when to ask)
 
 **Act without asking:**
 
-- Creating a CAST agent, pipeline skill, or doc that has no existing counterpart
+- Creating a CAST agent, pipeline skill, or `.claude/cast/` file that has no existing counterpart
 - Creating `artifacts/` scaffold directories
-- Substituting detected placeholders (`[PROJECT_NAME]`, `[LANGUAGE]`, `[FRAMEWORK]`, `[TEST_CMD]`, etc.) with values from the inventory
-- Installing `docs/FILE_CONVENTIONS.md` and the milestone / architecture templates (load-bearing for CAST)
+- Substituting detected placeholders (`[PROJECT_NAME]`, `[TEST_CMD]`, etc.) with values from the inventory
+- Installing the process contracts and document templates under `.claude/cast/` (load-bearing for CAST)
 - Creating the Templates section inside an agent file (CAST convention)
-- Adding revision-history blocks to new planning artifacts
 
 **Ask before acting:**
 
@@ -215,7 +217,7 @@ Write the final report to `artifacts/adoption-report.md` using the template in `
 - Overwriting any existing file
 - Merging any existing agent, pipeline, or CLAUDE.md (show the user what sections will change)
 - Deleting any existing file (including superseded pre-1.0 command files)
-- Installing a topic doc (FRONTEND / BACKEND / CLI / MOBILE) when the project type is ambiguous or mixed
+- Classifying an ambiguous documentation location into a source-map category (when Phase 1.3's classification is a genuine coin flip, the interview asks rather than assumes)
 - Creating an agent that requires judgment about role (e.g., is this project's `designer.md` closer to CAST's UI agent or its Product agent?)
 - Running `git mv` on directories
 - Any action the Phase 3 plan marked as Ask
@@ -227,13 +229,13 @@ Write the final report to `artifacts/adoption-report.md` using the template in `
 - Any user response that conflicts with the approved plan
 - Any placeholder scan failure
 - Any write that would overwrite user content without explicit approval
-- Any attempt to write a work artifact to `docs/`
+- Any attempt to write into, move, or reorganize the project's own documentation
 
 ## Reference files
 
 - **`references/discovery.md`** — Phase 1 checklists and the inventory template
-- **`references/roster.md`** — 8-agent roster, tiers, alias tables, pipeline-skills mapping
-- **`references/dispositions.md`** — docs/templates/artifacts/root disposition tables and the plan-file format
+- **`references/roster.md`** — 7-agent roster, tiers, alias tables, pipeline-skills mapping
+- **`references/dispositions.md`** — `.claude/cast/`, artifacts, and root-file install rules, the v3→v4 migration dispositions, and the plan-file format
 - **`references/execution.md`** — Phase 5 install mechanics and customization-preservation rules
 - **`references/validation.md`** — Phase 6 checklist and the Phase 7 report template
 

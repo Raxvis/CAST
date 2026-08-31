@@ -6,7 +6,7 @@
            discipline. If you change the loop, change it here — not in the skills.
 
   WHO READS THIS: the orchestrator. Not agents.
-           Agents read docs/STAGE_CONTRACT.md, which carries the read set and the handoff
+           Agents read .claude/cast/STAGE_CONTRACT.md, which carries the read set and the handoff
            format and nothing else. That split is deliberate and load-bearing: in v2 every
            agent cited this file, and it had grown to ~5,000 tokens of routing rules that
            no stage acts on — the largest single item in every stage's context. Do not
@@ -22,7 +22,7 @@
 
 # The Engineering Loop
 
-The per-task engineering sequence executed by `/agent-code` and `/agent-task`. The unit of work is a **task file** (an instance of `templates/TASK.md` — `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md`, or `artifacts/one-off/task-{slug}.md`). The orchestrating skill selects the task file and runs this loop until the task passes validation (Step 3) or the loop cap escalates.
+The per-task engineering sequence executed by `/agent-code` and `/agent-task`. The unit of work is a **task file** (an instance of `.claude/cast/templates/TASK.md` — `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md`, or `artifacts/one-off/task-{slug}.md`). The orchestrating skill selects the task file and runs this loop until the task passes validation (Step 3) or the loop cap escalates.
 
 **Two stages, not four.**
 
@@ -42,7 +42,7 @@ Git is part of the loop's contract: every task leaves a commit trail keyed to it
 
 1. **Coder commits its own work** at the end of every pass — that task's production code and test files only, nothing else. The message starts with the task ID: `M{N}-T{TT}: <summary>` (one-off tasks use their slug). This is safe under parallel execution because eligible tasks have disjoint Files lists.
 2. **Loop-back passes stack, never amend.** A fix or refactor pass adds a new commit on top. Never amend or rebase mid-loop — the stacked history is the audit trail the Handoff Log points into.
-3. **The handoff entry names the commit** (the `Commit` field in `templates/TASK.md`). This is how Reviewer finds the code without re-reading whole files.
+3. **The handoff entry names the commit** (the `Commit` field in `.claude/cast/templates/TASK.md`). This is how Reviewer finds the code without re-reading whole files.
 4. **Reviewer reviews the diff, not the tree** — the commits recorded in the Handoff Log since the last Reviewer approval (on the first review, all of the task's commits), via `git show`/`git diff`, plus surrounding context only where the diff demands it.
 5. **Bug fixes cite the fix commit.** When a Fix Now defect is fixed, Coder fills the bug file's Resolution → Commit field with the hash of the stacking fix commit.
 6. **Validation closes the range.** Rolling back a bad task later means reverting the commits prefixed with its ID — no other task is touched.
@@ -125,8 +125,8 @@ Every task's acceptance criteria are checked, criterion by criterion, before it 
 
 Product validates against the task file's criteria and disposes of every flagged criterion. If any criterion is unmet, it appends the handoff entry citing the failure and the task returns to Coder.
 
-**Product retains milestone-grain oversight either way.** At the `/agent-code` milestone-completion checkpoint the close record's Per-Task Validation table (`templates/MILESTONE_CLOSE.md`) covers every task in the milestone — including 3a closures — so no task escapes Product review. A 3a-closed task whose criteria Product later judges unmet re-enters the loop like any Fix Now finding.
+**Product retains milestone-grain oversight either way.** At the `/agent-code` milestone-completion checkpoint the close record's Per-Task Validation table (`.claude/cast/templates/MILESTONE_CLOSE.md`) covers every task in the milestone — including 3a closures — so no task escapes Product review. A 3a-closed task whose criteria Product later judges unmet re-enters the loop like any Fix Now finding.
 
 ---
 
-Do NOT write any work artifact to `docs/`; that directory is reference-only. All live work — task files, bug files, progress entries, close records — goes under `artifacts/`.
+All live work — task files, bug files, progress entries, close records — goes under `artifacts/`. Never write into the project's own documentation locations (the source-map entries in `.claude/cast/SOURCES.md`) from this loop — Docs Writer alone updates the Documentation Home, at the completion checkpoints.

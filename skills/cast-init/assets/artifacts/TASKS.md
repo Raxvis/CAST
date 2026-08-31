@@ -7,7 +7,7 @@
            is also the SINGLE CANONICAL definition of the backlog lifecycle and field
            ownership — the skills reference these rules rather than restating them.
            Entries here are queue entries, not task files: /agent-task instantiates
-           templates/TASK.md at artifacts/one-off/task-{slug}.md when work starts.
+           .claude/cast/templates/TASK.md at artifacts/one-off/task-{slug}.md when work starts.
 
   HOW TO CUSTOMIZE:
   - Replace [PROJECT_NAME] with your project name.
@@ -19,7 +19,7 @@
 
 # [PROJECT_NAME] — One-Off Task Backlog
 
-Small, self-contained work — bug fixes, typos, single-function refactors, dependency bumps — queued by `/add-task` for later execution. Each entry is a queue entry, not a task file: when work starts, `/agent-task` creates the real task file at `artifacts/one-off/task-{slug}.md` from `templates/TASK.md` and this index tracks where the entry went. Drain the queue with `/agent-task backlog` (all open entries) or `/agent-task TASK-XXX` (one entry); `/agent-plan` Stage 1 reviews open entries and adopts the ones relevant to the milestone it is planning.
+Small, self-contained work — bug fixes, typos, single-function refactors, dependency bumps — queued by `/add-task` for later execution. Each entry is a queue entry, not a task file: when work starts, `/agent-task` creates the real task file at `artifacts/one-off/task-{slug}.md` from `.claude/cast/templates/TASK.md` and this index tracks where the entry went. Drain the queue with `/agent-task backlog` (all open entries) or `/agent-task TASK-XXX` (one entry); `/agent-plan` Stage 1 reviews open entries and adopts the ones relevant to the milestone it is planning.
 
 ---
 

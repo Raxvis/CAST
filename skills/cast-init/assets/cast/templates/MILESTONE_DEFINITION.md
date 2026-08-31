@@ -4,7 +4,7 @@
   directory, produced by the Product agent during /agent-plan Stage 1 as
   artifacts/milestone-{N}-{slug}/README.md. It describes WHAT the milestone is and WHY it
   matters, indexes the milestone's per-task files (tasks/task-{T}-{slug}.md, one instance
-  of templates/TASK.md each), and carries the milestone Status and the CEO Approval
+  of .claude/cast/templates/TASK.md each), and carries the milestone Status and the CEO Approval
   Conditions. Task-level detail ("how") lives in the task files, one per task.
 
   HOW TO CUSTOMIZE:
@@ -128,6 +128,17 @@ _Filled after the CEO verdict (`reviews/ceo.md`). Coder tracks each condition du
 
 ---
 
+## Standards Digest (required, scales)
+
+_The distilled project standards that apply to THIS milestone, written by Product at Stage 1 from the sources mapped in `.claude/cast/SOURCES.md` (Standards & Conventions, Testing & Quality). This section is what makes plans self-contained: engineering stages read the digest — never the sources — so every rule an implementer or reviewer needs must be stated here, concretely, with a citation back to where it came from. Rules that do not bear on this milestone's work are omitted; a milestone none of whose sources apply (or a project with no sources declared) collapses this to one line: "N/A — <no applicable standards / no sources declared; conventions inferred from existing code in `<paths>`>"._
+
+| Rule | Applies to | Source |
+|---|---|---|
+| [Concrete, checkable rule — e.g., "All DB access goes through the repository layer; no inline SQL in commands"] | [tasks/modules it binds] | [`path/to/source.md` § anchor] |
+| [Rule] | [scope] | [citation] |
+
+---
+
 ## Cross-Cutting Concerns (optional)
 
 _Anything that touches multiple tasks in this milestone and needs to be specified once at the milestone level rather than repeated per-task. Examples: error-handling conventions, logging requirements, shared naming rules, the set of platforms that must be tested._
@@ -139,9 +150,9 @@ _Anything that touches multiple tasks in this milestone and needs to be specifie
 
 ## References (required)
 
-- **PRD section(s):** [PRD link or section anchor]
+- **Requirements source(s):** [link or section anchor into the Product & Requirements locations mapped in `.claude/cast/SOURCES.md`, or "None declared — scope from the feature request"]
 
-_Only the variable reference lives here — the milestone's fixed layout (`architecture.md`, `ui.md`, `tasks/`, `reviews/`) is `docs/FILE_CONVENTIONS.md`'s to define, not each README's to restate._
+_Only the variable reference lives here — the milestone's fixed layout (`architecture.md`, `ui.md`, `tasks/`, `reviews/`) is fixed by CAST convention, not each README's to restate._
 
 ---
 

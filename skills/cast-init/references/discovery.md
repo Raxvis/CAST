@@ -28,27 +28,21 @@ For each matched file, read the first 20 lines and classify:
 - Is it a work log (standup, bug tracker)?
 - Is it reference material (PRD, style guide, architecture decision record)?
 
-## 1.3 — Documentation state
+## 1.3 — Documentation state (source-map candidates)
 
-- Does `docs/` exist? List every file.
-- Map existing files to CAST reference docs by content, not just filename. Look for:
-  - PRD / requirements / product requirements → `docs/PRD.md`
-  - Concept / vision / product overview → `docs/CONCEPT.md`
-  - Glossary / terminology / definitions → `docs/GLOSSARY.md`
-  - ADRs / decision log / design rationale → `docs/DESIGN_RATIONALE.md`
-  - Style guide / code conventions / coding standards → `docs/CODE_PATTERNS.md`
-  - File layout / directory convention → `docs/FILE_CONVENTIONS.md`
-  - Error handling guide → `docs/ERROR_HANDLING.md`
-  - Testing strategy / test setup → `docs/TEST_FRAMEWORK.md`
-  - Model policy / AI model selection / model upgrade guide → `docs/MODEL_OPTIMIZATION.md`
-  - CHANGELOG / release notes → `docs/CHANGELOG.md`
-  - Asset registry / media inventory → `docs/ASSETS.md`
-  - MVP launch checklist → `docs/MVP_LAUNCH.md`
-  - Frontend patterns → `docs/FRONTEND.md`
-  - Backend / API patterns → `docs/BACKEND.md`
-  - CLI patterns → `docs/CLI.md`
-  - Mobile patterns → `docs/MOBILE.md`
-- Is there a top-level `README.md`, `CHANGELOG.md`, or `TROUBLESHOOTING.md`? Note their presence.
+v4 installs no documentation — this section finds where the project's own documentation lives so the Phase 3 interview can propose it for `.claude/cast/SOURCES.md`. Classify every find by **source-map category**, judging by content, not filename:
+
+- **Where to look:** `docs/` and any documentation-shaped directory (`documentation/`, `doc/`, `wiki/`, `handbook/`, `adr/`, `rfcs/`, `design/`); root-level `README.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md`, `TESTING.md`, `STYLE.md`, `CHANGELOG.md`; doc comments pointing elsewhere. In a monorepo, sweep package-level docs too.
+- **Classify each find:**
+  - PRD / requirements / vision / roadmap / glossary / user research → **Product & Requirements**
+  - Style guide / code conventions / naming rules / file layout / error-handling guide / review checklist / CONTRIBUTING code-style sections → **Standards & Conventions**
+  - Architecture docs / ADRs / schemas / API contracts / design systems → **Architecture & Design**
+  - Testing strategy / coverage policy / QA checklists / performance budgets → **Testing & Quality**
+  - The directory where documentation updates evidently land (usually the main docs dir) → **Documentation Home** candidate
+  - CHANGELOG / release notes / deprecation log / ADR index → **Project Registers**
+- **Record, per candidate:** the path (or a glob covering a homogeneous set), one line on what it contains, and the proposed category. A file that fits two categories gets both noted with the better fit first; a genuinely ambiguous one becomes a Phase 3 Ask.
+- **A prior CAST install's `docs/`** is inventoried file-by-file with a filled-vs-skeleton judgment per file — the v3→v4 migration table in `dispositions.md` consumes exactly that list.
+- Nothing found is a valid outcome: record "no documentation discovered" per category so the interview can propose `_None declared._` honestly.
 
 ## 1.4 — Project metadata
 
@@ -89,7 +83,7 @@ These feed the substitution pass directly: each maps to a placeholder (`[PROJECT
 
 Detect workspace layouts before settling the metadata above: `pnpm-workspace.yaml`, a `workspaces` field in the root `package.json`, a `[workspace]` table in the root `Cargo.toml`, a `go.work` file, or equivalent (Nx/Turborepo/Lerna configs are corroborating signals). If the project is a workspace:
 
-- **Default to a root-level install.** CAST installs once at the repository root — one `CLAUDE.md`, one `.claude/`, one `docs/`/`templates/`/`artifacts/` — not per package. Only deviate if the user explicitly asks for a package-scoped install.
+- **Default to a root-level install.** CAST installs once at the repository root — one `CLAUDE.md`, one `.claude/` (agents, skills, cast machinery), one `artifacts/` — not per package. Only deviate if the user explicitly asks for a package-scoped install.
 - **Prefer workspace-wide values** for the metadata placeholders: the root manifest's `name` for `[PROJECT_NAME]`, workspace-wide commands (`pnpm -r test`, `cargo test --workspace`, `go test ./...`) for `[TEST_CMD]`/`[BUILD_CMD]`, and so on.
 - **Turn manifest ambiguity into Phase 3 Ask items.** When the root manifest lacks a value and multiple packages could supply it (which package's name is `[PROJECT_NAME]`? whose framework is `[FRAMEWORK]`? which test command is canonical?), do not pick one silently — record each ambiguity in the inventory's open questions and surface it as an Ask in the Phase 3 plan, listing the candidate packages.
 - **Sweep the workspace members for nested Claude Code config.** The 1.1 checks cover only the repository root; in a workspace, also glob each member package (bounded to the member directories detected above — e.g. `packages/*/.claude/**`, `apps/*/.claude/**`, and `<member>/CLAUDE.md` for every member) for per-package `.claude/` directories (agents, skills, commands, settings) and nested `CLAUDE.md` files. Inventory each hit like its root-level counterpart in 1.1. Any nested config found becomes a **Phase 3 Ask item** — consolidate it into the root install or leave it in place per package — never silently absorb or ignore it.
@@ -102,7 +96,7 @@ Detect project type:
 - **CLI** — `bin` entry in package.json, `cmd/` directory in Go, `#!/usr/bin/env` shebang files
 - **Library** — manifest has `main`/`exports`/`lib.rs` without a `bin`, no dev server command
 - **Data pipeline** — Airflow, dbt, Dagster, Prefect, Spark
-- **Mobile** — native or cross-platform mobile app targeting iOS / Android. Signals: React Native, Expo, Flutter, SwiftUI, Jetpack Compose, .NET MAUI, Ionic / Capacitor, native Swift (`.xcodeproj`, `Package.swift`), native Kotlin (`build.gradle` with Android plugin), `ios/` or `android/` directories at the project root, `Info.plist`, `AndroidManifest.xml`. **Mobile projects are also Frontend** — they render a UI — so classify them as `mobile` (for MOBILE.md) AND as requiring `docs/FRONTEND.md`. Both topic docs apply.
+- **Mobile** — native or cross-platform mobile app targeting iOS / Android. Signals: React Native, Expo, Flutter, SwiftUI, Jetpack Compose, .NET MAUI, Ionic / Capacitor, native Swift (`.xcodeproj`, `Package.swift`), native Kotlin (`build.gradle` with Android plugin), `ios/` or `android/` directories at the project root, `Info.plist`, `AndroidManifest.xml`. **Mobile projects are also Frontend** — they render a UI — so classify them as `mobile` AND `frontend` — the classification feeds the `ui` opt-out decision (never offer it for these) and helps the interview classify design-system material.
 - **Mixed** — multiple of the above (common for full-stack apps, monorepos, or apps with both a mobile client and a web dashboard)
 
 Read the top of the existing `README.md` for the project's one-sentence pitch. If none exists, note that you'll need to prompt the user for it during Phase 3.

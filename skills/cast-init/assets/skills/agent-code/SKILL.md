@@ -10,11 +10,11 @@ description: >-
 
 <!-- TEMPLATE INSTRUCTIONS
 PURPOSE: This file defines the /agent-code pipeline skill. It runs the Engineering Stage for
-an approved milestone by executing the canonical loop in docs/PIPELINE_LOOP.md. This file
+an approved milestone by executing the canonical loop in .claude/cast/PIPELINE_LOOP.md. This file
 carries only the deltas specific to milestone work.
 
-READ docs/PIPELINE_LOOP.md — you (the orchestrator) are its audience. Agents do not read it;
-they read docs/STAGE_CONTRACT.md. Do not pass the loop doc into a stage invocation.
+READ .claude/cast/PIPELINE_LOOP.md — you (the orchestrator) are its audience. Agents do not read it;
+they read .claude/cast/STAGE_CONTRACT.md. Do not pass the loop doc into a stage invocation.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
@@ -45,7 +45,7 @@ Run the engineering stage for a milestone the CEO approved during `/agent-plan`.
 
 ## Model Compatibility
 
-Each stage runs on the model in its agent file (default `inherit` — the session model). Effort is per agent file (Coder `medium`, Reviewer `high`, Product `high`/`low` by duty; `xhigh` is opt-in). Reviewer reports every Defect and Issue it finds — filtering happens in triage, never at review time. Per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
+Each stage runs on the model in its agent file (default `inherit` — the session model). Effort is per agent file (Coder `medium`, Reviewer `high`, Product `high`/`low` by duty; `xhigh` is opt-in). Reviewer reports every Defect and Issue it finds — filtering happens in triage, never at review time.
 
 ## Input
 
@@ -71,14 +71,15 @@ The argument text the user provided (e.g. `/agent-code milestone-1`) — a miles
 
 ### Per-Task Loop
 
-Execute the loop in `docs/PIPELINE_LOOP.md` — Coder → Reviewer → validation, with the Defect and Issue routing, commit discipline, test gate, amendment rule, loop counters, and Environment Issue rule. That doc is the canonical statement; do not improvise routing.
+Execute the loop in `.claude/cast/PIPELINE_LOOP.md` — Coder → Reviewer → validation, with the Defect and Issue routing, commit discipline, test gate, amendment rule, loop counters, and Environment Issue rule. That doc is the canonical statement; do not improvise routing.
 
 **Task release.** When you select a task, append its first Handoff Log entry yourself — `orchestrator -> coder — task released` (Outcome: released for implementation; Read next: Manifest only). You write this one entry and no others; every later entry comes from a stage.
 
 Deltas for this skill:
 
-- **Every stage receives the task file path** and reads only that file, its Context Manifest, and the latest entry's "Read next" (`docs/STAGE_CONTRACT.md`). Never pass whole design documents into a stage — the manifest cites the sections each task needs. A stage that finds the manifest insufficient adds the missing reference and notes it.
-- **Never pass `docs/PIPELINE_LOOP.md` into a stage.** It is yours; stages read `docs/STAGE_CONTRACT.md`.
+- **Every stage receives the task file path** and reads only that file, its Context Manifest, and the latest entry's "Read next" (`.claude/cast/STAGE_CONTRACT.md`). Never pass whole design documents into a stage — the manifest cites the sections each task needs. A stage that finds the manifest insufficient adds the missing reference and notes it.
+- **Never pass `.claude/cast/PIPELINE_LOOP.md` into a stage.** It is yours; stages read `.claude/cast/STAGE_CONTRACT.md`.
+- **Never pass a source-map location into a stage, and never read one yourself.** Engineering runs entirely on the plan: the Standards Digest and design documents carry what planning distilled. A digest gap a stage flags is a planning defect — route it through the task-amendment rule (Product owns the digest), not by opening the sources.
 - **Stage replies are one routing line**: `Handoff entry #<n> appended — <outcome>; next: <stage>`. Route on it. Never relay, summarize, or re-read a stage's work into your context — the Handoff Log on disk is the record.
 - **Coder (Step 1)** additionally honors any Approval Conditions the task's manifest points at.
 - The test-gate pre-check, the criterion-violating-Defect auto-route, and the batch-triage rule are part of the loop doc (Step 2 and 2a/2b) — apply them as written there.
@@ -117,7 +118,7 @@ When either trips, pause and escalate with: which tasks are looping and on what,
 
 1. **Status writeback.** Mark the task's **Status** Complete in its own file's Header — the single place task status lives, and what makes this skill resumable.
 2. **Progress entry.** Append the task's `progress` entry to `artifacts/STANDUP.md` under this run's heading, per Step 3a or 3b.
-3. **Overflow drain (conditional).** Count pending `docs` entries (the `- <agent> | docs | <note>` lines without ✅). At **10 or more**, invoke **docs-writer** now; below that, the queue waits for the milestone drain.
+3. **Overflow drain (conditional).** Count pending `docs` entries (the `- <agent> | docs | <note>` lines without ✅). At **10 or more**, invoke **docs-writer** now; below that, the queue waits for the milestone drain. Docs Writer runs only when `.claude/cast/SOURCES.md` declares a Documentation Home — with none declared, never launch it: list the pending entries to the user instead and leave them un-✅'d.
 
 #### Milestone-completion checkpoint
 
@@ -129,10 +130,10 @@ Fires when every task file is Complete or Deferred.
    - Findings from steps 2–3 are filed as bug files, triaged by Product inside the close pass below. A **Fix Now** finding sends the affected task back into the loop; the close pass runs (or is revised) once it resolves. Deferred findings join Known Issues.
 4. **Milestone close (one product launch).** Launch **product** once to close the milestone end-to-end — the steps are strictly sequential and each consumes what the previous produced, so they share one context:
    - **Re-triage** every Deferred bug in `artifacts/BUGS.md` and every Deferred task file — schedule, re-defer with an updated rationale, or close as Won't Fix with a rationale — plus any bugs steps 2–3 just filed.
-   - **Write `reviews/close.md`** (`templates/MILESTONE_CLOSE.md`): the Per-Task Validation table covers **every** task including Step 3a closures, citing Reviewer's Acceptance Criteria Check as evidence; the retrospective sections fill every metric from its recorded source.
+   - **Write `reviews/close.md`** (`.claude/cast/templates/MILESTONE_CLOSE.md`): the Per-Task Validation table covers **every** task including Step 3a closures, citing Reviewer's Acceptance Criteria Check as evidence; the retrospective sections fill every metric from its recorded source.
    - **Verify each CEO Approval Condition** — flip Status to Verified with verifier and date, or leave it open under Known Issues.
    - **Set Status** — **Complete with Deferrals** when anything remains Deferred, otherwise **Complete** — and mirror it into the README Header.
-5. **Docs Writer.** If any pending `docs` entries remain (`- <agent> | docs | <note>` lines without ✅), launch **docs-writer** to drain them. This is the milestone's primary drain; skip only when the queue is empty.
+5. **Docs Writer.** If any pending `docs` entries remain (`- <agent> | docs | <note>` lines without ✅) **and** `.claude/cast/SOURCES.md` declares a Documentation Home, launch **docs-writer** to drain them into it. This is the milestone's primary drain; skip when the queue is empty, and with no Documentation Home declared, launch nothing — surface the pending entries in the run summary so the user can update their documentation themselves.
 6. **Record and archive (orchestrator, no agent).** Append the milestone's rows to `artifacts/AGENT_STATE.md` — Milestone Progress, any Decisions Log entries stages surfaced in their handoff entries, and the Performance Budget Current/Status values from `reviews/risk-impl.md` when step 3 ran (a transcription of measurements already on record). Then bound the root files: move `artifacts/one-off/task-*.md` with Status Complete to `artifacts/one-off/archive/`; move STANDUP session sections older than this milestone's first session to `artifacts/archive/STANDUP.md`; move closed AGENT_STATE rows dated before it to `artifacts/archive/AGENT_STATE.md`. Never move unresolved Open Questions, the Milestone Progress table, or the Performance Budget table. Rows relocate verbatim — the history stays greppable.
 7. Append a final `progress` entry summarizing the run.
 8. **Summarize** for the user: what was implemented, test results, bugs filed (including any still Deferred), the outcome of each completion review that ran, and the status of every Approval Condition.
@@ -142,6 +143,6 @@ Fires when every task file is Complete or Deferred.
 
 - A task blocked by an unfinished dependency: skip it, record a `blocker` entry.
 - An ambiguous architecture document or UI spec: flag it, pause the task, tell the user to re-run the relevant `/agent-plan` stage. Do not guess.
-- Loop-cap escalation and Environment Issue handling follow `docs/PIPELINE_LOOP.md`. On an Environment Issue, pause the task and escalate the infrastructure problem to the user directly — v3 has no Validator agent for this; other tasks are not blocked.
+- Loop-cap escalation and Environment Issue handling follow `.claude/cast/PIPELINE_LOOP.md`. On an Environment Issue, pause the task and escalate the infrastructure problem to the user directly — v3 has no Validator agent for this; other tasks are not blocked.
 
-Do NOT write any work artifact to `docs/`; that directory is reference-only.
+Do NOT write any work artifact into the project's own documentation locations (the source-map entries in `.claude/cast/SOURCES.md`) — Docs Writer alone updates the Documentation Home, at the checkpoints above. All work artifacts go under `artifacts/`.

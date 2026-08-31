@@ -1,5 +1,5 @@
 <!-- TEMPLATE INSTRUCTIONS
-  FILE: templates/README.md
+  FILE: cast/templates/README.md (installed to .claude/cast/templates/README.md)
   PURPOSE: Index for the document-template directory. Lists every reusable template,
   the agent that consumes it, and where its filled-in instances are written.
 
@@ -16,10 +16,10 @@ This directory holds **reusable document templates only**. Each file is a skelet
 agent copies into `artifacts/` and fills in to produce a work instance. Templates are never
 filled in place — copy first, then edit the copy.
 
-> **Scope of this directory:** `templates/` holds reusable document skeletons. Reference
-> material (requirements, conventions, design rationale) lives in `docs/`; filled-in work
-> instances live in `artifacts/`. See `docs/FILE_CONVENTIONS.md` for the full split and the
-> root `README.md` for the rationale.
+> **Scope of this directory:** `.claude/cast/templates/` holds CAST's reusable document
+> skeletons; filled-in work instances live in `artifacts/`. The project's own reference
+> material (requirements, conventions, design rationale) lives wherever you keep it —
+> mapped by `.claude/cast/SOURCES.md`, never inside `.claude/cast/`.
 
 ---
 
@@ -42,12 +42,11 @@ filled in place — copy first, then edit the copy.
 
 ## How to use a template
 
-1. Pick the template that matches what you are documenting (see the table above, or
-   `docs/CODE_PATTERNS.md` → "Architecture Document Templates").
+1. Pick the template that matches what you are documenting (see the table above).
 2. **Copy** it to the correct location inside the milestone's directory
-   (`artifacts/milestone-{N}-{slug}/`) under the naming pattern in
-   `docs/FILE_CONVENTIONS.md` — or under `artifacts/one-off/` for `/agent-task` work.
-3. Fill in the copy. Never edit the template in `templates/` directly.
+   (`artifacts/milestone-{N}-{slug}/`, naming patterns in `artifacts/README.md`) — or
+   under `artifacts/one-off/` for `/agent-task` work.
+3. Fill in the copy. Never edit the template in `.claude/cast/templates/` directly.
 
 ---
 

@@ -10,7 +10,8 @@ Per-agent models and tool lists are pre-configured in each agent file's YAML fro
 not placeholders. The `tools:` line is deliberate enforcement — every list omits the Task
 tool, which makes "do not spawn subagents" a hard guarantee rather than an instruction.
 Every agent defaults to `model: inherit` (it runs on the session model); role
-differentiation comes from the frontmatter `effort:` key. See docs/MODEL_OPTIMIZATION.md.
+differentiation comes from the frontmatter `effort:` key. Per-model orchestration notes
+live in each pipeline skill's Model Compatibility section.
 -->
 
 # [PROJECT_NAME] — Agent System Overview
@@ -19,7 +20,7 @@ differentiation comes from the frontmatter `effort:` key. See docs/MODEL_OPTIMIZ
 
 Seven specialist agents. Each owns a domain, hands work off through files rather than conversation, and reads a deliberately small slice of the project.
 
-**The read set is the whole design.** An agent working a task reads that task file, the entries in its Context Manifest, and whatever the last handoff entry says to read next — nothing else. It appends one capped entry to the task file and replies to the orchestrator with a single routing line. Capped reads in, one line out, so the orchestrating context stays flat across an entire milestone. The full contract is `docs/STAGE_CONTRACT.md`, and it is the only process document an agent ever reads.
+**The read set is the whole design.** An agent working a task reads that task file, the entries in its Context Manifest, and whatever the last handoff entry says to read next — nothing else. It appends one capped entry to the task file and replies to the orchestrator with a single routing line. Capped reads in, one line out, so the orchestrating context stays flat across an entire milestone. The full contract is `.claude/cast/STAGE_CONTRACT.md`, and it is the only process document an agent ever reads.
 
 **Why seven and not fifteen.** Every agent launch pays a cold context — the agent definition, project memory, the task file, the manifest — before doing any work, and each distinct agent *type* is a separate prompt-cache prefix. A role earns its own agent when it brings **independence**: a different reader, examining work someone else did, where the risk is self-serving judgment. Reviewer reading Coder's diff is independence and is worth its spawn. A separate agent writing tests for code another agent just wrote is not independence — it is a second pass by an equally-invested party, at full cold-context cost. Nor is a second reviewer of the same plan: the CEO read the risk review in full minutes after another cold context wrote it, so the risk lenses now run inside the CEO's own pass. v3 merged those cases into the stages that already held the context, and kept every gate they enforced.
 
@@ -33,7 +34,7 @@ Seven specialist agents. Each owns a domain, hands work off through files rather
 | Coder | `coder.md` | T1 | Owns every change to production code and its tests. Implements, tests, commits; handles every loop-back — defect fixes (investigating root cause when needed), Issue restructuring, and criteria rejections. |
 | Reviewer | `reviewer.md` | T1 | The independent gate. Verifies the test-results block, reviews the diff, classifies findings as Defects (filing each as a bug file) or Issues, and records the per-criterion Acceptance Criteria Check. |
 | Architect | `architect.md` | T2 | Owns system design: module boundaries, data schemas, cross-module contracts, the performance budget. Returns the manifest rows each task needs. |
-| Docs Writer | `docs-writer.md` | T2 | Owns `docs/`. Drains the documentation queue at milestone completion, at an overflow drain, and at `/agent-task` completion — launched only when entries are pending. |
+| Docs Writer | `docs-writer.md` | T2 | Maintains the project's own documentation at the Documentation Home mapped in `.claude/cast/SOURCES.md`. Drains the documentation queue at milestone completion, at an overflow drain, and at `/agent-task` completion — launched only when entries are pending and a Documentation Home is declared. |
 | UI | `ui.md` | T3 | Owns visual design, layout, interaction states, accessibility. Performs the milestone UX review. Optional for backend/CLI-only projects. |
 | CEO | `ceo.md` | T3 | The planning gate. Runs the security and performance lenses over the plan (writing `reviews/risk.md` and its two flags when they apply), reads across every planning artifact for what falls *between* the specialists, and issues APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED. Also runs the flagged implementation reviews at milestone completion. |
 
@@ -51,12 +52,12 @@ v2 routed conflicts through a Validator agent. v3 escalates to the user: an unre
 
 | Section | Purpose |
 |---|---|
-| **Model Configuration** | Effort default and when to raise it; the pointer to `docs/STAGE_CONTRACT.md`; the role's binding rules |
+| **Model Configuration** | Effort default and when to raise it; the pointer to `.claude/cast/STAGE_CONTRACT.md`; the role's binding rules |
 | **Role** | What this agent owns, in a few lines |
 | **Duties / What a pass does** | The actual work, step by step |
 | **Boundaries** | What this agent may **not** do |
 
-The documentation-queue rule (append `- <agent> | docs | <note>` to `artifacts/STANDUP.md` when work changes something documentation-worthy) lives in `docs/STAGE_CONTRACT.md`, once, rather than restated per agent file.
+The documentation-queue rule (append `- <agent> | docs | <note>` to `artifacts/STANDUP.md` when work changes something documentation-worthy) lives in `.claude/cast/STAGE_CONTRACT.md`, once, rather than restated per agent file.
 
 Agents may add domain-specific sections (checklists, rubrics, output formats). They may **not** re-add the v2 org-chart sections — Purpose, Goals, Authority, Inputs, Outputs — which averaged 52 lines per agent restating what the Rules block and the task file already carried. That is documentation *about* a role, loaded as instruction *to* it, on every spawn.
 
@@ -134,7 +135,7 @@ Same loop, no milestone and no CEO verdict: Coder → Reviewer → validation, w
 
 ### Planning (`/agent-plan`)
 
-1. **Product** defines scope and writes the milestone README plus one task file per task, each seeded with the smallest sufficient Context Manifest. It also sweeps the Deferred backlog, reviews the intake queues (open `/file-bug` reports in `artifacts/BUGS.md` and open `/add-task` entries in `artifacts/TASKS.md`) — adopting into the milestone whatever is relevant to it — and disposes of the previous close record's open actions.
+1. **Product** reads the project's mapped sources (`.claude/cast/SOURCES.md` — requirements, standards, testing), defines scope, and writes the milestone README — including the **Standards Digest**, the distilled rules engineering will follow so it never reads the sources itself — plus one task file per task, each seeded with the smallest sufficient Context Manifest. It also sweeps the Deferred backlog, reviews the intake queues (open `/file-bug` reports in `artifacts/BUGS.md` and open `/add-task` entries in `artifacts/TASKS.md`) — adopting into the milestone whatever is relevant to it — and disposes of the previous close record's open actions.
 2. **Architect** and **UI** run in parallel, each producing its document and returning **Manifest Rows** rather than editing task files. UI runs only when a task is UI-flagged.
 3. **2c**: the orchestrator applies both agents' rows to the task files. Single-writer, no spawn.
 4. **CEO** — one launch, two parts: the risk lenses over the architecture (only when the plan shows a security surface or an applicable performance budget; writes `reviews/risk.md` with the two implementation-review flags), then the cross-cutting review and verdict. REVISION REQUIRED returns the plan to the named agent; the CEO's re-review re-runs its lenses when the architecture changed. Cap: 3 revision cycles, then escalate.
@@ -185,20 +186,20 @@ Escalate to the **user**, not to another agent:
 
 ## Documentation Placement
 
-The hard rule: **`docs/` is reference, `templates/` is skeletons, `artifacts/` is work.**
+The hard rule: **your documentation is yours, `.claude/cast/` is CAST's machinery, `artifacts/` is work.**
 
 | Content | Location | Owner |
 |---|---|---|
-| Requirements, conventions, design rationale | `docs/` | Docs Writer |
-| Reusable document skeletons | `templates/` | (not modified during work) |
+| Requirements, conventions, design rationale — the project's own documentation | Wherever the source map (`.claude/cast/SOURCES.md`) says it lives | Docs Writer (updates the Documentation Home; the material is the user's) |
+| The source map, process contracts, and reusable document skeletons | `.claude/cast/` (templates under `.claude/cast/templates/`) | (not modified during work) |
 | Milestone definitions, design docs, reviews, task files, bug files | `artifacts/milestone-{N}-{slug}/` | The producing agent |
-| Bug index, session log, project state | `artifacts/` root | Orchestrator |
+| Bug index, task backlog, session log, project state | `artifacts/` root | Orchestrator |
 | One-off task work | `artifacts/one-off/` | The producing agent |
 
-No agent writes a work artifact to `docs/` or fills a template in place.
+No agent writes a work artifact into the project's documentation or fills a template in place. Planning stages read the mapped sources and distill them into milestone artifacts; engineering stages read only those artifacts.
 
 ## Templates
 
-Agents that produce a document read its template from `templates/` **first** and follow its structure. Required sections are always present; sections marked `(required, scales)` collapse to one `N/A — <reason>` line when the work does not exercise them; `(optional)` sections are omitted unless their trigger fires. **Depth scales; coverage does not** — the milestone close record still carries one Per-Task Validation row per task, and UI_SPEC's six interaction states and accessibility section are the gate, not a suggestion.
+Agents that produce a document read its template from `.claude/cast/templates/` **first** and follow its structure. Required sections are always present; sections marked `(required, scales)` collapse to one `N/A — <reason>` line when the work does not exercise them; `(optional)` sections are omitted unless their trigger fires. **Depth scales; coverage does not** — the milestone close record still carries one Per-Task Validation row per task, and UI_SPEC's six interaction states and accessibility section are the gate, not a suggestion.
 
-Revisions happen in place. Git is the audit log — v2's hand-maintained `## Revision History` tables are gone (`docs/FILE_CONVENTIONS.md` → Revisions).
+Revisions happen in place. Git is the audit log — v2's hand-maintained `## Revision History` tables are gone.

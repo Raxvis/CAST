@@ -2,7 +2,8 @@
 name: cast-release
 description: >-
   Prepare a release after a milestone closes: verify the quality gates, assign a semantic
-  version, update docs/CHANGELOG.md, and run the build verification. Use when the user asks
+  version, update the project changelog named in the .claude/cast/SOURCES.md Project
+  Registers, and run the build verification. Use when the user asks
   to cut a release, prepare release notes, or invokes /cast-release. Runs in-session and
   launches no agents.
 ---
@@ -59,7 +60,7 @@ State the bump and the reason before applying it. When the change set spans cate
 
 ## Changelog
 
-Update `docs/CHANGELOG.md` — **this skill is its owner**; Docs Writer routes changelog-worthy items here rather than editing the file. Add one entry for the new version, newest first, describing every substantive change since the prior version, grouped Added / Changed / Fixed / Removed. Source the entries from:
+Read the **Project Registers** section of `.claude/cast/SOURCES.md` for the changelog's location. With one declared, update it — **this skill is its owner**; Docs Writer routes changelog-worthy items here rather than editing the file. Match the file's existing entry format; absent one, add entries newest-first, grouped Added / Changed / Fixed / Removed. With **no changelog declared**, skip this step, say so in the release record's Changes section, and include the would-be entry text there so the user can place it. Either way, describe every substantive change since the prior version, sourced from:
 
 - the milestone's `reviews/close.md` (what shipped),
 - the `artifacts/BUGS.md` rows closed during the milestone (what was fixed),

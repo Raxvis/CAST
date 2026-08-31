@@ -48,7 +48,7 @@
   evidence at the next milestone's planning and in the retrospective.
 
   Coverage is NOT scalable. The Per-Task Validation table carries one row per task
-  in the milestone — including tasks that closed via Step 3a of docs/PIPELINE_LOOP.md
+  in the milestone — including tasks that closed via Step 3a of .claude/cast/PIPELINE_LOOP.md
   without a Product spawn during the loop. Those tasks were validated by Reviewer's
   Acceptance Criteria Check; this document is where Product reviews them, so omitting
   one defeats the batching Step 3a enables. Scale the depth of the Notes, never the
@@ -236,7 +236,7 @@ _Fill each metric from its recorded source (product.md → Duty 5) — do not es
 | Escalations to the user | [N] | `blocker` entries in `artifacts/STANDUP.md` for this milestone |
 | Architecture doc revisions | [N] | `git log --follow artifacts/milestone-{N}-{slug}/architecture.md` |
 | UI spec revisions | [N] | `git log --follow artifacts/milestone-{N}-{slug}/ui.md` |
-| Manifest patches during engineering | [N] | Handoff Log entries across `artifacts/milestone-{N}-{slug}/tasks/task-*.md` noting a Context Manifest addition (the insufficient-manifest fallback in `docs/STAGE_CONTRACT.md`). Each one is a planning defect the CEO gate missed — a high count is itself an improvement action |
+| Manifest patches during engineering | [N] | Handoff Log entries across `artifacts/milestone-{N}-{slug}/tasks/task-*.md` noting a Context Manifest addition (the insufficient-manifest fallback in `.claude/cast/STAGE_CONTRACT.md`). Each one is a planning defect the CEO gate missed — a high count is itself an improvement action |
 
 ---
 

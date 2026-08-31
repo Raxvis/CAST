@@ -22,7 +22,7 @@ between them, which is what a cross-cutting review actually examines.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. The review checklist lives in templates/CEO_REVIEW.md — adjust it to the gates that
+2. The review checklist lives in .claude/cast/templates/CEO_REVIEW.md — adjust it to the gates that
    matter for your project.
 3. The verdict vocabulary is parsed by /agent-plan and /agent-code — keep it exact.
 4. The severity scale matches artifacts/BUGS.md — keep them aligned.
@@ -36,7 +36,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`.
 
-**Contract:** `docs/STAGE_CONTRACT.md` — you are a milestone-grain stage, so your read set is the one below rather than a single task file.
+**Contract:** `.claude/cast/STAGE_CONTRACT.md` — you are a milestone-grain stage, so your read set is the one below rather than a single task file.
 
 **Rules:**
 
@@ -62,7 +62,7 @@ The lenses stay separate in the output — a reader looking for the security pos
 - **Security lens** — vulnerabilities, insecure patterns, and risky dependencies the milestone introduces: authentication and authorization boundaries, input handling and injection surfaces, secret and credential handling, sensitive-data storage and transit, and the trust assumptions of every new dependency.
 - **Performance lens** — hot paths, state-update frequency, memory footprint, rendering and query cost, and unbounded growth, against the architecture document's Performance Budget section.
 
-Write the result to `artifacts/milestone-{N}-{slug}/reviews/risk.md` (no `templates/` skeleton — this is the format):
+Write the result to `artifacts/milestone-{N}-{slug}/reviews/risk.md` (no template skeleton — this is the format):
 
 ```
 # Risk Review — [MILESTONE_NAME]
@@ -109,7 +109,7 @@ Reading a design document end-to-end is not the job. A cross-cutting review exam
 
 ### Output
 
-Copy `templates/CEO_REVIEW.md`, fill every section, write to `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
+Copy `.claude/cast/templates/CEO_REVIEW.md`, fill every section, write to `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
 
 Required in every review:
 

@@ -16,8 +16,8 @@ executed later — individually (/agent-task TASK-XXX), in bulk (/agent-task bac
 by adoption into a milestone (/agent-plan Stage 1 reviews open entries).
 
 /add-task writes only to artifacts/TASKS.md. It creates no task files — /agent-task
-instantiates templates/TASK.md when work on an entry actually starts — and it never
-writes to docs/ or templates/.
+instantiates .claude/cast/templates/TASK.md when work on an entry actually starts — and it
+never writes to .claude/cast/ or the project's documentation.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
@@ -70,4 +70,4 @@ Confirm what was queued: the ID(s) and title(s), plus the standing options — `
 
 ## Scope Boundaries
 
-`/add-task` writes only `artifacts/TASKS.md`. It does not create task files, modify code, launch agents, file bugs (that is `/file-bug`), or write anything to `docs/`, `templates/`, or a milestone directory. It records work; it never performs it.
+`/add-task` writes only `artifacts/TASKS.md`. It does not create task files, modify code, launch agents, file bugs (that is `/file-bug`), or write anything to `.claude/cast/`, the project's documentation, or a milestone directory. It records work; it never performs it.

@@ -12,7 +12,7 @@ data schemas, and the performance budget for a milestone.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
-2. The templates table below points at templates/ARCH_*.md — adjust if you add templates.
+2. The templates table below points at .claude/cast/templates/ARCH_*.md — adjust if you add templates.
 -->
 
 <!-- Placeholders — see README.md → Placeholder Reference -->
@@ -25,11 +25,12 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`. Raise to `xhigh` for a milestone introducing a new subsystem, a schema migration, or a cross-cutting contract change.
 
-**Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format.
+**Contract:** `.claude/cast/STAGE_CONTRACT.md` — read set, handoff format, reply format.
 
 **Rules:**
 
-- **Simplest design that meets the requirements.** No speculative abstractions, no future-proofing for milestones that do not exist. The Post-Launch Roadmap in `docs/PRD.md` exists so you can make a decision *compatible* with future work without *building* for it.
+- **Simplest design that meets the requirements.** No speculative abstractions, no future-proofing for milestones that do not exist. Where the project's requirements sources name a roadmap, use it to make decisions *compatible* with future work without *building* for it.
+- **Design within the system that exists.** Your invocation names the project's Architecture & Design sources (mapped in `.claude/cast/SOURCES.md`) alongside prior milestones' architecture documents — read them and stay consistent with the contracts, schemas, and patterns they establish. Everything a downstream task needs from them must land in *your* document: engineering reads the milestone artifacts, never the sources.
 - **Return a Manifest Rows block** in your report (below). The manifest — not the whole document — is what engineering agents read.
 - **Minor structural choices are yours.** Pick a reasonable default and record it in the Decisions Log rather than asking.
 - **Name every new dependency** in the Decisions Log with what it buys and what it costs. Coder may not introduce one that isn't there.
@@ -44,9 +45,9 @@ You decide how the milestone is built: what the modules are, where their boundar
 
 | Artifact | Template | Destination |
 |---|---|---|
-| Milestone architecture | `templates/ARCH_SYSTEM.md` | `artifacts/milestone-{N}-{slug}/architecture.md` |
-| Supplemental module depth (when the milestone needs it) | `templates/ARCH_MODULE.md` | `artifacts/milestone-{N}-{slug}/arch-{slug}.md` |
-| Supplemental schema depth (when the milestone needs it) | `templates/ARCH_DATA_SCHEMA.md` | `artifacts/milestone-{N}-{slug}/arch-{slug}.md` |
+| Milestone architecture | `.claude/cast/templates/ARCH_SYSTEM.md` | `artifacts/milestone-{N}-{slug}/architecture.md` |
+| Supplemental module depth (when the milestone needs it) | `.claude/cast/templates/ARCH_MODULE.md` | `artifacts/milestone-{N}-{slug}/arch-{slug}.md` |
+| Supplemental schema depth (when the milestone needs it) | `.claude/cast/templates/ARCH_DATA_SCHEMA.md` | `artifacts/milestone-{N}-{slug}/arch-{slug}.md` |
 
 Read the template **first** and follow its structure — downstream agents rely on predictable sections. Link supplements from the milestone document; never inline them.
 
