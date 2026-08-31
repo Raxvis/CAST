@@ -56,7 +56,7 @@ Common problems adopting or running this template, with the most likely cause an
    rmdir .cast-stage/skills .cast-stage
    ```
 3. Restart your Claude Code session so the moved agents and skills register.
-4. To avoid staging entirely, run `/cast-init` in an interactive session and approve the `.claude/` write prompts when asked.
+4. To avoid staging entirely, run `/cast-init` in an interactive session and approve the `.claude/` write prompts when asked — or run the deterministic installer yourself from a plain shell, outside any permission system: `bash .claude/skills/cast-init/scripts/install.sh --project-name "<name>" --test-cmd "<cmd>"` (it never overwrites existing files).
 
 ---
 

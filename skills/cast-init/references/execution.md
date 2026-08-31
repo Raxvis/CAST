@@ -41,16 +41,27 @@ Verify:
 2. **Not a git repository?** If `git rev-parse --is-inside-work-tree` fails, there is no rollback safety net: warn the user explicitly, then either get their explicit confirmation to proceed without one or offer to run `git init` (plus an initial commit) so the recovery path exists. Do not proceed silently. In a non-git project, every `git mv`/`git rm` below becomes plain `mv`/`rm`.
 3. `CAST_SOURCE` (resolved in SKILL.md as `<CAST_SKILL_DIR>/assets`) exists and contains `agents/`, `skills/`, `cast/`, `artifacts/`, and `root/`. If missing, stop — the cast-init install is incomplete; ask the user to re-install with `npx skills add Raxvis/CAST` or `/plugin install cast@cast`.
 
-## 5.1a — Fast path for pure-Create actions
+## 5.1a — The deterministic installer handles pure-Create actions
 
-Most greenfield adoptions are dominated by **Create** actions with no merge work. Do not read-and-retype those files one at a time. Instead:
+Every payload file has exactly one destination — agents to `.claude/agents/`, skills to `.claude/skills/`, the machinery to `.claude/cast/`, the scaffold to `artifacts/` — so the Create portion of an adoption is a script, not a judgment call. **Run the bundled installer** instead of copying files one at a time:
 
-1. Copy the payload subtrees mechanically with shell (`cp -R "<CAST_SOURCE>/cast/." .claude/cast/` etc., or per-file `cp` driven by the plan's Create list). This is permitted: the safety rule forbids executing the *target project's* code, not using the shell to copy CAST's own payload files.
-2. Run **one substitution pass** over the copied files, replacing every token listed in 5.4.2 with its inventory value (e.g. a scripted find-and-replace per token). The pass must also cover the tokens introduced outside 5.4.2: `[MAX_LOOP_COUNT]` (default 3 — see 5.5.2 and the 5.6 note on `.claude/cast/PIPELINE_LOOP.md`) and the `[YYYY-MM-DD]` "Last updated" tokens in the installed READMEs and `SOURCES.md`, replaced with the install date per 5.6.
-3. Run **one scaffolding-strip pass** over the copied files per the global strip rule (skip the `.claude/cast/templates/` skeletons).
-4. Spot-check one file per class (an agent, a pipeline skill, a doc) to confirm substitution and strip landed, then rely on Phase 6 validation for full coverage.
+```bash
+bash <CAST_SKILL_DIR>/scripts/install.sh \
+  --project-name "<name>" --test-cmd "<cmd>" --build-cmd "<cmd>" \
+  --max-loop-count <N> [--versioning-scheme "<scheme>"] [--no-ui]
+```
 
-The per-file read-merge-write procedure in 5.4–5.8 remains **required** for every Rename+Update and Update-in-place action — customization preservation cannot be done mechanically. Never bulk-copy over an existing file.
+Facts about the script that make it safe to run inside an adoption:
+
+- It **never overwrites an existing file** (no `--force` during an adoption — ever): each existing path is skipped and reported, so files the plan marked Rename+Update / Update-in-place / Preserve are untouched and remain 5.4–5.8's per-file merge work.
+- It performs the substitution pass (the 5.4.2 tokens plus `[MAX_LOOP_COUNT]`, `[CAST_VERSION]` from this skill's own `metadata.version`, and the `[YYYY-MM-DD]` install date) and the scaffolding-strip pass (skipping the `.claude/cast/templates/` skeletons) in one deterministic sweep.
+- Pass `--no-ui` when the plan carries the recorded `ui` opt-out — it skips `ui.md` and the two UI templates together.
+- `SOURCES.md` installs as the empty-category skeleton; step 5.6.3 (writing the interview answers into it) still runs afterwards. Running the script does **not** replace 5.6.3, 5.8's CLAUDE.md handling for a pre-existing file it skipped, or any migration move.
+- This is permitted under safety rule 7: the rule forbids executing the *target project's* code, not CAST's own installer.
+
+After the script reports, reconcile its output against the plan ledger: every Create it installed is checked off; every skip must correspond to a planned non-Create action (a skip the plan did not predict is a drift signal — stop and re-check). Spot-check one file per class, then rely on Phase 6 validation for full coverage.
+
+If the script cannot run (no bash — e.g. a bare Windows environment), fall back to the manual equivalent: per-file `cp` driven by the plan's Create list, one substitution pass, one strip pass. The per-file read-merge-write procedure in 5.4–5.8 remains **required** for every Rename+Update and Update-in-place action — customization preservation cannot be done mechanically. Never bulk-copy over an existing file.
 
 ## 5.2 — Create directories
 

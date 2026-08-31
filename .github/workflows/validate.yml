@@ -440,6 +440,62 @@ jobs:
           test -f example/.claude/cast/SOURCES.md
           echo "present"
 
+      - name: Deterministic installer produces a complete, clean install
+        run: |
+          # scripts/install.sh is the contract that placement never needs a judgment
+          # call: run it for real and assert the result. Counts are DERIVED from the
+          # payload so adding an agent or skill can't silently pass with a stale
+          # assertion.
+          set -e
+          fail=0
+          agents_expected=$(ls skills/cast-init/assets/agents/*.md | grep -cv README.md)
+          skills_expected=$(ls -d skills/cast-init/assets/skills/*/ | wc -l | tr -d ' ')
+          tmpl_expected=$(ls skills/cast-init/assets/cast/templates/*.md | wc -l | tr -d ' ')
+          t=$(mktemp -d)
+          bash skills/cast-init/scripts/install.sh --target "$t" \
+            --project-name "CI Fixture" --test-cmd "npm test" --build-cmd "npm run build" > "$t/out.log"
+          a=$(ls "$t"/.claude/agents/*.md | wc -l | tr -d ' ')
+          k=$(ls -d "$t"/.claude/skills/*/ | wc -l | tr -d ' ')
+          m=$(ls "$t"/.claude/cast/templates/*.md | wc -l | tr -d ' ')
+          echo "agents $a/$agents_expected, skills $k/$skills_expected, templates $m/$tmpl_expected"
+          [ "$a" = "$agents_expected" ] || { echo "agent count mismatch"; fail=1; }
+          [ "$k" = "$skills_expected" ] || { echo "skill count mismatch"; fail=1; }
+          [ "$m" = "$tmpl_expected" ]   || { echo "template count mismatch"; fail=1; }
+          for f in "$t"/.claude/cast/SOURCES.md "$t"/.claude/cast/PIPELINE_LOOP.md \
+                   "$t"/.claude/cast/STAGE_CONTRACT.md "$t"/artifacts/BUGS.md \
+                   "$t"/artifacts/TASKS.md "$t"/artifacts/STANDUP.md \
+                   "$t"/artifacts/AGENT_STATE.md "$t"/artifacts/README.md "$t"/CLAUDE.md; do
+            [ -f "$f" ] || { echo "missing: $f"; fail=1; }
+          done
+          [ -d "$t/artifacts/one-off" ] || { echo "missing artifacts/one-off/"; fail=1; }
+          # Scaffolding stripped everywhere except the template skeletons (match the
+          # block opener at line start — prose may legitimately mention the phrase).
+          hits=$(grep -rln '^<!-- TEMPLATE INSTRUCTIONS' "$t"/.claude "$t"/artifacts "$t"/CLAUDE.md | grep -v cast/templates || true)
+          [ -z "$hits" ] || { echo "unstripped scaffolding:"; echo "$hits"; fail=1; }
+          blocks=$(grep -rln '^<!-- TEMPLATE INSTRUCTIONS' "$t"/.claude/cast/templates | wc -l | tr -d ' ')
+          [ "$blocks" -ge $((tmpl_expected - 1)) ] || { echo "skeletons lost their instruction blocks ($blocks)"; fail=1; }
+          # All supplied install-time tokens substituted (VERSIONING_SCHEME and
+          # MAX_LOOP_COUNT default; CAST_VERSION and dates are always stamped).
+          toks=$(grep -rlE '\[(PROJECT_NAME|TEST_CMD|BUILD_CMD|MAX_LOOP_COUNT|VERSIONING_SCHEME|CAST_VERSION|YYYY-MM-DD)\]' \
+            "$t"/.claude/agents "$t"/.claude/skills "$t"/.claude/cast/SOURCES.md \
+            "$t"/.claude/cast/PIPELINE_LOOP.md "$t"/.claude/cast/STAGE_CONTRACT.md \
+            "$t"/artifacts "$t"/CLAUDE.md || true)
+          [ -z "$toks" ] || { echo "unfilled install-time tokens:"; echo "$toks"; fail=1; }
+          grep -q "Adopted with CAST v$(grep -oE '"version": "[0-9.]+"' .claude-plugin/plugin.json | grep -oE '[0-9.]+')" "$t/CLAUDE.md" \
+            || { echo "CLAUDE.md stamp missing or version-mismatched"; fail=1; }
+          # Idempotency: a re-run installs nothing and overwrites nothing.
+          bash skills/cast-init/scripts/install.sh --target "$t" --project-name "CI Fixture" > "$t/rerun.log"
+          grep -q "0 file(s) installed" "$t/rerun.log" || { echo "re-run was not a no-op:"; cat "$t/rerun.log"; fail=1; }
+          # --no-ui skips the agent and both UI templates together.
+          t2=$(mktemp -d)
+          bash skills/cast-init/scripts/install.sh --target "$t2" --no-ui --project-name "CI Fixture" > /dev/null
+          [ ! -e "$t2/.claude/agents/ui.md" ] || { echo "--no-ui installed ui.md"; fail=1; }
+          [ ! -e "$t2/.claude/cast/templates/UI_SPEC.md" ] && [ ! -e "$t2/.claude/cast/templates/UX_REVIEW.md" ] \
+            || { echo "--no-ui installed a UI template"; fail=1; }
+          rm -rf "$t" "$t2"
+          [ "$fail" -eq 0 ] && echo "installer clean"
+          exit $fail
+
       - name: README File Listing counts match the payload
         run: |
           tmpl_actual=$(ls skills/cast-init/assets/cast/templates/*.md | grep -cv README.md)

@@ -119,6 +119,17 @@ The skill reads all template files from its bundled payload — no network acces
 
 This works for greenfield projects, existing projects with no agentic workflow, and existing projects with a mature agentic workflow you want to migrate to CAST.
 
+### Deterministic install (no LLM required)
+
+File placement in v4 is fixed by rule — agents to `.claude/agents/`, skills to `.claude/skills/`, the machinery and templates to `.claude/cast/`, the scaffold to `artifacts/` — so the copy itself is a script, and `/cast-init` runs that script rather than deciding placement per file. You can also run it directly for a fully deterministic fresh install:
+
+```bash
+bash .claude/skills/cast-init/scripts/install.sh \
+  --project-name "Acme Dashboard" --test-cmd "npm test" --build-cmd "npm run build"
+```
+
+It substitutes the install-time tokens, strips the repo-documentation comment blocks (template skeletons excepted), **never overwrites an existing file** (each is skipped and reported; `--force` to replace), supports `--no-ui` for the backend/CLI opt-out and `--dry-run` to preview, and tells you what is left to do — chiefly filling in `.claude/cast/SOURCES.md`, the source map. Run `/cast-init` afterwards if you'd rather be interviewed for the source map than write it by hand; the skill detects the installed files, skips them, and conducts only the judgment work (discovery, the interview, migrations of pre-v4 installs, merges of customized files).
+
 **Next steps after adoption:**
 
 1. Restart the session so the installed agents and pipeline skills register.

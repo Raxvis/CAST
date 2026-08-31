@@ -27,7 +27,7 @@ Adopt CAST into the current project through a seven-phase migration: crawl the p
 All template files are bundled with this skill. Resolve them before Phase 1:
 
 1. The skill's base directory is the directory containing this SKILL.md (provided when the skill is invoked). Call it `CAST_SKILL_DIR`.
-2. Set `CAST_SOURCE = <CAST_SKILL_DIR>/assets`. Confirm it exists and contains `agents/`, `skills/`, `cast/`, `artifacts/`, and `root/` (e.g. `ls <CAST_SKILL_DIR>/assets`).
+2. Set `CAST_SOURCE = <CAST_SKILL_DIR>/assets`. Confirm it exists and contains `agents/`, `skills/`, `cast/`, `artifacts/`, and `root/` (e.g. `ls <CAST_SKILL_DIR>/assets`). The deterministic installer lives beside it at `<CAST_SKILL_DIR>/scripts/install.sh` — Phase 5 runs it for every Create action (`references/execution.md` 5.1a); placement is fixed by rule, never decided per file.
 3. With `npx skills` installs, `.claude/skills/cast-init` may be a symlink into `.agents/skills/`. Read files through the path provided — do not dereference symlinks manually, and do not go looking for the payload anywhere else (no network access, no other clones).
 4. If `assets/` is missing, stop and tell the user their cast-init install is incomplete (likely a partial copy); re-install with `npx skills add Raxvis/CAST` or `/plugin install cast@cast`.
 
@@ -166,7 +166,7 @@ Once approval is given, **record every Phase 4 resolution into `artifacts/adopti
 Once the plan is approved, execute the actions in a safe order, reporting progress as you go. **Read `references/execution.md` before writing any file** — it contains the full install mechanics and the customization-preservation rules, including the global rule that `<!-- TEMPLATE INSTRUCTIONS -->` blocks and placeholder-pointer comments are stripped from every installed file (the ten `.claude/cast/templates/` skeletons excepted). Execute its sections in order:
 
 1. **5.1 Preflight**
-2. **5.1a Fast path for pure-Create actions**
+2. **5.1a The deterministic installer handles pure-Create actions** — run `scripts/install.sh` (bundled beside this skill) for every Create; it places files by fixed rule, never overwrites, and leaves merge work to 5.4–5.8
 3. **5.2 Create directories**
 4. **5.3 Handle directory renames**
 5. **5.4 Install agent files**
