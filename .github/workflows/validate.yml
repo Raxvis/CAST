@@ -163,43 +163,18 @@ jobs:
           #   comm -23 <(grep -rhoE '\[[A-Z][A-Z0-9_]+\]' skills/cast-init/assets/ | tr -d '[]' | sort -u) \
           #            <(grep -oE '\| `\[[A-Z][A-Z0-9_]*\]`' README.md | grep -oE '[A-Z][A-Z0-9_]*' | sort -u)
           allow="
-            ABBR_1 ABBR_2 ABBR_3 ABBR_4 ABBR_5 ACCESSIBILITY_STANDARD ACTION ACTION_1 ACTION_2
-            ACTION_OR_RULE_CHANGE ACTUAL_APPROACH ACTUAL_DURATION AGENT ANDROID ANY_TYPE ASSET_CATEGORY
-            ASSET_NAME AUDIT_DATE AUTHOR BENEFIT BUSINESS_OUTCOME CAST CHANGE_SUMMARY CHECK_1 CHECK_2
-            CHECK_3 CHECK_NAME_1 CHECK_NAME_2 CHECK_NAME_3 COLOR_CONSTANT COMMAND COMPONENT_CATEGORY
-            COMPONENT_NAME_1 COMPONENT_NAME_2 COMPONENT_NAME_3 COMPONENT_OR_SCREEN_NAME COMPONENT_PATH
-            CONCEPT_TITLE CONSTANT CONSTANT_NAME CORRECT_BEHAVIOR COST COVERAGE_OUTPUT_DIRECTORY
-            CRASH_REPORTER CURRENT_VERSION CUSTOM_METRIC DATE DECIMAL_PLACES DECISION_TITLE DEFAULT
-            DEFAULT_SAVE_FUNCTION DEFAULT_VALUE DESCRIPTION DETAIL DIFFERENCE_AND_REASON_IF_SIGNIFICANT
-            DOC_REFERENCE DOMAIN_NOT_FOUND DOMAIN_SPECIFIC DURATION ELEMENT EPSILON ESTIMATED_EFFORT
-            EXAMPLE_CONSTANT
-            EXAMPLE_MODULE_NAME EXPECTED_ERROR_MESSAGE FAMILY FEATURE_AREA FEATURE_AREA_1
-            FEATURE_AREA_2 FEATURE_NAME FEATURE_OR_AREA_1 FEATURE_OR_AREA_2 FIELD_NAME FILE_1 FILE_2
-            FILE_PATTERN FILTER_FLAG FINAL_STATE FIXED_TIMESTAMP FORMAT FULL_TERM_1 FULL_TERM_2
-            FULL_TERM_3 FULL_TERM_4 FULL_TERM_5 HEADER_HEIGHT HEX HOME HOOK_CATEGORY HOOK_PATH
-            HOW_MEASURED ID_TYPE INCORRECT_BEHAVIOR INITIAL_STATE INVALID_CONDITION IOS ISSUE_1 ISSUE_2
-            ITEM_1 ITEM_2 ITEM_3 ITEM_TITLE KEY_BEHAVIOR KEY_DIFFERENTIATOR LEVEL LIMIT
-            LIST_AGENTS_ACTIVE_THIS_MILESTONE LIST_KEY_BEHAVIORS_TESTED LIST_TESTS M1_NAME M2_NAME
-            M3_NAME M4_NAME M5_NAME MAX_RETRY_COUNT MEASURABLE_BEHAVIOR MEMBER METRIC_1 METRIC_2
-            MILESTONE_1 MILESTONE_2 MILESTONE_3 MILESTONE_NAME MILESTONE_OR_DATE MIN_ANDROID_VERSION
-            MIN_IOS_VERSION MINIMUM_SPEC_DEVICE MISSING_INPUT_CONDITION MOBILE_FRAMEWORK MODULE
-            MODULE_1 MODULE_2 MODULE_3 MODULE_4 MODULE_5 MODULE_A MODULE_B MODULE_C MODULE_CONSTANT
-            MODULE_NAME NAME NOTE NOTES OPERATION_NAME OS_LIST OTHER_TERM PARTICIPANT_ROLES
-            PATH_OR_NONE PATH_TO_ARCH_DOC PATH_TO_MILESTONE_DOC PATH_TO_TASKS_DOC
-            PERFORMANCE_METRIC PERSISTENCE PERSISTENCE_MODULE_PATH PILLAR_1 PILLAR_2 PILLAR_3
-            PLACEHOLDER PLATFORM PLATFORM_A PLATFORM_B POST_LAUNCH_ITEM_1
-            POST_LAUNCH_ITEM_2 POST_LAUNCH_ITEM_3 POST_LAUNCH_ITEM_4 PRIMARY_USER_SEGMENT PRINCIPLE_1
-            PRINCIPLE_2 PRINCIPLE_3 PRODUCT_TYPE PURE_LOGIC_CATEGORY PURE_LOGIC_PATH QUESTION RATE
-            REASON REQUIREMENTS_REFERENCE RETRY_DELAY REVENUE ROOT_CAUSE ROUTES ROUTES_FILE
-            SAFE_DEFAULT_VALUE SCHEMA SCHEMA_NAME SCREEN SCREEN_NAME SCREEN_OR_COMPONENT_NAME SIZE
-            SOLUTION_DESCRIPTION SOURCE_ROOT SPACING_CONSTANT SPACING_UNIT SPEC_NAME_OR_LINK
-            SPEC_SECTION SPECIFIED_APPROACH STATE_A STATE_B STATE_C STATE_LAYER STATE_STORE_CATEGORY
-            STATUS_TYPE STORAGE_KEY STORE_PATH SUPPORTING_TYPE SYSTEM SYSTEM_NAME TARGET
-            TARGET_PLATFORM_LIST TASK_NAME TASK_OR_ISSUE_NAME TASK_REFERENCE TERM TERM_NAME
-            TEST_DESCRIPTION_PATTERN TEST_DIRECTORY TEST_FILE_EXTENSION TEST_ROOT TEST_WATCH_CMD
-            THEME_FILE THEME_KEY TIME TIMEOUT_MS TYPE UNKNOWN_TYPE USE_LOOP_HOOK USER_NEED USER_TYPE
-            UTILITY_CATEGORY UTILITY_PATH VALUE VALUE_A VALUE_B VALUE_C VERSION VERSION_1
-            VERSION_2 VERSION_OR_MILESTONE VERSIONING_SCHEME WEB WEIGHT
+            ACTION ACTION_1 ACTION_2 ACTION_OR_RULE_CHANGE ACTUAL_DURATION AGENT AUTHOR CAST CHECK_1
+            CHECK_2 COMPONENT_OR_SCREEN_NAME CORE_MECHANIC CURRENT_VERSION DATE DEFAULT DESCRIPTION
+            DIFFERENCE_AND_REASON_IF_SIGNIFICANT DOMAIN_ENTITY DURATION ESTIMATED_EFFORT
+            FEATURE_AREA_1 FEATURE_OR_AREA_1 FEATURE_OR_AREA_2 FIELD_NAME FINAL_STATE FRAMEWORK
+            ID_TYPE INITIAL_STATE ISSUE_1 ITEM_1 ITEM_2 LANGUAGE MILESTONE_1 MILESTONE_NAME
+            MILESTONE_OR_DATE MODULE MODULE_A MODULE_B MODULE_C MODULE_NAME PARTICIPANT_ROLES
+            PATH_OR_NONE PATH_TO_ARCH_DOC PATH_TO_MILESTONE_DOC PERFORMANCE_METRIC PERSISTENCE
+            PERSISTENCE_LAYER PLACEHOLDER PLATFORM_LIST PROGRESSION_UNIT REQUIREMENTS_REFERENCE
+            RESOURCE_TYPE ROOT_CAUSE SCHEMA_NAME SCREEN_NAME SCREEN_OR_COMPONENT_NAME SESSION_TYPE
+            SPEC_NAME_OR_LINK STATE_A STATE_B STATE_C STATE_LAYER STATE_LIBRARY STATUS_TYPE
+            STORAGE_KEY SUPPORTING_TYPE SYSTEM_NAME TARGET TASK_NAME TASK_REFERENCE THEME_KEY TYPE
+            VALUE_A VALUE_B VALUE_C VERSION VERSION_1 VERSION_2 VERSION_OR_MILESTONE
           "
           allow_flat=" $(printf '%s' "$allow" | tr '\n' ' ') "
           fail=0
@@ -224,26 +199,39 @@ jobs:
           fi
           echo "clean"
 
-      - name: docs/templates/artifacts path-split lint
+      - name: v4 layout lint (templates under .claude/cast/, no CAST docs, no instances in machinery)
         run: |
-          # Hard rule: templates are only ever referenced under templates/, and work
-          # instances only ever under artifacts/. Both sub-checks derive their inputs
-          # from the payload at run time.
+          # Hard rules of the v4 layout: template skeletons are only ever referenced at
+          # .claude/cast/templates/, CAST ships and cites no docs/ documentation, and
+          # work-instance paths never appear under .claude/cast/. Sub-checks derive
+          # their inputs from the payload at run time.
           fail=0
-          # (1) No payload file may reference a template basename under docs/ or artifacts/.
-          for t in skills/cast-init/assets/templates/*.md; do
+          # (1) Every template-basename reference carries the .claude/cast/templates/
+          #     (payload: cast/templates/) prefix — a bare or docs/-or-artifacts/-prefixed
+          #     reference is a stale pre-v4 path.
+          for t in skills/cast-init/assets/cast/templates/*.md; do
             b=$(basename "$t"); [ "$b" = "README.md" ] && continue
+            hits=$(grep -rnE "templates/$b" skills/cast-init/assets/ | grep -vE "(\.claude/)?cast/templates/$b" || true)
+            if [ -n "$hits" ]; then
+              echo "Template basename referenced outside .claude/cast/templates/:"; echo "$hits"; fail=1
+            fi
             hits=$(grep -rnE "(docs|artifacts)/$b" skills/cast-init/assets/ || true)
             if [ -n "$hits" ]; then
               echo "Template basename referenced under docs/ or artifacts/:"; echo "$hits"; fail=1
             fi
           done
-          # (2) No instance-pattern path may appear under docs/ or templates/.
-          hits=$(grep -rnE '(docs|templates)/[A-Za-z0-9_{}./-]*(milestone-|task-[0-9{]|bug-[0-9{]|ceo-review-|ux-review-|retrospective-)' skills/cast-init/assets/ || true)
+          # (2) No payload file cites a CAST-shipped doc path — v4 ships no documentation
+          #     (the source map points at the project's own).
+          hits=$(grep -rnE '\bdocs/[A-Z_]+\.md' skills/cast-init/assets/ || true)
           if [ -n "$hits" ]; then
-            echo "Instance-pattern path under docs/ or templates/:"; echo "$hits"; fail=1
+            echo "Stale CAST docs/ citation (v4 ships no documentation):"; echo "$hits"; fail=1
           fi
-          [ "$fail" -eq 0 ] && echo "path split clean"
+          # (3) No instance-pattern path may appear under docs/ or the .claude/cast machinery.
+          hits=$(grep -rnE '(docs|cast/templates|\.claude/cast)/[A-Za-z0-9_{}./-]*(milestone-|task-[0-9{]|bug-[0-9{]|ceo-review-|ux-review-|retrospective-)' skills/cast-init/assets/ || true)
+          if [ -n "$hits" ]; then
+            echo "Instance-pattern path under docs/ or .claude/cast/:"; echo "$hits"; fail=1
+          fi
+          [ "$fail" -eq 0 ] && echo "v4 layout clean"
           exit $fail
 
       - name: Relative markdown links resolve (README, TROUBLESHOOTING, example README)
@@ -270,7 +258,7 @@ jobs:
           # heading of its template (marker suffix stripped; extra sections fine).
           fail=0
           check_headings() {
-            inst=$1; tmpl="skills/cast-init/assets/templates/$2"
+            inst=$1; tmpl="skills/cast-init/assets/cast/templates/$2"
             if [ ! -f "$tmpl" ]; then echo "missing template: $tmpl (needed by $inst)"; fail=1; return; fi
             # Accept both "(required)" and "(required, scales)" — the scales marker
             # (added in 2.2.0) means a section's DEPTH may collapse to one N/A line,
@@ -282,7 +270,7 @@ jobs:
           }
           while IFS= read -r f; do
             case "$f" in
-              */AGENT_STATE.md|*/BUGS.md|*/STANDUP.md) ;;  # seed instances, covered by their own checks
+              */AGENT_STATE.md|*/BUGS.md|*/TASKS.md|*/STANDUP.md) ;;  # seed instances, covered by their own checks
               */milestone-*/README.md)             check_headings "$f" MILESTONE_DEFINITION.md ;;
               */milestone-*/tasks/task-*.md)       check_headings "$f" TASK.md ;;
               */one-off/task-*.md)                 check_headings "$f" TASK.md ;;
@@ -382,7 +370,7 @@ jobs:
           # Since 1.2.0 every template section states its contract. Level-3 headings are
           # exempt (repeatable per-instance blocks like task or module entries).
           fail=0
-          for f in skills/cast-init/assets/templates/*.md; do
+          for f in skills/cast-init/assets/cast/templates/*.md; do
             [ "$(basename "$f")" = "README.md" ] && continue
             while IFS= read -r h; do
               # "(required, scales)" (2.2.0) is a required marker with a depth
@@ -441,19 +429,20 @@ jobs:
           [ "$fail" -eq 0 ] && echo "task/bug state consistent"
           exit $fail
 
-      - name: Example fixture includes the 1.2 state files
+      - name: Payload machinery and example state files are present
         run: |
+          test -f skills/cast-init/assets/cast/SOURCES.md
+          test -f skills/cast-init/assets/cast/PIPELINE_LOOP.md
+          test -f skills/cast-init/assets/cast/STAGE_CONTRACT.md
           test -f skills/cast-init/assets/artifacts/AGENT_STATE.md
-          test -f skills/cast-init/assets/docs/PIPELINE_LOOP.md
+          test -f skills/cast-init/assets/artifacts/TASKS.md
           test -f example/artifacts/AGENT_STATE.md
+          test -f example/.claude/cast/SOURCES.md
           echo "present"
 
       - name: README File Listing counts match the payload
         run: |
-          docs_actual=$(ls skills/cast-init/assets/docs/*.md | wc -l | tr -d ' ')
-          docs_claim=$(grep -oE '### docs/ \(reference material, [0-9]+ files\)' README.md | grep -oE '[0-9]+')
-          tmpl_actual=$(ls skills/cast-init/assets/templates/*.md | grep -cv README.md)
-          tmpl_claim=$(grep -oE '### templates/ \(document templates, [0-9]+ files\)' README.md | grep -oE '[0-9]+')
-          echo "docs: claim=$docs_claim actual=$docs_actual; templates: claim=$tmpl_claim actual=$tmpl_actual"
-          test -n "$docs_claim" && test "$docs_claim" = "$docs_actual"
+          tmpl_actual=$(ls skills/cast-init/assets/cast/templates/*.md | grep -cv README.md)
+          tmpl_claim=$(grep -oE 'document templates, [0-9]+ files' README.md | head -1 | grep -oE '[0-9]+')
+          echo "templates: claim=$tmpl_claim actual=$tmpl_actual"
           test -n "$tmpl_claim" && test "$tmpl_claim" = "$tmpl_actual"

@@ -10,7 +10,7 @@ This file serves as a lightweight continuity log. Before starting each session, 
 
 ## Entry Grammar
 
-This is the **single canonical format** for everything written to this file. All producers — `/agent-plan` stage checkpoints, `/agent-code` and `/agent-task` completion entries, the loop counters from `docs/PIPELINE_LOOP.md`, and the Docs Writer queue — use it.
+This is the **single canonical format** for everything written to this file. All producers — `/agent-plan` stage checkpoints, `/agent-code` and `/agent-task` completion entries, the loop counters from `.claude/cast/PIPELINE_LOOP.md`, and the Docs Writer queue — use it.
 
 **Session sections** are added newest-first at the top of the Log, headed:
 
@@ -31,7 +31,7 @@ where `<skill>` is the pipeline skill running (`agent-plan`, `agent-code`, or `a
 | Type | Meaning | Note format |
 |---|---|---|
 | `progress` | Work completed — a stage finished, a task validated, an artifact written | Free text; name the artifact path where applicable |
-| `loop` | Engineering-loop cycle counter (see `docs/PIPELINE_LOOP.md`) | `Task <id>: loop <k>/3` |
+| `loop` | Engineering-loop cycle counter (see `.claude/cast/PIPELINE_LOOP.md`) | `Task <id>: loop <k>/3` |
 | `docs` | Documentation work queued for Docs Writer | Free text naming the doc and the needed change |
 | `decision` | A decision worth surfacing beyond the agent's own Decisions Log | Free text |
 | `blocker` | A blocker encountered (or resolved) | Free text; name the blocking dependency or agent |

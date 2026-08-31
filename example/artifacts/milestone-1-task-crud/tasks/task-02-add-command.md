@@ -46,7 +46,7 @@ inserts a new row into `tasks` with `completed = 0`, `createdAt = new Date().toI
 | `../architecture.md` | §5.1 (`add` command) | Handler signature and insert contract |
 | `../ui.md` | §2 (`add` output) | Stdout format and error wording |
 | `../README.md` | § CEO Approval Conditions | Condition 1 (parameterized SQL) names this task |
-| `docs/CODE_PATTERNS.md` | TypeScript Style Conventions | Naming and module-layout rules |
+| `../README.md` | § Standards Digest | The distilled conventions binding this task (naming, layout, error and test rules) |
 
 ---
 

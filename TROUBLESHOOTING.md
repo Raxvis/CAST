@@ -20,7 +20,7 @@ Common problems adopting or running this template, with the most likely cause an
 | "Work through everything I've queued up" | `/agent-task backlog` | Runs every open `artifacts/TASKS.md` entry sequentially through the mini pipeline; entries that turn out to need planning are flagged and skipped, not forced through. |
 | "Add a new command or endpoint" | `/agent-plan` then `/agent-code` | Touches the public interface — needs UI spec, security review, CEO sign-off. |
 | "A small feature that needs a few design decisions" | `/agent-plan light: <feature>` then `/agent-code` | Light planning mode: Product + Architecture + CEO only — design work gets planned without full milestone ceremony. Also engages automatically for work Stage 1 scopes to 3 tasks or fewer with no new screens, no security surface, no applicable performance budget, and nothing cross-cutting. |
-| "Check the health of the CAST install / slim the docs after a model upgrade" | `/cast-doctor` | Maintenance skill, not a pipeline: verifies install invariants, prescribes model-gated documentation pruning, finds coverage gaps. Report-only until you approve treatments. |
+| "Check the health of the CAST install / my docs moved" | `/cast-doctor` | Maintenance skill, not a pipeline: verifies install invariants, verifies the source map still resolves and matches your documentation reality, finds coverage gaps. Report-only until you approve treatments. |
 | "Bump a dependency and update call sites" | `/agent-task` | Mechanical change across existing patterns, no new design. |
 | "Refactor a single function" | `/agent-task` | Contract doesn't change, no architectural impact. |
 | "Refactor across multiple modules" | `/agent-plan` then `/agent-code` | Cross-cutting — needs an architecture revision. |
@@ -51,6 +51,7 @@ Common problems adopting or running this template, with the most likely cause an
 2. Run the move command(s) from the project root. Typically:
    ```
    mv .cast-stage/agents .claude/agents
+   mv .cast-stage/cast .claude/cast
    mv .cast-stage/skills/agent-plan .cast-stage/skills/agent-code .cast-stage/skills/agent-task .cast-stage/skills/file-bug .cast-stage/skills/add-task .cast-stage/skills/cast-doctor .cast-stage/skills/cast-release .claude/skills/
    rmdir .cast-stage/skills .cast-stage
    ```
@@ -61,11 +62,11 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## My installed files still contain `[PLACEHOLDER]` tokens
 
-**Cause.** `/cast-init` substitutes every placeholder it can detect (tech stack, commands, platforms, directory roles) or that you answered during planning, but some tokens are undetectable domain values (`[DOMAIN_ENTITY]`, `[SAVE_KEY]`, …) and some are deliberate: per-use sub-template tokens (`[DATE]`, `[TASK_NAME]`, `[MILESTONE_NAME]`) are filled by agents each time a form or template is used and are supposed to remain.
+**Cause.** `/cast-init` substitutes v4's small install-time set (`[PROJECT_NAME]`, `[TEST_CMD]`, `[BUILD_CMD]`, `[MAX_LOOP_COUNT]`, `[VERSIONING_SCHEME]`, and the auto-stamped `[CAST_VERSION]`), but per-use sub-template tokens (`[DATE]`, `[TASK_NAME]`, `[MILESTONE_NAME]`, and everything inside the `.claude/cast/templates/` skeletons) are deliberate: agents fill them each time a form or template is instantiated, and they are supposed to remain.
 
 **Fix.**
 1. Open `artifacts/adoption-report.md` — the "Remaining TODOs" section lists every real unfilled placeholder from your install; per-use tokens are not defects.
-2. Fill the listed tokens by hand (they're stable project facts: domain entity, save key, budgets, etc.), or re-run `/cast-init` and answer the questions you skipped.
+2. Fill the listed tokens by hand, or re-run `/cast-init` and answer the questions you skipped.
 3. If a token you expected to be auto-filled wasn't (e.g. `[TEST_CMD]` in a project with a test script), that's a discovery miss — file an issue on `Raxvis/CAST` with your project's manifest shape.
 
 ---
@@ -130,7 +131,7 @@ Common problems adopting or running this template, with the most likely cause an
 **Fix.**
 1. Run `/agent-plan <milestone>` first. The planning stage ends with a CEO verdict written to that path.
 2. If the CEO issued **REVISION REQUIRED**, the planning stage is not complete. Address the Revision Requests (named by agent in the review document), re-run the affected stage, and re-run the CEO review.
-3. If you are trying to run engineering for a milestone that was planned manually (not via `/agent-plan`), you have two options: either run `/agent-plan` to produce the CEO review file retroactively, or hand-create `artifacts/milestone-{N}-{slug}/reviews/ceo.md` from `templates/CEO_REVIEW.md` with its single `**Verdict**: APPROVED` line filled in. Pre-Flight parses that one line — there is exactly one verdict string in the file (the old three-checkbox verdict block is gone), so don't leave all three options in place.
+3. If you are trying to run engineering for a milestone that was planned manually (not via `/agent-plan`), you have two options: either run `/agent-plan` to produce the CEO review file retroactively, or hand-create `artifacts/milestone-{N}-{slug}/reviews/ceo.md` from `.claude/cast/templates/CEO_REVIEW.md` with its single `**Verdict**: APPROVED` line filled in. Pre-Flight parses that one line — there is exactly one verdict string in the file (the old three-checkbox verdict block is gone), so don't leave all three options in place.
 4. Note what Pre-Flight does beyond the existence check: it reads the verdict from the `**Verdict**:` line, and on **APPROVED WITH CONDITIONS** it cross-checks the CEO Approval Conditions table in the milestone README — backfilling it from the CEO review if missing or stale, and adding the manifest row to affected task files — so the conditions follow every task through implementation and review. A hand-created review with conditions should list them explicitly.
 
 ---
@@ -171,14 +172,14 @@ Common problems adopting or running this template, with the most likely cause an
 
 ---
 
-## Documentation feels heavier than the project needs (or models were upgraded)
+## My documentation moved and planning is reading stale material (or nothing at all)
 
-**Cause.** Installed CAST documentation restates things a capable model can infer from the code itself — directory layouts, naming tables, tech-stack lists, generic best-practice essays. That written scaffolding is load-bearing for less capable models (Opus 4.6/4.7, Haiku-pinned utility agents) but becomes redundant context weight once the models consuming a doc clear the Context Inference Bar (`docs/MODEL_OPTIMIZATION.md`).
+**Cause.** The source map (`.claude/cast/SOURCES.md`) is v4's single point of truth for where your documentation lives, and it does not track file moves by itself. A stale entry either dangles (planning warns and continues without it) or — worse — points at outdated material that planning dutifully distills into the Standards Digest.
 
 **Fix.**
-1. Run `/cast-doctor` (or `/cast-doctor checkup` for a report with no changes). It writes `artifacts/DOCTOR.md`: state findings, two-tier diet prescriptions (Tier A always safe; Tier B gated per doc on its weakest consumer's model), and coverage gaps.
-2. Approve or decline prescriptions individually — nothing is removed without your approval, and embedded decisions are rescued into `docs/DESIGN_RATIONALE.md` before any trim.
-3. Re-run after any model change: upgrades unlock previously bar-blocked prunes; downgrades surface restoration findings (git history keeps everything).
+1. Edit `.claude/cast/SOURCES.md` by hand — it is yours — updating the moved paths; or run `/cast-doctor`, which verifies every entry resolves, proposes corrections for moved files, and flags documentation-shaped material no category maps yet.
+2. Re-run `/cast-doctor checkup` after any documentation reorganization; a stale map silently corrupts every future plan.
+3. Note that already-planned milestones are unaffected — their Standards Digests were distilled at planning time — but the next `/agent-plan` run reads the corrected map.
 
 ---
 
@@ -231,20 +232,19 @@ Common problems adopting or running this template, with the most likely cause an
 1. Confirm the file is at the project root: `ls CLAUDE.md` should show it in the top-level directory.
 2. Restart your Claude Code session.
 3. If your project has nested subdirectories you work in, note that Claude Code loads `CLAUDE.md` from the root of the currently-open directory. Opening a subdirectory will not pick up the root `CLAUDE.md`.
-4. For large projects, split `CLAUDE.md` into the root file plus bare `@docs/<FILE>.md` import lines pointing at reference material. An import only fires as a bare `@path` line at the start of a line — there is no `@import` keyword, and a path wrapped in backticks or inside a comment is inert. This is what the shipped `root/CLAUDE.md` does: `@docs/CODE_PATTERNS.md` is the one always-on import (plus `@docs/PRD.md` once the PRD has real content), and the topic docs (`FRONTEND`/`BACKEND`/`CLI`/`MOBILE`) are listed as inert backticked paths you copy out as bare lines to activate.
-5. If a doc you "imported" is not in context, check for exactly that mistake: the line reads `` `@docs/FRONTEND.md` `` (backticks — inert) instead of `@docs/FRONTEND.md` (bare — fires).
+4. For large projects, you can split `CLAUDE.md` into the root file plus bare `@path/to/file.md` import lines. An import only fires as a bare `@path` line at the start of a line — there is no `@import` keyword, and a path wrapped in backticks or inside a comment is inert. (CAST itself adds no imports in v4 — the pipelines reach your documentation through the source map, not through session-wide imports; import a doc yourself only when you want it in *every* session's context.)
 
 ---
 
-## An agent wrote a work artifact to `docs/` instead of `artifacts/`
+## An agent wrote a work artifact into my documentation instead of `artifacts/`
 
-**Cause.** The agent was invoked ad-hoc without the pipeline skills, or its input pointed at a `docs/` path, or its prompt did not make the `docs/` vs `artifacts/` split explicit.
+**Cause.** The agent was invoked ad-hoc without the pipeline skills, or its input pointed at one of your documentation paths. Under the pipelines, only Docs Writer ever writes into your documentation — and only documentation updates at the mapped Documentation Home, never work artifacts.
 
 **Fix.**
-1. Move the file: `git mv docs/<file>.md artifacts/<appropriate-subdir>/<file>.md`.
+1. Move the file: `git mv <your-docs-path>/<file>.md artifacts/<appropriate-subdir>/<file>.md`.
 2. Grep for any references to the old path and update them.
-3. Update `agents/docs-writer.md` and the responsible agent's file if the source of the error is a stale path reference there.
-4. Re-read `docs/FILE_CONVENTIONS.md` → The Core Rule. If you are writing a template document or coding convention, it belongs in `docs/`. If you are writing a milestone plan, bug report, review, or session log, it belongs in `artifacts/`. The pipeline skills enforce this; direct agent invocation does not.
+3. If the source of the error is a stale path in an agent file or skill, fix it there.
+4. The rule of thumb: milestone plans, task files, bug reports, reviews, and session logs belong in `artifacts/`; only genuine documentation updates flow into your docs, via Docs Writer. The pipeline skills enforce this; direct agent invocation does not.
 
 ---
 

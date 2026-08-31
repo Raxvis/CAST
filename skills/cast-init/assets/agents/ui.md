@@ -57,7 +57,7 @@ Read the template **first** and follow its structure.
 
 **Two things never scale** — they are the gate: the six interaction states (default, pressed, disabled, loading, error, empty) and the accessibility section.
 
-**For CLI projects**, `.claude/cast/templates/UI_SPEC.md` is still the right template — adapt the visual-layout sections to terminal output: column alignment, exit codes, color usage, error message wording. See `docs/CLI.md`.
+**For CLI projects**, `.claude/cast/templates/UI_SPEC.md` is still the right template — adapt the visual-layout sections to terminal output: column alignment, exit codes, color usage, error message wording.
 
 ## The Manifest Rows block
 

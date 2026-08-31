@@ -2,7 +2,10 @@
 
 This directory is a **fixture**, not a real, buildable project. It shows what a
 populated instance of the CAST template looks like after a solo developer has
-run `/agent-plan` and `/agent-code` for Milestone 1 of a small project.
+run `/agent-plan` and `/agent-code` for Milestone 1 of a small project — with
+CAST's v4 bring-your-own-documentation model: the project's own `docs/` and
+`CLAUDE.md` are the documentation, and the source map
+(`.claude/cast/SOURCES.md`) points the pipelines at them.
 
 ## The Mock Project
 
@@ -15,10 +18,13 @@ See `CLAUDE.md` for the full project overview and `docs/PRD.md` for requirements
 
 ## What Has Happened
 
-1. `/agent-plan` ran on 2026-04-08, producing the Milestone 1 directory
-   (`artifacts/milestone-1-task-crud/`): the milestone README, one task file
-   per task under `tasks/`, the architecture and UI specs, and the risk and
-   CEO reviews under `reviews/`.
+1. `/agent-plan` ran on 2026-04-08. It resolved the source map, read the
+   project's own PRD, concept, glossary, and `CLAUDE.md` conventions, and
+   produced the Milestone 1 directory (`artifacts/milestone-1-task-crud/`):
+   the milestone README — including the **Standards Digest**, the distilled
+   conventions engineering reads instead of the sources — one task file per
+   task under `tasks/`, the architecture and UI specs, and the risk and CEO
+   reviews under `reviews/`.
 2. The CEO verdict was **APPROVED WITH CONDITIONS** (three conditions covering
    parameterized SQL, WAL mode plus an index on `completed`, and migration
    on first invocation).
@@ -50,43 +56,50 @@ See `CLAUDE.md` for the full project overview and `docs/PRD.md` for requirements
 
 Read these in order for the clearest picture:
 
-1. **`CLAUDE.md`** — the root context file an agent sees at every session.
-2. **`docs/PRD.md`** — requirements and acceptance criteria for M1 and M2.
+1. **`CLAUDE.md`** — the user's own root context file, with the one appended
+   CAST section at the bottom.
+2. **`.claude/cast/SOURCES.md`** — the source map: where this project keeps
+   its requirements, standards, testing guidance, and documentation home.
+4. **`docs/PRD.md`** — requirements and acceptance criteria for M1 and M2.
 3. **`artifacts/milestone-1-task-crud/README.md`** — the M1 plan.
-4. **`artifacts/milestone-1-task-crud/reviews/ceo.md`** — the APPROVED WITH
+5. **`artifacts/milestone-1-task-crud/reviews/ceo.md`** — the APPROVED WITH
    CONDITIONS verdict and the three conditions that shaped implementation.
-5. **`artifacts/BUGS.md`** — the bug index pointing at the two per-bug files
+6. **`artifacts/BUGS.md`** — the bug index pointing at the two per-bug files
    under `artifacts/milestone-1-task-crud/bugs/`: BUG-001 (closed during M1)
    and BUG-002 (Deferred — an open, held state re-triaged by Product at
    milestone completion), each with per-stage field ownership.
-6. **`artifacts/milestone-1-task-crud/tasks/task-03-list-command.md`** — the
+7. **`artifacts/milestone-1-task-crud/tasks/task-03-list-command.md`** — the
    clearest worked task file: a seeded Context Manifest and a Handoff Log that
    walks the full defect loop (BUG-001: coder -> reviewer files the bug ->
    product triages Fix Now -> coder investigates, fixes, and proves the test
    red -> reviewer approves).
-7. **`artifacts/milestone-1-task-crud/reviews/close.md`** — Product's one-pass
+8. **`artifacts/milestone-1-task-crud/reviews/close.md`** — Product's one-pass
    milestone close record (Sign-Off: Approved with Notes; Header Status:
    "Complete with Deferrals"): per-task validation for all five tasks, the
    milestone validation checklist, known issues, and the retrospective, with
    every metric filled from a recorded fixture source.
-8. **`artifacts/milestone-1-task-crud/reviews/ux.md`** — the UI agent's review of
+9. **`artifacts/milestone-1-task-crud/reviews/ux.md`** — the UI agent's review of
    the implemented command surface against the approved spec.
-9. **`artifacts/AGENT_STATE.md`** — project state written by the orchestrator
+10. **`artifacts/AGENT_STATE.md`** — project state written by the orchestrator
    after Milestone 1 closed: the Decisions Log, milestone progress, and the
    measured performance budgets. No agent reads this file.
-10. **`artifacts/STANDUP.md`** — the rolling session log across the three days,
+11. **`artifacts/STANDUP.md`** — the rolling session log across the three days,
     written in the canonical Entry Grammar (typed one-liner entries under
     dated session headings, with loop counters and the ✅-marked Docs Writer
     queue).
 
 ## Directory Layout
 
-- `CLAUDE.md` — populated project root context, stamped `Adopted with CAST v3.0.0`
-- `docs/` — PRD, CONCEPT, GLOSSARY (only these; see Deliberate Omissions below)
+- `CLAUDE.md` — the user's own project context, with the appended CAST section
+  (stamped `Adopted with CAST v4.0.0`)
+- `.claude/cast/SOURCES.md` — the source map (the one installed file that is
+  per-project, so the fixture includes it)
+- `docs/` — the project's **own** documentation: PRD, CONCEPT, GLOSSARY (see
+  Deliberate Omissions below)
 - `artifacts/` — all live milestone work, grouped by milestone:
-  - `AGENT_STATE.md`, `BUGS.md` (bug index), `STANDUP.md` — the cross-milestone state files
+  - `AGENT_STATE.md`, `BUGS.md` (bug index), `TASKS.md` (one-off backlog, empty), `STANDUP.md` — the cross-milestone state files
   - `milestone-1-task-crud/` — everything M1 produced:
-    - `README.md` — milestone definition, Task Index, CEO Approval Conditions
+    - `README.md` — milestone definition, Standards Digest, Task Index, CEO Approval Conditions
     - `architecture.md` and `ui.md` — the approved design specs
     - `tasks/task-01…05-*.md` — one isolated file per task, each with its
       Context Manifest and Handoff Log
@@ -98,16 +111,17 @@ Read these in order for the clearest picture:
 
 ## Deliberate Omissions
 
-- **No `.claude/` directory.** In a real populated project this would hold
-  the installed agent files (`.claude/agents/*.md`) and skills
-  (`.claude/skills/agent-plan/SKILL.md`, `agent-code`, `agent-task`,
-  `cast-doctor`, `cast-release`). Including them here would just duplicate the template
-  payload verbatim.
+- **Almost no `.claude/` directory.** Only `.claude/cast/SOURCES.md` is
+  included — it is filled per-project, so it is the interesting one. The rest
+  (`.claude/agents/*.md`, `.claude/skills/*/SKILL.md`, the contracts and
+  templates under `.claude/cast/`) would just duplicate the template payload
+  verbatim.
 - **No `artifacts/DOCTOR.md`.** `/cast-doctor` (the install health check) has
   not been run in this fixture's timeline; its report is created on first run.
 - **No `src/` directory.** This fixture demonstrates the *planning and review
   artifacts*, not a working build. Acme Todo is not a real package.
-- **No full `docs/` set.** Only `PRD.md`, `CONCEPT.md`, and `GLOSSARY.md`
-  are included. The other documentation templates (`CODE_PATTERNS.md`,
-  `FILE_CONVENTIONS.md`, `ERROR_HANDLING.md`, etc.) change only trivially
-  when populated and are omitted for brevity.
+- **A small `docs/` set.** `PRD.md`, `CONCEPT.md`, and `GLOSSARY.md` are the
+  project's own documentation — CAST installed none of it. The project's code
+  conventions live in `CLAUDE.md` rather than separate files, and the source
+  map says so; the milestone README's Standards Digest is what planning
+  distilled from them.

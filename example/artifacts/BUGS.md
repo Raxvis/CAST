@@ -1,6 +1,6 @@
 # Acme Todo — Bug Index
 
-Every bug is a standalone file created from `templates/BUG_REPORT.md` and filed beside the work that surfaced it: `artifacts/milestone-{N}-{slug}/bugs/bug-XXX-{slug}.md` for pipeline work, `artifacts/one-off/bugs/bug-XXX-{slug}.md` for `/agent-task` work. This file is the index: it assigns IDs and carries one status line per bug. Triage and re-triage sweeps read this index and open only the bug files they act on.
+Every bug is a standalone file created from `.claude/cast/templates/BUG_REPORT.md` and filed beside the work that surfaced it: `artifacts/milestone-{N}-{slug}/bugs/bug-XXX-{slug}.md` for pipeline work, `artifacts/one-off/bugs/bug-XXX-{slug}.md` for `/agent-task` work. This file is the index: it assigns IDs and carries one status line per bug. Triage and re-triage sweeps read this index and open only the bug files they act on.
 
 ---
 
@@ -22,7 +22,7 @@ Every bug is a standalone file created from `templates/BUG_REPORT.md` and filed 
 
 | Owner | Writes | Status set |
 |---|---|---|
-| **Reviewer** | Creates the bug file from `templates/BUG_REPORT.md` and adds its index row: ID, Description, Expected, Actual, Steps to Reproduce, Platform, Frequency, Evidence, Likely Files, Regression, Related Issues, initial Severity | `New` (or `Duplicate` at filing, when the report duplicates an existing entry — cite the original ID in Related Issues) |
+| **Reviewer** | Creates the bug file from `.claude/cast/templates/BUG_REPORT.md` and adds its index row: ID, Description, Expected, Actual, Steps to Reproduce, Platform, Frequency, Evidence, Likely Files, Regression, Related Issues, initial Severity | `New` (or `Duplicate` at filing, when the report duplicates an existing entry — cite the original ID in Related Issues) |
 | **Product** | Triages: sets final Severity, accepts/rejects/defers; re-triages `Deferred` entries at `/agent-code` milestone completion and `/agent-plan` Stage 1 | `Triaged` (or `Won't Fix` / `Deferred`) |
 | **Coder (investigation)** | Investigation fields: Root Cause, Affected Module(s), Approach Chosen, Alternatives Considered, Investigation Date — written before a non-obvious fix | `In Progress` (or `Cannot Reproduce` after an investigation that fails to reproduce the bug) |
 | **Coder** | Resolution fields at fix time: Commit, Files Changed, Regression Notes | `Fixed` |
