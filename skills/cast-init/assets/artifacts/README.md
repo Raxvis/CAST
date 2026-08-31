@@ -15,9 +15,9 @@ HOW TO CUSTOMIZE:
 
 # [PROJECT_NAME] — Work Artifacts (`artifacts/`)
 
-This directory holds every artifact produced by work on [PROJECT_NAME], **grouped by milestone**: each milestone owns one directory containing its definition, design specs, reviews, per-task files, and per-bug files. Cross-milestone state (session log, agent state, bug index) lives at the root.
+This directory holds every artifact produced by work on [PROJECT_NAME], **grouped by milestone**: each milestone owns one directory containing its definition, design specs, reviews, per-task files, and per-bug files. Cross-milestone state (session log, agent state, bug index, one-off task backlog) lives at the root.
 
-> **Provenance:** Every file under this directory is produced by an agent running inside the `/agent-plan`, `/agent-code`, or `/agent-task` pipeline (plus `artifacts/DOCTOR.md`, written by the `/cast-doctor` maintenance skill, and `artifacts/releases/`, written by `/cast-release`). Review accordingly — these are agent outputs, not hand-authored reference material. Humans may edit these files (to revise plans, triage bugs, or close milestones), but the canonical producer of each artifact is named at the top of the file.
+> **Provenance:** Every file under this directory is produced by an agent running inside the `/agent-plan`, `/agent-code`, or `/agent-task` pipeline (plus `artifacts/DOCTOR.md`, written by the `/cast-doctor` maintenance skill; `artifacts/releases/`, written by `/cast-release`; and the intake skills — `/file-bug` files user-reported bugs, `/add-task` queues backlog entries in `artifacts/TASKS.md`). Review accordingly — these are agent outputs, not hand-authored reference material. Humans may edit these files (to revise plans, triage bugs, or close milestones), but the canonical producer of each artifact is named at the top of the file.
 
 **Rule:** `artifacts/` is for **instances** of work. `docs/` is for **reference material**; `templates/` is for **reusable document skeletons**. If you are unsure where a file belongs, ask: "Is this content about a specific piece of work (feature, milestone, task, bug, session)?" If yes → `artifacts/`. "Is this a reusable skeleton agents copy?" If yes → `templates/`. "Is this reusable guidance?" If yes → `docs/`.
 
@@ -29,6 +29,9 @@ This directory holds every artifact produced by work on [PROJECT_NAME], **groupe
 artifacts/
   README.md                        # This file
   BUGS.md                          # Global bug INDEX: one line per bug → the per-bug file
+  TASKS.md                         # One-off task BACKLOG: entries queued by /add-task,
+                                   #   drained by /agent-task (backlog mode) and reviewed
+                                   #   for adoption at /agent-plan Stage 1
   STANDUP.md                       # Rolling session progress log (cross-milestone)
   AGENT_STATE.md                   # Cross-milestone state tables, orchestrator-written
                                    #   (Decisions Log, Milestone Progress, Performance Budget,
@@ -67,8 +70,9 @@ artifacts/
     archive/                       # Complete one-off task files (moved by the orchestrator at
                                    #   milestone-completion checkpoints)
     bugs/
-      bug-{XXX}-{slug}.md          # Bugs filed from one-off work (never archived — the
-                                   #   BUGS.md index points at them)
+      bug-{XXX}-{slug}.md          # Bugs filed from one-off work and user reports filed
+                                   #   via /file-bug (never archived — the BUGS.md index
+                                   #   points at them)
 
   releases/                        # Release records (`release-{VERSION}.md`), written by /cast-release
 
@@ -100,8 +104,9 @@ Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-creat
 | UX review of implemented screens | `milestone-{N}-{slug}/reviews/ux.md` | UI (milestone completion; UI-flagged milestones only) |
 | Risk implementation review (controls verified, budgets measured) | `milestone-{N}-{slug}/reviews/risk-impl.md` | CEO (milestone completion; only when a `reviews/risk.md` flag line says Yes) |
 | Milestone close record (per-task validation, milestone validation, completion summary, retrospective) | `milestone-{N}-{slug}/reviews/close.md` | Product (milestone completion, one pass) |
-| Per-bug report | `milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` (or `one-off/bugs/` for `/agent-task` work) | Reviewer files; Product triages and closes; Coder investigates, fixes, and verifies |
-| Bug index (ID assignment, one-line status per bug, regression checklist) | `artifacts/BUGS.md` | Reviewer adds rows; owners update status column |
+| Per-bug report | `milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md` (or `one-off/bugs/` for `/agent-task` work and `/file-bug` user reports) | Reviewer or `/file-bug` files; Product triages and closes; Coder investigates, fixes, and verifies |
+| Bug index (ID assignment, one-line status per bug, regression checklist) | `artifacts/BUGS.md` | Reviewer and `/file-bug` add rows; owners update status column |
+| One-off task backlog (queue entries, lifecycle, field ownership) | `artifacts/TASKS.md` | `/add-task` adds entries; `/agent-task` and Product (`/agent-plan` Stage 1) advance statuses |
 | One-off task file | `one-off/task-{slug}.md` | `/agent-task` |
 | Session progress log | Entries in `artifacts/STANDUP.md` | Any agent / user |
 | Cross-milestone state (Decisions Log, Milestone Progress, Performance Budget, Open Questions) | `artifacts/AGENT_STATE.md` — no agent reads this file | The orchestrator (from stages' handoff entries) |

@@ -8,6 +8,24 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [3.1.0] — 2026-08-31
+
+Individual tracking for user-found bugs, a one-off task backlog, and a planning stage that consumes both.
+
+### Added
+
+- **`/file-bug` intake skill** (`skills/file-bug/`). Reviewer files the bugs found inside pipeline runs; until now a bug the *user* found had no route into the tracker short of starting a pipeline. `/file-bug <description>` files it the moment it is noticed: one instance of `templates/BUG_REPORT.md` at `artifacts/one-off/bugs/bug-{XXX}-{slug}.md` plus an `artifacts/BUGS.md` index row (`Found during: user report — /file-bug`, Status New, initial severity from the described impact — never guessing fields the user did not supply). Runs in-session, launches no agents, fixes nothing; Product remains the triage authority.
+- **`/add-task` intake skill** (`skills/add-task/`). Queues small, self-contained work as `TASK-XXX` entries in the new `artifacts/TASKS.md` backlog without running anything. Screens scope at filing — clearly planning-tier work is routed to `/agent-plan` instead of queued; borderline entries carry a Notes flag for Pre-Flight to settle. Runs in-session, launches no agents.
+- **`artifacts/TASKS.md`** — the one-off task backlog, new in the artifacts scaffold (installed by `/cast-init` alongside `BUGS.md`). Carries the canonical backlog lifecycle (`Open → In Progress → Done`, terminal `Adopted → M{N}` / `Dropped`) and field-ownership table, an index, and one entry block per queued task. Entries are queue entries, not task files — `/agent-task` instantiates `templates/TASK.md` when work starts.
+- **`/agent-task` backlog mode.** `/agent-task TASK-XXX` runs one queued entry (its entry block is the task description); `/agent-task backlog` drains every Open entry sequentially through the full mini pipeline, flagging entries that fail the scope check (`Open — needs planning`) and continuing rather than halting. Invoked with no argument, `/agent-task` now offers backlog mode when Open entries exist. The orchestrator advances each queued entry's index row (`Open → In Progress → Done`, Resolution linking the task file).
+
+### Changed
+
+- **`/agent-plan` Stage 1 gains an intake sweep** (new step 5, in the same Product launch as the Deferred re-triage): open user-filed bugs (`artifacts/BUGS.md` rows at New/Triaged) and open backlog entries (`artifacts/TASKS.md` rows at Open) are reviewed against the milestone being planned, and relevant items are adopted — a bug's fix becomes a task or lands in an existing task's criteria (bug triaged, index mirrored); a backlog entry becomes a milestone task with its row marked `Adopted → M{N}`. Items not adopted stay untouched: the sweep only adopts, it never closes or drops queue items. The Stage 1 input list now passes both queues; `agents/product.md` carries the matching duty.
+- **`artifacts/BUGS.md`** documents `/file-bug` as the second filing route (user reports, filed under `one-off/bugs/`) in its lifecycle prose and field-ownership table; `templates/BUG_REPORT.md` adds the `user report — /file-bug` Found-during value.
+- **`/cast-init`** installs the two new skills and the `TASKS.md` scaffold: roster pipeline-skills mapping, execution 5.5/5.7, dispositions, and validation checks 3/3a updated. The 5.5 install list also now names `cast-release` explicitly (it was installed but missing from that list).
+- Payload READMEs, root README, `TROUBLESHOOTING.md` decision table, `docs/FIRST_RUN.md` smoke checks, and both CLAUDE.md files updated for the seven-skill roster and the new backlog file.
+
 ## [3.0.0] — 2026-08-19
 
 **Breaking.** The roster goes from 15 agents to 7, the engineering loop from four stages to two, and every agent file is rewritten. A clean task's fixed setup cost drops from ~72,000 tokens (v2.1) to **~10,000**.

@@ -46,6 +46,7 @@ For each CAST reference doc and document template, determine the disposition fro
 If `artifacts/` does not exist, Create it with:
 
 - `BUGS.md` from CAST template (the global bug index)
+- `TASKS.md` from CAST template (the one-off task backlog `/add-task` fills and `/agent-task` drains)
 - `STANDUP.md` from CAST template
 - `AGENT_STATE.md` from CAST template
 - `README.md` from CAST template

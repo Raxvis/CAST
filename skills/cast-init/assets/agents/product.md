@@ -62,6 +62,7 @@ Where a template carries a **Section Scaling** rule, honor it: required sections
 **Also at Stage 1:**
 
 - **Deferred backlog sweep.** Re-triage every Deferred bug in the `artifacts/BUGS.md` index and every Deferred task file from prior milestones — pull into scope, re-defer with an updated rationale, or close as Won't Fix with a rationale. Deferred is a held-open state, not terminal.
+- **Intake sweep.** Review the two intake queues — open user-filed bugs (`artifacts/BUGS.md` rows at New/Triaged, filed via `/file-bug` or by Reviewer and not yet scheduled) and open one-off backlog entries (`artifacts/TASKS.md` rows at Open, queued via `/add-task`) — and adopt what belongs to this milestone: a relevant bug's fix becomes a task or lands in an existing task's criteria (bug triaged, index mirrored); a relevant backlog entry becomes a milestone task, its row marked `Adopted → M{N}` per the field-ownership table in `artifacts/TASKS.md`. Items not adopted stay untouched — the sweep only adopts, it never drops.
 - **Retrospective intake.** Read the previous milestone's close record (`reviews/close.md`, or a pre-v3 `reviews/retrospective.md`) and dispose of every undisposed row in its Actions for Next Milestone table: `Adopted → M{N}` (into Cross-Cutting Concerns or a task) or `Declined — <reason>`. No open action may be left undisposed — this is what makes retrospectives feed planning instead of being write-only.
 
 ---
