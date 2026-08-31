@@ -64,7 +64,7 @@ CAST v4 ships **no documentation** — the project brings its own, and CAST plug
 Two rules are load-bearing:
 
 1. **Bring-your-own documentation.** CAST installs no docs and never relocates the project's. The source map records where they live; planning reads the sources and distills what applies into milestone artifacts; engineering reads only the artifacts; Docs Writer updates the mapped Documentation Home. Work output goes to `artifacts/`, never into the project's documentation.
-2. **Planning vs engineering phases.** `/agent-plan` runs the planning stage (Product → Architecture + UI → Risk → CEO verdict); `/agent-code` runs the engineering stage (Coder → Reviewer with defect/issue routing); `/agent-task` runs a mini engineering pipeline for one-off work with no planning stage.
+2. **Planning vs engineering phases.** `/agent-plan` runs the planning stage (Product → Architecture + UI → CEO, risk lenses + verdict); `/agent-code` runs the engineering stage (Coder → Reviewer with defect/issue routing); `/agent-task` runs a mini engineering pipeline for one-off work with no planning stage.
 
 ## Safety rules
 

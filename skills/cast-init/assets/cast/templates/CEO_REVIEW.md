@@ -1,7 +1,7 @@
 <!-- TEMPLATE INSTRUCTIONS
   FILE: CEO_REVIEW.md
   PURPOSE: CEO planning-review template. The CEO Agent copies this skeleton during
-           /agent-plan Stage 4, works through every checklist section against the full
+           /agent-plan Stage 3, works through every checklist section against the full
            set of planning artifacts, and issues the go/no-go verdict that gates the
            engineering stage.
 
@@ -131,6 +131,6 @@ _Both lenses of the Risk review. If a lens found nothing, say so — an empty le
 
 **Verdict**: <APPROVED | APPROVED WITH CONDITIONS | REVISION REQUIRED>
 
-Write exactly one of the three values on the line above — `/agent-plan` and `/agent-code` parse the `**Verdict**:` line (meanings: `agents/ceo.md`).
+Write exactly one of the three values on the line above — `/agent-plan` and `/agent-code` parse the `**Verdict**:` line (meanings: `.claude/agents/ceo.md`).
 
 **Verdict Notes**:

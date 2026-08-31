@@ -49,7 +49,7 @@ This skill invokes the following agents. Open any of them for the full role defi
 
 ## Model Compatibility
 
-Each stage runs on the model set in that agent's file (default: `inherit` — the session model). Invoke only the agents named in the stages below, exactly as written: no ad-hoc subagents, no added verification passes (the executing model self-verifies), no collapsing a stage into direct work. Effort is per agent frontmatter — v3 planning defaults are `high` across the stage; re-pin Architecture to `xhigh` only for a new subsystem, a schema migration, or a cross-cutting contract change.
+Each stage runs on the model set in that agent's file (default: `inherit` — the session model). Invoke only the agents named in the stages below, exactly as written: no ad-hoc subagents, no added verification passes (the executing model self-verifies), no collapsing a stage into direct work. Effort is per agent frontmatter — planning defaults are `high` across the stage; re-pin Architecture to `xhigh` only for a new subsystem, a schema migration, or a cross-cutting contract change.
 
 ## Input
 

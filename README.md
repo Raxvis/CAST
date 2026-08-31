@@ -22,9 +22,8 @@ Planning stage — /agent-plan
     feature request        .claude/cast/SOURCES.md — the source map:
           │                YOUR requirements, standards, architecture
           │                docs, wherever you keep them
-          ▼                          │
-    Product  ◄───────────────────────┘  (planning reads the sources and
-          │                              distills them into the plan)
+          ▼                          │  (planning reads the sources and
+          │  ◄───────────────────────┘   distills them into the plan)
           ▼
     Product  →  Architecture + UI  →  CEO (risk lenses + verdict)
                                                                       │
@@ -251,7 +250,7 @@ A common source of confusion: this repo is a **template**, not a framework. Sett
 - **The pipeline skills are orchestration scripts written in Markdown.** `/agent-plan` and `/agent-code` tell Claude Code to invoke a specific sequence of subagents. They are not compiled, not executable, and not testable outside Claude Code. Reading them is reading their full behavior.
 - **The workflow is Claude Code-specific.** Copilot CLI, Gemini CLI, Cursor, and other AI tools do not honor `.claude/agents/`. Porting the template to another tool requires manual adaptation — read each agent file as a prompt and invoke it however that tool supports role prompts. (The `SKILL.md` format itself is portable across a growing set of agents, but the subagent roster and orchestration are Claude Code conventions.)
 - **No code is written by installing this template.** You get a directory layout, agent role files, pipeline skill definitions, document templates, and empty work-artifact scaffolding. Your first real output appears after you run `/agent-plan` on a feature.
-- **Templates contain nested placeholders.** Some files (bug report forms, milestone validation records) include their own fill-in-per-use placeholders like `[DATE]`, `[MILESTONE_NAME]`, `[TASK_NAME]`. These are not bugs in your customization — they are deliberate sub-templates filled in each time the form is used.
+- **Templates contain nested placeholders.** Some files (bug report forms, milestone close records) include their own fill-in-per-use placeholders like `[DATE]`, `[MILESTONE_NAME]`, `[TASK_NAME]`. These are not bugs in your customization — they are deliberate sub-templates filled in each time the form is used.
 
 Common problems you may hit during adoption or first use — a pipeline skill not recognized, subagent not delegating, `features/` references after upgrade, CEO returning REVISION REQUIRED — are covered in [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md). Skim it before filing a new issue.
 

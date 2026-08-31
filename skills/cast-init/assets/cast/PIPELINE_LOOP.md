@@ -53,7 +53,7 @@ Tests must pass before Reviewer runs. No exceptions. Because Coder now owns test
 
 - Coder's handoff entry carries a **Test Results** block with the **verbatim tail of the `[TEST_CMD]` run** — the actual pass/fail counts as printed, not a paraphrase. "All tests pass" without output is an incomplete entry and Reviewer rejects it back to Coder without reviewing.
 - **Full suite vs. targeted.** The first pass of a task and the final pass before validation run the full `[TEST_CMD]` suite. Intermediate loop-back passes may run the targeted set for the affected modules — k loop iterations must not cost k full-suite runs.
-- **Defect cycles — prove the test red.** A pass that fixes a Fix Now defect must record red→green evidence against the pre-fix commit in its handoff entry (procedure in `agents/coder.md`); Reviewer checks for it.
+- **Defect cycles — prove the test red.** A pass that fixes a Fix Now defect must record red→green evidence against the pre-fix commit in its handoff entry (procedure in `.claude/agents/coder.md`); Reviewer checks for it.
 
 ## Environment Issue rule
 
@@ -80,7 +80,7 @@ One full cycle is any return to Step 1 (Coder).
 
 ## Step 1 — Coder
 
-Launch the **coder** agent with the task file path. One pass implements, tests, and commits, ending in a `coder -> reviewer` handoff entry with the **Test Results block** (what a pass does is `agents/coder.md`'s content, not yours).
+Launch the **coder** agent with the task file path. One pass implements, tests, and commits, ending in a `coder -> reviewer` handoff entry with the **Test Results block** (what a pass does is `.claude/agents/coder.md`'s content, not yours).
 
 Routing facts: **on a loop-back**, Coder handles all three return paths — a Reviewer-classified Defect, a Reviewer-classified Issue, and a Product criteria rejection — in one pass. **If Coder cannot make tests pass** after a genuine attempt, it appends the failing entry and you loop it back to Step 1 with the loop counter incremented — the same escalation path as any other cycle.
 
@@ -88,7 +88,7 @@ Routing facts: **on a loop-back**, Coder handles all three return paths — a Re
 
 After Coder hands off, the orchestrator first applies the **test-gate pre-check**: read the latest Coder entry and confirm it carries a Test Results block with verbatim output showing no failures. This is a presence check, never judgment on the tests. Absent or failing: route straight back to Coder without launching Reviewer (a full Reviewer context spent rejecting a missing block is a wasted spawn); this does not increment the loop counter — no work was reviewed.
 
-When the block is present, launch the **reviewer** agent with the task file path. Reviewer enforces the same gate as backstop, reviews the diff, files every Defect as a bug file, and hands back an entry you route on: every finding classified **Defect** (incorrect behaviour, broken functionality, violated contract) or **Issue** (structural problem, convention violation, maintainability concern), and — on approving a clean version — the **Acceptance Criteria Check**, one line per criterion (`Met` with evidence / `Not met` / `Product judgment`; details in `agents/reviewer.md`).
+When the block is present, launch the **reviewer** agent with the task file path. Reviewer enforces the same gate as backstop, reviews the diff, files every Defect as a bug file, and hands back an entry you route on: every finding classified **Defect** (incorrect behaviour, broken functionality, violated contract) or **Issue** (structural problem, convention violation, maintainability concern), and — on approving a clean version — the **Acceptance Criteria Check**, one line per criterion (`Met` with evidence / `Not met` / `Product judgment`; details in `.claude/agents/reviewer.md`).
 
 ### Step 2a — Defect routing
 

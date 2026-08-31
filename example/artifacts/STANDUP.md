@@ -89,7 +89,7 @@ Entries under a session heading are appended in the order they happen (oldest fi
 - ui | docs | CLAUDE.md Domain-Specific Patterns needs the stdout/stderr and exit-code contract recorded ✅
 - ceo | progress | Stage 3 (risk lenses) complete: `artifacts/milestone-1-task-crud/reviews/risk.md` — security lens 1 High (SQL injection across command handlers) + 1 Low + 1 Informational; performance lens 2 Medium (missing index on `completed`, migration cost on every invocation) + 1 Informational. Both flags set Yes.
 - ceo | decision | Verdict: APPROVED WITH CONDITIONS — three conditions (parameterized SQL; WAL + index; migration on first invocation) in `artifacts/milestone-1-task-crud/reviews/ceo.md`; no revision requests
-- ceo | progress | Stage 4 complete: engineering may begin
+- ceo | progress | Stage 3 complete: engineering may begin
 
 ---
 

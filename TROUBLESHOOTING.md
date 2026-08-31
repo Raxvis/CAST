@@ -6,7 +6,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## Which pipeline should I use — `/agent-plan`, `/agent-code`, or `/agent-task`?
 
-**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes (plus `/file-bug` and `/add-task`, the intake skills, and `/cast-doctor` and `/cast-release`, the maintenance skills — not pipelines), and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → Risk → CEO). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
+**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes (plus `/file-bug` and `/add-task`, the intake skills, and `/cast-doctor` and `/cast-release`, the maintenance skills — not pipelines), and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → CEO, risk lenses + verdict). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
 
 **Fix.** Use the table below to pick a pipeline, then read the narrative note after it.
 
@@ -166,7 +166,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 **Fix.**
 1. Re-read the halt message. It should name the specific scope-crossing concern (e.g., "introduces a new module", "changes a data schema", "adds a new CLI subcommand").
-2. Run the planning tier the halt message named. For a small feature needing a few design decisions, `/agent-plan light: "<feature description>"` runs the light mode (Product + Architecture + CEO). For multi-task or cross-cutting scope, `/agent-plan "<feature description>"` runs the full stage (Product → Architecture + UI → Risk → CEO). Either way it ends with a verdict file at `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
+2. Run the planning tier the halt message named. For a small feature needing a few design decisions, `/agent-plan light: "<feature description>"` runs the light mode (Product + Architecture + CEO). For multi-task or cross-cutting scope, `/agent-plan "<feature description>"` runs the full stage (Product → Architecture + UI → CEO, risk lenses + verdict). Either way it ends with a verdict file at `artifacts/milestone-{N}-{slug}/reviews/ceo.md`.
 3. After the CEO issues **APPROVED** or **APPROVED WITH CONDITIONS**, run `/agent-code <milestone>` to execute the engineering stage against the approved plan.
 4. If you disagree with the scope classification and think the change is really self-contained, you can re-run `/agent-task` with a more precise task description that narrows the scope (name the specific file, the specific bug ID, or the specific existing pattern the change follows). Do not try to sneak a design change through `/agent-task` — the gate exists to prevent drift, and the Reviewer in Step 2 will catch it anyway.
 
@@ -219,7 +219,7 @@ Common problems adopting or running this template, with the most likely cause an
 **Fix.**
 1. Open `artifacts/milestone-{N}-{slug}/reviews/ceo.md` and read the "Revision Requests" table (the verdict itself is the single `**Verdict**:` line). Every revision is addressed to a specific agent with a cited section.
 2. Re-run only the affected planning stage — but note a revised architecture re-passes Stage 3 (the Risk review, both lenses) before the CEO sees it again, so the CEO never re-reviews against stale findings.
-3. Only then re-run Stage 4 (CEO). The CEO does not rewrite plans; it reviews them.
+3. Only then re-run Stage 3 (CEO). The CEO does not rewrite plans; it reviews them.
 4. If you disagree with a CEO revision, escalate per the conflict resolution hierarchy (Product > Architecture > UI) — the CEO does not override Product on business intent, and an unresolved disagreement comes to you rather than to another agent.
 
 ---

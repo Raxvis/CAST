@@ -61,7 +61,7 @@ while [ $# -gt 0 ]; do
     --force)             FORCE=1; shift ;;
     --upgrade)           UPGRADE=1; shift ;;
     --dry-run)           DRY=1; shift ;;
-    -h|--help)           sed -n '2,42p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help)           sed -n '2,39p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "install.sh: unknown option: $1" >&2; exit 2 ;;
   esac
 done
@@ -270,9 +270,22 @@ fi
 #    only when it is byte-identical to what CAST wrote (the stamp line included).
 extract_section() { awk '/^## CAST Agent Workflow$/{f=1} f{print} f && /^Adopted with CAST v/{exit}' CLAUDE.md; }
 section_hash=""
+process < "$ASSETS/root/CLAUDE.md" > "$render_tmp"
+new_section_hash=$(hash_file "$render_tmp")
+if [ "$DRY" -eq 1 ]; then
+  if [ -f CLAUDE.md ] && grep -q "Adopted with CAST v" CLAUDE.md; then
+    if [ "$UPGRADE" -eq 1 ]; then
+      rec=$(sed -n 's/^S \([^ ]*\) CLAUDE.md#cast-section$/\1/p' "$MANIFEST" | head -1)
+      cur=$(extract_section | hash_stdin)
+      if [ -n "$rec" ] && [ "$cur" = "$rec" ]; then echo "would refresh: CLAUDE.md CAST section (stamp → v$SUB_CAST_VERSION)"
+      else echo "would keep: CLAUDE.md CAST section (customized)"; fi
+    else
+      echo "would keep: CLAUDE.md (already carries a CAST section)"
+    fi
+  elif [ -f CLAUDE.md ]; then echo "would append: CLAUDE.md CAST section"
+  else echo "would create: CLAUDE.md with the CAST section"; fi
+fi
 if [ "$DRY" -ne 1 ]; then
-  process < "$ASSETS/root/CLAUDE.md" > "$render_tmp"
-  new_section_hash=$(hash_file "$render_tmp")
   if [ -f CLAUDE.md ] && grep -q "Adopted with CAST v" CLAUDE.md; then
     if [ "$UPGRADE" -eq 1 ]; then
       rec=$(sed -n 's/^S \([^ ]*\) CLAUDE.md#cast-section$/\1/p' "$MANIFEST" | head -1)

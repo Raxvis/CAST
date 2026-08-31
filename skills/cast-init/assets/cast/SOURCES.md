@@ -33,7 +33,7 @@ Where this project keeps its documentation, standards, and registers. CAST insta
 **Ground rules**
 
 1. **Locations are paths or globs relative to the project root.** A directory entry means every markdown file beneath it. Keep entries minimal and current — every entry is something planning is forced to read.
-2. **Planning reads sources; engineering reads plans.** `/agent-plan` and `/agent-task` Pre-Flight open these locations and distill what applies into the milestone's Standards Digest, architecture document, and task files. Coder and Reviewer read only those distilled artifacts — never the sources. If a plan's digest is missing something, that is a planning defect to fix in the plan, not a license for engineering to browse.
+2. **Planning reads sources; engineering reads plans.** `/agent-plan` and `/agent-task` Pre-Flight open these locations and distill what applies into the milestone's Standards Digest, architecture document, and task files. Coder and Reviewer read only those distilled artifacts — never the sources. If a plan's digest is missing something, that is a planning defect to fix in the plan, not a license for engineering to browse. A plan snapshots the sources **as they stood at planning time**: editing a source mid-milestone does not update an approved plan — the next `/agent-plan` run (or a revision of the affected stage) picks the change up.
 3. **Empty is honest.** A category with `_None declared._` makes the pipelines plan from code inspection (existing patterns in the codebase) and note that they did.
 
 ---

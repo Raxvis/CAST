@@ -54,7 +54,7 @@ artifacts/
       risk.md                      # Risk review — security + performance lenses in one file
                                    #   (/agent-plan Stage 3; only when the plan has a security
                                    #   surface or an applicable performance budget)
-      ceo.md                       # CEO planning verdict (/agent-plan Stage 4)
+      ceo.md                       # CEO planning verdict (/agent-plan Stage 3)
       ux.md                        # UX review (milestone completion; UI-flagged milestones only)
       risk-impl.md                 # Risk implementation review — security controls verified and
                                    #   budgets measured (milestone completion; only when a
@@ -103,7 +103,7 @@ Milestone directories are created by `/agent-plan` Stage 1 (nothing is pre-creat
 | Supplemental arch docs (module/system/schema) | `milestone-{N}-{slug}/arch-{slug}.md` | Architect (during planning or engineering) |
 | Supplemental UI specs (screen/component) | `milestone-{N}-{slug}/ui-{slug}.md` | UI (during planning or engineering) |
 | Risk review (security + performance lenses, one file) | `milestone-{N}-{slug}/reviews/risk.md` | CEO (`/agent-plan` Stage 3, its risk pass) |
-| CEO planning verdict | `milestone-{N}-{slug}/reviews/ceo.md` | CEO (`/agent-plan` Stage 4) |
+| CEO planning verdict | `milestone-{N}-{slug}/reviews/ceo.md` | CEO (`/agent-plan` Stage 3) |
 | UX review of implemented screens | `milestone-{N}-{slug}/reviews/ux.md` | UI (milestone completion; UI-flagged milestones only) |
 | Risk implementation review (controls verified, budgets measured) | `milestone-{N}-{slug}/reviews/risk-impl.md` | CEO (milestone completion; only when a `reviews/risk.md` flag line says Yes) |
 | Milestone close record (per-task validation, milestone validation, completion summary, retrospective) | `milestone-{N}-{slug}/reviews/close.md` | Product (milestone completion, one pass) |

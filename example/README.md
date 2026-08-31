@@ -60,8 +60,8 @@ Read these in order for the clearest picture:
    CAST section at the bottom.
 2. **`.claude/cast/SOURCES.md`** — the source map: where this project keeps
    its requirements, standards, testing guidance, and documentation home.
-4. **`docs/PRD.md`** — requirements and acceptance criteria for M1 and M2.
-3. **`artifacts/milestone-1-task-crud/README.md`** — the M1 plan.
+3. **`docs/PRD.md`** — requirements and acceptance criteria for M1 and M2.
+4. **`artifacts/milestone-1-task-crud/README.md`** — the M1 plan.
 5. **`artifacts/milestone-1-task-crud/reviews/ceo.md`** — the APPROVED WITH
    CONDITIONS verdict and the three conditions that shaped implementation.
 6. **`artifacts/BUGS.md`** — the bug index pointing at the two per-bug files

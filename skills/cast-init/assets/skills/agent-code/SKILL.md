@@ -108,7 +108,7 @@ The per-task cap (`[MAX_LOOP_COUNT]`) guards one runaway task; these guard a run
 - **Breadth**: more than half the started tasks have looped at least once, or
 - **Depth**: total Loop counts have reached 2× the Task Index row count.
 
-When either trips, pause and escalate with: which tasks are looping and on what, the total loop-back count, and a cost note (stages launched so far versus a clean run — **a clean v3 task is two stages**). A milestone where everything loops is telling you its plan is wrong; the user decides whether to continue, re-plan, or stop. Amendments do not count toward either trigger.
+When either trips, pause and escalate with: which tasks are looping and on what, the total loop-back count, and a cost note (stages launched so far versus a clean run — **a clean task is two stages**). A milestone where everything loops is telling you its plan is wrong; the user decides whether to continue, re-plan, or stop. Amendments do not count toward either trigger.
 
 ### Completion
 
