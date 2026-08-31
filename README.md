@@ -130,6 +130,8 @@ bash .claude/skills/cast-init/scripts/install.sh \
 
 It substitutes the install-time tokens, strips the repo-documentation comment blocks (template skeletons excepted), **never overwrites an existing file** (each is skipped and reported; `--force` to replace), supports `--no-ui` for the backend/CLI opt-out and `--dry-run` to preview, and tells you what is left to do — chiefly filling in `.claude/cast/SOURCES.md`, the source map. Run `/cast-init` afterwards if you'd rather be interviewed for the source map than write it by hand; the skill detects the installed files, skips them, and conducts only the judgment work (discovery, the interview, migrations of pre-v4 installs, merges of customized files).
 
+The installer also writes `.claude/cast/install-manifest.txt` — the per-file hashes of exactly what it installed plus your substitution values — which is what makes **future upgrades script-only**: `install.sh --upgrade` replaces CAST files you never modified, adds new ones, removes obsolete unmodified ones, and refreshes the CLAUDE.md CAST section and version stamp, while anything you customized is kept and reported for `/cast-init` to merge. Nothing you wrote is ever overwritten or deleted — the script only replaces bytes it itself installed.
+
 **Next steps after adoption:**
 
 1. Restart the session so the installed agents and pipeline skills register.
@@ -138,10 +140,10 @@ It substitutes the install-time tokens, strips the repo-documentation comment bl
 
 ### Keeping CAST up to date
 
-Keep the cast-init skill installed after adoption — it is also the upgrade mechanism:
+Keep the cast-init skill installed after adoption — it is also the upgrade mechanism, and from v4 on upgrades are **script-only**:
 
 1. `npx skills update` refreshes the skill to the latest content of this repo (updates are content-hash based, not semver). Plugin installs use `/plugin marketplace update` instead.
-2. Re-run `/cast-init`. It detects your installed CAST version, short-circuits if you're already current, and otherwise proposes a migration plan that preserves your customizations.
+2. `bash .claude/skills/cast-init/scripts/install.sh --upgrade` — deterministic, no LLM: guided by the install manifest, it replaces only byte-unmodified CAST files, adds new ones, removes obsolete unmodified ones, and updates the version stamp. Files you customized are kept and listed; run `/cast-init` only when that list is non-empty (it merges CAST's changes into your customized files) or when upgrading a **pre-v4 install** — that one-time v3→v4 migration is `/cast-init`'s job, and it ends by writing the manifest, so it is the last LLM-driven upgrade the project needs.
 
 Two operational notes about the `npx skills` route:
 

@@ -486,12 +486,29 @@ jobs:
           # Idempotency: a re-run installs nothing and overwrites nothing.
           bash skills/cast-init/scripts/install.sh --target "$t" --project-name "CI Fixture" > "$t/rerun.log"
           grep -q "0 file(s) installed" "$t/rerun.log" || { echo "re-run was not a no-op:"; cat "$t/rerun.log"; fail=1; }
-          # --no-ui skips the agent and both UI templates together.
+          # The manifest exists and records every installed file — it is the upgrade contract.
+          [ -f "$t/.claude/cast/install-manifest.txt" ] || { echo "no install manifest written"; fail=1; }
+          mrows=$(grep -c '^F ' "$t/.claude/cast/install-manifest.txt")
+          frows=$((a + k + m + 3 + 5))   # agents + skills + templates + contracts/map + artifacts (manifest itself excluded)
+          [ "$mrows" -ge $((frows - 1)) ] || { echo "manifest rows $mrows < expected ~$frows"; fail=1; }
+          # Upgrade path: a customized file is kept through --upgrade (twice — the
+          # manifest must carry the CAST hash forward, not the customized one), an
+          # unmodified file stays CAST-current, and the run is a no-op at same version.
+          echo "MY CUSTOM RULE" >> "$t/.claude/agents/coder.md"
+          bash skills/cast-init/scripts/install.sh --target "$t" --upgrade > "$t/up1.log"
+          bash skills/cast-init/scripts/install.sh --target "$t" --upgrade > "$t/up2.log"
+          grep -q "MY CUSTOM RULE" "$t/.claude/agents/coder.md" || { echo "upgrade clobbered a customized file"; fail=1; }
+          grep -q "1 kept (customized)" "$t/up2.log" || { echo "customization not carried in manifest:"; cat "$t/up2.log"; fail=1; }
+          grep -q "0 file(s) upgraded, 0 added, 0 obsolete removed" "$t/up2.log" || { echo "same-version upgrade not a no-op:"; cat "$t/up2.log"; fail=1; }
+          # --no-ui skips the agent and both UI templates together, and persists
+          # through --upgrade via the manifest.
           t2=$(mktemp -d)
           bash skills/cast-init/scripts/install.sh --target "$t2" --no-ui --project-name "CI Fixture" > /dev/null
           [ ! -e "$t2/.claude/agents/ui.md" ] || { echo "--no-ui installed ui.md"; fail=1; }
           [ ! -e "$t2/.claude/cast/templates/UI_SPEC.md" ] && [ ! -e "$t2/.claude/cast/templates/UX_REVIEW.md" ] \
             || { echo "--no-ui installed a UI template"; fail=1; }
+          bash skills/cast-init/scripts/install.sh --target "$t2" --upgrade > /dev/null
+          [ ! -e "$t2/.claude/agents/ui.md" ] || { echo "--upgrade forgot the no-ui opt-out"; fail=1; }
           rm -rf "$t" "$t2"
           [ "$fail" -eq 0 ] && echo "installer clean"
           exit $fail
