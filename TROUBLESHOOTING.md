@@ -6,7 +6,7 @@ Common problems adopting or running this template, with the most likely cause an
 
 ## Which pipeline should I use — `/agent-plan`, `/agent-code`, or `/agent-task`?
 
-**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes (plus `/cast-doctor` and `/cast-release`, the maintenance skills — not pipelines), and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → Risk → CEO). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
+**Cause.** This is a decision problem rather than an error. The template ships three pipeline skills with three different scopes (plus `/file-bug` and `/add-task`, the intake skills, and `/cast-doctor` and `/cast-release`, the maintenance skills — not pipelines), and users don't always know which one fits their current work. `/agent-plan` runs the full planning stage (Product → Architecture + UI → Risk → CEO). `/agent-code` runs the engineering stage for a CEO-approved milestone (Coder → Reviewer, with Defect and Issue routing). `/agent-task` runs a mini engineering pipeline for a single self-contained task with no milestone, no planning artifacts, and no CEO verdict.
 
 **Fix.** Use the table below to pick a pipeline, then read the narrative note after it.
 
@@ -15,6 +15,9 @@ Common problems adopting or running this template, with the most likely cause an
 | "Add a new feature / milestone" | `/agent-plan` then `/agent-code` | New features need a planning stage with CEO sign-off before engineering. |
 | "Fix a typo in the README" | `/agent-task` | Self-contained text change, no design work needed. |
 | "Fix a bug already in `artifacts/BUGS.md`" | `/agent-task` | Scope is bounded by the bug report. |
+| "I found a bug but I'm not fixing it right now" | `/file-bug` | Intake skill, not a pipeline: files the bug as its own tracked report (per-bug file + index row) and nothing runs. Fix later via `/agent-task`, or let `/agent-plan` Stage 1 pull it into a milestone. |
+| "Small task I want recorded for later" | `/add-task` | Intake skill, not a pipeline: queues the task in `artifacts/TASKS.md`. Nothing runs until you drain the queue or a milestone adopts the entry. |
+| "Work through everything I've queued up" | `/agent-task backlog` | Runs every open `artifacts/TASKS.md` entry sequentially through the mini pipeline; entries that turn out to need planning are flagged and skipped, not forced through. |
 | "Add a new command or endpoint" | `/agent-plan` then `/agent-code` | Touches the public interface — needs UI spec, security review, CEO sign-off. |
 | "A small feature that needs a few design decisions" | `/agent-plan light: <feature>` then `/agent-code` | Light planning mode: Product + Architecture + CEO only — design work gets planned without full milestone ceremony. Also engages automatically for work Stage 1 scopes to 3 tasks or fewer with no new screens, no security surface, no applicable performance budget, and nothing cross-cutting. |
 | "Check the health of the CAST install / slim the docs after a model upgrade" | `/cast-doctor` | Maintenance skill, not a pipeline: verifies install invariants, prescribes model-gated documentation pruning, finds coverage gaps. Report-only until you approve treatments. |
@@ -48,7 +51,7 @@ Common problems adopting or running this template, with the most likely cause an
 2. Run the move command(s) from the project root. Typically:
    ```
    mv .cast-stage/agents .claude/agents
-   mv .cast-stage/skills/agent-plan .cast-stage/skills/agent-code .cast-stage/skills/agent-task .cast-stage/skills/cast-doctor .cast-stage/skills/cast-release .claude/skills/
+   mv .cast-stage/skills/agent-plan .cast-stage/skills/agent-code .cast-stage/skills/agent-task .cast-stage/skills/file-bug .cast-stage/skills/add-task .cast-stage/skills/cast-doctor .cast-stage/skills/cast-release .claude/skills/
    rmdir .cast-stage/skills .cast-stage
    ```
 3. Restart your Claude Code session so the moved agents and skills register.

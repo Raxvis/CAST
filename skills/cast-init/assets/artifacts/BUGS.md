@@ -18,7 +18,7 @@
 
 # [PROJECT_NAME] — Bug Index
 
-Every bug is a standalone file created from `templates/BUG_REPORT.md` and filed beside the work that surfaced it: `artifacts/milestone-{N}-{slug}/bugs/bug-XXX-{slug}.md` for pipeline work, `artifacts/one-off/bugs/bug-XXX-{slug}.md` for `/agent-task` work. This file is the index: it assigns IDs and carries one status line per bug. Triage and re-triage sweeps read this index and open only the bug files they act on.
+Every bug is a standalone file created from `templates/BUG_REPORT.md` and filed beside the work that surfaced it: `artifacts/milestone-{N}-{slug}/bugs/bug-XXX-{slug}.md` for pipeline work, `artifacts/one-off/bugs/bug-XXX-{slug}.md` for `/agent-task` work and for user-found bugs filed via the `/file-bug` skill (no milestone's work surfaced those). This file is the index: it assigns IDs and carries one status line per bug. Triage and re-triage sweeps read this index and open only the bug files they act on — Product's sweeps run at `/agent-code` milestone completion and `/agent-plan` Stage 1, which also reviews open (New/Triaged) user-filed bugs and pulls the ones relevant to the milestone into its scope.
 
 ---
 
@@ -41,6 +41,7 @@ Every bug is a standalone file created from `templates/BUG_REPORT.md` and filed 
 | Owner | Writes | Status set |
 |---|---|---|
 | **Reviewer** | Creates the bug file from `templates/BUG_REPORT.md` and adds its index row: ID, Description, Expected, Actual, Steps to Reproduce, Platform, Frequency, Evidence, Likely Files, Regression, Related Issues, initial Severity | `New` (or `Duplicate` at filing, when the report duplicates an existing entry — cite the original ID in Related Issues) |
+| **`/file-bug` (user report)** | Second filing route, for bugs users find outside a pipeline run: creates the bug file at `artifacts/one-off/bugs/` and its index row, same fields as Reviewer's filing, from the user's description — never guessing what the user did not supply | `New` |
 | **Product** | Triages: sets final Severity, accepts/rejects/defers; re-triages `Deferred` entries at `/agent-code` milestone completion and `/agent-plan` Stage 1 | `Triaged` (or `Won't Fix` / `Deferred`) |
 | **Coder (investigation)** | Investigation fields: Root Cause, Affected Module(s), Alternative Solutions, Recommended Fix, Assigned To, Investigation Date | `In Progress` (or `Cannot Reproduce` after an investigation that fails to reproduce the bug) |
 | **Coder** | Resolution fields at fix time: Commit, Files Changed, Regression Notes | `Fixed` |

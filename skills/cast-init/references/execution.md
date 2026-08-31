@@ -104,10 +104,10 @@ Place preserved custom sections in a `## Project Customizations (preserved)` sec
 
 ## 5.5 — Install pipeline skills
 
-For each of `agent-plan`, `agent-code`, `agent-task`, `cast-doctor`:
+For each of `agent-plan`, `agent-code`, `agent-task`, `file-bug`, `add-task`, `cast-doctor`, `cast-release`:
 
 1. Read from `<CAST_SOURCE>/skills/<name>/SKILL.md`. **Never install `<CAST_SOURCE>/skills/README.md`** — it is payload documentation, not a skill.
-2. Substitute project-specific values including `[PROJECT_NAME]`, `[TEST_CMD]`, and `[MAX_LOOP_COUNT]` (default 3 if not specified). `cast-doctor` carries only `[PROJECT_NAME]` — it never runs project code, so it takes no test command or loop cap.
+2. Substitute project-specific values including `[PROJECT_NAME]`, `[TEST_CMD]`, and `[MAX_LOOP_COUNT]` (default 3 if not specified). `file-bug`, `add-task`, and `cast-doctor` carry only `[PROJECT_NAME]` — none of them runs project code, so they take no test command or loop cap.
 3. Write to `.claude/skills/<name>/SKILL.md` (create the directory). Keep the frontmatter `name` field equal to the directory name — Claude Code requires the match.
 4. If updating an existing similar-named pipeline: preserve any project-specific pre-flight or post-completion steps by moving them to an appendix section labelled `## Project-Specific Extensions (preserved from pre-CAST version)`.
 5. **Pre-1.0 migration**: if `.claude/commands/<name>.md` exists (the pipelines were slash commands before CAST v1.0.0), treat it as the existing counterpart — merge its preserved custom sections into the new SKILL.md per rule 4, then propose Delete of the old command file. The delete requires explicit user approval (per the safety rules), but leaving both files registers a duplicate `/<name>`, so flag it clearly rather than silently keeping both.
@@ -129,7 +129,7 @@ For each CAST reference doc and document template in the plan:
 
 ## 5.7 — Install artifacts scaffold
 
-1. Read `BUGS.md`, `STANDUP.md`, `AGENT_STATE.md`, `README.md` from `<CAST_SOURCE>/artifacts/`.
+1. Read `BUGS.md`, `TASKS.md`, `STANDUP.md`, `AGENT_STATE.md`, `README.md` from `<CAST_SOURCE>/artifacts/`.
 2. Substitute placeholders.
 3. Write to `artifacts/`. If a file already exists with user content, preserve it — merge only if the user explicitly approved.
 4. Ensure `artifacts/one-off/` exists. Do not pre-create milestone directories — `/agent-plan` Stage 1 creates each `artifacts/milestone-{N}-{slug}/`. If the plan approved a pre-2.0 by-type layout migration (see `dispositions.md` → Artifacts directory), execute it here: per-file `git mv` into the milestone directories, the `-tasks.md` → per-task-file split, and the `BUGS.md` → index + per-bug-file conversion, exactly as planned.

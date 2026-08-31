@@ -128,13 +128,13 @@ Light mode skips 2b and the CEO's risk lenses for small, low-risk work — the f
 
 ### One-Off Task Pipeline (`/agent-task`)
 
-Same loop, no milestone and no CEO verdict: Coder → Reviewer → validation, with the task description serving as the acceptance criteria. Pre-Flight halts and routes to `/agent-plan` if the task turns out to need design work.
+Same loop, no milestone and no CEO verdict: Coder → Reviewer → validation, with the task description serving as the acceptance criteria. Pre-Flight halts and routes to `/agent-plan` if the task turns out to need design work. Feeding it are the two agent-less intake skills: `/file-bug` records a user-found bug (per-bug file plus `artifacts/BUGS.md` index row), and `/add-task` queues small work in the `artifacts/TASKS.md` backlog — drained one entry at a time (`/agent-task TASK-XXX`) or all at once (`/agent-task backlog`).
 
 ## Workflow
 
 ### Planning (`/agent-plan`)
 
-1. **Product** defines scope and writes the milestone README plus one task file per task, each seeded with the smallest sufficient Context Manifest. It also sweeps the Deferred backlog and disposes of the previous close record's open actions.
+1. **Product** defines scope and writes the milestone README plus one task file per task, each seeded with the smallest sufficient Context Manifest. It also sweeps the Deferred backlog, reviews the intake queues (open `/file-bug` reports in `artifacts/BUGS.md` and open `/add-task` entries in `artifacts/TASKS.md`) — adopting into the milestone whatever is relevant to it — and disposes of the previous close record's open actions.
 2. **Architect** and **UI** run in parallel, each producing its document and returning **Manifest Rows** rather than editing task files. UI runs only when a task is UI-flagged.
 3. **2c**: the orchestrator applies both agents' rows to the task files. Single-writer, no spawn.
 4. **CEO** — one launch, two parts: the risk lenses over the architecture (only when the plan shows a security surface or an applicable performance budget; writes `reviews/risk.md` with the two implementation-review flags), then the cross-cutting review and verdict. REVISION REQUIRED returns the plan to the named agent; the CEO's re-review re-runs its lenses when the architecture changed. Cap: 3 revision cycles, then escalate.

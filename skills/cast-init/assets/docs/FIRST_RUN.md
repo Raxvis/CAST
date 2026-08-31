@@ -47,12 +47,14 @@ In the Claude Code session, type:
 
 ## Step 3 — Check the installed skills as "tab completion" smoke checks
 
-Type `/agent` and check that the three pipeline skills auto-complete, then `/cast` for the maintenance skill (on current Claude Code versions, skills are invocable as `/<name>`):
+Type `/agent` and check that the three pipeline skills auto-complete, then `/cast` for the maintenance skills, and `/file` and `/add` for the intake skills (on current Claude Code versions, skills are invocable as `/<name>`):
 
 ```
 /agent-plan
 /agent-code
 /agent-task
+/file-bug
+/add-task
 /cast-doctor
 /cast-release
 ```

@@ -72,7 +72,7 @@ Claude Code accepts the `opus` / `sonnet` / `haiku` aliases or full model IDs in
 
 ## Pipeline skills mapping
 
-The five CAST skills are the three pipelines `/agent-plan`, `/agent-code`, `/agent-task`, plus two maintenance skills: `/cast-doctor` (install health checks and model-aware documentation audits) and `/cast-release` (release preparation — this was the `release` agent in v2). Both maintenance skills install unconditionally, with no agent-tier coupling. They install to `.claude/skills/<name>/SKILL.md`. For each, apply this decision:
+The seven CAST skills are the three pipelines `/agent-plan`, `/agent-code`, `/agent-task`, two intake skills — `/file-bug` (files a user-found bug as a tracked per-bug report plus index row) and `/add-task` (queues a one-off task in the `artifacts/TASKS.md` backlog) — plus two maintenance skills: `/cast-doctor` (install health checks and model-aware documentation audits) and `/cast-release` (release preparation — this was the `release` agent in v2). The intake and maintenance skills install unconditionally, with no agent-tier coupling — they launch no agents. All install to `.claude/skills/<name>/SKILL.md`. For each, apply this decision:
 
 | State | Action |
 |---|---|

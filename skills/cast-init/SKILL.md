@@ -3,7 +3,8 @@ name: cast-init
 description: >-
   Install or migrate the CAST multi-agent workflow (Claude Agent Staged Team) into the
   current project: 8 specialist subagents, three pipeline skills (/agent-plan,
-  /agent-code, /agent-task) plus the /cast-doctor and /cast-release maintenance skills, a
+  /agent-code, /agent-task) plus the /file-bug and /add-task intake skills and the
+  /cast-doctor and /cast-release maintenance skills, a
   docs/templates/artifacts scaffold, and a parameterized CLAUDE.md — with project
   detection, a user-approved migration plan, and placeholder substitution. Use when the user says "install CAST", "adopt CAST", "set up CAST",
   "cast init", "migrate to CAST", asks for a staged multi-agent planning/engineering
@@ -11,7 +12,7 @@ description: >-
   produces the migration plan without changing files.
 license: MIT
 metadata:
-  version: "3.0.0"
+  version: "3.1.0"
   source: "https://github.com/Raxvis/CAST"
 ---
 
@@ -48,7 +49,7 @@ CAST's canonical structure in a target project is:
 
 - `CLAUDE.md` at project root — top-level context for every session
 - `.claude/agents/` — 8 subagent definitions with YAML frontmatter and per-agent model settings (all `model: inherit` by default — agents run on the session model)
-- `.claude/skills/` — three pipeline skills (`/agent-plan`, `/agent-code`, `/agent-task`) plus `/cast-doctor`, the run-anytime install health check and documentation audit, and `/cast-release`, release-prep automation
+- `.claude/skills/` — three pipeline skills (`/agent-plan`, `/agent-code`, `/agent-task`), two intake skills (`/file-bug` files user-found bugs individually, `/add-task` queues one-off tasks in the `artifacts/TASKS.md` backlog), plus `/cast-doctor`, the run-anytime install health check and documentation audit, and `/cast-release`, release-prep automation
 - `docs/` — reference material only (PRD, conventions, topic-specific guides)
 - `templates/` — reusable document templates (architecture, UI spec, milestone, task, and bug-report files) copied into `artifacts/` as instances
 - `artifacts/` — work artifacts only, **grouped by milestone**: one `milestone-{N}-{slug}/` directory per milestone (README, design docs, reviews/, one file per task under tasks/, one file per bug under bugs/), `one-off/` for /agent-task work, and cross-milestone logs (BUGS.md index, STANDUP.md, AGENT_STATE.md) at the root

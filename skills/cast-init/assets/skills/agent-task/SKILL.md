@@ -5,7 +5,9 @@ description: >-
   spawned only when Reviewer's acceptance-criteria check calls for it, and a micro path
   where the orchestrator itself reviews diffs containing no executable statement) for a
   single self-contained task — bug fixes, typos, single-function refactors, dependency
-  bumps — with no milestone, planning artifacts, or CEO verdict. Use when the user asks
+  bumps — with no milestone, planning artifacts, or CEO verdict. Also drains the
+  /add-task backlog: /agent-task TASK-XXX runs one queued artifacts/TASKS.md entry,
+  /agent-task backlog runs every open entry in sequence. Use when the user asks
   for a small one-off change or invokes /agent-task. Bails out for design work: to
   /agent-plan light mode when a few design decisions are implied, full /agent-plan
   for cross-cutting work.
@@ -58,7 +60,8 @@ This skill explicitly does NOT invoke [architect](../../agents/architect.md), [u
 ## When to use this skill
 
 **Good fits:**
-- Fixing a bug already filed in the `artifacts/BUGS.md` index
+- Fixing a bug already filed in the `artifacts/BUGS.md` index (by Reviewer during pipeline work, or by the user via `/file-bug`)
+- Running a task queued in the `artifacts/TASKS.md` backlog by `/add-task` — one entry (`/agent-task TASK-XXX`) or all open entries (`/agent-task backlog`)
 - Fixing a typo or small correctness issue
 - Adding a log line, metric, or debug output
 - Refactoring a single function without changing its contract
@@ -84,20 +87,38 @@ Each stage runs on the model set in that agent's file (default: `inherit` — th
 
 ## Input
 
-The argument text the user provided when invoking this skill — a free-form description of the task. May reference a specific file path, a bug ID (e.g., "Fix BUG-002: `done` silently succeeds on missing ID"), or a plain description ("Add a `--json` flag to the `list` command following the pattern in `add.ts`"). If none was provided, ask for one before the Pre-Flight Check.
+The argument text the user provided when invoking this skill — one of:
+
+- A free-form description of the task. May reference a specific file path, a bug ID (e.g., "Fix BUG-002: `done` silently succeeds on missing ID"), or a plain description ("Add a `--json` flag to the `list` command following the pattern in `add.ts`").
+- A backlog entry ID (`TASK-XXX`): run that queued `artifacts/TASKS.md` entry — its entry block is the task description.
+- `backlog`: run **every** Open entry in `artifacts/TASKS.md`, per **Backlog mode** below.
+
+If no argument was provided, read the `artifacts/TASKS.md` index: when Open entries exist, list them and offer backlog mode; otherwise ask for a task description before the Pre-Flight Check.
 
 ## Instructions
 
 This skill orchestrates a mini engineering pipeline by executing the canonical engineering loop defined in `docs/PIPELINE_LOOP.md` — the same loop `/agent-code` runs — but skips the planning stage entirely. This file carries only the deltas specific to one-off tasks.
+
+### Backlog mode
+
+When invoked as `/agent-task backlog` (or the user accepts the no-argument offer), drain the `/add-task` queue:
+
+1. Read the `artifacts/TASKS.md` index and list the Open entries. Confirm the set with the user before starting (they may want to skip or reorder some).
+2. Run each entry **sequentially, oldest first**, through the full pipeline below — Pre-Flight, task file, loop, completion — exactly as if it were the sole invocation. One entry finishes (or bails) before the next starts; one-off tasks carry no dependency or file-disjointness metadata, so backlog entries never run in parallel.
+3. An entry that fails the Pre-Flight scope check does not halt the run: mark its Notes `Open — needs planning` with the recommended `/agent-plan` invocation (per the Backlog Lifecycle in `artifacts/TASKS.md`), leave its Status Open, report it, and continue with the next entry. Likewise, an entry whose loop escalates (loop cap, Environment Issue) stops **that entry** — record where it stopped, then ask the user whether to continue the run or stop.
+4. After the last entry, summarize the run: entries completed (with task file links), entries routed to planning, entries escalated.
+
+**Backlog bookkeeping applies in every mode.** Whenever the task being run came from the queue — backlog mode or a single `/agent-task TASK-XXX` — the orchestrator advances that entry's index row per the field-ownership table in `artifacts/TASKS.md` (canonical): `Open → In Progress` when its Pre-Flight starts, `In Progress → Done` with the Resolution column linking the task file at completion.
 
 ### Pre-Flight Check
 
 Before any work begins:
 
 1. Read only what Pre-Flight needs beyond what the session already has in context (root `CLAUDE.md` and its Memory Imports — do not re-read those): `docs/FILE_CONVENTIONS.md`, plus any applicable topic doc (`docs/FRONTEND.md` / `BACKEND.md` / `CLI.md` / `MOBILE.md`) not already imported. Stages run cold and see only what the task file's Context Manifest cites — so seed the manifest below with every convention doc the task needs; it is a stage's only route to one (rationale: `docs/DESIGN_RATIONALE.md` → "Memory Imports ship empty").
-2. If the task description references a bug ID, look it up in the `artifacts/BUGS.md` index and read its per-bug file.
-3. Read any files named in the task description.
-4. **Scope check.** If the task description implies an architectural change, a new module, a new screen, a new endpoint, or a cross-cutting change, **stop and route the user to the right planning tier**. Do not attempt to inline architect or UI work into a one-off task. For a small feature needing a few design decisions, point at light mode: "This task introduces <specific scope>, which needs a planning pass. Run `/agent-plan light: \"<feature description>\"` — a light run (Product + Architecture + CEO) — then `/agent-code` to implement." For multi-task or cross-cutting scope, point at the full run: "Run `/agent-plan \"<feature description>\"` first, then `/agent-code`."
+2. If the invocation names a backlog entry (`TASK-XXX`), read its entry block in `artifacts/TASKS.md` — that block is the task description for every step below — and flip its index row to In Progress (see Backlog bookkeeping above). If the entry is not Open, stop and report its current status instead of re-running it.
+3. If the task description references a bug ID, look it up in the `artifacts/BUGS.md` index and read its per-bug file.
+4. Read any files named in the task description.
+5. **Scope check.** If the task description implies an architectural change, a new module, a new screen, a new endpoint, or a cross-cutting change, **stop and route the user to the right planning tier**. Do not attempt to inline architect or UI work into a one-off task. For a small feature needing a few design decisions, point at light mode: "This task introduces <specific scope>, which needs a planning pass. Run `/agent-plan light: \"<feature description>\"` — a light run (Product + Architecture + CEO) — then `/agent-code` to implement." For multi-task or cross-cutting scope, point at the full run: "Run `/agent-plan \"<feature description>\"` first, then `/agent-code`."
 
 ### Task File
 
@@ -119,7 +140,7 @@ Deltas specific to this skill:
   2. No regressions in adjacent features.
   3. The change did not sneak in scope beyond what was asked. If new scope appeared, flag it and either trim or escalate to `/agent-plan`.
 
-  **Scope creep always needs Product.** Point 3 is not something Reviewer's criteria check covers — if Reviewer's entry reports files touched beyond the task file's Files list, or any finding it classified as out-of-scope, route to Step 3b regardless of how the criteria were marked. (A resolved filed bug no longer forces a Product spawn: the orchestrator flips its status `Verified` → `Closed` at Completion step 5, per the field-ownership table in `artifacts/BUGS.md`.)
+  **Scope creep always needs Product.** Point 3 is not something Reviewer's criteria check covers — if Reviewer's entry reports files touched beyond the task file's Files list, or any finding it classified as out-of-scope, route to Step 3b regardless of how the criteria were marked. (A resolved filed bug no longer forces a Product spawn: the orchestrator flips its status `Verified` → `Closed` at Completion step 6, per the field-ownership table in `artifacts/BUGS.md`.)
 
 ### Completion
 
@@ -129,13 +150,14 @@ After the task passes validation (Step 3a or 3b):
 2. Set the task file's Status to Complete in its Header.
 3. Append an entry to `artifacts/STANDUP.md` using that file's Entry Grammar: a session heading `### YYYY-MM-DD — agent-task — <task summary>` (if this run has not added one yet) and a `- <product|reviewer> | progress | <task summary, any bug ID resolved>` line — attributed to whichever stage closed the task.
 4. **Docs Writer (conditional).** Count the pending `docs` entries in `artifacts/STANDUP.md` (lines of the form `- <agent> | docs | <note>` without ✅ — see that file's Entry Grammar). If **one or more** are pending, invoke the **docs-writer** agent to drain them all (it marks each with ✅) — a one-off run has exactly one task, so this checkpoint is its only drain opportunity. If the queue is empty — the common case for a one-off task — launch nothing.
-5. If the task resolved a filed bug, advance the per-bug file's status per the field-ownership table in `artifacts/BUGS.md` (which is canonical): Coder already set the status to **Fixed** at fix time, filling in the resolution fields (Commit, Files Changed, Regression Notes) — verify this happened and have Coder backfill it if not. Now that the suite is green and the task passed validation, **you (the orchestrator)** flip the status **Verified** → **Closed**, mirroring each change into the index row — a transcription of recorded facts, no agent launch.
-6. Summarize what changed, what tests were affected, and any follow-up items or deferred scope.
+5. If the task came from the `artifacts/TASKS.md` backlog, flip its index row `In Progress` → `Done` and fill the Resolution column with the task file path (see Backlog bookkeeping above).
+6. If the task resolved a filed bug, advance the per-bug file's status per the field-ownership table in `artifacts/BUGS.md` (which is canonical): Coder already set the status to **Fixed** at fix time, filling in the resolution fields (Commit, Files Changed, Regression Notes) — verify this happened and have Coder backfill it if not. Now that the suite is green and the task passed validation, **you (the orchestrator)** flip the status **Verified** → **Closed**, mirroring each change into the index row — a transcription of recorded facts, no agent launch.
+7. Summarize what changed, what tests were affected, and any follow-up items or deferred scope.
 
 ### Error Handling
 
 - If the task description is ambiguous enough that Coder cannot proceed without a design decision, stop and ask the user to clarify before continuing. Do not guess.
-- If the change turns out to touch more modules than initially expected, stop and re-apply the Pre-Flight scope check (step 4) — route to the right planning tier rather than finishing a large change inside a one-off task.
+- If the change turns out to touch more modules than initially expected, stop and re-apply the Pre-Flight scope check (step 5) — route to the right planning tier rather than finishing a large change inside a one-off task.
 - Loop-cap escalation (`[MAX_LOOP_COUNT]`) follows `docs/PIPELINE_LOOP.md`. On an Environment Issue, this skill escalates to the user directly and the user decides whether to continue.
 
 ### Scope Boundaries

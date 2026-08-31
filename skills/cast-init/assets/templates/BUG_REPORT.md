@@ -2,8 +2,9 @@
   FILE: BUG_REPORT.md
   PURPOSE: Template for a SINGLE bug report file. One instance per bug:
            artifacts/milestone-{N}-{slug}/bugs/bug-{XXX}-{slug}.md for bugs found during
-           pipeline work, artifacts/one-off/bugs/bug-{XXX}-{slug}.md for /agent-task work.
-           Reviewer creates the instance and adds a row to the global index in
+           pipeline work, artifacts/one-off/bugs/bug-{XXX}-{slug}.md for /agent-task work
+           and user-found bugs filed via /file-bug.
+           Reviewer (or /file-bug, for user reports) creates the instance and adds a row to the global index in
            artifacts/BUGS.md, which also carries the canonical lifecycle, severity scale,
            and field-ownership rules — this template only defines the file's shape.
 
@@ -27,7 +28,7 @@
 - **Status**: New / Triaged / In Progress / Fixed / Verified / Closed / Cannot Reproduce / Duplicate / Won't Fix / Deferred
 - **Severity (initial)**: Critical | High | Medium | Low   _(set by Reviewer; Product sets the final severity at triage)_
 - **Severity (final)**: Critical | High | Medium | Low   _(set by Product at triage)_
-- **Found during**: [Task ID or milestone reference, or "one-off"]
+- **Found during**: [Task ID or milestone reference, "one-off", or "user report — /file-bug"]
 - **Description**: [Detailed description of the bug and its impact on the user experience.]
 - **Expected**: [What should happen.]
 - **Actual**: [What actually happens.]

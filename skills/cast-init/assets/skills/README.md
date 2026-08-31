@@ -1,7 +1,7 @@
 <!-- TEMPLATE INSTRUCTIONS
 PURPOSE: This file is the in-directory index for the pipeline skills payload. It is
 reference material for readers browsing the template repo — it must NOT be copied to
-target projects during adoption. /cast-init installs only the five skill directories
+target projects during adoption. /cast-init installs only the seven skill directories
 below.
 
 HOW TO CUSTOMIZE: no customization needed. This file is metadata about the directory.
@@ -19,6 +19,8 @@ When `/cast-init` installs the template into a target project, each skill direct
 skills/agent-plan/SKILL.md    →  <target>/.claude/skills/agent-plan/SKILL.md
 skills/agent-code/SKILL.md    →  <target>/.claude/skills/agent-code/SKILL.md
 skills/agent-task/SKILL.md    →  <target>/.claude/skills/agent-task/SKILL.md
+skills/file-bug/SKILL.md      →  <target>/.claude/skills/file-bug/SKILL.md
+skills/add-task/SKILL.md      →  <target>/.claude/skills/add-task/SKILL.md
 skills/cast-doctor/SKILL.md   →  <target>/.claude/skills/cast-doctor/SKILL.md
 skills/cast-release/SKILL.md  →  <target>/.claude/skills/cast-release/SKILL.md
 ```
@@ -34,7 +36,9 @@ Claude Code auto-discovers any `<name>/SKILL.md` under `.claude/skills/` at sess
 | `agent-plan/` | `/agent-plan <feature description>` | Runs the full Planning Stage: Product → Architecture + UI → CEO (risk lenses + verdict in one launch). Produces a complete milestone directory (`artifacts/milestone-{N}-{slug}/`): the milestone README, one task file per task (each with a Context Manifest), architecture document, UI spec, reviews, and a CEO verdict. No code is written. **Light mode** (`/agent-plan light: <feature>`, or `single:` for the one-task case) plans a small feature with Product + Architecture + CEO only — same milestone layout, minimal ceremony. It also engages automatically when Stage 1 scoping finds 3 tasks or fewer with no new screen set, no security-sensitive scope, no applicable performance budget, and nothing cross-cutting. |
 | `agent-code/` | `/agent-code <milestone or task>` | Runs the Engineering Stage for a CEO-approved milestone: **Coder → Reviewer → validation — a clean task is two spawns.** Coder implements, writes and runs the tests, and commits; Reviewer verifies the verbatim test-results block (the test gate), reviews the diff, classifies findings as Defects (filing each as a bug file, then Product triage) or Issues (back to Coder), and records the per-criterion Acceptance Criteria Check. That check decides validation: all criteria Met closes the task with no agent launch (the orchestrator also flips any resolved bug Verified → Closed); a flagged criterion, a mid-task amendment, or a CEO Approval Condition launches Product. Independent tasks (disjoint dependencies and file lists) run their loops in parallel, up to 3 at a time, with shared-state writes serialized by the orchestrator. The task-completion checkpoint launches no agents (Status writeback plus a `docs`-queue overflow drain past 10 pending entries); at milestone completion the UX review runs for UI-flagged milestones, the CEO runs the risk implementation review when flagged, one Product launch writes the close record (`reviews/close.md`) covering every task, Docs Writer drains any queued docs entries, and the orchestrator records outcomes and archives. |
 | `cast-release/` | `/cast-release` | Release preparation: verify the gates (milestone closed, tests pass, build succeeds, no blocking bugs, risk flags cleared), derive the semantic version from what actually shipped, update `docs/CHANGELOG.md`, and write a release record with a GO / NO-GO. Runs in-session and launches no agents. This was the `release` agent in v2. Does not tag, push, or publish — that stays the user's command. |
-| `agent-task/` | `/agent-task <task description>` | Runs a mini engineering pipeline for a single one-off task without requiring a milestone, planning artifacts, or CEO verdict. Same Defect/Issue routing as `/agent-code` but no planning stage. Bails out if the task turns out to need design work — recommending `/agent-plan` light mode for a small feature with a few design decisions, the full run for cross-cutting scope. |
+| `agent-task/` | `/agent-task <task description>` | Runs a mini engineering pipeline for a single one-off task without requiring a milestone, planning artifacts, or CEO verdict. Same Defect/Issue routing as `/agent-code` but no planning stage. Also drains the `/add-task` queue: `/agent-task TASK-XXX` runs one `artifacts/TASKS.md` entry, `/agent-task backlog` runs every open entry sequentially. Bails out if the task turns out to need design work — recommending `/agent-plan` light mode for a small feature with a few design decisions, the full run for cross-cutting scope. |
+| `file-bug/` | `/file-bug <bug description>` | Intake skill, not a pipeline: files a user-found bug as its own tracked report — one instance of `templates/BUG_REPORT.md` under `artifacts/one-off/bugs/` plus an `artifacts/BUGS.md` index row, Status New. Runs in-session, launches no agents, fixes nothing. The fix happens later via `/agent-task "Fix BUG-XXX"`, an `/add-task` queue entry, or adoption at `/agent-plan` Stage 1 (which reviews open user-filed bugs). |
+| `add-task/` | `/add-task <task description>` | Intake skill, not a pipeline: queues a small self-contained task as an entry in the `artifacts/TASKS.md` backlog without running anything. Runs in-session and launches no agents; screens scope and routes planning-tier work to `/agent-plan` instead of queueing it. Queued entries are drained by `/agent-task` (per entry or `backlog` mode) or adopted into a milestone at `/agent-plan` Stage 1. |
 | `cast-doctor/` | `/cast-doctor` (or `/cast-doctor checkup` for report-only) | The maintenance skill, not a pipeline: a run-anytime health check of the CAST install. Verifies structural and state invariants (bug index, task indexes, STANDUP grammar, bounded logs, resolving references), prescribes model-aware documentation pruning in two tiers gated on the Context Inference Bar in `docs/MODEL_OPTIMIZATION.md`, and finds documentation coverage gaps. Writes `artifacts/DOCTOR.md`; treats only user-approved prescriptions. Run it after model changes or every few milestones. |
 
 ## When to use each skill
@@ -44,6 +48,8 @@ Short version:
 - **New feature or milestone?** → `/agent-plan` then `/agent-code`
 - **A small feature with a few design decisions?** → `/agent-plan light: <feature>` then `/agent-code`
 - **Bug fix, typo, small refactor, dependency bump?** → `/agent-task`
+- **Found a bug but not fixing it right now?** → `/file-bug` (records it; nothing runs)
+- **Small task for later?** → `/add-task` (queues it), then `/agent-task backlog` to work through the queue
 - **Unsure?** → `/agent-plan` first (light mode keeps the tax small). It is strictly safer to plan and not need it than to skip planning and discover you needed it mid-implementation.
 - **Milestone closed and ready to ship?** → `/cast-release`
 - **Docs feel heavier than the project needs, models were upgraded, or the install hasn't been checked in a while?** → `/cast-doctor`
@@ -52,13 +58,13 @@ Longer version with a decision table: see the repo's `TROUBLESHOOTING.md` → "W
 
 ## Model compatibility
 
-All five skills are optimized for the Claude Opus family (agents default to `model: inherit`, running on the session model; `claude-opus-5` is the preferred executing model, with `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` supported). Each SKILL.md carries a **Model Compatibility** section with orchestration notes for the model executing it — chiefly that Opus 5 delegates readily and expands scope (spawn only the agents each stage names; hold tasks to their Files lists), Opus 4.8/4.7 delegate conservatively (the explicit stage invocations are load-bearing), and Opus 4.6 over-delegates like Opus 5. Behavior profiles and the upgrade checklists through Opus 4.8 → Opus 5 live in `docs/MODEL_OPTIMIZATION.md`.
+All seven skills are optimized for the Claude Opus family (agents default to `model: inherit`, running on the session model; `claude-opus-5` is the preferred executing model, with `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` supported). Each pipeline SKILL.md carries a **Model Compatibility** section with orchestration notes for the model executing it — chiefly that Opus 5 delegates readily and expands scope (spawn only the agents each stage names; hold tasks to their Files lists), Opus 4.8/4.7 delegate conservatively (the explicit stage invocations are load-bearing), and Opus 4.6 over-delegates like Opus 5. Behavior profiles and the upgrade checklists through Opus 4.8 → Opus 5 live in `docs/MODEL_OPTIMIZATION.md`.
 
 ## How pipeline skills work
 
 A SKILL.md is Markdown with YAML frontmatter (`name`, `description`) that Claude Code discovers at session start. When the user invokes the skill (e.g. `/agent-plan add dark mode`), Claude loads the file body and follows it, treating the text the user typed after the skill name as the invocation input. The rest of the file is instructions to Claude for how to orchestrate the work.
 
-Open any of the SKILL.md files to see the full orchestration: which agents get launched, in what order, with what inputs, and how findings are routed (`cast-doctor` and `cast-release` are the exceptions — both run self-contained in the session, cooperating with the roster through files rather than launching agents). The files are self-documenting and deliberately verbose — they are the contract between the user's intent and the agent pipeline.
+Open any of the SKILL.md files to see the full orchestration: which agents get launched, in what order, with what inputs, and how findings are routed (`cast-doctor`, `cast-release`, `file-bug`, and `add-task` are the exceptions — all four run self-contained in the session, cooperating with the roster through files rather than launching agents). The files are self-documenting and deliberately verbose — they are the contract between the user's intent and the agent pipeline.
 
 ## Customization
 
