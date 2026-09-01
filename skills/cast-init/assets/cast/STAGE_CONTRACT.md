@@ -27,11 +27,13 @@ You are running as one stage of a pipeline. This is everything you need to know 
 
 ## 1. Your read set is closed
 
-Read exactly these, and nothing else:
+Read exactly these **documents**, and nothing else:
 
 1. **The task file** whose path you were given.
 2. **Every entry in its Context Manifest.**
 3. **Whatever the latest Handoff Log entry lists under "Read next".**
+
+**The codebase itself is always in bounds.** This contract closes your *document* read set — it never limits your access to the code you are changing: the task's Files list, the code surrounding it, and the existing tests are yours to read, and matching the patterns established there is expected. The split is: code teaches what *is* (style, naming, idiom — read it from the neighbors); the Standards Digest teaches what *should be* where that differs from the code (policy, migrations away from current patterns, thresholds).
 
 Not the milestone directory. Not sibling task files. Not whole design documents when the manifest cites sections. Not `artifacts/AGENT_STATE.md`. Not this pipeline's other documents. **Not the project's own documentation** — the source map (`.claude/cast/SOURCES.md`) and everything it points at belong to planning, which distilled what applies into the Standards Digest and design documents your manifest cites. If the digest seems to miss a rule your work needs, that is a planning defect: flag it in your handoff entry; do not go read the sources.
 

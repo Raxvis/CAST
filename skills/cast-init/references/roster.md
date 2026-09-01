@@ -58,13 +58,13 @@ Use this table as the authoritative reference when comparing an existing project
 
 **One-line summary you can keep in context:** 7 agents, all on `model: inherit` (the session model) = 4 planning-tier at effort `high` (product, architect, ui, ceo) + 2 loop agents (coder at `medium`, reviewer at `high`) + 1 utility at `low` (docs-writer). Every adoption must account for all 7.
 
-**Right-sizing models (cost optimization).** `model: inherit` is the safe default, but each agent's `model:` line can be pinned independently. Note the ordering: **spawn count dominates both model tier and effort** — a stage you don't launch costs nothing, and each distinct agent type is its own prompt-cache prefix. v3's roster is already right-sized in that dimension; the table below is the second-order lever. Every Phase 3 plan must include an Ask item proposing a right-sized assignment for the user to accept, adjust, or decline. A sensible starting split:
+**Right-sizing models (cost optimization).** `model: inherit` is the safe default, but each agent's `model:` line can be pinned independently. Note the ordering: **spawn count dominates both model tier and effort** — a stage you don't launch costs nothing, and each distinct agent type is its own prompt-cache prefix. the roster is already right-sized in that dimension; the table below is the second-order lever. Every Phase 3 plan must include an Ask item proposing a right-sized assignment for the user to accept, adjust, or decline. A sensible starting split:
 
 | Workload | Agents | Suggested model |
 |---|---|---|
-| Judgment-heavy gates and design | `ceo`, `architect`, `reviewer` | The most capable model available — e.g. `opus` (or a Fable/Mythos-class model if the account serves one) |
-| Planning and implementation | `product`, `ui`, `coder` | `sonnet` — strong coding and spec writing at a fraction of the cost |
-| Structured utility work | `docs-writer` | `sonnet` — the cheapest tier that still clears the Context Inference Bar (see caution below) |
+| Judgment-heavy gates and design | `product`, `ceo`, `architect`, `reviewer` | The most capable model available — `opus`, or a Fable/Mythos-class model if the account serves one. Product belongs here in v4: its Stage 1 distillation of your documentation into the Standards Digest is what every engineering spawn runs on — a weak distillation silently degrades the whole milestone |
+| Implementation and specs | `ui`, `coder` | `sonnet` — strong coding and spec writing at a fraction of the cost |
+| Structured utility work | `docs-writer` | `sonnet` — no lower (see caution below) |
 
 Claude Code accepts the `opus` / `sonnet` / `haiku` aliases or full model IDs in agent frontmatter. Record accepted assignments in the plan as part of each agent's Create/Update action; any agent the user leaves undecided keeps `inherit`.
 
