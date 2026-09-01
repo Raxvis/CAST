@@ -82,7 +82,7 @@ Entries under a session heading are appended in the order they happen (oldest fi
 
 ### 2026-04-08 — agent-plan — milestone-1-task-crud
 
-- product | progress | Stage 1 complete: `artifacts/milestone-1-task-crud/README.md` and five task files (`tasks/task-01…05-*.md`) written
+- product | progress | Stage 1 complete: sources resolved from `.claude/cast/SOURCES.md` (PRD/CONCEPT/GLOSSARY + `CLAUDE.md` conventions); `artifacts/milestone-1-task-crud/README.md` written with its Standards Digest, plus five task files (`tasks/task-01…05-*.md`)
 - architect | progress | Stage 2a complete: `artifacts/milestone-1-task-crud/architecture.md` — `src/db/`, `src/commands/`, `src/cli.ts` module layout and initial SQLite schema
 - architect | docs | docs/GLOSSARY.md needs entries for the migration runner, WAL mode, and `schema_version` ✅
 - ui | progress | Stage 2b complete: `artifacts/milestone-1-task-crud/ui.md` — every command surface, exit code, and error message
