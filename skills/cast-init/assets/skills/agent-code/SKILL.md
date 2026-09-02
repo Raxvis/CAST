@@ -143,6 +143,6 @@ Fires when every task file is Complete or Deferred.
 
 - A task blocked by an unfinished dependency: skip it, record a `blocker` entry.
 - An ambiguous architecture document or UI spec: flag it, pause the task, tell the user to re-run the relevant `/agent-plan` stage. Do not guess.
-- Loop-cap escalation and Environment Issue handling follow `.claude/cast/PIPELINE_LOOP.md`. On an Environment Issue, pause the task and escalate the infrastructure problem to the user directly — v3 has no Validator agent for this; other tasks are not blocked.
+- Loop-cap escalation and Environment Issue handling follow `.claude/cast/PIPELINE_LOOP.md`. On an Environment Issue, pause the task and escalate the infrastructure problem to the user directly — CAST has no Validator agent for this; other tasks are not blocked.
 
 Do NOT write any work artifact into the project's own documentation locations (the source-map entries in `.claude/cast/SOURCES.md`) — Docs Writer alone updates the Documentation Home, at the checkpoints above. All work artifacts go under `artifacts/`.
