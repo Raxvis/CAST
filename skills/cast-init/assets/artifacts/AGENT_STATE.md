@@ -30,7 +30,7 @@
 
 # [PROJECT_NAME] — Project State
 
-Written by the orchestrating skill (`/agent-plan`, `/agent-code`, `/agent-task`) at checkpoints. **Agents do not read this file** — a stage's read set is its task file, that file's Context Manifest, and the latest handoff entry's "Read next" (`docs/STAGE_CONTRACT.md`).
+Written by the orchestrating skill (`/agent-plan`, `/agent-code`, `/agent-task`) at checkpoints. **Agents do not read this file** — a stage's read set is its task file, that file's Context Manifest, and the latest handoff entry's "Read next" (`.claude/cast/STAGE_CONTRACT.md`).
 
 ---
 

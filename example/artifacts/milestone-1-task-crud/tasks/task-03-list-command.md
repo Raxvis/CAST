@@ -50,7 +50,7 @@ on first invocation rather than throwing — this is the path BUG-001 surfaced.
 | `../architecture.md` | §5.2 (`list` command) | Query contract and formatter boundary |
 | `../ui.md` | §3 (`list` output) | Column format and empty-state wording |
 | `../README.md` | § CEO Approval Conditions | Conditions 1 (parameterized SQL) and 3 (first-run migration) name this task |
-| `docs/CODE_PATTERNS.md` | TypeScript Style Conventions | Naming and module-layout rules |
+| `../README.md` | § Standards Digest | The distilled conventions binding this task (naming, layout, error and test rules) |
 
 ---
 

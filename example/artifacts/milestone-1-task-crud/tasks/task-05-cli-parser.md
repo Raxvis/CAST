@@ -49,7 +49,7 @@ that opens the DB, runs migrations, dispatches, and closes the DB.
 |---|---|---|
 | `../architecture.md` | §6 (Entrypoint) | Dispatch shape and migration-before-dispatch rule |
 | `../ui.md` | §5 (help output) | Usage text format |
-| `docs/CODE_PATTERNS.md` | TypeScript Style Conventions | Naming and module-layout rules |
+| `../README.md` | § Standards Digest | The distilled conventions binding this task (naming, layout, error and test rules) |
 
 ---
 

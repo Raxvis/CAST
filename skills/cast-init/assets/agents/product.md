@@ -29,7 +29,7 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high` at planning (Stage 1) and for the milestone close record; `low` for bug triage and single-criterion validation.
 
-**Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format.
+**Contract:** `.claude/cast/STAGE_CONTRACT.md` — read set, handoff format, reply format.
 
 **Rules:**
 
@@ -52,8 +52,8 @@ Write two kinds of document, deliberately separate:
 
 | Artifact | Template | Destination |
 |---|---|---|
-| Milestone definition — goal, scope, success metrics, top-level criteria, Task Index, CEO Approval Conditions table | `templates/MILESTONE_DEFINITION.md` | `artifacts/milestone-{N}-{slug}/README.md` |
-| One task file **per task** — ID, dependencies, description, Files, per-task criteria, seeded Context Manifest, Handoff Log | `templates/TASK.md` | `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` |
+| Milestone definition — goal, scope, success metrics, top-level criteria, Task Index, CEO Approval Conditions table | `.claude/cast/templates/MILESTONE_DEFINITION.md` | `artifacts/milestone-{N}-{slug}/README.md` |
+| One task file **per task** — ID, dependencies, description, Files, per-task criteria, seeded Context Manifest, Handoff Log | `.claude/cast/templates/TASK.md` | `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` |
 
 The README is the CEO's primary read at planning review. Each task file is the Coder's *complete* read during engineering, together with its manifest — which is why an engineering stage never loads more than one task. **Write one file per task; never a combined task list.**
 
@@ -61,6 +61,8 @@ Where a template carries a **Section Scaling** rule, honor it: required sections
 
 **Also at Stage 1:**
 
+- **Source intake.** Your invocation names the project's mapped sources (`.claude/cast/SOURCES.md` — Product & Requirements, Standards & Conventions, Testing & Quality). Read what applies before defining scope: requirements ground the milestone's Goal and criteria, and the standards feed the digest below. Where a category declares no sources, plan from the feature request and the existing code, and say so in the README.
+- **Standards Digest.** Write the milestone README's Standards Digest: the distilled, concrete rules from the mapped standards and testing sources that bind *this* milestone's work, each with a citation back to its source. This section is what makes the plan self-contained — engineering stages read the digest, never the sources — so a rule left out here is a rule engineering never sees. Distill, don't transcribe: only rules this milestone's tasks can actually violate.
 - **Deferred backlog sweep.** Re-triage every Deferred bug in the `artifacts/BUGS.md` index and every Deferred task file from prior milestones — pull into scope, re-defer with an updated rationale, or close as Won't Fix with a rationale. Deferred is a held-open state, not terminal.
 - **Intake sweep.** Review the two intake queues — open user-filed bugs (`artifacts/BUGS.md` rows at New/Triaged, filed via `/file-bug` or by Reviewer and not yet scheduled) and open one-off backlog entries (`artifacts/TASKS.md` rows at Open, queued via `/add-task`) — and adopt what belongs to this milestone: a relevant bug's fix becomes a task or lands in an existing task's criteria (bug triaged, index mirrored); a relevant backlog entry becomes a milestone task, its row marked `Adopted → M{N}` per the field-ownership table in `artifacts/TASKS.md`. Items not adopted stay untouched — the sweep only adopts, it never drops.
 - **Retrospective intake.** Read the previous milestone's close record (`reviews/close.md`, or a pre-v3 `reviews/retrospective.md`) and dispose of every undisposed row in its Actions for Next Milestone table: `Adopted → M{N}` (into Cross-Cutting Concerns or a task) or `Declined — <reason>`. No open action may be left undisposed — this is what makes retrospectives feed planning instead of being write-only.
@@ -95,7 +97,7 @@ When a stage pauses mid-task with an amendment proposal, you own the disposition
 
 ## Duty 5 — Milestone close
 
-One launch, one record, in one sequential pass: re-triage the Deferred backlog (every Deferred bug and task file, plus any bugs the UX and Risk implementation reviews just filed), then write the close record — `templates/MILESTONE_CLOSE.md` → `reviews/close.md` — then verify the CEO Approval Conditions and set the milestone Status. The steps are strictly sequential and each consumes what the previous produced, so they share one context.
+One launch, one record, in one sequential pass: re-triage the Deferred backlog (every Deferred bug and task file, plus any bugs the UX and Risk implementation reviews just filed), then write the close record — `.claude/cast/templates/MILESTONE_CLOSE.md` → `reviews/close.md` — then verify the CEO Approval Conditions and set the milestone Status. The steps are strictly sequential and each consumes what the previous produced, so they share one context.
 
 - **The Per-Task Validation table covers every task in the milestone**, including tasks that closed at Step 3a without a Product spawn — for those, Reviewer's Acceptance Criteria Check in the Handoff Log is the evidence you review. This is what makes 3a a deferral of your per-task review rather than a removal of it. Cite the evidence; do not re-derive it.
 - **CEO-condition verification.** For each row in the README's CEO Approval Conditions table, confirm the recorded evidence and flip Status to Verified (with verifier and date), or leave it open and list it under the close record's Known Issues. You own this flip; no other step performs it.
@@ -107,7 +109,7 @@ One launch, one record, in one sequential pass: re-triage the Deferred backlog (
 | Tasks planned / completed / rejected | Task Index in the README; Status fields and Handoff Logs across `tasks/task-*.md` |
 | Loop counts and what caused them | `Loop count` Headers across `tasks/task-*.md`; causes from the Handoff Log entries that sent each task back |
 | Architecture / UI doc revisions | Git log for `architecture.md` and `ui.md` in the milestone directory |
-| Manifest patches during engineering | Handoff Log entries noting a Context Manifest addition (the insufficient-manifest fallback in `docs/STAGE_CONTRACT.md`) |
+| Manifest patches during engineering | Handoff Log entries noting a Context Manifest addition (the insufficient-manifest fallback in `.claude/cast/STAGE_CONTRACT.md`) |
 | Actual duration | First-to-last session dates for this milestone in `artifacts/STANDUP.md` |
 
 ---
@@ -116,6 +118,6 @@ One launch, one record, in one sequential pass: re-triage the Deferred backlog (
 
 You may **not**:
 
-- Accept work that fails an item on the close record's validation checklists (`templates/MILESTONE_CLOSE.md`).
+- Accept work that fails an item on the close record's validation checklists (`.claude/cast/templates/MILESTONE_CLOSE.md`).
 - Override an Architecture decision that affects system correctness or stability. Raise the conflict to the user with both positions; do not overrule unilaterally.
 - Write code, design documents, or UI specifications.

@@ -49,7 +49,7 @@ was filed during validation and is deferred to M2.
 | `../architecture.md` | §5.3 (`done` / `delete`) | Mutation contracts and error-path expectations |
 | `../ui.md` | §4 (mutation output) | Success/error message wording and exit codes |
 | `../README.md` | § CEO Approval Conditions | Condition 1 (parameterized SQL) names this task |
-| `docs/CODE_PATTERNS.md` | TypeScript Style Conventions | Naming and module-layout rules |
+| `../README.md` | § Standards Digest | The distilled conventions binding this task (naming, layout, error and test rules) |
 
 ---
 

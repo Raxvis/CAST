@@ -9,8 +9,8 @@
            A task file must be executable in isolation: an agent picking it up reads THIS
            file plus exactly the references in its Context Manifest — nothing else. Handoffs
            are compact entries appended to the Handoff Log, not conversation context. The
-           full contract lives in docs/STAGE_CONTRACT.md — the only process document an
-           agent reads. Routing lives in docs/PIPELINE_LOOP.md, read by the
+           full contract lives in .claude/cast/STAGE_CONTRACT.md — the only process document an
+           agent reads. Routing lives in .claude/cast/PIPELINE_LOOP.md, read by the
            orchestrating skill only.
 
   HOW TO CUSTOMIZE:
@@ -32,10 +32,13 @@
     every task.
   - Context Manifest: Product seeds it at planning; Architect and UI append their document
     sections (with anchors) when they write the milestone design docs. Keep it minimal —
-    every entry is a file another agent is forced to read.
+    every entry is a file another agent is forced to read. Entries cite MILESTONE ARTIFACTS
+    only, never the project's own documentation: planning distills the applicable standards
+    into the Standards Digest (milestone README, or this file for one-off tasks), and
+    engineering reads the digest, not the sources.
   - Handoff Log: append-only, newest last; one fixed-format entry per stage transition.
     The entry format, 10-line cap, and its exceptions are defined once in
-    docs/STAGE_CONTRACT.md §2 — deliberately not restated per instance (every stage
+    .claude/cast/STAGE_CONTRACT.md §2 — deliberately not restated per instance (every stage
     of every task re-reads this file).
   - Sections marked (required) must be present and non-empty in every instance;
     (optional) sections may be omitted.
@@ -82,20 +85,30 @@ _Expected to create or modify:_
 
 ## Context Manifest (required)
 
-_The complete read set for this task (`docs/STAGE_CONTRACT.md` §1). Cite sections, not whole files._
+_The complete read set for this task (`.claude/cast/STAGE_CONTRACT.md` §1). Cite sections, not whole files. **Milestone artifacts only** — never a source-map location: the project's standards reach this task through the Standards Digest (milestone README § Standards Digest, or this file's own Standards Digest for one-off tasks), distilled at planning time. The `../` rows below are milestone-shaped seeds: a one-off instance replaces the whole table with what `/agent-task` Pre-Flight identified — there is no milestone directory to point into._
 
 | Reference | Sections | Why |
 |---|---|---|
+| `../README.md` | § Standards Digest | [the distilled standards binding this task] |
 | `../architecture.md` | [§ anchor(s), e.g. "§ Data Schema"] | [what this task takes from it] |
 | `../ui.md` | [§ anchor(s), or remove row if no UI work] | [what this task takes from it] |
 | `../README.md` | § CEO Approval Conditions | [only if a condition names this task; otherwise remove row] |
-| `docs/CODE_PATTERNS.md` | [§ anchor(s)] | [conventions this task must follow] |
+
+---
+
+## Standards Digest (optional)
+
+_One-off (`/agent-task`) tasks only — milestone tasks cite the milestone README's digest instead. Pre-Flight distills the applicable rules from the sources mapped in `.claude/cast/SOURCES.md` into this table so the engineering stages never open those sources. Omit the section when no mapped standard bears on the task (and say so in the Description: conventions inferred from existing code)._
+
+| Rule | Source |
+|---|---|
+| [Concrete, checkable rule this task must follow] | [`path/to/source.md` § anchor] |
 
 ---
 
 ## Handoff Log (required)
 
-_Append-only; newest last; one entry per stage transition. Entry format, the 10-line cap, and its exceptions (Coder's Test Results block, Reviewer's per-finding lines and Acceptance Criteria Check): `docs/STAGE_CONTRACT.md` §2._
+_Append-only; newest last; one entry per stage transition. Entry format, the 10-line cap, and its exceptions (Coder's Test Results block, Reviewer's per-finding lines and Acceptance Criteria Check): `.claude/cast/STAGE_CONTRACT.md` §2._
 
 ### 1. [from-agent] → [to-agent] — [YYYY-MM-DD]
 

@@ -4,7 +4,7 @@ Reference material for Phase 3 (Migration plan). The roster table is the authori
 
 ## Critical agent requirements
 
-CAST v3 ships **seven** agents. An adoption must account for every one of them.
+CAST ships **seven** agents. An adoption must account for every one of them.
 
 v2 shipped fifteen. Eight were removed by merging, not by dropping their work — see the v3 CHANGELOG for the full reasoning, and the migration table below for where each one's duties went. When you find a v2 CAST install (or any project with a `tester.md` / `refactor.md` / `debugger.md`), map the role forward rather than preserving the file.
 
@@ -32,7 +32,7 @@ v2 shipped fifteen. Eight were removed by merging, not by dropping their work �
 | `validator` | `product` + orchestrator | Its bookkeeping (AGENT_STATE rows, archival) is orchestrator file-writing; the retrospective went to Product; its conflict-resolution protocol had time-based triggers ("after 7 days blocked") that could never fire in a pipeline where a milestone runs in one or two sessions. |
 | `release` | `/cast-release` skill | Checklist execution against files the session can already read. An agent spawn to run a checklist is a spawn spent on ceremony. |
 
-**`ui` opt-out for backend/CLI-only projects.** The `ui` agent is Tier 3, but it becomes optional when the project is clearly backend/CLI-only with no user interface (the same condition under which `dispositions.md` skips `templates/UI_SPEC.md` and `templates/UX_REVIEW.md`). The opt-out must be explicit: propose it as a Skip in the plan, get the user's confirmation at the Phase 4 gate, and record it in the Phase 7 report. The UI templates are skipped **if and only if** the `ui` agent is skipped — never install one half of the pair (Phase 6 checks this consistency). The installed `/agent-plan` skill skips its UI stage when no `ui` agent is present, so the pipeline stays runnable.
+**`ui` opt-out for backend/CLI-only projects.** The `ui` agent is Tier 3, but it becomes optional when the project is clearly backend/CLI-only with no user interface (the same condition under which `dispositions.md` skips `.claude/cast/templates/UI_SPEC.md` and `.claude/cast/templates/UX_REVIEW.md`). The opt-out must be explicit: propose it as a Skip in the plan, get the user's confirmation at the Phase 4 gate, and record it in the Phase 7 report. The UI templates are skipped **if and only if** the `ui` agent is skipped — never install one half of the pair (Phase 6 checks this consistency). The installed `/agent-plan` skill skips its UI stage when no `ui` agent is present, so the pipeline stays runnable.
 
 **Default install set: all 7 agents**, `ui` excepted under a recorded opt-out. Do not silently omit any.
 
@@ -42,7 +42,7 @@ v2 shipped fifteen. Eight were removed by merging, not by dropping their work �
 
 ## Canonical CAST agent roster (current release)
 
-Use this table as the authoritative reference when comparing an existing project's agents against CAST. The description column is pulled verbatim from each agent file's YAML frontmatter — match role against role, not name against name. Every agent defaults to `model: inherit` and runs on the session model (the Claude Opus family is the optimized target — `claude-opus-5` preferred, with `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` supported; see `docs/MODEL_OPTIMIZATION.md`); the Effort column is enforced by each agent file's frontmatter `effort:` key (Product ships un-keyed — its `high`-planning / `low`-triage split is per-duty guidance in its body). Override per-agent only when the user has a reason.
+Use this table as the authoritative reference when comparing an existing project's agents against CAST. The description column is pulled verbatim from each agent file's YAML frontmatter — match role against role, not name against name. Every agent defaults to `model: inherit` and runs on the session model (the Claude Opus family is the optimized target — `claude-opus-5` preferred, with `claude-opus-4-8`, `claude-opus-4-7`, and `claude-opus-4-6` supported); the Effort column is enforced by each agent file's frontmatter `effort:` key (Product ships un-keyed — its `high`-planning / `low`-triage split is per-duty guidance in its body). Override per-agent only when the user has a reason.
 
 | # | Agent | Tier | Model | Effort | Role (from agent frontmatter) |
 |---|---|---|---|---|---|
@@ -52,23 +52,23 @@ Use this table as the authoritative reference when comparing an existing project
 | 4 | `ceo` | 3 | `inherit` | `high` | Use as the planning gate once Product, Architecture, and UI have completed their milestone outputs — runs the security and performance lenses over the plan (writing reviews/risk.md with its two flag lines when the plan has a security surface or an applicable budget), then reads across every artifact and issues APPROVED / APPROVED WITH CONDITIONS / REVISION REQUIRED. Also runs the flagged implementation reviews at milestone completion. |
 | 5 | `coder` | 1 | `inherit` | `medium` | Use to implement each task in /agent-code or /agent-task — writes production code, writes and runs its tests, and commits. Also handles every loop-back: Fix Now defects (investigating root cause first when the mechanism is not obvious), Reviewer Issues (behavior-preserving restructuring), and Product criteria rejections. |
 | 6 | `reviewer` | 1 | `inherit` | `high` | Use after every Coder handoff — the independent gate. Verifies the test-results block, reviews the diff for quality, standards, and architecture adherence, classifies findings as Defects (filing each as a bug file) or Issues (back to Coder), and on approval records the per-criterion Acceptance Criteria Check. No code bypasses review. |
-| 7 | `docs-writer` | 2 | `inherit` | `low` | Use at the milestone-completion checkpoint, at an overflow drain when the docs queue passes its bound, at the /agent-task completion checkpoint, or on direct user request — drains the docs queue in artifacts/STANDUP.md. Owns docs/ reference material. |
+| 7 | `docs-writer` | 2 | `inherit` | `low` | Use at the milestone-completion checkpoint, at an overflow drain when the docs queue passes its bound, at the /agent-task completion checkpoint, or on direct user request — drains the docs queue in artifacts/STANDUP.md into the project's own documentation, at the Documentation Home mapped in .claude/cast/SOURCES.md. |
 
 **How to compare against existing project agents.** When the Phase 1 inventory finds an agent file in the project under any name, match it by **role**, not by filename. Read the Role column in the table above and ask: "Does this existing file do what that role describes?" An existing `planner.md` whose purpose is "defines features and acceptance criteria" maps to `product`. An existing `coordinator.md` whose purpose is "resolves conflicts between roles and tracks milestones" has no v3 agent — its duties belong to the orchestrating skill and to `product`; propose Delete with the duties named. An existing `shipper.md` whose purpose is "runs the release cut and updates the changelog" maps to the `/cast-release` skill, not to an agent. Use the agent similar-name candidates table below for alias hints, but the description column above is the tiebreaker — the role always wins over the filename.
 
 **One-line summary you can keep in context:** 7 agents, all on `model: inherit` (the session model) = 4 planning-tier at effort `high` (product, architect, ui, ceo) + 2 loop agents (coder at `medium`, reviewer at `high`) + 1 utility at `low` (docs-writer). Every adoption must account for all 7.
 
-**Right-sizing models (cost optimization).** `model: inherit` is the safe default, but each agent's `model:` line can be pinned independently. Note the ordering: **spawn count dominates both model tier and effort** — a stage you don't launch costs nothing, and each distinct agent type is its own prompt-cache prefix. v3's roster is already right-sized in that dimension; the table below is the second-order lever. Every Phase 3 plan must include an Ask item proposing a right-sized assignment for the user to accept, adjust, or decline. A sensible starting split:
+**Right-sizing models (cost optimization).** `model: inherit` is the safe default, but each agent's `model:` line can be pinned independently. Note the ordering: **spawn count dominates both model tier and effort** — a stage you don't launch costs nothing, and each distinct agent type is its own prompt-cache prefix. The roster is already right-sized in that dimension; the table below is the second-order lever. Every Phase 3 plan must include an Ask item proposing a right-sized assignment for the user to accept, adjust, or decline. A sensible starting split:
 
 | Workload | Agents | Suggested model |
 |---|---|---|
-| Judgment-heavy gates and design | `ceo`, `architect`, `reviewer` | The most capable model available — e.g. `opus` (or a Fable/Mythos-class model if the account serves one) |
-| Planning and implementation | `product`, `ui`, `coder` | `sonnet` — strong coding and spec writing at a fraction of the cost |
-| Structured utility work | `docs-writer` | `sonnet` — the cheapest tier that still clears the Context Inference Bar (see caution below) |
+| Judgment-heavy gates and design | `product`, `ceo`, `architect`, `reviewer` | The most capable model available — `opus`, or a Fable/Mythos-class model if the account serves one. Product belongs here in v4: its Stage 1 distillation of your documentation into the Standards Digest is what every engineering spawn runs on — a weak distillation silently degrades the whole milestone |
+| Implementation and specs | `ui`, `coder` | `sonnet` — strong coding and spec writing at a fraction of the cost |
+| Structured utility work | `docs-writer` | `sonnet` — no lower (see caution below) |
 
 Claude Code accepts the `opus` / `sonnet` / `haiku` aliases or full model IDs in agent frontmatter. Record accepted assignments in the plan as part of each agent's Create/Update action; any agent the user leaves undecided keeps `inherit`.
 
-**Caution — a Haiku pin interacts with `/cast-doctor`'s doc audit.** The doctor computes each doc's Tier-B prune eligibility against its **weakest consumer**: a section may be deleted only when every model that reads it can infer the content from the codebase. `docs-writer` cites `docs/FILE_CONVENTIONS.md` and `docs/README.md`, so pinning it to a model below the Inference Bar (Haiku-class) permanently blocks Tier-B prunes on those docs — a per-spawn saving that forfeits a larger always-on saving. Pin utility roles no lower than a Sonnet-class model unless the project has decided against doc pruning.
+**Caution — Docs Writer works inside the user's own documentation.** It must match an existing corpus's structure and style while reconciling a multi-task queue, which is judgment work; pin it no lower than a Sonnet-class model on projects whose Documentation Home is substantial.
 
 ## Pipeline skills mapping
 

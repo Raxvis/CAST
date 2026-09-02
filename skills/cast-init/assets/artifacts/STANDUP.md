@@ -4,7 +4,7 @@
            /agent-task) appends entries here using the single Entry Grammar defined below.
            The grammar covers session sections, progress notes, the Docs
            Writer queue, decisions, and blockers — there is exactly one format, cited by
-           the pipeline skills and docs/PIPELINE_LOOP.md.
+           the pipeline skills and .claude/cast/PIPELINE_LOOP.md.
 
   HOW TO CUSTOMIZE:
   - Replace [PROJECT_NAME] with your project name.
@@ -59,7 +59,7 @@ Example session section:
 ```
 ### 2026-04-09 — agent-code — milestone-2-search-ui
 
-- coder | docs | docs/CODE_PATTERNS.md needs the new debounce pattern documented ✅
+- coder | docs | the new debounce pattern needs documenting in the conventions guide ✅
 - reviewer | progress | M2-T01 closed at Step 3a — all 5 criteria Met, no Product spawn; Status set to Complete
 - coder | blocker | Task M2-T02 Environment Issue: fixture server port collision in CI
 - docs-writer | progress | Milestone-completion drain: 1 docs entry drained

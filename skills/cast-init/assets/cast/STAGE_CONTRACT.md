@@ -5,7 +5,7 @@
            an agent ever reads.
 
            This file exists because of a measured problem: in CAST v2 every agent
-           cited docs/PIPELINE_LOOP.md, which had grown to ~5,000 tokens of routing
+           cited the pipeline-loop document, which had grown to ~5,000 tokens of routing
            rules, loop counters, and circuit breakers — none of which a stage acts on.
            The document that existed to keep context minimal had become the largest
            single item in every stage's context. v3 splits it: routing lives in
@@ -27,15 +27,17 @@ You are running as one stage of a pipeline. This is everything you need to know 
 
 ## 1. Your read set is closed
 
-Read exactly these, and nothing else:
+Read exactly these **documents**, and nothing else:
 
 1. **The task file** whose path you were given.
 2. **Every entry in its Context Manifest.**
 3. **Whatever the latest Handoff Log entry lists under "Read next".**
 
-Not the milestone directory. Not sibling task files. Not whole design documents when the manifest cites sections. Not `artifacts/AGENT_STATE.md`. Not this pipeline's other documents.
+**The codebase itself is always in bounds.** This contract closes your *document* read set — it never limits your access to the code you are changing: the task's Files list, the code surrounding it, and the existing tests are yours to read, and matching the patterns established there is expected. The split is: code teaches what *is* (style, naming, idiom — read it from the neighbors); the Standards Digest teaches what *should be* where that differs from the code (policy, migrations away from current patterns, thresholds).
 
-**If the manifest is insufficient**, that is a planning defect, not a reason to browse: add the missing reference to the Context Manifest so the next stage benefits, note the addition in your handoff entry, and continue.
+Not the milestone directory. Not sibling task files. Not whole design documents when the manifest cites sections. Not `artifacts/AGENT_STATE.md`. Not this pipeline's other documents. **Not the project's own documentation** — the source map (`.claude/cast/SOURCES.md`) and everything it points at belong to planning, which distilled what applies into the Standards Digest and design documents your manifest cites. If the digest seems to miss a rule your work needs, that is a planning defect: flag it in your handoff entry; do not go read the sources.
+
+**If the manifest is insufficient**, that is a planning defect, not a reason to browse: add the missing reference to the Context Manifest — citing only milestone artifacts, never source-map locations — note the addition in your handoff entry, and continue.
 
 **Milestone-grain stages** (CEO, and the milestone-completion stages) read what their agent file defines instead — still only within the milestone directory plus the cross-milestone root files.
 
@@ -80,7 +82,7 @@ Complete your role's work directly. Your `tools:` list omits the Task tool, so t
 
 ## 6. Queue documentation work; do not do it
 
-When your work changes something documentation-worthy — an API, command, configuration, convention, requirement, schema, or user-facing behavior — append `- <your agent name> | docs | <note>` to the current session in `artifacts/STANDUP.md`. Docs Writer drains the queue at completion checkpoints; no other stage edits `docs/`.
+When your work changes something documentation-worthy — an API, command, configuration, convention, requirement, schema, or user-facing behavior — append `- <your agent name> | docs | <note>` to the current session in `artifacts/STANDUP.md`. Docs Writer drains the queue at completion checkpoints by updating the project's own documentation (the Documentation Home in `.claude/cast/SOURCES.md`); no other stage edits the project's documentation.
 
 ## 7. Silence is not a clean report
 

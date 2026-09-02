@@ -33,12 +33,12 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`. Raise to `xhigh` on security-flagged milestones or when the plan marked the task complex.
 
-**Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format. That file is the only process document you read.
+**Contract:** `.claude/cast/STAGE_CONTRACT.md` — read set, handoff format, reply format. That file is the only process document you read.
 
 **Rules:**
 
 - **Report everything.** Every Defect and Issue you find, with severity and confidence. Never self-filter to high-severity only — severity filters measurably depress recall on every supported model, and filtering happens downstream (Product triages; Coder resolves). Emit the finding block even when it is empty; silence and "nothing found" must be distinguishable.
-- **Cite the standard.** Every Issue anchors to a named convention in `docs/CODE_PATTERNS.md`, the milestone's `architecture.md`, or `ui.md`. "This feels wrong" is not a finding.
+- **Cite the standard.** Every Issue anchors to a named rule in the Standards Digest (milestone README § Standards Digest, or the task file's own digest for one-off work), the milestone's `architecture.md` or `ui.md`, or a pattern demonstrably established in the surrounding code. "This feels wrong" is not a finding — and neither is a rule you fetched from the project's documentation sources yourself: if the digest is missing a rule the diff needs, flag the digest gap in your entry.
 - **Review the diff, not the tree.** The commits in the Handoff Log since your last approval, via `git show`/`git diff`. Read surrounding files only where the diff demands it — re-reading whole files the task did not touch is a read-set violation.
 - **Do not modify production code.** You write bug files and handoff entries. Fixes go back to Coder.
 
@@ -71,10 +71,10 @@ List every finding, with its classification, in your handoff entry — one line 
 
 ### 4. File each Defect as a bug
 
-Create `bugs/bug-{XXX}-{slug}.md` from `templates/BUG_REPORT.md` beside the task (`artifacts/one-off/bugs/` for `/agent-task` work), and add its one-line row to the index in `artifacts/BUGS.md`. Then:
+Create `bugs/bug-{XXX}-{slug}.md` from `.claude/cast/templates/BUG_REPORT.md` beside the task (`artifacts/one-off/bugs/` for `/agent-task` work), and add its one-line row to the index in `artifacts/BUGS.md`. Then:
 
 - **IDs** are `BUG-XXX`, sequential across the project, zero-padded, never reused — the next free ID is one greater than the highest in the index.
-- **Status on filing is always `New`.** The lifecycle and field ownership at the top of `artifacts/BUGS.md` are canonical; the entry format is `templates/BUG_REPORT.md`.
+- **Status on filing is always `New`.** The lifecycle and field ownership at the top of `artifacts/BUGS.md` are canonical; the entry format is `.claude/cast/templates/BUG_REPORT.md`.
 - **Symptoms, not diagnoses.** Steps to reproduce, expected result, actual result. Root-cause analysis belongs to whoever fixes it.
 - **Suggest a severity** from the canonical scale at the top of `artifacts/BUGS.md` (you are in that file adding the index row anyway); Product sets the final one. When unsure, round up.
 - **One bug per report**, and check the index for an existing report of the same symptom before filing — a duplicate is filed with status `Duplicate` referencing the original.
@@ -124,7 +124,7 @@ _Applied to every submission._
 - [ ] No hardcoded values that should be constants
 - [ ] No unnecessary duplication — shared logic extracted appropriately
 - [ ] No commented-out code or debug output in production paths
-- [ ] Error handling follows `docs/ERROR_HANDLING.md`
+- [ ] Error handling follows the rules in the Standards Digest (or the established pattern in adjacent code where the digest is silent)
 - [ ] No performance anti-patterns; within the architecture document's Performance Budget where one applies
 
 ### Architecture adherence

@@ -15,9 +15,12 @@ description: >-
 PURPOSE: This file defines the /agent-plan pipeline skill. It runs the Planning Stage of the
 multi-agent workflow end-to-end: Product → (Architecture + UI) → CEO. No code is written — the stage produces planning documents only.
 
-All work artifacts are written to `artifacts/`. Templates are read from `templates/`;
-guidelines are read from `docs/`. Never mix them: `docs/` and `templates/` are
-reference-only, `artifacts/` is where live work lives.
+All work artifacts are written to `artifacts/`. Templates are read from
+`.claude/cast/templates/`; the project's own documentation and standards are read from
+the locations mapped in `.claude/cast/SOURCES.md` — the source map. Planning is the ONLY
+stage tier that reads those sources: it distills what applies into the milestone's own
+artifacts (Standards Digest, architecture document, task files), and engineering reads
+the artifacts. A plan is not done until it is self-contained.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
@@ -33,7 +36,7 @@ skill. Invoke it with `/agent-plan <feature description or milestone>`.
 
 # /agent-plan — Feature Planning Pipeline
 
-Run the planning stage for a new feature or milestone. Produces milestone definitions, architecture documents, UI specifications, a risk review, and a CEO sign-off. No code is written. Every artifact produced by this skill is written to `artifacts/`; templates are read from `templates/`.
+Run the planning stage for a new feature or milestone. Produces milestone definitions, architecture documents, UI specifications, a risk review, and a CEO sign-off. No code is written. Every artifact produced by this skill is written to `artifacts/`; templates are read from `.claude/cast/templates/`; the project's own documentation is read through the source map (`.claude/cast/SOURCES.md`).
 
 ## Related agent files
 
@@ -46,7 +49,7 @@ This skill invokes the following agents. Open any of them for the full role defi
 
 ## Model Compatibility
 
-Each stage runs on the model set in that agent's file (default: `inherit` — the session model). Invoke only the agents named in the stages below, exactly as written: no ad-hoc subagents, no added verification passes (the executing model self-verifies), no collapsing a stage into direct work. Effort is per agent frontmatter — v3 planning defaults are `high` across the stage; re-pin Architecture to `xhigh` only for a new subsystem, a schema migration, or a cross-cutting contract change. Per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
+Each stage runs on the model set in that agent's file (default: `inherit` — the session model). Invoke only the agents named in the stages below, exactly as written: no ad-hoc subagents, no added verification passes (the executing model self-verifies), no collapsing a stage into direct work. Effort is per agent frontmatter — planning defaults are `high` across the stage; re-pin Architecture to `xhigh` only for a new subsystem, a schema migration, or a cross-cutting contract change.
 
 ## Input
 
@@ -54,11 +57,15 @@ The argument text the user provided when invoking this skill (e.g. `/agent-plan 
 
 ## Instructions
 
-This skill orchestrates the **Planning Stage** of the agent workflow. It runs the agents in the order below, each building on the previous agent's output. All outputs are planning documents under `artifacts/` — no production code is modified and nothing is written to `docs/`.
+This skill orchestrates the **Planning Stage** of the agent workflow. It runs the agents in the order below, each building on the previous agent's output. All outputs are planning documents under `artifacts/` — no production code is modified and nothing is written into the project's own documentation locations.
+
+**Source resolution (before Stage 1).** Read `.claude/cast/SOURCES.md` and resolve each category's entries to concrete file lists (expand globs; a directory means its markdown files). Note any entry that no longer resolves — tell the user and continue without it — and any category left `_None declared._`. You now hold the per-category source lists the stage invocations below pass on; stages read their own sources, so pass paths, never contents. This is also the moment to stop early: if the source map is missing entirely, tell the user to re-run `/cast-init` (which writes it) rather than improvising one.
+
+**Plans are self-contained.** Every stage below writes milestone artifacts complete enough that `/agent-code` never opens a mapped source: standards land in the README's Standards Digest, requirements land in the Goal and criteria, existing-system constraints land in the architecture document. Task-file Context Manifests cite milestone artifacts only.
 
 **Pass paths, not bodies.** Each stage's "Input to pass" means name the artifact paths (plus section pointers where a stage needs only part of one) in the agent's invocation — the stage reads its own inputs. Do not read stage outputs into your own context to paste them forward: a subagent is cold either way, so pasting pays an extra copy per receiving stage *and* permanently bloats this orchestrating context, which stage replies are designed to keep flat. Inline content belongs in an invocation only when you produced it yourself (the feature request, manifest-row corrections, revision notes).
 
-**Stage replies are routing metadata.** Per `docs/STAGE_CONTRACT.md`, each stage's final report is a short completion notice (artifact written, one-line outcome) — plus, for Stages 2a/2b, the per-task manifest-rows block described below. Do not relay or summarize document contents between stages; the documents on disk are the record.
+**Stage replies are routing metadata.** Per `.claude/cast/STAGE_CONTRACT.md`, each stage's final report is a short completion notice (artifact written, one-line outcome) — plus, for Stages 2a/2b, the per-task manifest-rows block described below. Do not relay or summarize document contents between stages; the documents on disk are the record.
 
 **Milestone numbering.** Unless the invocation input names an existing milestone to re-plan, allocate `{N}` as the highest `milestone-{N}-*` directory number already present under `artifacts/` plus one (`1` if there are none). Allocate it once, before Stage 1; Stage 1 creates the milestone directory `artifacts/milestone-{N}-{slug}/` and every artifact of the run is written inside it.
 
@@ -84,7 +91,7 @@ Between `/agent-task` (no design content at all) and a full planning run there i
 
 - **Stages run:** Stage 1 (Product) → Stage 2a (Architecture) → Stage 2c → Stage 3 (CEO, risk lenses skipped). Stage 2b (UI) is skipped by default.
 - **Stage 1** creates the milestone directory exactly as in full mode — same layout, so `/agent-code` consumes it unchanged — with one task file per task. Every required README section is still present (lean is fine; absent is not). Stage 1 also sets the flags that pull skipped work back in: **Needs UI Spec** = Yes on any task pulls in Stage 2b; a failed test 3 or 4 (security surface, applicable budget) pulls the risk lenses back into Stage 3. These flags are the safety net under the scoping tests: work wrongly skipped at scoping time is pulled back the moment a task declares its need.
-- **Stage 3 (CEO)** reviews as usual; skipped work's checklist sections and input rows read "N/A — skipped: <reason>" (permitted by `templates/CEO_REVIEW.md`). **The CEO is the backstop:** if the plan clearly needed the skipped UI stage, the correct verdict is REVISION REQUIRED naming Stage 2b; if it clearly needed the risk lenses, the CEO runs them itself in the same pass (`agents/ceo.md` → Skipped stages). The verdict line, Approval Conditions, and the post-verdict backfill work identically.
+- **Stage 3 (CEO)** reviews as usual; skipped work's checklist sections and input rows read "N/A — skipped: <reason>" (permitted by `.claude/cast/templates/CEO_REVIEW.md`). **The CEO is the backstop:** if the plan clearly needed the skipped UI stage, the correct verdict is REVISION REQUIRED naming Stage 2b; if it clearly needed the risk lenses, the CEO runs them itself in the same pass (`agents/ceo.md` → Skipped stages). The verdict line, Approval Conditions, and the post-verdict backfill work identically.
 - **Downstream:** skipped risk lenses leave no `reviews/risk.md` and therefore no flag lines, so the `/agent-code` milestone-completion checkpoint skips the implementation review automatically.
 
 Record the mode and why it was chosen in the Stage 1 checkpoint entry — `- agent-plan | progress | Stage 1 complete (light mode: 2 tasks, no new screens, no security or perf surface): ...` — so a resumed run knows which stages to expect and a later reader can audit the call.
@@ -95,22 +102,22 @@ Record the mode and why it was chosen in the Stage 1 checkpoint entry — `- age
 
 Launch the **product** agent to:
 
-1. Define the feature scope, goals, and success metrics.
-2. Create the milestone directory `artifacts/milestone-{N}-{slug}/` and write the milestone README at `artifacts/milestone-{N}-{slug}/README.md` using `templates/MILESTONE_DEFINITION.md` as the template. This is the milestone's highest-order document: what it is and why it matters — goal, success metrics, in-scope, out-of-scope, top-level acceptance criteria, dependencies and risks, cross-cutting concerns — plus the Task Index (one row per task file; no status column) and the CEO Approval Conditions table (backfilled after Stage 3).
-3. Decompose the work into tasks and write **one task file per task** at `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` using `templates/TASK.md` — each file self-contained: ID, dependencies, description, files touched, per-task acceptance criteria, and a **seeded Context Manifest** naming the smallest read set the task needs (convention docs now; Architecture and UI append their section references in Stage 2). Every manifest entry forces a downstream read — keep them minimal.
+1. Read the mapped sources passed in the invocation — Product & Requirements, Standards & Conventions, Testing & Quality — then define the feature scope, goals, and success metrics, grounded in those requirements where they exist. Where a category declared no sources, plan from the feature request and the existing code, and say so in the README.
+2. Create the milestone directory `artifacts/milestone-{N}-{slug}/` and write the milestone README at `artifacts/milestone-{N}-{slug}/README.md` using `.claude/cast/templates/MILESTONE_DEFINITION.md` as the template. This is the milestone's highest-order document: what it is and why it matters — goal, success metrics, in-scope, out-of-scope, top-level acceptance criteria, dependencies and risks, the **Standards Digest** (the distilled, source-cited rules from the mapped standards and testing sources that bind this milestone's work — what lets engineering never read the sources), cross-cutting concerns — plus the Task Index (one row per task file; no status column) and the CEO Approval Conditions table (backfilled after Stage 3).
+3. Decompose the work into tasks and write **one task file per task** at `artifacts/milestone-{N}-{slug}/tasks/task-{T}-{slug}.md` using `.claude/cast/templates/TASK.md` — each file self-contained: ID, dependencies, description, files touched, per-task acceptance criteria, and a **seeded Context Manifest** naming the smallest read set the task needs (convention docs now; Architecture and UI append their section references in Stage 2). Every manifest entry forces a downstream read — keep them minimal.
 4. Review the Deferred backlog while defining the milestone: re-triage every Deferred bug in the `artifacts/BUGS.md` index and any Deferred task files from prior milestone directories (Status field in each task file's Header) — pull items into this milestone's scope, keep them Deferred with an updated rationale, or close them as Won't Fix with a rationale. Deferred is a held-open state, not terminal (see `artifacts/BUGS.md` → Bug Lifecycle).
 5. **Intake sweep — user-filed bugs and the one-off backlog.** In the same pass, review the two intake queues and pull in what belongs to this milestone; relevance means the item touches the modules, screens, or feature area this milestone works on, or the milestone's changes would supersede or conflict with it. Everything not pulled in stays untouched — this sweep never closes or drops queue items, it only adopts:
    - **Open user-filed bugs** (`artifacts/BUGS.md` index rows with Status New or Triaged, not yet In Progress — `/file-bug` reports and any not-yet-scheduled Reviewer filings). Adopt a relevant bug by scheduling its fix in this milestone — as its own task, or folded into the acceptance criteria of a task already touching that code — with the bug ID cited in the task file and the triage recorded in the bug file (Status Triaged, final severity, scheduling note in its Notes; mirror the index row).
    - **Open backlog entries** (`artifacts/TASKS.md` index rows with Status Open, queued by `/add-task`). Adopt a relevant entry by writing it into this milestone as a task (or folding it into one) and marking its index row `Adopted → M{N}` with the Resolution column naming the milestone task (e.g. `M{N}-T03`), per the field-ownership table in `artifacts/TASKS.md`. Entries left Open remain `/agent-task` work.
 6. **Retrospective intake.** Read the previous milestone's close record, `reviews/close.md` (the highest-numbered milestone directory that has one — or a pre-v3 `reviews/retrospective.md`; skip this step if neither exists). For each row of its **Actions for Next Milestone** table that has no disposition yet, dispose of it: **adopt** it into this milestone's Cross-Cutting Concerns (or as a task), or **decline** it with a reason. Write the disposition into that Actions table (Disposition column: `Adopted → M{N}` or `Declined — <reason>`). No open action may be left undisposed — this step is what makes retrospectives feed planning instead of being write-only.
-7. Reference existing context in `docs/PRD.md`, `docs/CONCEPT.md`, and `docs/GLOSSARY.md`.
 
 The README and the task files are deliberately separate: the README is the CEO's primary read during planning review; each task file is the Coder's **complete** read during engineering (together with its Context Manifest). Isolated task files mean an engineering stage never loads more than its one task.
 
 Input to pass:
 - Feature request: the invocation input
+- Mapped sources: the resolved Product & Requirements, Standards & Conventions, and Testing & Quality file lists from Source resolution (name empty categories as `none declared`)
 - Output directory: `artifacts/milestone-{N}-{slug}/`
-- Templates: `templates/MILESTONE_DEFINITION.md` (for the README) and `templates/TASK.md` (one instance per task)
+- Templates: `.claude/cast/templates/MILESTONE_DEFINITION.md` (for the README) and `.claude/cast/templates/TASK.md` (one instance per task)
 - Deferred backlog: the Deferred rows in the `artifacts/BUGS.md` index and any Deferred task files in prior milestone directories (for the re-triage in step 4)
 - Intake queues: the New/Triaged rows in the `artifacts/BUGS.md` index and the Open rows in `artifacts/TASKS.md` (for the intake sweep in step 5)
 - Prior close record: the previous milestone's `reviews/close.md` (for the disposition duty in step 6), when one exists
@@ -120,12 +127,12 @@ Input to pass:
 After Product completes, launch the **architect** agent to:
 
 1. Read the milestone README and task files from Stage 1.
-2. Produce the architecture document at `artifacts/milestone-{N}-{slug}/architecture.md` as an **instance of `templates/ARCH_SYSTEM.md`** — that template defines the milestone architecture document's required headings. When the milestone needs module- or schema-level depth beyond it, additionally instantiate `templates/ARCH_MODULE.md` and/or `templates/ARCH_DATA_SCHEMA.md` as `artifacts/milestone-{N}-{slug}/arch-{slug}.md`, and link them from the milestone document.
+2. Produce the architecture document at `artifacts/milestone-{N}-{slug}/architecture.md` as an **instance of `.claude/cast/templates/ARCH_SYSTEM.md`** — that template defines the milestone architecture document's required headings. When the milestone needs module- or schema-level depth beyond it, additionally instantiate `.claude/cast/templates/ARCH_MODULE.md` and/or `.claude/cast/templates/ARCH_DATA_SCHEMA.md` as `artifacts/milestone-{N}-{slug}/arch-{slug}.md`, and link them from the milestone document.
 3. Define module boundaries, data schemas, cross-module contracts, and data flows.
 4. **Return a Manifest Rows block** in its completion report: for each affected task, the specific `architecture.md` sections (by anchor) that task needs and why — one proposed Context Manifest row per line, in the manifest's table format. Do **not** edit the task files directly: Stage 2b runs in parallel and edits to the same files would collide; the orchestrator applies both agents' rows in Stage 2c.
 5. Reference prior milestones' architecture documents (`artifacts/milestone-*/architecture.md`) for consistency and name any new dependencies in the Decisions Log.
 
-Input to pass: the paths of the milestone README and task files from Stage 1.
+Input to pass: the paths of the milestone README and task files from Stage 1, plus the resolved Architecture & Design source list from Source resolution (or `none declared`) — the Architect stays consistent with the system those sources describe, and everything a task needs from them lands in the architecture document itself.
 
 ### Stage 2b — UI
 
@@ -133,12 +140,12 @@ In parallel with Architecture, launch the **ui** agent to:
 
 1. Read the milestone README from Stage 1.
 2. Read the task files from Stage 1 — the per-task `Needs UI Spec` flags identify every screen the milestone introduces.
-3. Produce the UI specification at `artifacts/milestone-{N}-{slug}/ui.md` using the template in `templates/UI_SPEC.md`.
+3. Produce the UI specification at `artifacts/milestone-{N}-{slug}/ui.md` using the template in `.claude/cast/templates/UI_SPEC.md`.
 4. Define screen layouts, component structure, interaction states, and accessibility notes.
 5. **Return a Manifest Rows block** in its completion report: for each affected task, the specific `ui.md` sections (by anchor) that task needs and why — one proposed Context Manifest row per line. Do **not** edit the task files directly (Stage 2a runs in parallel; the orchestrator applies both agents' rows in Stage 2c).
 6. Reference prior milestones' UI specs (`artifacts/milestone-*/ui.md`) for consistency.
 
-Input to pass: the paths of the milestone README and the task files from Stage 1 (the `Needs UI Spec` flags live in each task file's Header). Coordinate state-shape questions with the architect agent if they arise.
+Input to pass: the paths of the milestone README and the task files from Stage 1 (the `Needs UI Spec` flags live in each task file's Header), plus any design-system or style-guide entries from the resolved Architecture & Design source list. Coordinate state-shape questions with the architect agent if they arise.
 
 **This stage is conditional in full mode too**, on scoping test 2: run it only when at least one task file's Header has **Needs UI Spec** = Yes. A full-mode backend milestone with no UI-flagged task would otherwise pay a UI launch for a spec no manifest cites. Skip with a checkpoint note (`- agent-plan | progress | Stage 2b skipped: no UI-flagged tasks`); the CEO reviews the skip like any light-mode skip ("N/A" input row), and a task that later declares **Needs UI Spec** = Yes pulls the stage back in.
 
@@ -159,13 +166,13 @@ After both Stage 2a and Stage 2b complete (or 2a alone in a no-ui run), the orch
 One launch covers the risk review and the verdict — the two halves are defined in `agents/ceo.md` as Part 1 and Part 2. Launch the **ceo** agent to:
 
 1. **Part 1 — risk lenses (conditional on scoping tests 3 and 4).** When Stage 1's scoping shows a security surface or an applicable performance budget, review the architecture through the security and performance lenses and write `artifacts/milestone-{N}-{slug}/reviews/risk.md` — both lens sections (even when one is empty) and the two flag lines `/agent-code` parses (`**Security implementation review required**` / `**Performance measured check required**`). A Yes on either commits `/agent-code` to a `reviews/risk-impl.md` at milestone completion. When both tests hold (no surface, no budget), the lenses are skipped, no `reviews/risk.md` is written, and `/agent-code` skips the implementation review automatically. **When genuinely unsure, tell the CEO to run them** — an unreviewed security surface ships a risk.
-2. **Part 2 — cross-cutting review and verdict.** Read the Stage 1–2 artifacts per the **Read set** in `agents/ceo.md` (that section bounds what the CEO opens; do not restate or widen it in the invocation), fill `templates/CEO_REVIEW.md`, and save to `artifacts/milestone-{N}-{slug}/reviews/ceo.md` with the single `**Verdict**:` line — exactly one of **APPROVED**, **APPROVED WITH CONDITIONS**, or **REVISION REQUIRED**. This skill's revision handling and `/agent-code`'s Pre-Flight both parse that line.
+2. **Part 2 — cross-cutting review and verdict.** Read the Stage 1–2 artifacts per the **Read set** in `agents/ceo.md` (that section bounds what the CEO opens; do not restate or widen it in the invocation), fill `.claude/cast/templates/CEO_REVIEW.md`, and save to `artifacts/milestone-{N}-{slug}/reviews/ceo.md` with the single `**Verdict**:` line — exactly one of **APPROVED**, **APPROVED WITH CONDITIONS**, or **REVISION REQUIRED**. This skill's revision handling and `/agent-code`'s Pre-Flight both parse that line.
 
-Input to pass: the milestone directory path, the template `templates/CEO_REVIEW.md`, and whether the risk lenses apply (scoping tests 3–4, with the reason). The CEO reads its own set — do not paste artifact bodies into the invocation; this is the most expensive stage in the pipeline and its read set is deliberately bounded.
+Input to pass: the milestone directory path, the template `.claude/cast/templates/CEO_REVIEW.md`, and whether the risk lenses apply (scoping tests 3–4, with the reason). The CEO reads its own set — do not paste artifact bodies into the invocation; this is the most expensive stage in the pipeline and its read set is deliberately bounded.
 
 **If REVISION REQUIRED** (read from the review's `**Verdict**:` line): the CEO's Revision Requests identify which agent owns each change. Re-run the affected stage with the revision notes, re-apply Stage 2c for corrected manifest rows, then re-launch the CEO — its re-review reads the diff and, when the architecture changed, re-runs its risk lenses against the changed sections before re-issuing the verdict (`agents/ceo.md` → Re-review). Planning does not advance until the CEO issues APPROVED or APPROVED WITH CONDITIONS. **Revision cap:** allow at most 3 revision cycles (one cycle = re-running the affected stages plus one CEO re-review). If the third cycle still ends in REVISION REQUIRED, stop the run and escalate to the user with a summary of the unresolved objections — do not keep looping.
 
-**After any approval-level verdict**, the orchestrator backfills — no agent launch. This is pure transcription from the CEO review (the same operation `/agent-code`'s Pre-Flight performs as a repair when it finds the table missing or stale): (a) copy the conditions into the **CEO Approval Conditions** table in the milestone README (`artifacts/milestone-{N}-{slug}/README.md`, table defined by `templates/MILESTONE_DEFINITION.md`) — one row per condition with its source and Status Open, or a single "None — verdict was APPROVED" row; (b) add a `../README.md § CEO Approval Conditions` row to the Context Manifest of every task file a condition names; and (c) set the README's Status to CEO-Approved. `/agent-code` reads the conditions from the README table (its Pre-Flight may still cross-check them against the CEO review); Coder tracks them during engineering and Reviewer and Product verify them on completion.
+**After any approval-level verdict**, the orchestrator backfills — no agent launch. This is pure transcription from the CEO review (the same operation `/agent-code`'s Pre-Flight performs as a repair when it finds the table missing or stale): (a) copy the conditions into the **CEO Approval Conditions** table in the milestone README (`artifacts/milestone-{N}-{slug}/README.md`, table defined by `.claude/cast/templates/MILESTONE_DEFINITION.md`) — one row per condition with its source and Status Open, or a single "None — verdict was APPROVED" row; (b) add a `../README.md § CEO Approval Conditions` row to the Context Manifest of every task file a condition names; and (c) set the README's Status to CEO-Approved. `/agent-code` reads the conditions from the README table (its Pre-Flight may still cross-check them against the CEO review); Coder tracks them during engineering and Reviewer and Product verify them on completion.
 
 ### Revision Handling
 
@@ -173,7 +180,7 @@ When an agent revises a file during a re-run of an earlier stage (for example, t
 
 **Revised design docs invalidate manifests.** A revision to `architecture.md`, `ui.md`, or a supplemental design doc can move or remove the section anchors that task-file Context Manifests cite — and a stale anchor silently defeats the minimal-context contract. On every such revision, the revising agent re-checks each of its returned manifest rows against the new document and returns corrected rows in its completion report; the orchestrator re-runs the Stage 2c application for the affected tasks before any downstream stage reads them.
 
-**Git is the revision record** — no hand-maintained revision tables; `git log --follow <path>` and `git diff` are what the CEO re-reviews against (`docs/FILE_CONVENTIONS.md` → Revisions).
+**Git is the revision record** — no hand-maintained revision tables; `git log --follow <path>` and `git diff` are what the CEO re-reviews against.
 
 ### Output
 
@@ -185,4 +192,4 @@ Summarize the run:
 4. CEO verdict and any Approval Conditions or Revision Requests.
 5. Next step — if the verdict is approval-level, the milestone is ready for `/agent-code`.
 
-Do NOT proceed to implementation. The planning stage ends with the CEO verdict. Do NOT write any artifact to `docs/`; that directory is reference-only.
+Do NOT proceed to implementation. The planning stage ends with the CEO verdict. Do NOT write any artifact into the project's own documentation locations (the source-map entries) — planning reads them; only Docs Writer, at engineering checkpoints, writes to the Documentation Home.

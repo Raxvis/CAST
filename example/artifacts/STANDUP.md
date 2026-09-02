@@ -10,7 +10,7 @@ This file serves as a lightweight continuity log. Before starting each session, 
 
 ## Entry Grammar
 
-This is the **single canonical format** for everything written to this file. All producers — `/agent-plan` stage checkpoints, `/agent-code` and `/agent-task` completion entries, the loop counters from `docs/PIPELINE_LOOP.md`, and the Docs Writer queue — use it.
+This is the **single canonical format** for everything written to this file. All producers — `/agent-plan` stage checkpoints, `/agent-code` and `/agent-task` completion entries, the loop counters from `.claude/cast/PIPELINE_LOOP.md`, and the Docs Writer queue — use it.
 
 **Session sections** are added newest-first at the top of the Log, headed:
 
@@ -31,7 +31,7 @@ where `<skill>` is the pipeline skill running (`agent-plan`, `agent-code`, or `a
 | Type | Meaning | Note format |
 |---|---|---|
 | `progress` | Work completed — a stage finished, a task validated, an artifact written | Free text; name the artifact path where applicable |
-| `loop` | Engineering-loop cycle counter (see `docs/PIPELINE_LOOP.md`) | `Task <id>: loop <k>/3` |
+| `loop` | Engineering-loop cycle counter (see `.claude/cast/PIPELINE_LOOP.md`) | `Task <id>: loop <k>/3` |
 | `docs` | Documentation work queued for Docs Writer | Free text naming the doc and the needed change |
 | `decision` | A decision worth surfacing beyond the agent's own Decisions Log | Free text |
 | `blocker` | A blocker encountered (or resolved) | Free text; name the blocking dependency or agent |
@@ -82,14 +82,14 @@ Entries under a session heading are appended in the order they happen (oldest fi
 
 ### 2026-04-08 — agent-plan — milestone-1-task-crud
 
-- product | progress | Stage 1 complete: `artifacts/milestone-1-task-crud/README.md` and five task files (`tasks/task-01…05-*.md`) written
+- product | progress | Stage 1 complete: sources resolved from `.claude/cast/SOURCES.md` (PRD/CONCEPT/GLOSSARY + `CLAUDE.md` conventions); `artifacts/milestone-1-task-crud/README.md` written with its Standards Digest, plus five task files (`tasks/task-01…05-*.md`)
 - architect | progress | Stage 2a complete: `artifacts/milestone-1-task-crud/architecture.md` — `src/db/`, `src/commands/`, `src/cli.ts` module layout and initial SQLite schema
 - architect | docs | docs/GLOSSARY.md needs entries for the migration runner, WAL mode, and `schema_version` ✅
 - ui | progress | Stage 2b complete: `artifacts/milestone-1-task-crud/ui.md` — every command surface, exit code, and error message
 - ui | docs | CLAUDE.md Domain-Specific Patterns needs the stdout/stderr and exit-code contract recorded ✅
 - ceo | progress | Stage 3 (risk lenses) complete: `artifacts/milestone-1-task-crud/reviews/risk.md` — security lens 1 High (SQL injection across command handlers) + 1 Low + 1 Informational; performance lens 2 Medium (missing index on `completed`, migration cost on every invocation) + 1 Informational. Both flags set Yes.
 - ceo | decision | Verdict: APPROVED WITH CONDITIONS — three conditions (parameterized SQL; WAL + index; migration on first invocation) in `artifacts/milestone-1-task-crud/reviews/ceo.md`; no revision requests
-- ceo | progress | Stage 4 complete: engineering may begin
+- ceo | progress | Stage 3 complete: engineering may begin
 
 ---
 

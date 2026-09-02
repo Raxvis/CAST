@@ -1,23 +1,4 @@
-<!-- TEMPLATE INSTRUCTIONS
-  FILE: TASKS.md
-  PURPOSE: One-off task BACKLOG for the project. /add-task queues small, self-contained
-           work here without running anything; /agent-task drains the queue (one entry,
-           or the whole backlog in backlog mode); /agent-plan Stage 1 reviews the open
-           entries and adopts the ones relevant to the milestone being planned. This file
-           is also the SINGLE CANONICAL definition of the backlog lifecycle and field
-           ownership — the skills reference these rules rather than restating them.
-           Entries here are queue entries, not task files: /agent-task instantiates
-           .claude/cast/templates/TASK.md at artifacts/one-off/task-{slug}.md when work starts.
-
-  HOW TO CUSTOMIZE:
-  - Replace [PROJECT_NAME] with your project name.
-  - Add one index row and one entry block per queued task; never remove rows — terminal
-    entries keep their row with a terminal status.
-  - Keep entries small. A description that needs headings, design decisions, or more
-    than a handful of lines is a sign the work belongs in /agent-plan, not this queue.
--->
-
-# [PROJECT_NAME] — One-Off Task Backlog
+# Acme Todo — One-Off Task Backlog
 
 Small, self-contained work — bug fixes, typos, single-function refactors, dependency bumps — queued by `/add-task` for later execution. Each entry is a queue entry, not a task file: when work starts, `/agent-task` creates the real task file at `artifacts/one-off/task-{slug}.md` from `.claude/cast/templates/TASK.md` and this index tracks where the entry went. Drain the queue with `/agent-task backlog` (all open entries) or `/agent-task TASK-XXX` (one entry); `/agent-plan` Stage 1 reviews open entries and adopts the ones relevant to the milestone it is planning.
 
@@ -69,4 +50,4 @@ _One block per queued task, newest last. `/agent-task` reads the entry block as 
 
 ---
 
-_Last updated: [YYYY-MM-DD]_
+_Last updated: 2026-04-08_

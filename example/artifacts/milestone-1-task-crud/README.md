@@ -140,6 +140,25 @@ See `reviews/ceo.md` for the full verdict.
 
 ---
 
+## Standards Digest
+
+Distilled at Stage 1 from the sources mapped in `.claude/cast/SOURCES.md` (Standards &
+Conventions → `CLAUDE.md`; Testing & Quality → `CLAUDE.md`, `docs/PRD.md` §7). Engineering
+stages read this table — never the sources — so every rule an implementer or reviewer
+needs for this milestone is stated here.
+
+| Rule | Applies to | Source |
+|---|---|---|
+| Strict TypeScript throughout — no `any`, explicit return types on exported functions | All tasks | `CLAUDE.md` § TypeScript Style Conventions |
+| camelCase for variables/functions/files; PascalCase for types; UPPER_SNAKE for module constants | All tasks | `CLAUDE.md` § TypeScript Style Conventions |
+| One file per subcommand under `src/commands/`; DB access only through `src/db/` | T-2 … T-5 | `CLAUDE.md` § Project Structure, § File Naming |
+| No new dependencies without an Architect Decisions Log entry (better-sqlite3 is the approved M1 addition) | All tasks | `CLAUDE.md` § Dependencies |
+| Errors print a one-line human message to stderr and exit non-zero — never a bare stack trace | T-2 … T-5 | `CLAUDE.md` § Common Pitfalls |
+| Every command has Vitest coverage for its happy path, empty case, and error path | All tasks | `CLAUDE.md` § Build & Test |
+| CRUD commands stay under the 100 ms budget at 1,000 tasks | T-1, T-3 | `docs/PRD.md` §7 (Performance) |
+
+---
+
 ## Estimated Effort
 
 | Task | Rough Size |

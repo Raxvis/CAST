@@ -8,6 +8,47 @@ The current template version is recorded in four synchronized locations: the roo
 
 ---
 
+## [4.0.0] — 2026-08-31
+
+**Breaking.** CAST ships no documentation. The 22-file `docs/` payload is gone; in its place, target projects **bring their own documentation** and a source map points the pipelines at it. The install footprint shrinks to `.claude/` (agents, skills, and the new `cast/` machinery) plus `artifacts/` — nothing CAST-shaped lands in the project's source tree, and CAST no longer owns any part of `CLAUDE.md` beyond one appended section.
+
+### Why this release exists
+
+v3 shipped a full documentation scaffold — PRD, conventions, topic guides, file-placement rules — and `/cast-init` spent most of its effort mapping a project's existing docs onto CAST's shapes. Real projects already have documentation systems, and forcing them through CAST's made the agent team less portable, not more. v4 inverts the relationship: **you state where your documentation, standards, and registers live; the pipelines read them there.** Planning distills what applies into each milestone's own artifacts, so plans are complete enough that engineering never reads your docs at all — the agents become highly portable and stop depending on CAST-installed infrastructure.
+
+### Added
+
+- **The source map — `.claude/cast/SOURCES.md`.** Six categories of user-owned locations (Standards & Conventions, Product & Requirements, Architecture & Design, Testing & Quality, Documentation Home, Project Registers), each a path/glob plus a one-line description. Written by `/cast-init` from a new **source-map interview** (discovery finds the candidates; you confirm, correct, or declare a category honestly empty), hand-editable, and verified by `/cast-doctor`. `_None declared._` is a valid answer — the pipelines then plan from code inspection and say so.
+- **The Standards Digest.** A new `(required, scales)` section of the milestone README: the distilled, source-cited rules that bind this milestone's work, written by Product at Stage 1 from the mapped standards and testing sources. Task Context Manifests now cite **milestone artifacts only** — the digest is how project standards reach engineering. One-off `/agent-task` work gets its own digest section in the task file, distilled by Pre-Flight.
+- **`/agent-plan` Source resolution.** Before Stage 1 the orchestrator resolves the source map to per-category file lists and passes each stage its sources (Product: requirements/standards/testing; Architect: architecture & design; UI: design systems). A new hard rule rides along: **plans are self-contained** — `/agent-code` never opens a mapped source, and a digest gap found during engineering is a planning defect routed through the task-amendment rule, never a license to browse.
+- **A deterministic installer — `scripts/install.sh`.** v4's fixed placement (agents → `.claude/agents/`, skills → `.claude/skills/`, machinery and templates → `.claude/cast/`, scaffold → `artifacts/`) means no LLM decides where files go: a bundled bash script performs the whole copy — substitution of the install-time tokens, the scaffolding strip (skeletons excepted), the CLAUDE.md section append, never overwriting an existing file (`--force` to override, `--no-ui` for the opt-out pair, `--dry-run` to preview). `/cast-init` Phase 5 runs it for every Create action and keeps only the judgment work (discovery, the source-map interview, migrations, merges); it also works standalone for a fully script-driven fresh install. It records `.claude/cast/install-manifest.txt` (per-file hashes plus the substitution values), and **`--upgrade` makes every future upgrade script-only**: byte-unmodified CAST files are replaced, new files added, obsolete unmodified ones removed, and the CLAUDE.md CAST section and stamp refreshed — while customized files are kept and reported for `/cast-init` to merge (the script never overwrites or deletes bytes it did not itself install). The one-time v3→v4 `/cast-init` migration writes the manifest, making it the last LLM-driven upgrade a project needs. CI runs install, customization retention, and upgrade end-to-end and asserts the results.
+
+### Changed
+
+- **`.claude/cast/` is the new home for CAST's machinery.** `PIPELINE_LOOP.md` and `STAGE_CONTRACT.md` (formerly `docs/`) and the ten document templates (formerly top-level `templates/`) install inside `.claude/` with the tooling. The stage contract adds the closed-read-set rule for sources; the docs-queue rule now names the Documentation Home.
+- **Docs Writer maintains *your* documentation.** It drains the `docs` queue into the Documentation Home mapped in the source map, matching that documentation's existing structure and style. With no Documentation Home declared it is never launched — pending entries surface to the user at each checkpoint instead.
+- **`/cast-doctor` trades the documentation diet for source-map medicine.** The v3 two-tier, Inference-Bar-gated pruning function is gone with the docs it pruned. In its place: five source-map checks (entries resolve, tables well-formed, reality drift, writable Documentation Home, staleness) alongside the structural/state catalog and slimmed coverage checks.
+- **`/cast-release` reads the changelog location from the source map's Project Registers** — with none declared it skips changelog work, says so, and includes the would-be entry in the release record.
+- **`CLAUDE.md` is the user's file.** `root/CLAUDE.md` collapses from a full parameterized project template to the single appendable CAST section (workflow summary, source-map pointer, artifacts conventions, version stamp). CAST adds no Memory Imports and never merges into user sections.
+- **`/cast-init` is rebuilt around the interview.** Discovery 1.3 finds where documentation actually lives instead of mapping it onto CAST docs; dispositions carry the `.claude/cast/` install rules and a v3→v4 migration table; execution installs `.claude/cast/` and appends the CLAUDE.md section; validation checks the source map resolves. Stale 8/15-agent counts in the references corrected to 7.
+- **The install-time placeholder set collapses** to `[PROJECT_NAME]`, `[TEST_CMD]`, `[BUILD_CMD]`, `[MAX_LOOP_COUNT]`, `[VERSIONING_SCHEME]`, and the auto-stamped `[CAST_VERSION]` — project context reaches agents through your own CLAUDE.md and the source map, not baked-in tokens. README's placeholder table and `validate.yml`'s token lints regenerate accordingly, and CI gains a v4 layout lint (template references only at `.claude/cast/templates/`, no CAST `docs/` citations, no work instances under the machinery).
+- **The example fixture demonstrates BYO docs**: `example/docs/` and the conventions in `example/CLAUDE.md` are the *project's own* documentation, `example/.claude/cast/SOURCES.md` maps them, and the M1 milestone README carries a real Standards Digest with per-rule citations; task manifests cite it instead of CAST docs.
+
+### Removed
+
+- **The entire `docs/` payload** (22 files): PRD, CONCEPT, GLOSSARY, DESIGN_RATIONALE, CODE_PATTERNS, FILE_CONVENTIONS, ERROR_HANDLING, TEST_FRAMEWORK, ASSETS, MVP_LAUNCH, ADDITIONAL, CHANGELOG, the four topic docs (FRONTEND/BACKEND/CLI/MOBILE), FIRST_RUN, CLAUDE_CODE_SETTINGS, MODEL_OPTIMIZATION, and docs/README. The two process contracts moved to `.claude/cast/`; everything else is replaced by the source map pointing at your own material. FIRST_RUN's smoke checklist folded into the `/cast-init` closing summary; MODEL_OPTIMIZATION's orchestration notes survive in the skills' Model Compatibility sections.
+- The top-level `templates/` install location (moved under `.claude/cast/templates/`), and the v3 CLAUDE.md Directory Conventions section and Memory Imports block.
+
+### Migration (v3 → v4)
+
+Re-run `/cast-init` after `npx skills update` (or `/plugin marketplace update`). The upgrade plan applies the governing rule — **content you wrote is yours and stays exactly where it is; content CAST shipped and nobody filled is clutter**:
+
+- Filled docs (a real PRD, populated conventions, a maintained changelog) are **preserved in place** and proposed as source-map entries; your existing `docs/` directory is the natural Documentation Home candidate.
+- Unfilled CAST skeletons and the CAST process docs are proposed as **Deletes** (itemized, requiring your approval; the contracts are reinstalled under `.claude/cast/`).
+- `templates/` is `git mv`'d to `.claude/cast/templates/`, preserving your customizations.
+- Your `CLAUDE.md` keeps every section you wrote; CAST's v3 Directory Conventions section, its `@docs/...` imports, and the old stamp are replaced by the one v4 section.
+- Documentation moves and deletes execute **before** `SOURCES.md` is written, so every map entry points at a post-migration path.
+
 ## [3.1.0] — 2026-08-31
 
 Individual tracking for user-found bugs, a one-off task backlog, and a planning stage that consumes both.

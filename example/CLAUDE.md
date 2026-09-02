@@ -202,55 +202,12 @@ Current dependencies (see `package.json`):
     types/       # Shared type declarations
   ```
 
-## Directory Conventions
+## CAST Agent Workflow
 
-The project uses a strict split between reference material, document templates, and work artifacts:
+Acme Todo uses the CAST staged agent team (https://github.com/Raxvis/CAST): `/agent-plan` plans a milestone (Product → Architecture + UI → CEO verdict), `/agent-code` implements it (Coder → Reviewer → validation), `/agent-task` runs small one-off work, `/file-bug` and `/add-task` capture bugs and backlog entries, and `/cast-doctor` / `/cast-release` maintain the install and prepare releases.
 
-- **`docs/`** - reference only: PRD, concept, glossary, conventions. Never
-  receives work artifacts.
-- **`templates/`** - reusable document skeletons (architecture, UI spec,
-  milestone files). Agents copy them into `artifacts/` as instances; never
-  filled in place.
-- **`artifacts/`** - all live work, grouped by milestone: each
-  `milestone-{N}-{slug}/` directory holds that milestone's README (definition),
-  `architecture.md`, `ui.md`, `reviews/`, one file per task under `tasks/`
-  (each with its Context Manifest and Handoff Log), and one file per bug under
-  `bugs/`. Cross-milestone state lives at the root: the bug index
-  (`artifacts/BUGS.md`), the rolling session log (`artifacts/STANDUP.md`), and
-  project state written by the orchestrator (`artifacts/AGENT_STATE.md`) —
-  no agent reads it. One-off
-  `/agent-task` work goes under `artifacts/one-off/`. Everything produced by
-  the pipelines lands here.
+- **CAST brings no documentation — this project's own docs drive it.** `.claude/cast/SOURCES.md` (the **source map**) records where the requirements, standards, architecture docs, testing guidance, documentation home, and registers live. Planning reads those sources and distills what applies into each milestone's own artifacts; engineering reads only the artifacts. Keep the source map current when documentation moves — `/cast-doctor` verifies it.
+- **`artifacts/`** holds all live work, grouped by milestone: each `milestone-{N}-{slug}/` directory carries that milestone's README (definition, Standards Digest, CEO conditions), design docs, reviews, per-task files, and per-bug files. Cross-milestone state sits at the root — the bug index (`artifacts/BUGS.md`), the one-off task backlog (`artifacts/TASKS.md`), the session log (`artifacts/STANDUP.md`), and the orchestrator's state tables (`artifacts/AGENT_STATE.md`). One-off `/agent-task` work goes under `artifacts/one-off/`.
+- **`.claude/cast/`** is CAST's machinery — the source map, the process contracts (`PIPELINE_LOOP.md`, `STAGE_CONTRACT.md`), and the document templates (`templates/`). Agents copy templates into `artifacts/` as instances; nothing under `.claude/cast/` is edited during work except the source map, by you or `/cast-doctor`.
 
-When in doubt, read `docs/FILE_CONVENTIONS.md` and `artifacts/README.md`.
-
-This structure and the agent workflow were installed by CAST
-(https://github.com/Raxvis/CAST).
-Adopted with CAST v3.0.0
-
-## Memory Imports
-
-These documents are loaded into Claude Code's context at every session start.
-They provide the baseline context all agents need. The list is kept lean —
-every import is paid in every session. The Directory Conventions section above
-already covers where files live; agents read the detailed reference docs on
-demand by path (the planning stage reads `docs/PRD.md` on demand regardless of
-whether it is imported here).
-
-<!-- Core context — keep this. In a real install the always-on core import is
-     a bare "@docs/CODE_PATTERNS.md" line; this fixture omits that doc for
-     brevity (see README.md → Deliberate Omissions), so the line is not active
-     here. For a CLI project like this one, the topic-specific import would be
-     "@docs/CLI.md" (also omitted from the fixture). -->
-
-<!-- docs/PRD.md ships as a placeholder skeleton and stays gated (import left
-     inert) until it contains real project content — importing a skeleton pays
-     for hundreds of placeholder lines per session. Acme Todo's PRD is
-     populated (v0.1.0, Approved), so its import is active: -->
-@docs/PRD.md
-
-<!-- On-demand reference — agents read these by path when a task calls for them
-     (coder/docs-writer: FILE_CONVENTIONS; coder/reviewer: ERROR_HANDLING; coder:
-     TEST_FRAMEWORK; navigation: docs/README.md, artifacts/README.md). Add an
-     import line ("@docs/FILE_CONVENTIONS.md", "@docs/ERROR_HANDLING.md") only
-     if sessions repeatedly need one unprompted. -->
+Adopted with CAST v4.0.0

@@ -29,11 +29,11 @@ HOW TO CUSTOMIZE:
 
 **Effort:** `high`.
 
-**Contract:** `docs/STAGE_CONTRACT.md` — read set, handoff format, reply format.
+**Contract:** `.claude/cast/STAGE_CONTRACT.md` — read set, handoff format, reply format.
 
 **Rules:**
 
-- **Anchor every visual rule to a named style-guide token with concrete values.** Never leave a visual decision to model defaults or to an adjective — "prominent", "subtle", and "clean" are not specifications. If the token does not exist yet, define it.
+- **Anchor every visual rule to a named style-guide token with concrete values.** Never leave a visual decision to model defaults or to an adjective — "prominent", "subtle", and "clean" are not specifications. Where your invocation names design-system or style-guide sources (`.claude/cast/SOURCES.md` → Architecture & Design), use their tokens; if the token does not exist yet, define it. Everything a task needs from those sources lands in *your* spec — engineering reads the spec, never the sources.
 - **On open-ended briefs, propose distinct directions before committing.** Two or three, differing in approach rather than in detail.
 - **Return a Manifest Rows block** in your report (below). The manifest — not the whole spec — is what engineering agents read.
 
@@ -47,9 +47,9 @@ You decide what the user sees and how it responds. You write no code and validat
 
 | Artifact | Template | Destination |
 |---|---|---|
-| Milestone UI specification | `templates/UI_SPEC.md` | `artifacts/milestone-{N}-{slug}/ui.md` |
-| Per-screen or per-component spec (when a milestone needs the depth) | `templates/UI_SPEC.md` | `artifacts/milestone-{N}-{slug}/ui-{slug}.md` |
-| Milestone UX review | `templates/UX_REVIEW.md` | `artifacts/milestone-{N}-{slug}/reviews/ux.md` |
+| Milestone UI specification | `.claude/cast/templates/UI_SPEC.md` | `artifacts/milestone-{N}-{slug}/ui.md` |
+| Per-screen or per-component spec (when a milestone needs the depth) | `.claude/cast/templates/UI_SPEC.md` | `artifacts/milestone-{N}-{slug}/ui-{slug}.md` |
+| Milestone UX review | `.claude/cast/templates/UX_REVIEW.md` | `artifacts/milestone-{N}-{slug}/reviews/ux.md` |
 
 Read the template **first** and follow its structure.
 
@@ -57,7 +57,7 @@ Read the template **first** and follow its structure.
 
 **Two things never scale** — they are the gate: the six interaction states (default, pressed, disabled, loading, error, empty) and the accessibility section.
 
-**For CLI projects**, `templates/UI_SPEC.md` is still the right template — adapt the visual-layout sections to terminal output: column alignment, exit codes, color usage, error message wording. See `docs/CLI.md`.
+**For CLI projects**, `.claude/cast/templates/UI_SPEC.md` is still the right template — adapt the visual-layout sections to terminal output: column alignment, exit codes, color usage, error message wording.
 
 ## The Manifest Rows block
 

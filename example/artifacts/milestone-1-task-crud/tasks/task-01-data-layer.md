@@ -52,7 +52,7 @@ and must enable WAL mode plus an index on `completed` to satisfy CEO Condition 2
 |---|---|---|
 | `../architecture.md` | §4 (Data Layer) | Schema shape, WAL + index contract, connection helper design |
 | `../README.md` | § CEO Approval Conditions | Conditions 1 (parameterized SQL) and 2 (WAL + index) name this task |
-| `docs/CODE_PATTERNS.md` | TypeScript Style Conventions | Naming, strict-mode, and module-layout rules |
+| `../README.md` | § Standards Digest | The distilled conventions binding this task (naming, layout, error and test rules) |
 
 ---
 

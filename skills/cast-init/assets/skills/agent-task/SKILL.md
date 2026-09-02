@@ -24,10 +24,11 @@ modules, new data schemas, or cross-cutting changes — those belong in /agent-p
 followed by /agent-code.
 
 All work artifacts (the one-off task file, bug files, progress log entries) are written
-to `artifacts/` — one-off work lives under `artifacts/one-off/`.
-Templates are read from `templates/`; guidelines are read from `docs/`. Never mix
-them: `docs/` and `templates/` are reference-only, `artifacts/` is where live work
-lives.
+to `artifacts/` — one-off work lives under `artifacts/one-off/`. Templates are read from
+`.claude/cast/templates/`; the project's own standards are read from the locations mapped
+in `.claude/cast/SOURCES.md` — by Pre-Flight only, which distills what applies into the
+task file's Standards Digest. The engineering stages read the task file, never the
+sources.
 
 HOW TO CUSTOMIZE:
 1. Replace [PROJECT_NAME] with your project name.
@@ -68,7 +69,7 @@ This skill explicitly does NOT invoke [architect](../../agents/architect.md), [u
 - Updating a dependency and its usages
 - Adding a flag or option that follows an existing pattern
 - Adding or updating tests for existing code
-- Small documentation corrections in `docs/` or `CLAUDE.md`
+- Small corrections to the project's own documentation or `CLAUDE.md`
 
 **Not a fit — use `/agent-plan` followed by `/agent-code` instead:**
 - Introducing a new module or file set
@@ -83,7 +84,7 @@ If in doubt, run `/agent-plan` first — for a small feature that needs a few de
 
 ## Model Compatibility
 
-Each stage runs on the model set in that agent's file (default: `inherit` — the session model). Invoke only the agents this pipeline names, exactly as written: keep the task to its stated description (out-of-scope discoveries go in the Handoff Log), honor the bail-out rule above instead of spawning planning agents ad hoc, and never fold a stage into direct work. Effort is per agent file (Coder `medium`, Reviewer `high`; raise Coder to `high` for a fix whose mechanism is not obvious — `xhigh` is rarely warranted for one-off work). Per-model profiles: `docs/MODEL_OPTIMIZATION.md`.
+Each stage runs on the model set in that agent's file (default: `inherit` — the session model). Invoke only the agents this pipeline names, exactly as written: keep the task to its stated description (out-of-scope discoveries go in the Handoff Log), honor the bail-out rule above instead of spawning planning agents ad hoc, and never fold a stage into direct work. Effort is per agent file (Coder `medium`, Reviewer `high`; raise Coder to `high` for a fix whose mechanism is not obvious — `xhigh` is rarely warranted for one-off work).
 
 ## Input
 
@@ -97,7 +98,7 @@ If no argument was provided, read the `artifacts/TASKS.md` index: when Open entr
 
 ## Instructions
 
-This skill orchestrates a mini engineering pipeline by executing the canonical engineering loop defined in `docs/PIPELINE_LOOP.md` — the same loop `/agent-code` runs — but skips the planning stage entirely. This file carries only the deltas specific to one-off tasks.
+This skill orchestrates a mini engineering pipeline by executing the canonical engineering loop defined in `.claude/cast/PIPELINE_LOOP.md` — the same loop `/agent-code` runs — but skips the planning stage entirely. This file carries only the deltas specific to one-off tasks.
 
 ### Backlog mode
 
@@ -114,7 +115,7 @@ When invoked as `/agent-task backlog` (or the user accepts the no-argument offer
 
 Before any work begins:
 
-1. Read only what Pre-Flight needs beyond what the session already has in context (root `CLAUDE.md` and its Memory Imports — do not re-read those): `docs/FILE_CONVENTIONS.md`, plus any applicable topic doc (`docs/FRONTEND.md` / `BACKEND.md` / `CLI.md` / `MOBILE.md`) not already imported. Stages run cold and see only what the task file's Context Manifest cites — so seed the manifest below with every convention doc the task needs; it is a stage's only route to one (rationale: `docs/DESIGN_RATIONALE.md` → "Memory Imports ship empty").
+1. Read `.claude/cast/SOURCES.md` and open only the Standards & Conventions (and, where the task touches tests, Testing & Quality) entries that bear on this task — resolve globs, skip categories left `_None declared._`, and tell the user about any entry that no longer resolves. Stages run cold and see only the task file — so what you read here must be **distilled into the task file's Standards Digest** below; it is a stage's only route to a project standard.
 2. If the invocation names a backlog entry (`TASK-XXX`), read its entry block in `artifacts/TASKS.md` — that block is the task description for every step below — and flip its index row to In Progress (see Backlog bookkeeping above). If the entry is not Open, stop and report its current status instead of re-running it.
 3. If the task description references a bug ID, look it up in the `artifacts/BUGS.md` index and read its per-bug file.
 4. Read any files named in the task description.
@@ -122,11 +123,11 @@ Before any work begins:
 
 ### Task File
 
-After Pre-Flight passes, create the one-off task file at `artifacts/one-off/task-{slug}.md` from `templates/TASK.md`: the task description becomes the Description and acceptance criteria; the Context Manifest lists exactly what Pre-Flight identified (the referenced bug file, the files named in the description, the applicable convention docs). Set the Header's Milestone field to "One-off — /agent-task". This file is the handoff medium for the loop below, exactly as in `/agent-code`.
+After Pre-Flight passes, create the one-off task file at `artifacts/one-off/task-{slug}.md` from `.claude/cast/templates/TASK.md`: the task description becomes the Description and acceptance criteria; the Context Manifest lists exactly what Pre-Flight identified (the referenced bug file, the files named in the description — milestone-free artifacts and code paths only, never a source-map location); and the **Standards Digest** section carries the rules Pre-Flight distilled from the mapped sources, each with its citation (omit the section, and note conventions come from adjacent code, when nothing mapped applies). Set the Header's Milestone field to "One-off — /agent-task". This file is the handoff medium for the loop below, exactly as in `/agent-code` — the stages read it, never the sources.
 
 ### The Loop
 
-Execute the engineering loop defined in `docs/PIPELINE_LOOP.md` — Coder → Reviewer (with the Defect and Issue routing) → validation — including its commit discipline, loop-counter rules, test-gate rule, and Environment Issue rule. That doc is yours, not a stage's; stages read `docs/STAGE_CONTRACT.md`. The loop doc is the single canonical statement of that sequence; do not improvise routing.
+Execute the engineering loop defined in `.claude/cast/PIPELINE_LOOP.md` — Coder → Reviewer (with the Defect and Issue routing) → validation — including its commit discipline, loop-counter rules, test-gate rule, and Environment Issue rule. That doc is yours, not a stage's; stages read `.claude/cast/STAGE_CONTRACT.md`. The loop doc is the single canonical statement of that sequence; do not improvise routing.
 
 Deltas specific to this skill:
 
@@ -149,7 +150,7 @@ After the task passes validation (Step 3a or 3b):
 1. If any commit landed after Coder's last full-suite run, run `[TEST_CMD]` once more to confirm everything still passes; otherwise skip it — the test-gate rule already required Coder's final pass to run the full suite, no stage after Coder modifies code, and the verbatim block in the Handoff Log is the record.
 2. Set the task file's Status to Complete in its Header.
 3. Append an entry to `artifacts/STANDUP.md` using that file's Entry Grammar: a session heading `### YYYY-MM-DD — agent-task — <task summary>` (if this run has not added one yet) and a `- <product|reviewer> | progress | <task summary, any bug ID resolved>` line — attributed to whichever stage closed the task.
-4. **Docs Writer (conditional).** Count the pending `docs` entries in `artifacts/STANDUP.md` (lines of the form `- <agent> | docs | <note>` without ✅ — see that file's Entry Grammar). If **one or more** are pending, invoke the **docs-writer** agent to drain them all (it marks each with ✅) — a one-off run has exactly one task, so this checkpoint is its only drain opportunity. If the queue is empty — the common case for a one-off task — launch nothing.
+4. **Docs Writer (conditional).** Count the pending `docs` entries in `artifacts/STANDUP.md` (lines of the form `- <agent> | docs | <note>` without ✅ — see that file's Entry Grammar). If **one or more** are pending and `.claude/cast/SOURCES.md` declares a Documentation Home, invoke the **docs-writer** agent to drain them all into it (it marks each with ✅) — a one-off run has exactly one task, so this checkpoint is its only drain opportunity. If the queue is empty — the common case for a one-off task — launch nothing; with entries pending but no Documentation Home declared, launch nothing either and surface the entries in the summary instead.
 5. If the task came from the `artifacts/TASKS.md` backlog, flip its index row `In Progress` → `Done` and fill the Resolution column with the task file path (see Backlog bookkeeping above).
 6. If the task resolved a filed bug, advance the per-bug file's status per the field-ownership table in `artifacts/BUGS.md` (which is canonical): Coder already set the status to **Fixed** at fix time, filling in the resolution fields (Commit, Files Changed, Regression Notes) — verify this happened and have Coder backfill it if not. Now that the suite is green and the task passed validation, **you (the orchestrator)** flip the status **Verified** → **Closed**, mirroring each change into the index row — a transcription of recorded facts, no agent launch.
 7. Summarize what changed, what tests were affected, and any follow-up items or deferred scope.
@@ -158,8 +159,8 @@ After the task passes validation (Step 3a or 3b):
 
 - If the task description is ambiguous enough that Coder cannot proceed without a design decision, stop and ask the user to clarify before continuing. Do not guess.
 - If the change turns out to touch more modules than initially expected, stop and re-apply the Pre-Flight scope check (step 5) — route to the right planning tier rather than finishing a large change inside a one-off task.
-- Loop-cap escalation (`[MAX_LOOP_COUNT]`) follows `docs/PIPELINE_LOOP.md`. On an Environment Issue, this skill escalates to the user directly and the user decides whether to continue.
+- Loop-cap escalation (`[MAX_LOOP_COUNT]`) follows `.claude/cast/PIPELINE_LOOP.md`. On an Environment Issue, this skill escalates to the user directly and the user decides whether to continue.
 
 ### Scope Boundaries
 
-`/agent-task` produces no planning artifacts (milestone definitions, architecture documents, UI specs, risk reviews, CEO verdicts — those are `/agent-plan`'s), writes nothing inside any `artifacts/milestone-{N}-{slug}/` directory (one-off work stays under `artifacts/one-off/`), and writes no work artifact to `docs/`. If the work needs any of those, the Pre-Flight scope check routes to `/agent-plan`.
+`/agent-task` produces no planning artifacts (milestone definitions, architecture documents, UI specs, risk reviews, CEO verdicts — those are `/agent-plan`'s), writes nothing inside any `artifacts/milestone-{N}-{slug}/` directory (one-off work stays under `artifacts/one-off/`), and writes no work artifact into the project's own documentation locations (Docs Writer alone updates the Documentation Home, at the completion checkpoint). If the work needs any of those, the Pre-Flight scope check routes to `/agent-plan`.
