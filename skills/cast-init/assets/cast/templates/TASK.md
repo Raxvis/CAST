@@ -85,7 +85,7 @@ _Expected to create or modify:_
 
 ## Context Manifest (required)
 
-_The complete read set for this task (`.claude/cast/STAGE_CONTRACT.md` §1). Cite sections, not whole files. **Milestone artifacts only** — never a source-map location: the project's standards reach this task through the Standards Digest (milestone README § Standards Digest, or this file's own Standards Digest for one-off tasks), distilled at planning time._
+_The complete read set for this task (`.claude/cast/STAGE_CONTRACT.md` §1). Cite sections, not whole files. **Milestone artifacts only** — never a source-map location: the project's standards reach this task through the Standards Digest (milestone README § Standards Digest, or this file's own Standards Digest for one-off tasks), distilled at planning time. The `../` rows below are milestone-shaped seeds: a one-off instance replaces the whole table with what `/agent-task` Pre-Flight identified — there is no milestone directory to point into._
 
 | Reference | Sections | Why |
 |---|---|---|
